@@ -64,7 +64,7 @@ class Round:
         # changing too because of the position of dealer changes with every round
         self.players = players
         # cards are an important part but makes in a round context only sense if shuffled
-        self.cards = []
+        self.cards = deepcopy(Deck.cards)
         # needed to know how many cards are dealed
         # same as number of turns in a round
         self.cards_per_player = len(self.cards) // len(self.players)
@@ -74,9 +74,8 @@ class Round:
 
     def shuffle(self):
         """
-        shuffle deck
+        shuffle cards
         """
-        self.cards = deepcopy(Deck.cards)
         shuffle(self.cards)
 
     def deal(self):
