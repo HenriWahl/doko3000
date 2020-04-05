@@ -13,6 +13,8 @@ from flask import Flask,\
 from flask_bootstrap import Bootstrap
 from flask_socketio import SocketIO
 
+from game import test_session
+
 # initalize app
 app = Flask(__name__)
 # to be given by environment variable
@@ -42,12 +44,12 @@ def handle_my_custom_even(json, methods=['GET', 'POST']):
     socketio.emit('my response', json, callback=message_received)
 
 
-# https://flask.palletsprojects.com/en/1.1.x/patterns/favicon/
 @app.route('/favicon.ico')
 def favicon():
     return send_file(FAVICON,
                      mimetype='image/vnd.microsoft.icon')
 
+test_session()
 
 if __name__ == '__main__':
     socketio.run(app,
