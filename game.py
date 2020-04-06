@@ -1,7 +1,8 @@
+# game logic part of doko3000
+
 from copy import deepcopy
 from random import seed,\
                    shuffle
-
 
 class Card:
     """
@@ -92,9 +93,11 @@ class Session:
     """
     Definition of a session
     """
-    def __init__(self):
+    def __init__(self, name):
         # ID
         identity = 0
+        # what session?
+        self.name = name
         # who plays?
         self.players = {}
         # how are the players seated?
@@ -120,12 +123,32 @@ class Session:
         self.current_round = Round(current_players)
 
 
-# very important for game
-seed()
+class Game:
+    """
+    organizes sessions
+    """
+    def __init__(self):
+        # very important for game - some randomness
+        seed()
+        # store sessions
+        self.sessions = {}
+
+    def add_session(self, name):
+        """
+        adds a new session
+        """
+        self.sessions[name] = Session(name)
+
+    def has_sessions(self):
+        if len(self.sessions) == 0:
+            return False
+        else:
+            return True
+
 
 
 def test_session():
-    session = Session()
+    session = Session('test')
     for name in ('Albert', 'Bernd', 'Christoph', 'David', 'Ernie'):
         player = Player(name)
         session.add_player(player)
@@ -133,6 +156,19 @@ def test_session():
 
     session.add_round()
 
-    print(session.current_round.cards)
+    print()
+
+
+game = Game()
+
+
+def test_game():
+    game.add_session('test')
+    for name in ('Albert', 'Bernd', 'Christoph', 'David', 'Ernie'):
+        player = Player(name)
+        game.sessions['test'].add_player(player)
+    game.sessions['test'].order = ['Bernd', 'Christoph', 'Albert', 'Ernie', 'David']
+
+    game.sessions['test'].add_round()
 
     print()

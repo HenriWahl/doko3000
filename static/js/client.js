@@ -8,3 +8,8 @@ socket.on('connect', function () {
 socket.on('my response', function(msg) {
     console.log(msg.data)
 })
+
+socket.on('session_available', function(msg) {
+    console.log('yo')
+    console.log(msg.data)
+})

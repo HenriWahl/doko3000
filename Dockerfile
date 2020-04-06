@@ -6,8 +6,7 @@ RUN apt -y update &&\
 
 RUN pip install --upgrade pip
 
-RUN pip install eventlet \
-                flask \
-                flask-socketio \
-                https://github.com/HenriWahl/bootstrap-flask/archive/master.zip
+RUN pip install eventlet\
+                flask\
+                flask-socketio
 
