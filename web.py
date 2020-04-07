@@ -18,23 +18,15 @@ app.config['SECRET_KEY'] = 'dummykey'
 socketio = SocketIO(app,
                     path='/doko3000')
 
-# to be set later by socketio.start_background_task()
-message_thread = Thread()
-message_thread_stopped = Event()
-
-def message_processor():
-    while not message_thread_stopped.is_set():
-        socketio.emit('thread_test', {'data': time.time()})
-        print('emit')
-        socketio.sleep(1)
-
-
 class Web:
     """
     bundles all web-related stuff
     """
-
     def __init__(self):
+        # to be set later by socketio.start_background_task()
+        self.message_thread = Thread()
+        self.message_thread_stopped = Event()
+
         @socketio.on('my event')
         def handle_my_custom_event(json, methods=['GET', 'POST']):
             print(f'received event: {json}')
@@ -42,18 +34,23 @@ class Web:
 
         @socketio.on('connect')
         def connect():
-            global message_thread
             if game.has_sessions():
                 socketio.emit('session_available', {'data': 456})
                 print(request.sid)
             else:
                 socketio.emit('no session', None)
-            if not message_thread.is_alive():
-                message_thread = socketio.start_background_task(message_processor)
+            if not self.message_thread.is_alive():
+                self.message_thread = socketio.start_background_task(self.message_processor)
 
         @app.route('/')
         def index():
             return render_template('index.html')
+
+    def message_processor(self):
+        while not self.message_thread_stopped.is_set():
+            socketio.emit('thread_test', {'data': time.time()})
+            print('emit')
+            socketio.sleep(1)
 
 
 
