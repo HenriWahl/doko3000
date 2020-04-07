@@ -9,8 +9,7 @@ from game import test_game
 
 from web import app,\
                 socketio,\
-                Web
-web = Web()
+                web
 
 test_game()
 

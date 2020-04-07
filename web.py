@@ -52,6 +52,5 @@ class Web:
             print('emit')
             socketio.sleep(1)
 
-
-
+web = Web()
 
