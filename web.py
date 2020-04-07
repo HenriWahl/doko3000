@@ -1,6 +1,7 @@
 # web interface part of doko3000
-
-import json
+import time
+from threading import Event,\
+                      Thread
 
 from flask import Flask,\
                   render_template,\
@@ -17,27 +18,43 @@ app.config['SECRET_KEY'] = 'dummykey'
 socketio = SocketIO(app,
                     path='/doko3000')
 
-# extend by socket.io
-socketio = SocketIO(app,
-                    path='/doko3000')
+# to be set later by socketio.start_background_task()
+message_thread = Thread()
+message_thread_stopped = Event()
 
-def message_received(methods=['GET', 'POST']):
-    print('message received')
+def message_processor():
+    while not message_thread_stopped.is_set():
+        socketio.emit('thread_test', {'data': time.time()})
+        print('emit')
+        socketio.sleep(1)
 
-@socketio.on('my event')
-def handle_my_custom_event(json, methods=['GET', 'POST']):
-    print(f'received event: {json}')
-    socketio.emit('my response', json, callback=message_received)
 
-@socketio.on('connect')
-def connect():
-    if game.has_sessions():
-        socketio.emit('session_available', {'data': 456})
-        print(request.sid)
-    else:
-        socketio.emit('no session', None)
+class Web:
+    """
+    bundles all web-related stuff
+    """
 
-@app.route('/')
-def index():
-    return render_template('index.html')
+    def __init__(self):
+        @socketio.on('my event')
+        def handle_my_custom_event(json, methods=['GET', 'POST']):
+            print(f'received event: {json}')
+            socketio.emit('my response', json)
+
+        @socketio.on('connect')
+        def connect():
+            global message_thread
+            if game.has_sessions():
+                socketio.emit('session_available', {'data': 456})
+                print(request.sid)
+            else:
+                socketio.emit('no session', None)
+            if not message_thread.is_alive():
+                message_thread = socketio.start_background_task(message_processor)
+
+        @app.route('/')
+        def index():
+            return render_template('index.html')
+
+
+
 

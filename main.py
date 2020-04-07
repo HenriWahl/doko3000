@@ -8,7 +8,9 @@
 from game import test_game
 
 from web import app,\
-                socketio
+                socketio,\
+                Web
+web = Web()
 
 test_game()
 
