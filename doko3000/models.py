@@ -32,13 +32,18 @@ class User(UserMixin, db.Model):
         return check_password_hash(self.password_hash, password)
 
 
+# initialize database
+db.create_all()
+db.session.commit()
+
 @login.user_loader
 def load_user(id):
     return User.query.get(int(id))
 
 
 def test_models():
-    user = User(name='test')
-    user.set_password('test')
-    db.session.add(user)
-    db.session.commit()
+    if User.query.filter_by(name='test').first() is None:
+        user = User(name='test')
+        user.set_password('test')
+        db.session.add(user)
+        db.session.commit()
