@@ -6,9 +6,9 @@ from threading import Event,\
 from flask import render_template,\
                   request
 
-from app import app,\
+from doko3000 import app,\
                 socketio
-from app.game import game
+from doko3000.game import game
 
 # to be set later by socketio.start_background_task()
 message_thread = Thread()
