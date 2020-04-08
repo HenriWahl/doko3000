@@ -5,10 +5,10 @@
 # Attempt to play good ol' Doppelkopf online
 #
 
-from game import test_game
-from web import app,\
-                socketio,\
-                web
+from app.game import test_game
+
+from app import app,\
+                socketio
 
 test_game()
 
