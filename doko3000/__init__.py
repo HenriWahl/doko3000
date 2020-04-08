@@ -1,6 +1,5 @@
-from flask import Flask,\
-                  render_template,\
-                  request
+from flask import Flask
+from flask_login import LoginManager
 from flask_socketio import SocketIO
 from flask_sqlalchemy import SQLAlchemy
 
@@ -10,6 +9,7 @@ from doko3000.config import Config
 app = Flask(__name__)
 app.config.from_object(Config)
 db = SQLAlchemy(app)
+login = LoginManager(app)
 # extend by socket.io
 socketio = SocketIO(app,
                     path='/doko3000')
