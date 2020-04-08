@@ -6,7 +6,6 @@
 #
 
 from game import test_game
-
 from web import app,\
                 socketio,\
                 web

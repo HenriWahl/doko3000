@@ -8,5 +8,6 @@ RUN pip install --upgrade pip
 
 RUN pip install eventlet\
                 flask\
+                flask-sqlalchemy\
                 flask-socketio
 

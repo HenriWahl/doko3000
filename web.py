@@ -8,12 +8,14 @@ from flask import Flask,\
                   request
 from flask_socketio import SocketIO
 
+from config import Config
 from game import game
 
 # initalize app
 app = Flask(__name__)
 # to be given by environment variable
-app.config['SECRET_KEY'] = 'dummykey'
+#app.config['SECRET_KEY'] = 'dummykey'
+app.config.from_object(Config)
 # extend by socket.io
 socketio = SocketIO(app,
                     path='/doko3000')
