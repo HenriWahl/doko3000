@@ -10,14 +10,14 @@ from doko3000 import db,\
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(64), index=True, unique=True)
+    username = db.Column(db.String(64), index=True, unique=True)
     password_hash = db.Column(db.String(128))
 
     def __repr__(self):
         """
         representation
         """
-        return f'<User {self.name}'
+        return f'<User {self.username}'
 
     def set_password(self, password):
         """
@@ -36,14 +36,15 @@ class User(UserMixin, db.Model):
 db.create_all()
 db.session.commit()
 
+
 @login.user_loader
 def load_user(id):
     return User.query.get(int(id))
 
 
 def test_models():
-    if User.query.filter_by(name='test').first() is None:
-        user = User(name='test')
+    if User.query.filter_by(username='test').first() is None:
+        user = User(username='test')
         user.set_password('test')
         db.session.add(user)
         db.session.commit()

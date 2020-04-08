@@ -3,11 +3,13 @@ import time
 from threading import Event,\
                       Thread
 
-from flask import render_template,\
+from flask import redirect,\
+                  render_template,\
                   request
+from flask_login import current_user
 
 from doko3000 import app,\
-                socketio
+                     socketio
 from doko3000.game import game
 
 # to be set later by socketio.start_background_task()
@@ -32,8 +34,15 @@ def connect():
     if not message_thread.is_alive():
         message_thread = socketio.start_background_task(message_processor)
 
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if current_user.is_authenticated:
+        return redirect('/')
+    else:
+        return render_template('login.html')
 
-@app.route('/')
+
+@app.route('/', methods=['GET', 'POST'])
 def index():
     return render_template('index.html')
 
