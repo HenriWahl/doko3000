@@ -149,10 +149,10 @@ class Game:
 
 def test_session():
     session = Session('test')
-    for name in ('Albert', 'Bernd', 'Christoph', 'David', 'Ernie'):
+    for name in ('test1', 'test2', 'test3', 'test4', 'test5'):
         player = Player(name)
         session.add_player(player)
-    session.order = ['Bernd', 'Christoph', 'Albert', 'Ernie', 'David']
+    session.order = ['test3', 'test1', 'test5', 'test2', 'test4']
 
     session.add_round()
 

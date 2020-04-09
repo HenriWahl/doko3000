@@ -10,7 +10,7 @@ $(document).ready(function () {
         socket.emit('whoami')
     })
 
-    socket.on('you-are-what-you-is', function(msg) {
+    socket.on('you-are-what-you-is', function (msg) {
         console.log(msg.username)
         username = msg.username
     })
@@ -29,4 +29,16 @@ $(document).ready(function () {
         console.log(msg.data)
         console.log(username)
     })
+
+    socket.on('button-pressed-by-user', function (msg) {
+        console.log(msg.username)
+    })
+
+    $(document).on('click', '#testbutton', function () {
+        console.log('testbutton')
+        socket.emit('button-pressed', {button: 'testbutton'})
+    })
+
+
+
 })

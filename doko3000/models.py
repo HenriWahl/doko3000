@@ -31,11 +31,14 @@ class User(UserMixin, db.Model):
         """
         return check_password_hash(self.password_hash, password)
 
-
-# # initialize database
-# db.create_all()
-# db.session.commit()
-
+# no database model but an object too
+class BroadcastMessage:
+    """
+    broadcast message for socket.io
+    """
+    def __init__(self, name, content):
+        self.name = name
+        self.content = content
 
 @login.user_loader
 def load_user(id):
