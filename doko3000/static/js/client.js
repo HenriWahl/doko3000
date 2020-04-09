@@ -4,6 +4,8 @@ $(document).ready(function () {
     socket.on('connect', function () {
         socket.emit('my event',
             {data: 'I\'m connected!'})
+
+        socket.emit('whoami')
     })
 
     socket.on('my response', function (msg) {

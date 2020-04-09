@@ -1,6 +1,5 @@
 from flask import Flask
 from flask_login import LoginManager
-from flask_session import Session
 from flask_socketio import SocketIO
 from flask_sqlalchemy import SQLAlchemy
 
@@ -13,9 +12,6 @@ app.config.from_object(Config)
 db = SQLAlchemy(app)
 db.create_all()
 db.session.commit()
-# sessions
-session = Session(app)
-session.app.session_interface.db.create_all()
 # login
 login = LoginManager(app)
 login.login_view = 'login'

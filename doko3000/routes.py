@@ -1,7 +1,8 @@
-# web interface part of doko3000
-import time
+# routes for web interface part of doko3000
+from functools import wraps
 from threading import Event,\
                       Thread
+import time
 
 from flask import flash,\
                   redirect,\
@@ -12,6 +13,7 @@ from flask_login import current_user,\
                         login_required,\
                         login_user,\
                         logout_user
+from flask_socketio import disconnect
 
 from doko3000 import app,\
                      socketio
@@ -24,7 +26,6 @@ from doko3000.models import User
 message_thread = Thread()
 message_thread_stopped = Event()
 
-
 @socketio.on('my event')
 def handle_my_custom_event(json, methods=['GET', 'POST']):
     print(f'received event: {json}')
@@ -34,13 +35,20 @@ def handle_my_custom_event(json, methods=['GET', 'POST']):
 @socketio.on('connect')
 def connect():
     global message_thread
+    print(current_user)
     if game.has_sessions():
         socketio.emit('session_available', {'data': 456})
         print(request.sid)
     else:
         socketio.emit('no session', None)
-    if not message_thread.is_alive():
+
+    if current_user.is_authenticated and not message_thread.is_alive():
         message_thread = socketio.start_background_task(message_processor)
+
+@socketio.on('whoami')
+def whoami():
+    print(current_user)
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
