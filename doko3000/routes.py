@@ -1,8 +1,4 @@
 # routes for web interface part of doko3000
-from queue import Queue
-from threading import Event, \
-    Thread
-import time
 
 from flask import flash, \
     redirect, \
@@ -13,20 +9,12 @@ from flask_login import current_user, \
     login_required, \
     login_user, \
     logout_user
-from flask_socketio import emit
 
 from doko3000 import app, \
                      socketio
 from doko3000.forms import Login
 from doko3000.game import game
-from doko3000.models import BroadcastMessage, \
-    User
-
-# everything needed for a broadcast mechanism
-broadcast_thread = Thread()
-broadcast_thread_stopped = Event()
-broadcast_queue = Queue()
-
+from doko3000.models import User
 
 @socketio.on('my event')
 def handle_my_custom_event(json, methods=['GET', 'POST']):
@@ -44,9 +32,6 @@ def connect():
     else:
         socketio.emit('no session', None)
 
-    # if current_user.is_authenticated and not broadcast_thread.is_alive():
-    #     broadcast_thread = socketio.start_background_task(broadcast_sender, broadcast_queue)
-
 
 @socketio.on('whoami')
 def whoami():
@@ -57,8 +42,7 @@ def whoami():
 @socketio.on('button-pressed')
 def button_pressed(data):
     print('testbutton', current_user)
-    # broadcast_queue.put(BroadcastMessage('testbutton', {'username': current_user.username}))
-    emit('button-pressed-by-user', {'username': current_user.username}, broadcast=True )
+    socketio.emit('button-pressed-by-user', {'username': current_user.username}, broadcast=True )
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -90,11 +74,3 @@ def index():
     return render_template('index.html',
                            title='doko3000')
 
-
-def broadcast_sender(broadcast_queue):
-    # while not broadcast_thread_stopped.is_set():
-    while True:
-        message = broadcast_queue.get()
-        print(message)
-        socketio.emit(message.name, message.content)
-    print('what?')
