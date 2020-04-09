@@ -3,8 +3,13 @@ let myname = ''
 $(document).ready(function () {
     const socket = io({path: '/doko3000'})
 
-    // dragula([$('#hand'), $('#table')])
-    dragula([document.querySelector('#hand'), document.querySelector('#table')]);
+    let dragging = dragula([document.querySelector('#hand'), document.querySelector('#table')]);
+
+    dragging.on('drop', function(el) {
+        console.log(el.id)
+        console.log(el.parentNode.id)
+        socket.emit('played-card', {card: el.id, username: myname})
+    })
 
     socket.on('connect', function () {
         socket.emit('my event',
@@ -43,6 +48,16 @@ $(document).ready(function () {
             console.log(msg.username, 'testbutton')
         }
     })
+
+        socket.on('played-card-by-user', function (msg) {
+        console.log(msg)
+        console.log('myname:', myname)
+        console.log(myname, msg.username, myname != msg.username)
+        if (myname != msg.username) {
+            console.log(msg.username, msg.card)
+        }
+    })
+
 
     $(document).on('click', '#testbutton', function () {
         console.log('testbutton')

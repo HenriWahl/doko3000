@@ -44,6 +44,12 @@ def button_pressed(data):
     print('testbutton', current_user)
     socketio.emit('button-pressed-by-user', {'username': current_user.username}, broadcast=True )
 
+@socketio.on('played-card')
+def button_pressed(data):
+    print('played-card', current_user)
+    socketio.emit('played-card-by-user', {'username': data['username'], 'card': data['card']}, broadcast=True )
+
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = Login()
