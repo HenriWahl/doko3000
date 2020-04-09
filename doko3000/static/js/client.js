@@ -1,3 +1,5 @@
+let username = ''
+
 $(document).ready(function () {
     const socket = io({path: '/doko3000'})
 
@@ -6,6 +8,11 @@ $(document).ready(function () {
             {data: 'I\'m connected!'})
 
         socket.emit('whoami')
+    })
+
+    socket.on('you-are-what-you-is', function(msg) {
+        console.log(msg.username)
+        username = msg.username
     })
 
     socket.on('my response', function (msg) {
@@ -20,5 +27,6 @@ $(document).ready(function () {
     socket.on('thread_test', function (msg) {
         console.log('yolo')
         console.log(msg.data)
+        console.log(username)
     })
 })

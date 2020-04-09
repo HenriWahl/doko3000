@@ -13,7 +13,6 @@ from flask_login import current_user,\
                         login_required,\
                         login_user,\
                         logout_user
-from flask_socketio import disconnect
 
 from doko3000 import app,\
                      socketio
@@ -47,7 +46,8 @@ def connect():
 
 @socketio.on('whoami')
 def whoami():
-    print(current_user)
+    print('whoami', current_user)
+    socketio.emit('you-are-what-you-is', {'username': current_user.username})
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -83,5 +83,5 @@ def index():
 def message_processor():
     while not message_thread_stopped.is_set():
         socketio.emit('thread_test', {'data': time.time()})
-        print('emit')
+        #print('emit')
         socketio.sleep(1)
