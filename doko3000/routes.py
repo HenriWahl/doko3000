@@ -3,14 +3,22 @@ import time
 from threading import Event,\
                       Thread
 
-from flask import redirect,\
+from flask import flash,\
+                  redirect,\
                   render_template,\
-                  request
-from flask_login import current_user
+                  request,\
+                  url_for
+from flask_login import current_user,\
+                        login_required,\
+                        login_user,\
+                        logout_user
 
 from doko3000 import app,\
                      socketio
+from doko3000.forms import Login
 from doko3000.game import game
+from doko3000.models import User
+
 
 # to be set later by socketio.start_background_task()
 message_thread = Thread()
@@ -36,15 +44,32 @@ def connect():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    if current_user.is_authenticated:
-        return redirect('/')
-    else:
-        return render_template('login.html')
+    form = Login()
+    if form.validate_on_submit():
+        user = User.query.filter_by(username=form.username.data).first()
+        if user is None or not user.check_password(form.password.data):
+            flash('Unknown user or wrong password :-(')
+            return redirect(url_for('login'))
+        login_user(user)
+        return redirect(url_for('index'))
+
+    print(current_user, current_user.is_authenticated)
+
+    return render_template('login.html',
+                           title='doko3000 Login',
+                           form=form)
+
+@app.route('/logout')
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
 
 
 @app.route('/', methods=['GET', 'POST'])
+@login_required
 def index():
-    return render_template('index.html')
+    return render_template('index.html',
+                           title='doko3000')
 
 
 def message_processor():

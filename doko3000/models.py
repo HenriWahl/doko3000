@@ -17,7 +17,7 @@ class User(UserMixin, db.Model):
         """
         representation
         """
-        return f'<User {self.username}'
+        return f'<User {self.username}>'
 
     def set_password(self, password):
         """
@@ -43,8 +43,9 @@ def load_user(id):
 
 
 def test_models():
-    if User.query.filter_by(username='test').first() is None:
-        user = User(username='test')
-        user.set_password('test')
-        db.session.add(user)
-        db.session.commit()
+    for test_user in ('test1', 'test2'):
+        if User.query.filter_by(username=test_user).first() is None:
+            user = User(username=test_user)
+            user.set_password(test_user)
+            db.session.add(user)
+            db.session.commit()

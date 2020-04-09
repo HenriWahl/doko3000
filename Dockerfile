@@ -10,5 +10,6 @@ RUN pip install eventlet\
                 flask\
                 flask-login\
                 flask-sqlalchemy\
-                flask-socketio
+                flask-socketio\
+                flask-wtf
 
