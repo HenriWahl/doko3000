@@ -1,9 +1,23 @@
 {% extends "base.html" %}
 
 {% block custom_content %}
-<a href="{{ url_for('login') }}">login</a>
-<a href="{{ url_for('logout') }}">logout</a>
+    <a href="{{ url_for('login') }}">login</a>
+    <a href="{{ url_for('logout') }}">logout</a>
     {{ current_user.username }}
     <p>
-    <button id="testbutton" type="button" class="btn btn-info">Testbutton</button>
+        <button id="testbutton" type="button" class="btn btn-info">Testbutton</button>
+    <div class="row">
+        <div class="col-md-12 w-100 h-75 bg-success container" id="table">
+            Tisch
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 w-100 h-25 bg-danger container" id="hand">
+            Hand
+            <div class="card">
+                <div class="card-body">Basic card</div>
+            </div>
+
+        </div>
+    </div>
 {% endblock custom_content %}

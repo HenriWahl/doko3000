@@ -38,7 +38,7 @@ def load_user(id):
 
 
 def test_models():
-    for test_user in ('test1', 'test2'):
+    for test_user in ('test1', 'test2', 'test3', 'test4', 'test5'):
         if User.query.filter_by(username=test_user).first() is None:
             user = User(username=test_user)
             user.set_password(test_user)

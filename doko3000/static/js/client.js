@@ -3,6 +3,9 @@ let myname = ''
 $(document).ready(function () {
     const socket = io({path: '/doko3000'})
 
+    // dragula([$('#hand'), $('#table')])
+    dragula([document.querySelector('#hand'), document.querySelector('#table')]);
+
     socket.on('connect', function () {
         socket.emit('my event',
             {data: 'I\'m connected!'})
