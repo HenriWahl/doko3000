@@ -3,4 +3,5 @@
 {% block custom_content %}
 <a href="{{ url_for('login') }}">login</a>
 <a href="{{ url_for('logout') }}">logout</a>
+    {{ current_user.username }}
 {% endblock custom_content %}
