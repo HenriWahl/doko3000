@@ -32,6 +32,10 @@ class User(UserMixin, db.Model):
         return check_password_hash(self.password_hash, password)
 
 
+# # initialize database - has to be done here
+db.create_all()
+db.session.commit()
+
 @login.user_loader
 def load_user(id):
     return User.query.get(int(id))

@@ -10,8 +10,6 @@ app = Flask(__name__)
 app.config.from_object(Config)
 # initialize database
 db = SQLAlchemy(app)
-db.create_all()
-db.session.commit()
 # login
 login = LoginManager(app)
 login.login_view = 'login'
