@@ -1,20 +1,22 @@
 # routes for web interface part of doko3000
 
-from flask import flash, \
-    redirect, \
-    render_template, \
-    request, \
-    url_for
-from flask_login import current_user, \
-    login_required, \
-    login_user, \
-    logout_user
+from flask import flash,\
+                  redirect,\
+                  render_template,\
+                  request,\
+                  url_for
+from flask_login import AnonymousUserMixin,\
+                        current_user,\
+                        login_required,\
+                        login_user,\
+                        logout_user
 
 from doko3000 import app, \
                      socketio
 from doko3000.forms import Login
 from doko3000.game import game
 from doko3000.models import User
+
 
 @socketio.on('my event')
 def handle_my_custom_event(json, methods=['GET', 'POST']):
@@ -36,7 +38,8 @@ def connect():
 @socketio.on('whoami')
 def whoami():
     print('whoami', current_user)
-    socketio.emit('you-are-what-you-is', {'username': current_user.username})
+    if not current_user.is_anonymous:
+        socketio.emit('you-are-what-you-is', {'username': current_user.username})
 
 
 @socketio.on('button-pressed')
@@ -46,7 +49,7 @@ def button_pressed(data):
 
 @socketio.on('played-card')
 def button_pressed(data):
-    print('played-card', current_user)
+    print('played-card', current_user, data['card'])
     socketio.emit('played-card-by-user', {'username': data['username'], 'card': data['card']}, broadcast=True )
 
 

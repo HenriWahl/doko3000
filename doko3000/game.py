@@ -164,10 +164,10 @@ game = Game()
 
 def test_game():
     game.add_session('test')
-    for name in ('Albert', 'Bernd', 'Christoph', 'David', 'Ernie'):
+    for name in ('test1', 'test2', 'test3', 'test4', 'test5'):
         player = Player(name)
         game.sessions['test'].add_player(player)
-    game.sessions['test'].order = ['Bernd', 'Christoph', 'Albert', 'Ernie', 'David']
+    game.sessions['test'].order = ['test1', 'test2', 'test3', 'test4', 'test5']
 
     game.sessions['test'].add_round()
 

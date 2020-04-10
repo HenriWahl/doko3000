@@ -55,6 +55,7 @@ $(document).ready(function () {
         console.log(myname, msg.username, myname != msg.username)
         if (myname != msg.username) {
             console.log(msg.username, msg.card)
+            $('#table').append($('#' + msg.card))
         }
     })
 
