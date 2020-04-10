@@ -5,11 +5,11 @@
     <a href="{{ url_for('logout') }}">logout</a>
     {{ current_user.username }}
     <p>
-        <button id="new_session" type="button" class="btn btn-info">Neue Session</button>
+        <button id="new_table" type="button" class="btn btn-info">Neuer Tisch</button>
     <p></p>
-    Laufende Sessions:
-    <div class="list-group" id="available_sessions">
-        {% include 'available_sessions.html' %}
+    Tische:
+    <div class="list-group" id="available_tables">
+        {% include 'available_tables.html' %}
     </div>
     {#    <div class="row">#}
     {#        <div class="col-md-12 w-100 h-75 bg-success container" id="table">#}

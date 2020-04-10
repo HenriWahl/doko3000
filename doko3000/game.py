@@ -42,7 +42,7 @@ class Deck:
 
 class Player:
     """
-    one single player in a session
+    one single player on a table
     """
     def __init__(self, name):
         # Name of player
@@ -89,14 +89,14 @@ class Round:
                 player.get_card(self.cards.pop())
 
 
-class Session:
+class Table:
     """
-    Definition of a session
+    Definition of a table
     """
     def __init__(self, name):
         # ID
         identity = 0
-        # what session?
+        # what table?
         self.name = name
         # who plays?
         self.players = {}
@@ -127,42 +127,43 @@ class Session:
 
 class Game:
     """
-    organizes sessions
+    organizes tables
     """
     def __init__(self):
         # very important for game - some randomness
         seed()
-        # store sessions
-        self.sessions = {}
+        # store tables
+        self.tables = {}
 
-    def add_session(self, name):
+    def add_table(self, name):
         """
-        adds a new session
+        adds a new table
         """
-        self.sessions[name] = Session(name)
+        self.tables[name] = Table(name)
 
-    def has_sessions(self):
-        if len(self.sessions) == 0:
+    def has_tables(self):
+        if len(self.tables) == 0:
             return False
         else:
             return True
 
-    def get_sessions(self):
-        return self.sessions.values()
+    def get_tables(self):
+        return self.tables.values()
 
-    def get_sessions_names(self):
-        return list(self.sessions.keys())
+    def get_tables_names(self):
+        return list(self.tables.keys())
+
 
 game = Game()
 
 
 def test_game():
-    game.add_session('test')
+    game.add_table('test')
     for name in ('test1', 'test2', 'test3', 'test4', 'test5'):
         player = Player(name)
-        game.sessions['test'].add_player(player)
-    game.sessions['test'].order = ['test1', 'test2', 'test3', 'test4', 'test5']
+        game.tables['test'].add_player(player)
+    game.tables['test'].order = ['test1', 'test2', 'test3', 'test4', 'test5']
 
-    game.sessions['test'].add_round()
+    game.tables['test'].add_round()
 
     print()

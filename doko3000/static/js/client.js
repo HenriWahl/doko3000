@@ -29,7 +29,7 @@ $(document).ready(function () {
         console.log(msg.data)
     })
 
-    socket.on('session_available', function (msg) {
+    socket.on('table_available', function (msg) {
         console.log('yo')
         console.log(msg.data)
     })
@@ -40,14 +40,14 @@ $(document).ready(function () {
         console.log(myname)
     })
 
-    socket.on('new-session-available', function (msg) {
+    socket.on('new-table-available', function (msg) {
         console.log(msg)
         console.log('myname:', myname)
         console.log(myname, msg.username, myname != msg.username)
         if (myname != msg.username) {
             console.log(msg.username, 'testbutton')
         }
-        $('#available_sessions').html(msg.html)
+        $('#available_tables').html(msg.html)
     })
 
         socket.on('played-card-by-user', function (msg) {
@@ -61,10 +61,16 @@ $(document).ready(function () {
     })
 
 
-    $(document).on('click', '#new_session', function () {
-        console.log('new session')
-        socket.emit('new-session', {button: 'new_session'})
+    $(document).on('click', '#new_table', function () {
+        console.log('new table')
+        socket.emit('new-table', {button: 'new_table'})
     })
 
+    $(document).on('click', '.list-item-table', function () {
+        console.log(this)
+        console.log($(this).data('table'))
+        socket.emit('enter-table', {username: myname,
+                                    table: $(this).data('table')})
+    })
 
 })

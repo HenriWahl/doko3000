@@ -28,11 +28,11 @@ def handle_my_custom_event(json, methods=['GET', 'POST']):
 def connect():
     global broadcast_queue, broadcast_thread
     print(current_user)
-    if game.has_sessions():
-        socketio.emit('session_available', {'data': 456})
+    if game.has_tables():
+        socketio.emit('table_available', {'data': 456})
         print(request.sid)
     else:
-        socketio.emit('no session', None)
+        socketio.emit('no table', None)
 
 
 @socketio.on('whoami')
@@ -42,24 +42,30 @@ def whoami():
         socketio.emit('you-are-what-you-is', {'username': current_user.username})
 
 
-@socketio.on('new-session')
-def new_session(data):
-    print('new_session', current_user)
-    game.add_session('test')
-    game.sessions['test'].add_player(current_user.username)
-    socketio.emit('new-session-available',
-                  {'sessions': game.get_sessions_names(),
+@socketio.on('new-table')
+def new_table(msg):
+    print('new_table', current_user)
+    game.add_table('test')
+    game.tables['test'].add_player(current_user.username)
+    socketio.emit('new-table-available',
+                  {'tables': game.get_tables_names(),
                    'username': current_user.username,
-                   'html': render_template('available_sessions.html',
-                                           sessions=game.get_sessions())},
+                   'html': render_template('available_tables.html',
+                                           tables=game.get_tables())},
                   broadcast=True)
 
 
 @socketio.on('played-card')
-def button_pressed(data):
-    print('played-card', current_user, data['card'])
-    socketio.emit('played-card-by-user', {'username': data['username'], 'card': data['card']}, broadcast=True)
+def button_pressed(msg):
+    print('played-card', current_user, msg['card'])
+    socketio.emit('played-card-by-user', {'username': msg['username'], 'card': msg['card']}, broadcast=True)
 
+@socketio.on('enter-table')
+def enter_table(msg):
+    print(msg)
+    if msg['table'] in game.tables:
+        if not msg['username'] in game.tables[msg['table']].players:
+            game.tables[msg['table']].add_player(msg['username'])
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -89,5 +95,18 @@ def logout():
 @login_required
 def index():
     return render_template('index.html',
-                           sessions=game.get_sessions(),
+                           tables=game.get_tables(),
+                           title='doko3000')
+
+@app.route('/table/<table>')
+@login_required
+def table(table=''):
+    if table in game.tables and\
+       current_user.username in game.tables[table].players:
+        print('user in table')
+        return render_template('table.html',
+                               title=f'doko3000 {table}',
+                               table=game.tables[table])
+    return render_template('index.html',
+                           tables=game.tables,
                            title='doko3000')
