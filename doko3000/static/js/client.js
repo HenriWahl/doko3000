@@ -40,13 +40,14 @@ $(document).ready(function () {
         console.log(myname)
     })
 
-    socket.on('button-pressed-by-user', function (msg) {
+    socket.on('new-session-available', function (msg) {
         console.log(msg)
         console.log('myname:', myname)
         console.log(myname, msg.username, myname != msg.username)
         if (myname != msg.username) {
             console.log(msg.username, 'testbutton')
         }
+        $('#available_sessions').html(msg.html)
     })
 
         socket.on('played-card-by-user', function (msg) {
@@ -60,9 +61,9 @@ $(document).ready(function () {
     })
 
 
-    $(document).on('click', '#testbutton', function () {
-        console.log('testbutton')
-        socket.emit('button-pressed', {button: 'testbutton'})
+    $(document).on('click', '#new_session', function () {
+        console.log('new session')
+        socket.emit('new-session', {button: 'new_session'})
     })
 
 

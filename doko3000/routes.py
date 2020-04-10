@@ -1,18 +1,18 @@
 # routes for web interface part of doko3000
 
-from flask import flash,\
-                  redirect,\
-                  render_template,\
-                  request,\
-                  url_for
-from flask_login import AnonymousUserMixin,\
-                        current_user,\
-                        login_required,\
-                        login_user,\
-                        logout_user
+from flask import flash, \
+    redirect, \
+    render_template, \
+    request, \
+    url_for
+from flask_login import AnonymousUserMixin, \
+    current_user, \
+    login_required, \
+    login_user, \
+    logout_user
 
 from doko3000 import app, \
-                     socketio
+    socketio
 from doko3000.forms import Login
 from doko3000.game import game
 from doko3000.models import User
@@ -42,15 +42,23 @@ def whoami():
         socketio.emit('you-are-what-you-is', {'username': current_user.username})
 
 
-@socketio.on('button-pressed')
-def button_pressed(data):
-    print('testbutton', current_user)
-    socketio.emit('button-pressed-by-user', {'username': current_user.username}, broadcast=True )
+@socketio.on('new-session')
+def new_session(data):
+    print('new_session', current_user)
+    game.add_session('test')
+    game.sessions['test'].add_player(current_user.username)
+    socketio.emit('new-session-available',
+                  {'sessions': game.get_sessions_names(),
+                   'username': current_user.username,
+                   'html': render_template('available_sessions.html',
+                                           sessions=game.get_sessions())},
+                  broadcast=True)
+
 
 @socketio.on('played-card')
 def button_pressed(data):
     print('played-card', current_user, data['card'])
-    socketio.emit('played-card-by-user', {'username': data['username'], 'card': data['card']}, broadcast=True )
+    socketio.emit('played-card-by-user', {'username': data['username'], 'card': data['card']}, broadcast=True)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -81,5 +89,5 @@ def logout():
 @login_required
 def index():
     return render_template('index.html',
+                           sessions=game.get_sessions(),
                            title='doko3000')
-

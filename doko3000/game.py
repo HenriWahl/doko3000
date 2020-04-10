@@ -111,6 +111,8 @@ class Session:
         """
         adding just one player to the party
         """
+        if type(player) is str:
+            player = Player(player)
         self.players[player.name] = player
 
     def add_round(self):
@@ -145,19 +147,11 @@ class Game:
         else:
             return True
 
+    def get_sessions(self):
+        return self.sessions.values()
 
-
-def test_session():
-    session = Session('test')
-    for name in ('test1', 'test2', 'test3', 'test4', 'test5'):
-        player = Player(name)
-        session.add_player(player)
-    session.order = ['test3', 'test1', 'test5', 'test2', 'test4']
-
-    session.add_round()
-
-    print()
-
+    def get_sessions_names(self):
+        return list(self.sessions.keys())
 
 game = Game()
 
