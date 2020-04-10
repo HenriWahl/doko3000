@@ -1,7 +1,7 @@
 let myname = ''
 
 $(document).ready(function () {
-    const socket = io({path: '/doko3000'})
+    const socket = io({path: '/doko3000/socketio'})
 
     let dragging = dragula([document.querySelector('#hand'), document.querySelector('#table')]);
 
