@@ -83,7 +83,7 @@ class Round:
         """
         deal cards
         """
-        for player in self.players:
+        for player in self.players.values():
             for card in range(self.cards_per_player):
                 # cards are given to players so the can be .pop()ed
                 player.get_card(self.cards.pop())
@@ -91,7 +91,7 @@ class Round:
 
 class Table:
     """
-    Definition of a table
+    Definition of a table used by group of players
     """
     def __init__(self, name):
         # ID
@@ -119,9 +119,10 @@ class Table:
         """
         only 4 players can play at once - find out who and start a new round
         """
-        current_players = []
+        # since Python 3.6 or 3.7 dicts are ordered
+        current_players = {}
         for name in self.order[:4]:
-            current_players.append(self.players[name])
+            current_players[name] = self.players[name]
         self.current_round = Round(current_players)
 
 

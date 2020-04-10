@@ -10,6 +10,7 @@ from flask_login import AnonymousUserMixin, \
     login_required, \
     login_user, \
     logout_user
+from flask_socketio import join_room
 
 from doko3000 import app, \
     socketio
@@ -45,12 +46,12 @@ def whoami():
 @socketio.on('new-table')
 def new_table(msg):
     print('new_table', current_user)
-    game.add_table('test')
-    game.tables['test'].add_player(current_user.username)
+    game.add_table('test2')
+    game.tables['test2'].add_player(current_user.username)
     socketio.emit('new-table-available',
                   {'tables': game.get_tables_names(),
                    'username': current_user.username,
-                   'html': render_template('available_tables.html',
+                   'html': render_template('list_tables.html',
                                            tables=game.get_tables())},
                   broadcast=True)
 
@@ -66,6 +67,24 @@ def enter_table(msg):
     if msg['table'] in game.tables:
         if not msg['username'] in game.tables[msg['table']].players:
             game.tables[msg['table']].add_player(msg['username'])
+
+@socketio.on('deal-cards')
+def deal_cards(msg):
+    table = game.tables[msg['table']]
+    table.add_round()
+    print(table.current_round)
+    socketio.emit('grab-your-cards', {'table': table.name})
+
+
+@socketio.on('my-cards-please')
+def deal_cards_to_player(msg):
+    username = msg['username']
+    if username == current_user.username and\
+        msg['table'] in game.tables:
+        table = game.tables[msg['table']]
+        if username in table.current_round.players:
+            print(table.current_round.players[username].cards)
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():

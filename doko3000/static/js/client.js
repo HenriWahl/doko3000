@@ -1,14 +1,14 @@
-let myname = ''
+let username = ''
 
 $(document).ready(function () {
     const socket = io({path: '/doko3000/socketio'})
 
     let dragging = dragula([document.querySelector('#hand'), document.querySelector('#table')]);
 
-    dragging.on('drop', function(el) {
+    dragging.on('drop', function (el) {
         console.log(el.id)
         console.log(el.parentNode.id)
-        socket.emit('played-card', {card: el.id, username: myname})
+        socket.emit('played-card', {card: el.id, username: username})
     })
 
     socket.on('connect', function () {
@@ -19,47 +19,37 @@ $(document).ready(function () {
     })
 
     socket.on('you-are-what-you-is', function (msg) {
-        if (myname == '') {
-            myname = msg.username
-            console.log(myname)
+        if (username == '') {
+            username = msg.username
+            console.log(username)
         }
-    })
-
-    socket.on('my response', function (msg) {
-        console.log(msg.data)
-    })
-
-    socket.on('table_available', function (msg) {
-        console.log('yo')
-        console.log(msg.data)
-    })
-
-    socket.on('thread_test', function (msg) {
-        console.log('yolo')
-        console.log(msg.data)
-        console.log(myname)
     })
 
     socket.on('new-table-available', function (msg) {
         console.log(msg)
-        console.log('myname:', myname)
-        console.log(myname, msg.username, myname != msg.username)
-        if (myname != msg.username) {
+        console.log('username:', username)
+        console.log(username, msg.username, username != msg.username)
+        if (username != msg.username) {
             console.log(msg.username, 'testbutton')
         }
-        $('#available_tables').html(msg.html)
+        $('#list_tables').html(msg.html)
     })
 
-        socket.on('played-card-by-user', function (msg) {
+    socket.on('played-card-by-user', function (msg) {
         console.log(msg)
-        console.log('myname:', myname)
-        console.log(myname, msg.username, myname != msg.username)
-        if (myname != msg.username) {
+        console.log('username:', username)
+        console.log(username, msg.username, username != msg.username)
+        if (username != msg.username) {
             console.log(msg.username, msg.card)
             $('#table').append($('#' + msg.card))
         }
     })
 
+    socket.on('grab-your-cards', function (msg) {
+        console.log(msg)
+        socket.emit('my-cards-please', {username: username,
+                                        table: msg.table})
+    })
 
     $(document).on('click', '#new_table', function () {
         console.log('new table')
@@ -69,8 +59,17 @@ $(document).ready(function () {
     $(document).on('click', '.list-item-table', function () {
         console.log(this)
         console.log($(this).data('table'))
-        socket.emit('enter-table', {username: myname,
-                                    table: $(this).data('table')})
+        socket.emit('enter-table', {
+            username: username,
+            table: $(this).data('table')
+        })
     })
+
+    $(document).on('click', '#deal_cards', function () {
+        console.log('deal cards')
+        socket.emit('deal-cards', {username: username,
+                                   table: $(this).data('table')})
+    })
+
 
 })
