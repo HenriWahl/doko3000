@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block custom_content %}
+    <a href="{{ url_for('login') }}">login</a>
+    <a href="{{ url_for('logout') }}">logout</a>
+    {{ current_user.username }}
+
+    <p></p>
+    <button id="deal_cards" type="button" class="btn btn-info" data-table="{{ table.name }}">Karten Geben</button>
+    <p></p>
+
+    <div class="row">
+        <div class="col-md-12 w-100 h-75 bg-success container" id="table">
+            Tisch
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 w-100 h-25 bg-danger container" id="hand">
+            Hand
+            <div class="card" id="card1">
+                <div class="card-body">card1</div>
+            </div>
+            <div class="card" id="card2">
+                <div class="card-body">card2</div>
+            </div>
+            <div class="card" id="card3">
+                <div class="card-body">card3</div>
+            </div>
+        </div>
+    </div>
+{% endblock custom_content %}

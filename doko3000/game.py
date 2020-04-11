@@ -42,7 +42,7 @@ class Deck:
 
 class Player:
     """
-    one single player in a session
+    one single player on a table
     """
     def __init__(self, name):
         # Name of player
@@ -83,20 +83,20 @@ class Round:
         """
         deal cards
         """
-        for player in self.players:
+        for player in self.players.values():
             for card in range(self.cards_per_player):
                 # cards are given to players so the can be .pop()ed
                 player.get_card(self.cards.pop())
 
 
-class Session:
+class Table:
     """
-    Definition of a session
+    Definition of a table used by group of players
     """
     def __init__(self, name):
         # ID
         identity = 0
-        # what session?
+        # what table?
         self.name = name
         # who plays?
         self.players = {}
@@ -111,64 +111,60 @@ class Session:
         """
         adding just one player to the party
         """
+        if type(player) is str:
+            player = Player(player)
         self.players[player.name] = player
 
     def add_round(self):
         """
         only 4 players can play at once - find out who and start a new round
         """
-        current_players = []
+        # since Python 3.6 or 3.7 dicts are ordered
+        current_players = {}
         for name in self.order[:4]:
-            current_players.append(self.players[name])
+            current_players[name] = self.players[name]
         self.current_round = Round(current_players)
 
 
 class Game:
     """
-    organizes sessions
+    organizes tables
     """
     def __init__(self):
         # very important for game - some randomness
         seed()
-        # store sessions
-        self.sessions = {}
+        # store tables
+        self.tables = {}
 
-    def add_session(self, name):
+    def add_table(self, name):
         """
-        adds a new session
+        adds a new table
         """
-        self.sessions[name] = Session(name)
+        self.tables[name] = Table(name)
 
-    def has_sessions(self):
-        if len(self.sessions) == 0:
+    def has_tables(self):
+        if len(self.tables) == 0:
             return False
         else:
             return True
 
+    def get_tables(self):
+        return self.tables.values()
 
-
-def test_session():
-    session = Session('test')
-    for name in ('Albert', 'Bernd', 'Christoph', 'David', 'Ernie'):
-        player = Player(name)
-        session.add_player(player)
-    session.order = ['Bernd', 'Christoph', 'Albert', 'Ernie', 'David']
-
-    session.add_round()
-
-    print()
+    def get_tables_names(self):
+        return list(self.tables.keys())
 
 
 game = Game()
 
 
 def test_game():
-    game.add_session('test')
-    for name in ('Albert', 'Bernd', 'Christoph', 'David', 'Ernie'):
+    game.add_table('test')
+    for name in ('test1', 'test2', 'test3', 'test4', 'test5'):
         player = Player(name)
-        game.sessions['test'].add_player(player)
-    game.sessions['test'].order = ['Bernd', 'Christoph', 'Albert', 'Ernie', 'David']
+        game.tables['test'].add_player(player)
+    game.tables['test'].order = ['test1', 'test2', 'test3', 'test4', 'test5']
 
-    game.sessions['test'].add_round()
+    game.tables['test'].add_round()
 
     print()

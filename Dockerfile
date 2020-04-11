@@ -13,3 +13,12 @@ RUN pip install eventlet\
                 flask-socketio\
                 flask-wtf
 
+COPY ./ /doko3000
+
+WORKDIR /doko3000
+
+RUN mkdir data
+
+EXPOSE 5000
+
+CMD python3 main.py

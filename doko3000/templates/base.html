@@ -4,47 +4,51 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     {% block head %}
-    <link rel="icon" type="image/ico" href="{{url_for('static', filename='favicon.ico')}}">
-    <title>
-    {% block title %}
-    doko3000
-    {% endblock title %}
-    </title>
-    {% block styles %}
-    <link rel="stylesheet" href="{{url_for('static', filename='css/bootstrap.min.css')}}">
-    {% endblock styles %}
+        <link rel="icon" type="image/ico" href="{{ url_for('static', filename='favicon.ico') }}">
+        <title>
+            {% block title %}
+                {{ title }}
+            {% endblock title %}
+        </title>
+        {% block styles %}
+            <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+            <link rel="stylesheet" href="{{ url_for('static', filename='css/dragula.min.css') }}">
+        {% endblock styles %}
     {% endblock head %}
 </head>
 <body>
 
 {% block content %}
-<div class="container" id="content">
-    {% block custom_content %}
-    {% endblock custom_content %}
-</div>
+    <div class="container" id="content">
+        {% block custom_content %}
+        {% endblock custom_content %}
+    </div>
 
-<div id="modal_dialog" class="modal fade">
-    <div class="modal-dialog modal-lg shadow">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title" id="modal_title">Modal Header</h4>
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-            </div>
-            <div id="message_boxes">
-            </div>
-            <div class="modal-body" id="modal_body">
-                <p>Dummy content.</p>
+    <div id="modal_dialog" class="modal fade">
+        <div class="modal-dialog modal-lg shadow">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="modal_title">Modal Header</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div id="message_boxes">
+                </div>
+                <div class="modal-body" id="modal_body">
+                    <p>Dummy content.</p>
+                </div>
             </div>
         </div>
     </div>
-</div>
 {% endblock content %}
 
 {% block scripts %}
-<script type="text/javascript" src="{{url_for('static', filename='js/jquery.3.4.1.min.js')}}"></script>
-<script type="text/javascript" src="{{url_for('static', filename='js/bootstrap.bundle.min.js')}}"></script>
-<script type="text/javascript" src="{{url_for('static', filename='js/socket.io.js')}}"></script>
-<script type="text/javascript" src="{{url_for('static', filename='js/client.js')}}"></script>
+    <!-- 3rd party stuff -->
+    <script type="text/javascript" src="{{ url_for('static', filename='js/jquery.3.4.1.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/dragula.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/socket.io.js') }}"></script>
+    <!-- doko3000 stuff -->
+    <script type="text/javascript" src="{{ url_for('static', filename='js/client.js') }}"></script>
 {% endblock scripts %}
 
 </body>
