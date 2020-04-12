@@ -1,8 +1,8 @@
 # game logic part of doko3000
 
-from copy import deepcopy
 from random import seed,\
                    shuffle
+
 
 class Card:
     """
@@ -74,6 +74,21 @@ class Player:
     #     print(len(self.cards))
     #     return cards_as_dict
 
+
+class Moves:
+    """
+    contains all players and cards of moves - always 4
+    2 synchronized lists, players and cards, should be enough to be indexed
+    """
+    def __init__(self):
+        self.players = []
+        self.cards = []
+
+    def add_move(self, player, card):
+        self.players.append(player)
+        self.cards.append(card)
+
+
 class Round:
     """
     one round
@@ -85,8 +100,10 @@ class Round:
         # cards are an important part but makes in a round context only sense if shuffled
         self.cards = list(Deck.cards.values())
         # needed to know how many cards are dealed
-        # same as number of turns in a round
+        # same as number of moves in a round
         self.cards_per_player = len(self.cards) // len(self.players)
+        # collection of turns per round - its number should not exceed cards_per_player
+        self.moves = []
         # first shuffling, then dealing
         self.shuffle()
         self.deal()
@@ -107,6 +124,11 @@ class Round:
                 # cards are given to players so the can be .pop()ed
                 player.add_card(self.cards.pop())
 
+    def add_move(self, player, card):
+        """
+        adds one more move
+        """
+        pass
 
 class Table:
     """
