@@ -5,10 +5,13 @@ $(document).ready(function () {
 
     let dragging = dragula([document.querySelector('#hand'), document.querySelector('#table')]);
 
-    dragging.on('drop', function (el) {
-        console.log(el.id)
-        console.log(el.parentNode.id)
-        socket.emit('played-card', {card: el.id, username: username})
+    dragging.on('drop', function (card) {
+        console.log(card.id)
+        console.log(card.parentNode.id)
+        console.log($(card).data('name'))
+        socket.emit('played-card', {username: username,
+                                    card_id: $(card).data('id'),
+                                    card_name: $(card).data('name')})
     })
 
     socket.on('connect', function () {
@@ -40,8 +43,8 @@ $(document).ready(function () {
         console.log('username:', username)
         console.log(username, msg.username, username != msg.username)
         if (username != msg.username) {
-            console.log(msg.username, msg.card)
-            $('#table').append($('#' + msg.card))
+            console.log(msg.username, msg.html)
+            $('#table').append(msg.html)
         }
     })
 
@@ -55,6 +58,9 @@ $(document).ready(function () {
     socket.on('your-cards-please', function (msg) {
         console.log('response to your-cards-please')
         console.log(msg)
+        $('#table').html('Tisch')
+        $('#hand').html(msg.html)
+
     })
 
     $(document).on('click', '#new_table', function () {

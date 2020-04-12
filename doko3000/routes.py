@@ -15,7 +15,8 @@ from flask_socketio import join_room
 from doko3000 import app, \
     socketio
 from doko3000.forms import Login
-from doko3000.game import game
+from doko3000.game import Deck,\
+                          game
 from doko3000.models import User
 
 
@@ -49,8 +50,14 @@ def new_table(msg):
 
 @socketio.on('played-card')
 def button_pressed(msg):
-    print('played-card', current_user, msg['card'])
-    socketio.emit('played-card-by-user', {'username': msg['username'], 'card': msg['card']}, broadcast=True)
+    print('played-card', current_user, msg['card_id'], msg['card_name'])
+    card_id = msg['card_id']
+    socketio.emit('played-card-by-user', {'username': msg['username'],
+                                          'card_id': card_id,
+                                          'card_name': msg['card_name'],
+                                          'html': render_template('card.html',
+                                                                  card=Deck.cards[card_id])},
+                  broadcast=True)
 
 
 @socketio.on('enter-table')
@@ -61,6 +68,7 @@ def enter_table(msg):
     if table in game.tables:
         if not username in game.tables[table].players:
             game.tables[table].add_player(username)
+
 
 @socketio.on('deal-cards')
 def deal_cards(msg):
@@ -73,15 +81,16 @@ def deal_cards(msg):
 @socketio.on('my-cards-please')
 def deal_cards_to_player(msg):
     username = msg['username']
-    if username == current_user.username and\
-       msg['table'] in game.tables:
+    if username == current_user.username and \
+            msg['table'] in game.tables:
         print(msg)
         table = game.tables[msg['table']]
         if username in table.current_round.players:
             # print(table.current_round.players[username].cards)
-            cards = table.current_round.players[username].get_cards_as_dict()
+            cards = table.current_round.players[username].cards
             socketio.emit('your-cards-please', {'username': username,
-                                                'cards': cards},
+                                                'html': render_template('cards_hand.html',
+                                                                        cards=cards)},
                           room=request.sid)
 
 
@@ -116,11 +125,12 @@ def index():
                            tables=game.get_tables(),
                            title='doko3000')
 
+
 @app.route('/table/<table>')
 @login_required
 def table(table=''):
-    if table in game.tables and\
-       current_user.username in game.tables[table].players:
+    if table in game.tables and \
+            current_user.username in game.tables[table].players:
         print('user in table')
         return render_template('table.html',
                                title=f'doko3000 {table}',

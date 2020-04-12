@@ -36,7 +36,7 @@ class Deck:
              'König':4,
              'Ass':11}
     NUMBER = 2 # Doppelkopf :-)!
-    cards = []
+    cards = {}
 
     # counter for card IDs in deck
     card_id = 0
@@ -44,7 +44,7 @@ class Deck:
     for number in range(NUMBER):
         for symbol in SYMBOLS:
             for rank in RANKS.items():
-                cards.append(Card(symbol, rank, card_id))
+                cards[card_id] = Card(symbol, rank, card_id)
                 card_id += 1
 
 
@@ -66,13 +66,13 @@ class Player:
     def remove_all_cards(self):
         self.cards = []
 
-    def get_cards_as_dict(self):
-        cards_as_dict = {}
-        for card in self.cards:
-            print(card.name, card.id)
-            cards_as_dict[card.id] = card.name
-        print(len(self.cards))
-        return cards_as_dict
+    # def get_cards_as_dict(self):
+    #     cards_as_dict = {}
+    #     for card in self.cards:
+    #         print(card.name, card.id)
+    #         cards_as_dict[card.id] = card.name
+    #     print(len(self.cards))
+    #     return cards_as_dict
 
 class Round:
     """
@@ -83,7 +83,7 @@ class Round:
         # changing too because of the position of dealer changes with every round
         self.players = players
         # cards are an important part but makes in a round context only sense if shuffled
-        self.cards = deepcopy(Deck.cards)
+        self.cards = list(Deck.cards.values())
         # needed to know how many cards are dealed
         # same as number of turns in a round
         self.cards_per_player = len(self.cards) // len(self.players)
