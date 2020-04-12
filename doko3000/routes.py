@@ -25,22 +25,13 @@ def handle_my_custom_event(json, methods=['GET', 'POST']):
     socketio.emit('my response', json)
 
 
-@socketio.on('connect')
-def connect():
-    global broadcast_queue, broadcast_thread
-    print(current_user)
-    if game.has_tables():
-        socketio.emit('table_available', {'data': 456})
-        print(request.sid)
-    else:
-        socketio.emit('no table', None)
-
-
 @socketio.on('whoami')
 def whoami():
     print('whoami', current_user)
     if not current_user.is_anonymous:
-        socketio.emit('you-are-what-you-is', {'username': current_user.username})
+        socketio.emit('you-are-what-you-is',
+                      {'username': current_user.username},
+                      room=request.sid)
 
 
 @socketio.on('new-table')
@@ -83,13 +74,15 @@ def deal_cards(msg):
 def deal_cards_to_player(msg):
     username = msg['username']
     if username == current_user.username and\
-        msg['table'] in game.tables:
+       msg['table'] in game.tables:
+        print(msg)
         table = game.tables[msg['table']]
         if username in table.current_round.players:
             # print(table.current_round.players[username].cards)
             cards = table.current_round.players[username].get_cards_as_dict()
             socketio.emit('your-cards-please', {'username': username,
-                                                'cards': cards})
+                                                'cards': cards},
+                          room=request.sid)
 
 
 @app.route('/login', methods=['GET', 'POST'])

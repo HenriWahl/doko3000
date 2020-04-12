@@ -46,12 +46,14 @@ $(document).ready(function () {
     })
 
     socket.on('grab-your-cards', function (msg) {
+        console.log('response to grab-your-cards')
         console.log(msg)
         socket.emit('my-cards-please', {username: username,
                                         table: msg.table})
     })
 
     socket.on('your-cards-please', function (msg) {
+        console.log('response to your-cards-please')
         console.log(msg)
     })
 
