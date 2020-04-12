@@ -3,15 +3,28 @@ let username = ''
 $(document).ready(function () {
     const socket = io()
 
-    let dragging = dragula([document.querySelector('#hand'), document.querySelector('#table')]);
+    let dragging = dragula([document.querySelector('#hand'),
+                            document.querySelector('#table'), {
+            revertOnSpill: true
+        }
+    ]);
 
-    dragging.on('drop', function (card) {
-        console.log(card.id)
-        console.log(card.parentNode.id)
-        console.log($(card).data('name'))
-        socket.emit('played-card', {username: username,
-                                    card_id: $(card).data('id'),
-                                    card_name: $(card).data('name')})
+    dragging.on('drop', function (card, target, source) {
+        console.log(target.id)
+        console.log(source.id)
+        if (source.id == 'hand' && target.id == 'table') {
+            console.log(card.id)
+            console.log(card.parentNode.id)
+            console.log($(card).data('name'))
+            socket.emit('played-card', {
+                username: username,
+                card_id: $(card).data('id'),
+                card_name: $(card).data('name')
+            })
+        }
+        else {
+            dragging.cancel(true)
+        }
     })
 
     socket.on('connect', function () {
@@ -51,8 +64,10 @@ $(document).ready(function () {
     socket.on('grab-your-cards', function (msg) {
         console.log('response to grab-your-cards')
         console.log(msg)
-        socket.emit('my-cards-please', {username: username,
-                                        table: msg.table})
+        socket.emit('my-cards-please', {
+            username: username,
+            table: msg.table
+        })
     })
 
     socket.on('your-cards-please', function (msg) {
@@ -79,8 +94,10 @@ $(document).ready(function () {
 
     $(document).on('click', '#deal_cards', function () {
         console.log('deal cards')
-        socket.emit('deal-cards', {username: username,
-                                   table: $(this).data('table')})
+        socket.emit('deal-cards', {
+            username: username,
+            table: $(this).data('table')
+        })
     })
 
 
