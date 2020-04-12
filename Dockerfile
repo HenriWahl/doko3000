@@ -11,14 +11,22 @@ RUN pip install eventlet\
                 flask-login\
                 flask-sqlalchemy\
                 flask-socketio\
-                flask-wtf
+                flask-wtf\
+                gunicorn
 
 COPY ./ /doko3000
-
 WORKDIR /doko3000
+# run gunicorn workers as unprivileged user
+RUN useradd doko3000
+# just for devel - in production this directory should be mounted as volume
+RUN mkdir doko3000/data &&\
+    chown -R doko3000:doko3000 doko3000/data
 
-RUN mkdir data
+# gunicorn now cares about TLS because secured websockets and flask-socketio did not work
+EXPOSE 443
 
-EXPOSE 5000
+# entrypoint.sh sets the permissions for .pem files to be used by unprivileged gunicorn
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
-CMD python3 main.py
+ENTRYPOINT ["/entrypoint.sh"]
