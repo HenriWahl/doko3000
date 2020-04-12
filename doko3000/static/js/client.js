@@ -22,7 +22,7 @@ $(document).ready(function () {
                 card_name: $(card).data('name')
             })
         }
-        else {
+        else if (source.id == 'table') {
             dragging.cancel(true)
         }
     })
