@@ -14,8 +14,7 @@ db = SQLAlchemy(app)
 login = LoginManager(app)
 login.login_view = 'login'
 # extend by socket.io
-socketio = SocketIO(app,
-                    path='/doko3000/socketio')
+socketio = SocketIO(app)
 
 # workaround from Miguel Grinberg - even if not PEP8-ic
 from doko3000 import models,\

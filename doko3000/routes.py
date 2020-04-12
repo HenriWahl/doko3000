@@ -61,12 +61,15 @@ def button_pressed(msg):
     print('played-card', current_user, msg['card'])
     socketio.emit('played-card-by-user', {'username': msg['username'], 'card': msg['card']}, broadcast=True)
 
+
 @socketio.on('enter-table')
 def enter_table(msg):
     print(msg)
-    if msg['table'] in game.tables:
-        if not msg['username'] in game.tables[msg['table']].players:
-            game.tables[msg['table']].add_player(msg['username'])
+    table = game.tables[msg['table']]
+    username = msg['username']
+    if table in game.tables:
+        if not username in game.tables[table].players:
+            game.tables[table].add_player(username)
 
 @socketio.on('deal-cards')
 def deal_cards(msg):
@@ -83,7 +86,10 @@ def deal_cards_to_player(msg):
         msg['table'] in game.tables:
         table = game.tables[msg['table']]
         if username in table.current_round.players:
-            print(table.current_round.players[username].cards)
+            # print(table.current_round.players[username].cards)
+            cards = table.current_round.players[username].get_cards_as_dict()
+            socketio.emit('your-cards-please', {'username': username,
+                                                'cards': cards})
 
 
 @app.route('/login', methods=['GET', 'POST'])

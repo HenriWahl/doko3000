@@ -9,13 +9,17 @@ class Card:
     one single card
     """
 
-    def __init__(self, symbol, rank):
+    def __init__(self, symbol, rank_item, card_id):
         """
         symbol, rank and value come from deck
         """
         self.symbol = symbol
         # value is needed for counting score at the end
-        self.rank, self.value = rank
+        self.rank, self.value = rank_item
+        # name comes from symbol and rank
+        self.name = f'{self.symbol}-{self.rank}'
+        # id comes from deck
+        self.id = card_id
 
 
 class Deck:
@@ -34,10 +38,14 @@ class Deck:
     NUMBER = 2 # Doppelkopf :-)!
     cards = []
 
+    # counter for card IDs in deck
+    card_id = 0
+
     for number in range(NUMBER):
         for symbol in SYMBOLS:
             for rank in RANKS.items():
-                cards.append(Card(symbol, rank))
+                cards.append(Card(symbol, rank, card_id))
+                card_id += 1
 
 
 class Player:
@@ -52,9 +60,19 @@ class Player:
         # gained cards
         self.tricks = []
 
-    def get_card(self, card):
+    def add_card(self, card):
         self.cards.append(card)
 
+    def remove_all_cards(self):
+        self.cards = []
+
+    def get_cards_as_dict(self):
+        cards_as_dict = {}
+        for card in self.cards:
+            print(card.name, card.id)
+            cards_as_dict[card.id] = card.name
+        print(len(self.cards))
+        return cards_as_dict
 
 class Round:
     """
@@ -84,9 +102,10 @@ class Round:
         deal cards
         """
         for player in self.players.values():
+            player.remove_all_cards()
             for card in range(self.cards_per_player):
                 # cards are given to players so the can be .pop()ed
-                player.get_card(self.cards.pop())
+                player.add_card(self.cards.pop())
 
 
 class Table:
@@ -95,7 +114,7 @@ class Table:
     """
     def __init__(self, name):
         # ID
-        identity = 0
+        self.id = 0
         # what table?
         self.name = name
         # who plays?

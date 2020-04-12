@@ -1,7 +1,7 @@
 let username = ''
 
 $(document).ready(function () {
-    const socket = io({path: '/doko3000/socketio'})
+    const socket = io()
 
     let dragging = dragula([document.querySelector('#hand'), document.querySelector('#table')]);
 
@@ -49,6 +49,10 @@ $(document).ready(function () {
         console.log(msg)
         socket.emit('my-cards-please', {username: username,
                                         table: msg.table})
+    })
+
+    socket.on('your-cards-please', function (msg) {
+        console.log(msg)
     })
 
     $(document).on('click', '#new_table', function () {
