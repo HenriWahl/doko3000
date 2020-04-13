@@ -75,7 +75,7 @@ class Player:
     #     return cards_as_dict
 
 
-class Moves:
+class Trick:
     """
     contains all players and cards of moves - always 4
     2 synchronized lists, players and cards, should be enough to be indexed
@@ -84,9 +84,24 @@ class Moves:
         self.players = []
         self.cards = []
 
-    def add_move(self, player, card):
+    def __len__(self):
+        return len(self.players)
+
+    def add_turn(self, player, card):
+        """
+        when player plays card it will be added
+        """
         self.players.append(player)
         self.cards.append(card)
+
+    def get_turn(self, turn_number):
+        """
+        return indexed turn - count does not start from 0 as the aren't in the real game neither
+        """
+        if 1 <= turn_number <= 4 and len(self.players) <= turn_number and len(self.cards) <= turn_number:
+            return self.players[turn_number - 1], self.cards[turn_number - 1]
+        else:
+            return False
 
 
 class Round:
@@ -97,16 +112,20 @@ class Round:
         # if more than 4 players they change for every round
         # changing too because of the position of dealer changes with every round
         self.players = players
+        # order is important - index 0 is the dealer
+        self.order = list(players.values())
         # cards are an important part but makes in a round context only sense if shuffled
         self.cards = list(Deck.cards.values())
         # needed to know how many cards are dealed
-        # same as number of moves in a round
+        # same as number of tricks in a round
         self.cards_per_player = len(self.cards) // len(self.players)
-        # collection of turns per round - its number should not exceed cards_per_player
-        self.moves = []
+        # collection of tricks per round - its number should not exceed cards_per_player
+        self.tricks = []
         # first shuffling, then dealing
         self.shuffle()
         self.deal()
+        # add initial empty trick
+        self.add_trick()
 
     def shuffle(self):
         """
@@ -124,11 +143,24 @@ class Round:
                 # cards are given to players so the can be .pop()ed
                 player.add_card(self.cards.pop())
 
-    def add_move(self, player, card):
+    def add_trick(self):
         """
-        adds one more move
+        adds empty trick which will be filled by players one after another
         """
-        pass
+        self.tricks.append(Trick())
+
+    def add_turn_to_current_trick(self, player, card):
+        """
+        adds one more card to last trick
+        """
+        self.tricks[-1].add_turn(self, player, card)
+
+    def get_next_player(self):
+        """
+        get player for next turn - simply depends of number of played cards in current trick
+        """
+        return self.order[len(self.tricks[-1])]
+
 
 class Table:
     """
@@ -165,6 +197,9 @@ class Table:
         for name in self.order[:4]:
             current_players[name] = self.players[name]
         self.current_round = Round(current_players)
+
+        # for testing here - shall be only applied after successful round
+        #self.order.append(self.order.pop(0))
 
 
 class Game:
@@ -207,5 +242,3 @@ def test_game():
     game.tables['test'].order = ['test1', 'test2', 'test3', 'test4', 'test5']
 
     game.tables['test'].add_round()
-
-    print()

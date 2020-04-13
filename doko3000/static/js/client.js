@@ -4,7 +4,7 @@ $(document).ready(function () {
     const socket = io()
 
     let dragging = dragula([document.querySelector('#hand'),
-                            document.querySelector('#table'), {
+        document.querySelector('#table'), {
             revertOnSpill: true
         }
     ]);
@@ -19,10 +19,10 @@ $(document).ready(function () {
             socket.emit('played-card', {
                 username: username,
                 card_id: $(card).data('id'),
-                card_name: $(card).data('name')
+                card_name: $(card).data('name'),
+                table: $(card).data('table')
             })
-        }
-        else if (source.id == 'table') {
+        } else if (source.id == 'table') {
             dragging.cancel(true)
         }
     })
@@ -75,6 +75,11 @@ $(document).ready(function () {
         console.log(msg)
         $('#table').html('Tisch')
         $('#hand').html(msg.html)
+        if (msg.username == msg.next_player) {
+            $('#turn_indicator').removeClass('d-none')
+        } else {
+            $('#turn_indicator').addClass('d-none')
+        }
 
     })
 

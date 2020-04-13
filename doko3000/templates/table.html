@@ -5,6 +5,8 @@
     <a href="{{ url_for('logout') }}">logout</a>
     {{ current_user.username }}
 
+    <div class="alert alert-info d-none" id="turn_indicator">Your turn</div>
+
     <p></p>
     <button id="deal_cards" type="button" class="btn btn-info" data-table="{{ table.name }}">Karten Geben</button>
     <p></p>

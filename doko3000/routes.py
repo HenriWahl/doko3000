@@ -45,18 +45,21 @@ def new_table(msg):
                    'username': current_user.username,
                    'html': render_template('list_tables.html',
                                            tables=game.get_tables())},
-                  broadcast=True)
+                   broadcast=True)
 
 
 @socketio.on('played-card')
-def button_pressed(msg):
+def played_card(msg):
     print('played-card', current_user, msg['card_id'], msg['card_name'])
     card_id = msg['card_id']
+    table = game.tables[msg['table']]
     socketio.emit('played-card-by-user', {'username': msg['username'],
                                           'card_id': card_id,
                                           'card_name': msg['card_name'],
+                                          'next_player': table.current_round.get_next_player().name,
                                           'html': render_template('card.html',
-                                                                  card=Deck.cards[card_id])},
+                                                                  card=Deck.cards[card_id],
+                                                                  table=table)},
                   broadcast=True)
 
 
@@ -74,7 +77,7 @@ def enter_table(msg):
 def deal_cards(msg):
     table = game.tables[msg['table']]
     table.add_round()
-    print(table.current_round)
+    # just tell everybody to get personal cards
     socketio.emit('grab-your-cards', {'table': table.name})
 
 
@@ -86,11 +89,12 @@ def deal_cards_to_player(msg):
         print(msg)
         table = game.tables[msg['table']]
         if username in table.current_round.players:
-            # print(table.current_round.players[username].cards)
             cards = table.current_round.players[username].cards
             socketio.emit('your-cards-please', {'username': username,
+                                                'next_player': table.current_round.order[1].name,
                                                 'html': render_template('cards_hand.html',
-                                                                        cards=cards)},
+                                                                        cards=cards,
+                                                                        table=table)},
                           room=request.sid)
 
 
