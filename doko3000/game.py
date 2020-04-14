@@ -129,7 +129,7 @@ class Round:
         # counting all turns
         self.turn_count = 0
         # current player - starts with the one following the dealer
-        self.current_player = list(self.players.keys())[1]
+        self.current_player = self.players[list(self.players.keys())[1]]
         print('current_player', self.current_player)
         # first shuffling...
         self.shuffle()
@@ -171,12 +171,14 @@ class Round:
         get player for next turn
         """
 
-        current_player_index = [x.name for x in self.order].index(self.current_player)
+        current_player_index = [x.name for x in self.order].index(self.current_player.name)
 
         if current_player_index < 3:
+            # set new current player
             self.current_player = self.order[current_player_index + 1]
         else:
             self.current_player = self.order[0]
+        # current player is the next player
         return self.current_player
 
 

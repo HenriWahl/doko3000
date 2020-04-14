@@ -53,7 +53,7 @@ def played_card(msg):
     print('played-card', current_user, msg['card_id'], msg['card_name'])
     card_id = msg['card_id']
     table = game.tables[msg['table']]
-    if current_user.username == msg['username'] == table.current_round.current_player:
+    if current_user.username == msg['username'] == table.current_round.current_player.name:
         next_player = table.current_round.get_next_player()
         socketio.emit('played-card-by-user', {'username': msg['username'],
                                               'card_id': card_id,

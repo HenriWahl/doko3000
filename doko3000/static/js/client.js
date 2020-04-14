@@ -63,6 +63,12 @@ $(document).ready(function () {
             console.log(msg.username, msg.html)
             $('#table').append(msg.html)
         }
+        if (username == msg.next_player) {
+            $('#turn_indicator').removeClass('d-none')
+        } else {
+            $('#turn_indicator').addClass('d-none')
+        }
+
     })
 
     socket.on('grab-your-cards', function (msg) {
