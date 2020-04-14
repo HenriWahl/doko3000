@@ -83,6 +83,8 @@ class Trick:
     def __init__(self):
         self.players = []
         self.cards = []
+        # owner of the trick
+        self.owner = False
 
     def __len__(self):
         return len(self.players)
@@ -101,7 +103,10 @@ class Trick:
         if 1 <= turn_number <= 4 and len(self.players) <= turn_number and len(self.cards) <= turn_number:
             return self.players[turn_number - 1], self.cards[turn_number - 1]
         else:
-            return False
+            return
+
+    def set_owner(self, player):
+        self.owner = player
 
 
 class Round:
@@ -121,8 +126,14 @@ class Round:
         self.cards_per_player = len(self.cards) // len(self.players)
         # collection of tricks per round - its number should not exceed cards_per_player
         self.tricks = []
-        # first shuffling, then dealing
+        # counting all turns
+        self.turn_count = 0
+        # current player - starts with the one following the dealer
+        self.current_player = list(self.players.keys())[1]
+        print('current_player', self.current_player)
+        # first shuffling...
         self.shuffle()
+        # ...then dealing
         self.deal()
         # add initial empty trick
         self.add_trick()
@@ -157,9 +168,16 @@ class Round:
 
     def get_next_player(self):
         """
-        get player for next turn - simply depends of number of played cards in current trick
+        get player for next turn
         """
-        return self.order[len(self.tricks[-1])]
+
+        current_player_index = [x.name for x in self.order].index(self.current_player)
+
+        if current_player_index < 3:
+            self.current_player = self.order[current_player_index + 1]
+        else:
+            self.current_player = self.order[0]
+        return self.current_player
 
 
 class Table:

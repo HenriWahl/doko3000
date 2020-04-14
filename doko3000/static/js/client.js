@@ -1,4 +1,8 @@
+// globally used username
 let username = ''
+// for staying in sync with the game this is global
+let turn_count = 0
+
 
 $(document).ready(function () {
     const socket = io()

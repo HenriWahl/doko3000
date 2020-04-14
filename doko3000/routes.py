@@ -53,14 +53,16 @@ def played_card(msg):
     print('played-card', current_user, msg['card_id'], msg['card_name'])
     card_id = msg['card_id']
     table = game.tables[msg['table']]
-    socketio.emit('played-card-by-user', {'username': msg['username'],
-                                          'card_id': card_id,
-                                          'card_name': msg['card_name'],
-                                          'next_player': table.current_round.get_next_player().name,
-                                          'html': render_template('card.html',
-                                                                  card=Deck.cards[card_id],
-                                                                  table=table)},
-                  broadcast=True)
+    if current_user.username == msg['username'] == table.current_round.current_player:
+        next_player = table.current_round.get_next_player()
+        socketio.emit('played-card-by-user', {'username': msg['username'],
+                                              'card_id': card_id,
+                                              'card_name': msg['card_name'],
+                                              'next_player': next_player.name,
+                                              'html': render_template('card.html',
+                                                                      card=Deck.cards[card_id],
+                                                                      table=table)},
+                      broadcast=True)
 
 
 @socketio.on('enter-table')
@@ -91,6 +93,7 @@ def deal_cards_to_player(msg):
         if username in table.current_round.players:
             cards = table.current_round.players[username].cards
             socketio.emit('your-cards-please', {'username': username,
+                                                'turn_count': table.current_round.turn_count,
                                                 'next_player': table.current_round.order[1].name,
                                                 'html': render_template('cards_hand.html',
                                                                         cards=cards,
