@@ -2,7 +2,8 @@
 let username = ''
 // for staying in sync with the game this is global
 let turn_count = 0
-
+// keep an eye on next player to know if turns are allowed or not
+let next_player = ''
 
 $(document).ready(function () {
     const socket = io()
@@ -16,7 +17,7 @@ $(document).ready(function () {
     dragging.on('drop', function (card, target, source) {
         console.log(target.id)
         console.log(source.id)
-        if (source.id == 'hand' && target.id == 'table') {
+        if (source.id == 'hand' && target.id == 'table' && username == next_player) {
             console.log(card.id)
             console.log(card.parentNode.id)
             console.log($(card).data('name'))
@@ -26,7 +27,7 @@ $(document).ready(function () {
                 card_name: $(card).data('name'),
                 table: $(card).data('table')
             })
-        } else if (source.id == 'table') {
+        } else if (source.id == 'table' || username != next_player) {
             dragging.cancel(true)
         }
     })
@@ -59,11 +60,12 @@ $(document).ready(function () {
         console.log(msg)
         console.log('username:', username)
         console.log(username, msg.username, username != msg.username)
+        next_player = msg.next_player
         if (username != msg.username) {
             console.log(msg.username, msg.html)
             $('#table').append(msg.html)
         }
-        if (username == msg.next_player) {
+        if (username == next_player) {
             $('#turn_indicator').removeClass('d-none')
         } else {
             $('#turn_indicator').addClass('d-none')
@@ -83,9 +85,10 @@ $(document).ready(function () {
     socket.on('your-cards-please', function (msg) {
         console.log('response to your-cards-please')
         console.log(msg)
+        next_player = msg.next_player
         $('#table').html('Tisch')
         $('#hand').html(msg.html)
-        if (msg.username == msg.next_player) {
+        if (msg.username == next_player) {
             $('#turn_indicator').removeClass('d-none')
         } else {
             $('#turn_indicator').addClass('d-none')
