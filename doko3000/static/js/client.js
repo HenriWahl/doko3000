@@ -65,12 +65,16 @@ $(document).ready(function () {
             console.log(msg.username, msg.html)
             $('#table').append(msg.html)
         }
-        if (username == next_player) {
-            $('#turn_indicator').removeClass('d-none')
-        } else {
+        if (msg.end_of_trick) {
             $('#turn_indicator').addClass('d-none')
+            $('#grab_cards').removeClass('d-none')
+        } else {
+            if (username == next_player) {
+                $('#turn_indicator').removeClass('d-none')
+            } else {
+                $('#turn_indicator').addClass('d-none')
+            }
         }
-
     })
 
     socket.on('grab-your-cards', function (msg) {

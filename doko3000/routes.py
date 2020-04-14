@@ -54,10 +54,16 @@ def played_card(msg):
     card_id = msg['card_id']
     table = game.tables[msg['table']]
     if current_user.username == msg['username'] == table.current_round.current_player.name:
+        table.current_round.add_turn_to_current_trick(msg['username'], msg['card_id'])
+        if len(table.current_round.tricks[-1]) > 3:
+            end_of_trick = True
+        else:
+            end_of_trick = False
         next_player = table.current_round.get_next_player()
         socketio.emit('played-card-by-user', {'username': msg['username'],
                                               'card_id': card_id,
                                               'card_name': msg['card_name'],
+                                              'end_of_trick': end_of_trick,
                                               'next_player': next_player.name,
                                               'html': render_template('card.html',
                                                                       card=Deck.cards[card_id],

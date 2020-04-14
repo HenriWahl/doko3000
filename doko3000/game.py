@@ -164,7 +164,7 @@ class Round:
         """
         adds one more card to last trick
         """
-        self.tricks[-1].add_turn(self, player, card)
+        self.tricks[-1].add_turn(player, card)
 
     def get_next_player(self):
         """
