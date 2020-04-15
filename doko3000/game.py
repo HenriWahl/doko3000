@@ -84,7 +84,7 @@ class Trick:
         self.players = []
         self.cards = []
         # owner of the trick
-        self.owner = False
+        self.__owner = False
 
     def __len__(self):
         return len(self.players)
@@ -105,9 +105,20 @@ class Trick:
         else:
             return
 
-    def set_owner(self, player):
-        self.owner = player
+    @property
+    def owner(self):
+        return self.__owner
 
+    @owner.setter
+    def owner(self, player):
+        self.__owner = player
+
+    @property
+    def is_last_turn(self):
+        if len(self) > 3:
+            return True
+        else:
+            return False
 
 class Round:
     """
@@ -160,11 +171,15 @@ class Round:
         """
         self.tricks.append(Trick())
 
-    def add_turn_to_current_trick(self, player, card):
-        """
-        adds one more card to last trick
-        """
-        self.tricks[-1].add_turn(player, card)
+    @property
+    def current_trick(self):
+        return self.tricks[-1]
+
+    # def add_turn_to_current_trick(self, player, card):
+    #     """
+    #     adds one more card to last trick
+    #     """
+    #     self.tricks[-1].add_turn(player, card)
 
     def get_next_player(self):
         """

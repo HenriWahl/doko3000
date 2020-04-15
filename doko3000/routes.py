@@ -15,8 +15,8 @@ from flask_socketio import join_room
 from doko3000 import app, \
     socketio
 from doko3000.forms import Login
-from doko3000.game import Deck,\
-                          game
+from doko3000.game import Deck, \
+    game
 from doko3000.models import User
 
 
@@ -31,8 +31,7 @@ def whoami():
     print('whoami', current_user)
     if not current_user.is_anonymous:
         socketio.emit('you-are-what-you-is',
-                      {'username': current_user.username},
-                      room=request.sid)
+                      {'username': current_user.username})
 
 
 @socketio.on('new-table')
@@ -45,7 +44,7 @@ def new_table(msg):
                    'username': current_user.username,
                    'html': render_template('list_tables.html',
                                            tables=game.get_tables())},
-                   broadcast=True)
+                  broadcast=True)
 
 
 @socketio.on('played-card')
@@ -54,20 +53,17 @@ def played_card(msg):
     card_id = msg['card_id']
     table = game.tables[msg['table']]
     if current_user.username == msg['username'] == table.current_round.current_player.name:
-        table.current_round.add_turn_to_current_trick(msg['username'], msg['card_id'])
-        if len(table.current_round.tricks[-1]) > 3:
-            end_of_trick = True
-        else:
-            end_of_trick = False
+        table.current_round.current_trick.add_turn(msg['username'], msg['card_id'])
         next_player = table.current_round.get_next_player()
-        socketio.emit('played-card-by-user', {'username': msg['username'],
-                                              'card_id': card_id,
-                                              'card_name': msg['card_name'],
-                                              'end_of_trick': end_of_trick,
-                                              'next_player': next_player.name,
-                                              'html': render_template('card.html',
-                                                                      card=Deck.cards[card_id],
-                                                                      table=table)},
+        socketio.emit('played-card-by-user',
+                      {'username': msg['username'],
+                       'card_id': card_id,
+                       'card_name': msg['card_name'],
+                       'is_last_turn': table.current_round.current_trick.is_last_turn,
+                       'next_player': next_player.name,
+                       'html': render_template('card.html',
+                                               card=Deck.cards[card_id],
+                                               table=table)},
                       broadcast=True)
 
 
@@ -77,16 +73,19 @@ def enter_table(msg):
     table = game.tables[msg['table']]
     username = msg['username']
     if table in game.tables:
-        if not username in game.tables[table].players:
+        if username not in game.tables[table].players:
             game.tables[table].add_player(username)
+            join_room(table.name)
 
 
 @socketio.on('deal-cards')
 def deal_cards(msg):
     table = game.tables[msg['table']]
     table.add_round()
+
     # just tell everybody to get personal cards
-    socketio.emit('grab-your-cards', {'table': table.name})
+    socketio.emit('grab-your-cards',
+                  {'table': table.name})
 
 
 @socketio.on('my-cards-please')
@@ -98,13 +97,26 @@ def deal_cards_to_player(msg):
         table = game.tables[msg['table']]
         if username in table.current_round.players:
             cards = table.current_round.players[username].cards
-            socketio.emit('your-cards-please', {'username': username,
-                                                'turn_count': table.current_round.turn_count,
-                                                'next_player': table.current_round.order[1].name,
-                                                'html': render_template('cards_hand.html',
-                                                                        cards=cards,
-                                                                        table=table)},
-                          room=request.sid)
+            socketio.emit('your-cards-please',
+                          {'username': username,
+                           'turn_count': table.current_round.turn_count,
+                           'next_player': table.current_round.order[1].name,
+                           'html': render_template('cards_hand.html',
+                                                   cards=cards,
+                                                   table=table)})
+
+
+@socketio.on('claim-trick')
+def claimed_trick(msg):
+    username = msg['username']
+    if username == current_user.username and \
+            msg['table'] in game.tables:
+        print(msg)
+        table = game.tables[msg['table']]
+        if username in table.current_round.players:
+            table.current_round.current_trick.owner = table.current_round.players[username]
+            socketio.emit('next-trick',
+                          {'next_player': username})
 
 
 @app.route('/login', methods=['GET', 'POST'])
