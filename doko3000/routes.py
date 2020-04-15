@@ -5,8 +5,7 @@ from flask import flash, \
     render_template, \
     request, \
     url_for
-from flask_login import AnonymousUserMixin, \
-    current_user, \
+from flask_login import current_user, \
     login_required, \
     login_user, \
     logout_user
@@ -103,7 +102,8 @@ def deal_cards_to_player(msg):
                            'next_player': table.current_round.order[1].name,
                            'html': render_template('cards_hand.html',
                                                    cards=cards,
-                                                   table=table)})
+                                                   table=table)},
+                          room=request.sid)
 
 
 @socketio.on('claim-trick')
@@ -116,7 +116,8 @@ def claimed_trick(msg):
         if username in table.current_round.players:
             table.current_round.current_trick.owner = table.current_round.players[username]
             socketio.emit('next-trick',
-                          {'next_player': username})
+                          {'next_player': username},
+                          broadcast=True)
 
 
 @app.route('/login', methods=['GET', 'POST'])
