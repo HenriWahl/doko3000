@@ -4,6 +4,8 @@ let username = ''
 let turn_count = 0
 // keep an eye on next player to know if turns are allowed or not
 let next_player = ''
+// lock dragging of cards while waiting for trick being claimed
+let cards_locked = false
 
 $(document).ready(function () {
     const socket = io()
@@ -15,6 +17,7 @@ $(document).ready(function () {
     ]);
 
     dragging.on('drop', function (card, target, source) {
+        console.log(cards_locked)
         if (source.id == 'hand' && target.id == 'table' && username == next_player) {
             socket.emit('played-card', {
                 username: username,
@@ -22,7 +25,7 @@ $(document).ready(function () {
                 card_name: $(card).data('name'),
                 table: $(card).data('table')
             })
-        } else if (source.id == 'table' || username != next_player) {
+        } else if (source.id == 'table' || cards_locked ||username != next_player) {
             dragging.cancel(true)
         }
     })
@@ -50,9 +53,11 @@ $(document).ready(function () {
             $('#table').append(msg.html)
         }
         if (msg.is_last_turn) {
+            cards_locked = true
             $('#turn_indicator').addClass('d-none')
             $('#claim_cards').removeClass('d-none')
         } else {
+            cards_locked = false
             if (username == next_player) {
                 $('#turn_indicator').removeClass('d-none')
             } else {
