@@ -53,12 +53,13 @@ def played_card(msg):
     table = game.tables[msg['table']]
     if current_user.username == msg['username'] == table.current_round.current_player.name:
         table.current_round.current_trick.add_turn(msg['username'], msg['card_id'])
+        table.current_round.turn_count += 1
         next_player = table.current_round.get_next_player()
         socketio.emit('played-card-by-user',
                       {'username': msg['username'],
                        'card_id': card_id,
                        'card_name': msg['card_name'],
-                       'is_last_turn': table.current_round.current_trick.is_last_turn,
+                       'is_last_turn': table.current_round.current_trick.is_last_turn(),
                        'next_player': next_player.name,
                        'html': render_template('card.html',
                                                card=Deck.cards[card_id],
@@ -114,10 +115,22 @@ def claimed_trick(msg):
         print(msg)
         table = game.tables[msg['table']]
         if username in table.current_round.players:
-            table.current_round.current_trick.owner = table.current_round.players[username]
-            socketio.emit('next-trick',
-                          {'next_player': username},
-                          broadcast=True)
+            if not table.current_round.is_finished():
+                # old trick, freshly claimed
+                table.current_round.current_trick.owner = table.current_round.players[username]
+                # new trick for next turns
+                table.current_round.add_trick(table.players[username])
+                socketio.emit('next-trick',
+                              {'next_player': username},
+                              broadcast=True)
+            else:
+                print('finished', table.current_round.turn_count, len(Deck.cards))
+                table.shift_players()
+                table.add_round()
+
+                # just tell everybody to get personal cards
+                socketio.emit('grab-your-cards',
+                              {'table': table.name})
 
 
 @app.route('/login', methods=['GET', 'POST'])

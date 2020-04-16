@@ -30,22 +30,27 @@ class Deck:
                'Herz',
                'Grün',
                'Eichel')
-    RANKS = {'Zehn':10,
-             'Bube':2,
-             'Dame':3,
-             'König':4,
-             'Ass':11}
+    RANKS = {'Zehn': 10,
+             'Bube': 2,
+             'Dame': 3,
+             # 'König': 4,
+             'Ass': 11}
     NUMBER = 2 # Doppelkopf :-)!
     cards = {}
 
     # counter for card IDs in deck
     card_id = 0
 
-    for number in range(NUMBER):
-        for symbol in SYMBOLS:
-            for rank in RANKS.items():
-                cards[card_id] = Card(symbol, rank, card_id)
-                card_id += 1
+    # for number in range(NUMBER):
+    #     for symbol in SYMBOLS:
+    #         for rank in RANKS.items():
+    #             cards[card_id] = Card(symbol, rank, card_id)
+    #             card_id += 1
+
+    for symbol in SYMBOLS[0:2]:
+        for rank in RANKS.items():
+            cards[card_id] = Card(symbol, rank, card_id)
+            card_id += 1
 
 
 class Player:
@@ -113,7 +118,6 @@ class Trick:
     def owner(self, player):
         self.__owner = player
 
-    @property
     def is_last_turn(self):
         if len(self) > 3:
             return True
@@ -147,7 +151,7 @@ class Round:
         # ...then dealing
         self.deal()
         # add initial empty trick
-        self.add_trick()
+        self.add_trick(self.current_player)
 
     def shuffle(self):
         """
@@ -165,21 +169,16 @@ class Round:
                 # cards are given to players so the can be .pop()ed
                 player.add_card(self.cards.pop())
 
-    def add_trick(self):
+    def add_trick(self, player):
         """
         adds empty trick which will be filled by players one after another
         """
         self.tricks.append(Trick())
+        self.current_player = player
 
     @property
     def current_trick(self):
         return self.tricks[-1]
-
-    # def add_turn_to_current_trick(self, player, card):
-    #     """
-    #     adds one more card to last trick
-    #     """
-    #     self.tricks[-1].add_turn(player, card)
 
     def get_next_player(self):
         """
@@ -196,6 +195,12 @@ class Round:
         # current player is the next player
         return self.current_player
 
+    def is_finished(self):
+        """
+        check if round is over - reached when all cards are played
+        """
+        print(len(Deck.cards), self.turn_count)
+        return len(Deck.cards) == self.turn_count
 
 class Table:
     """
@@ -212,13 +217,12 @@ class Table:
         self.order = []
         # rounds, one after another
         self.rounds = []
-        # latest round
-        self.current_round = None
 
     def add_player(self, player):
         """
         adding just one player to the party
         """
+        # str as well as Player object is OK
         if type(player) is str:
             player = Player(player)
         self.players[player.name] = player
@@ -231,11 +235,17 @@ class Table:
         current_players = {}
         for name in self.order[:4]:
             current_players[name] = self.players[name]
-        self.current_round = Round(current_players)
+        self.rounds.append(Round(current_players))
 
-        # for testing here - shall be only applied after successful round
-        #self.order.append(self.order.pop(0))
+    def shift_players(self):
+        """
+        last dealer is moved to the end of the players list
+        """
+        self.order.append(self.order.pop(0))
 
+    @property
+    def current_round(self):
+        return self.rounds[-1]
 
 class Game:
     """

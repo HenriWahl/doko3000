@@ -82,8 +82,9 @@ $(document).ready(function () {
 
     socket.on('next-trick', function (msg) {
         next_player = msg.next_player
+        console.log(msg)
         $('#table').html('Tisch')
-        if (msg.username == next_player) {
+        if (username == next_player) {
             $('#turn_indicator').removeClass('d-none')
         } else {
             $('#turn_indicator').addClass('d-none')
