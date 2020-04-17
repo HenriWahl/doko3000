@@ -124,6 +124,7 @@ class Trick:
         else:
             return False
 
+
 class Round:
     """
     one round
@@ -178,7 +179,17 @@ class Round:
 
     @property
     def current_trick(self):
+        """
+        enable access to current trick
+        """
         return self.tricks[-1]
+
+    @property
+    def previous_trick(self):
+        """
+        return previous trick to enable reclaiming
+        """
+        return self.tricks[-2]
 
     def get_next_player(self):
         """

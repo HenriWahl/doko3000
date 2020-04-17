@@ -25,7 +25,7 @@ $(document).ready(function () {
                 card_name: $(card).data('name'),
                 table: $(card).data('table')
             })
-        } else if (source.id == 'table' || cards_locked ||username != next_player) {
+        } else if (source.id == 'table' || cards_locked || username != next_player) {
             dragging.cancel(true)
         }
     })
@@ -55,7 +55,7 @@ $(document).ready(function () {
         if (msg.is_last_turn) {
             cards_locked = true
             $('#turn_indicator').addClass('d-none')
-            $('#claim_cards').removeClass('d-none')
+            $('#claim_trick').removeClass('d-none')
         } else {
             cards_locked = false
             if (username == next_player) {
@@ -63,6 +63,7 @@ $(document).ready(function () {
             } else {
                 $('#turn_indicator').addClass('d-none')
             }
+            $('#claim_trick').addClass('d-none')
         }
     })
 
@@ -78,12 +79,16 @@ $(document).ready(function () {
         cards_locked = false
         $('#table').html('Tisch')
         $('#hand').html(msg.html)
-        if (msg.username == next_player) {
+        if (username == next_player) {
             $('#turn_indicator').removeClass('d-none')
         } else {
             $('#turn_indicator').addClass('d-none')
         }
-
+        if (username == msg.dealer) {
+            $('#deal_cards').removeClass('d-none')
+        } else {
+              $('#deal_cards').addClass('d-none')
+        }
     })
 
     socket.on('next-trick', function (msg) {
@@ -117,7 +122,7 @@ $(document).ready(function () {
         })
     })
 
-    $(document).on('click', '#claim_cards', function () {
+    $(document).on('click', '#claim_trick', function () {
         console.log('claim trick')
         socket.emit('claim-trick', {
             username: username,

@@ -100,6 +100,7 @@ def deal_cards_to_player(msg):
             socketio.emit('your-cards-please',
                           {'username': username,
                            'turn_count': table.current_round.turn_count,
+                           'dealer': table.current_round.order[0].name,
                            'next_player': table.current_round.order[1].name,
                            'html': render_template('cards_hand.html',
                                                    cards=cards,
@@ -116,10 +117,14 @@ def claimed_trick(msg):
         table = game.tables[msg['table']]
         if username in table.current_round.players:
             if not table.current_round.is_finished():
-                # old trick, freshly claimed
-                table.current_round.current_trick.owner = table.current_round.players[username]
-                # new trick for next turns
-                table.current_round.add_trick(table.players[username])
+                if not len(table.current_round.current_trick) == 0:
+                    # old trick, freshly claimed
+                    table.current_round.current_trick.owner = table.current_round.players[username]
+                    # new trick for next turns
+                    table.current_round.add_trick(table.players[username])
+                else:
+                    # apparently the ownership of the previous trick is not clear - change it
+                    table.current_round.previous_trick.owner = table.current_round.players[username]
                 socketio.emit('next-trick',
                               {'next_player': username},
                               broadcast=True)
@@ -173,7 +178,9 @@ def table(table=''):
         print('user in table')
         return render_template('table.html',
                                title=f'doko3000 {table}',
-                               table=game.tables[table])
+                               table=game.tables[table],
+                               dealer=game.tables[table].current_round.order[0].name
+)
     return render_template('index.html',
                            tables=game.tables,
                            title='doko3000')

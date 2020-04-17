@@ -1,28 +1,34 @@
 {% extends "base.html" %}
 
 {% block custom_content %}
-    <a href="{{ url_for('login') }}">login</a>
-    <a href="{{ url_for('logout') }}">logout</a>
-    {{ current_user.username }}
+<a href="{{ url_for('login') }}">login</a>
+<a href="{{ url_for('logout') }}">logout</a>
+{{ current_user.username }}
 
-    <div class="alert alert-info d-none" id="turn_indicator">Your turn</div>
+<div class="alert alert-info d-none" id="turn_indicator">Your turn</div>
 
-    <p></p>
-    <button id="deal_cards" type="button" class="btn btn-info" data-table="{{ table.name }}">Karten Geben</button>
-    <p></p>
+<p></p>
+<button id="deal_cards" type="button" class="btn btn-info
+    {% if current_user.username != dealer %}
+    d-none
+    {% endif %}
+    " data-table="{{ table.name }}">Karten Geben
+</button>
+<p></p>
 
-    <p></p>
-    <button id="claim_cards" type="button" class="btn btn-info d-none" data-table="{{ table.name }}">Karten Schnappen</button>
-    <p></p>
+<p></p>
+<button id="claim_trick" type="button" class="btn btn-info d-none" data-table="{{ table.name }}">Karten Schnappen
+</button>
+<p></p>
 
-    <div class="row">
-        <div class="col-md-12 w-100 h-75 bg-success container" id="table">
-            Tisch
-        </div>
+<div class="row">
+    <div class="col-md-12 w-100 h-75 bg-success container" id="table">
+        Tisch
     </div>
-    <div class="row">
-        <div class="col-md-12 w-100 h-25 bg-danger container" id="hand">
-Hand
-        </div>
+</div>
+<div class="row">
+    <div class="col-md-12 w-100 h-25 bg-danger container" id="hand">
+        Hand
     </div>
+</div>
 {% endblock custom_content %}
