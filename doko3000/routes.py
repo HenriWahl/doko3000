@@ -100,7 +100,6 @@ def deal_cards_to_player(msg):
             socketio.emit('your-cards-please',
                           {'username': username,
                            'turn_count': table.current_round.turn_count,
-                           'dealer': table.current_round.order[0].name,
                            'next_player': table.current_round.order[1].name,
                            'html': render_template('cards_hand.html',
                                                    cards=cards,
@@ -117,6 +116,8 @@ def claimed_trick(msg):
         table = game.tables[msg['table']]
         if username in table.current_round.players:
             if not table.current_round.is_finished():
+                # when ownership changes it does at previous trick because normally there is a new one created
+                # so the new one becomes the current one and the reclaimed is the previous
                 if not len(table.current_round.current_trick) == 0:
                     # old trick, freshly claimed
                     table.current_round.current_trick.owner = table.current_round.players[username]
@@ -130,12 +131,29 @@ def claimed_trick(msg):
                               broadcast=True)
             else:
                 print('finished', table.current_round.turn_count, len(Deck.cards))
-                table.shift_players()
-                table.add_round()
 
-                # just tell everybody to get personal cards
-                socketio.emit('grab-your-cards',
-                              {'table': table.name})
+                # tell everybody stats and wait for everybody confirming next round
+                socketio.emit('next-round',
+                              {'table': table.name},
+                              broadcast=True)
+
+
+@socketio.on('ready-for-next-round')
+def ready_for_next_round(msg):
+    username = msg['username']
+    if username == current_user.username and \
+            msg['table'] in game.tables:
+        print(msg)
+        table = game.tables[msg['table']]
+        table.add_ready_player(username)
+        if len(table.players_ready) == len(table.players):
+            table.shift_players()
+            table.add_round()
+
+            # just tell everybody to get personal cards
+            socketio.emit('start-next-round',
+                          {'table': table.name,
+                           'dealer': table.current_round.order[0].name})
 
 
 @app.route('/login', methods=['GET', 'POST'])

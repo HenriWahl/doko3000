@@ -228,6 +228,8 @@ class Table:
         self.order = []
         # rounds, one after another
         self.rounds = []
+        # players who are ready to play the next round
+        self.players_ready = []
 
     def add_player(self, player):
         """
@@ -257,6 +259,15 @@ class Table:
     @property
     def current_round(self):
         return self.rounds[-1]
+
+    def add_ready_player(self, player):
+        """
+        organize players who are ready for the next round in a list
+        """
+        self.players_ready.append(player)
+
+    def reset_ready_players(self):
+        self.players_ready = []
 
 class Game:
     """

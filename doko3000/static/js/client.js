@@ -84,11 +84,6 @@ $(document).ready(function () {
         } else {
             $('#turn_indicator').addClass('d-none')
         }
-        if (username == msg.dealer) {
-            $('#deal_cards').removeClass('d-none')
-        } else {
-              $('#deal_cards').addClass('d-none')
-        }
     })
 
     socket.on('next-trick', function (msg) {
@@ -103,6 +98,20 @@ $(document).ready(function () {
         }
 
     })
+
+    socket.on('next-round', function (msg) {
+        $('#next_round').removeClass('d-none')
+    })
+
+    socket.on('start-next-round', function (msg) {
+       if (username == msg.dealer) {
+            $('#deal_cards').removeClass('d-none')
+        } else {
+            $('#deal_cards').addClass('d-none')
+        }
+    })
+
+
 
     $(document).on('click', '#new_table', function () {
         socket.emit('new-table', {button: 'new_table'})
@@ -130,5 +139,12 @@ $(document).ready(function () {
         })
     })
 
+    $(document).on('click', '#next_round', function () {
+        console.log('next_round')
+        socket.emit('ready-for-next-round', {
+            username: username,
+            table: $(this).data('table')
+        })
+    })
 
 })
