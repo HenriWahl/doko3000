@@ -17,8 +17,8 @@ $(document).ready(function () {
     ]);
 
     dragging.on('drop', function (card, target, source) {
-        console.log(cards_locked)
-        if (source.id == 'hand' && target.id == 'table' && username == next_player) {
+        console.log('cards_locked:', cards_locked)
+        if (source.id == 'hand' && target.id == 'table' && username == next_player && !cards_locked) {
             socket.emit('played-card', {
                 username: username,
                 card_id: $(card).data('id'),
@@ -34,7 +34,7 @@ $(document).ready(function () {
         socket.emit('my event',
             {data: 'I\'m connected!'})
 
-        socket.emit('whoami')
+        socket.emit('who-am-i')
     })
 
     socket.on('you-are-what-you-is', function (msg) {
@@ -75,6 +75,7 @@ $(document).ready(function () {
 
     socket.on('your-cards-please', function (msg) {
         next_player = msg.next_player
+        cards_locked = false
         $('#table').html('Tisch')
         $('#hand').html(msg.html)
         if (msg.username == next_player) {
@@ -88,6 +89,7 @@ $(document).ready(function () {
     socket.on('next-trick', function (msg) {
         next_player = msg.next_player
         console.log(msg)
+        cards_locked = false
         $('#table').html('Tisch')
         if (username == next_player) {
             $('#turn_indicator').removeClass('d-none')

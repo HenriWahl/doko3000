@@ -25,9 +25,9 @@ def handle_my_custom_event(json, methods=['GET', 'POST']):
     socketio.emit('my response', json)
 
 
-@socketio.on('whoami')
-def whoami():
-    print('whoami', current_user)
+@socketio.on('who-am-i')
+def who_am_i():
+    print('who-am-i', current_user)
     if not current_user.is_anonymous:
         socketio.emit('you-are-what-you-is',
                       {'username': current_user.username})
