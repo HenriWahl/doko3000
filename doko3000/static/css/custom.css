@@ -1,0 +1,15 @@
+html, body {
+  height: 100%;
+}
+
+.background {
+  height: 100%;
+  background-image: url("/static/pictures/table.jpg");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.main-container {
+  height: 100vh;
+}

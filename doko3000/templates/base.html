@@ -13,13 +13,15 @@
         {% block styles %}
             <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
             <link rel="stylesheet" href="{{ url_for('static', filename='css/dragula.min.css') }}">
+            <link rel="stylesheet" href="{{ url_for('static', filename='css/open-iconic-bootstrap.min.css') }}">
+            <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
         {% endblock styles %}
     {% endblock head %}
 </head>
 <body>
 
 {% block content %}
-    <div class="container" id="content">
+    <div class="container-fluid main-container background h-100" id="main_content">
         {% block custom_content %}
         {% endblock custom_content %}
     </div>
