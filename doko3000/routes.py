@@ -149,7 +149,7 @@ def ready_for_next_round(msg):
         if len(table.players_ready) == len(table.players):
             table.shift_players()
             table.add_round()
-
+            table.reset_ready_players()
             # just tell everybody to get personal cards
             socketio.emit('start-next-round',
                           {'table': table.name,

@@ -79,6 +79,7 @@ $(document).ready(function () {
         cards_locked = false
         $('#table').html('Tisch')
         $('#hand').html(msg.html)
+        $('#claim_trick').addClass('d-none')
         if (username == next_player) {
             $('#turn_indicator').removeClass('d-none')
         } else {
@@ -104,13 +105,15 @@ $(document).ready(function () {
     })
 
     socket.on('start-next-round', function (msg) {
-       if (username == msg.dealer) {
+        if (username == msg.dealer) {
             $('#deal_cards').removeClass('d-none')
         } else {
             $('#deal_cards').addClass('d-none')
         }
-    })
+        $('#next_round').addClass('d-none')
+        $('#claim_trick').addClass('d-none')
 
+    })
 
 
     $(document).on('click', '#new_table', function () {
@@ -141,6 +144,7 @@ $(document).ready(function () {
 
     $(document).on('click', '#next_round', function () {
         console.log('next_round')
+        $('#next_round').addClass('d-none')
         socket.emit('ready-for-next-round', {
             username: username,
             table: $(this).data('table')

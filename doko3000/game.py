@@ -303,9 +303,11 @@ game = Game()
 
 def test_game():
     game.add_table('test')
-    for name in ('test1', 'test2', 'test3', 'test4', 'test5'):
+    # for name in ('test1', 'test2', 'test3', 'test4', 'test5'):
+    for name in ('test1', 'test2', 'test3', 'test4'):
         player = Player(name)
         game.tables['test'].add_player(player)
-    game.tables['test'].order = ['test1', 'test2', 'test3', 'test4', 'test5']
+    # game.tables['test'].order = ['test1', 'test2', 'test3', 'test4', 'test5']
+    game.tables['test'].order = ['test1', 'test2', 'test3', 'test4']
 
     game.tables['test'].add_round()
