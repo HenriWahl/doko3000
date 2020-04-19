@@ -31,8 +31,8 @@ class Deck:
                'Grün',
                'Eichel')
     RANKS = {'Zehn': 10,
-             'Bube': 2,
-             'Dame': 3,
+             'Unter': 2,
+             'Ober': 3,
              # 'König': 4,
              'Ass': 11}
     NUMBER = 2 # Doppelkopf :-)!
