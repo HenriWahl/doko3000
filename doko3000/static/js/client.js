@@ -25,6 +25,8 @@ $(document).ready(function () {
                 card_name: $(card).data('name'),
                 table: $(card).data('table')
             })
+        } else if (source.id == 'hand' && target.id == 'hand') {
+            return true
         } else if (source.id == 'table' || cards_locked || username != next_player) {
             dragging.cancel(true)
         }
