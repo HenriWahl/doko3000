@@ -12,13 +12,15 @@ $(document).ready(function () {
 
     let dragging = dragula([document.querySelector('#hand'),
         document.querySelector('#table'), {
-            revertOnSpill: true
+            revertOnSpill: true,
+            direction: 'horizontal'
         }
     ]);
 
     dragging.on('drop', function (card, target, source) {
         console.log('cards_locked:', cards_locked)
         if (source.id == 'hand' && target.id == 'table' && username == next_player && !cards_locked) {
+            $('#table').append(card)
             socket.emit('played-card', {
                 username: username,
                 card_id: $(card).data('id'),

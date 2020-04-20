@@ -33,7 +33,7 @@ class Deck:
     RANKS = {'Zehn': 10,
              'Unter': 2,
              'Ober': 3,
-             # 'König': 4,
+             'König': 4,
              'Ass': 11}
     NUMBER = 2 # Doppelkopf :-)!
     cards = {}
@@ -41,16 +41,16 @@ class Deck:
     # counter for card IDs in deck
     card_id = 0
 
-    # for number in range(NUMBER):
-    #     for symbol in SYMBOLS:
-    #         for rank in RANKS.items():
-    #             cards[card_id] = Card(symbol, rank, card_id)
-    #             card_id += 1
+    for number in range(NUMBER):
+        for symbol in SYMBOLS:
+            for rank in RANKS.items():
+                cards[card_id] = Card(symbol, rank, card_id)
+                card_id += 1
 
-    for symbol in SYMBOLS[0:2]:
-        for rank in RANKS.items():
-            cards[card_id] = Card(symbol, rank, card_id)
-            card_id += 1
+    # for symbol in SYMBOLS[0:2]:
+    #     for rank in RANKS.items():
+    #         cards[card_id] = Card(symbol, rank, card_id)
+    #         card_id += 1
 
 
 class Player:
