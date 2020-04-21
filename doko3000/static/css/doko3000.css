@@ -26,10 +26,25 @@ html, body {
 .overlay-button {
     position: fixed;
     width: 60%;
-    height: 20%;
-    top: 40%;
-    bottom: 40%;
+    height: 16%;
+    top: 42%;
+    bottom: 42%;
     left: 20%;
     right: 20%;
     z-index: 2000;
+}
+
+.overlay-notification {
+    position: fixed;
+    width: 60%;
+    height: 10%;
+    top: 45%;
+    bottom: 45%;
+    left: 20%;
+    right: 20%;
+    z-index: 2000;
+    background-color: rgba(0,0,0,0.5);
+    display: table-cell;
+    text-align: center;
+    vertical-align: middle;
 }

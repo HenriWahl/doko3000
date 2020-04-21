@@ -5,7 +5,7 @@
     <a href="{{ url_for('logout') }}">logout</a>
     {{ current_user.username }}
 
-    <div class="alert alert-info d-none" id="turn_indicator">Your turn</div>
+<!--    <div class="alert alert-info d-none" id="turn_indicator">Your turn</div>-->
 
     <p></p>
 <!--    <button id="deal_cards" type="button" class="btn btn-info-->
@@ -40,19 +40,20 @@
     d-none
     {% endif %}"
     data-table="{{ table.name }}">
-    <button class="btn btn-primary btn-block btn-lg">Karten geben</button>
+    <button class="btn btn-info btn-block btn-lg"><strong>Karten geben</strong></button>
 </div>
 
 <div id="next_round" class="row overlay-button justify-content-center d-none"
     data-table="{{ table.name }}">
-    <button class="btn btn-warning btn-block btn-lg">Bereit zur nächsten Runde</button>
+    <button class="btn btn-primary btn-block btn-lg"><strong>Bereit zur nächsten Runde</strong></button>
 </div>
 
 <div id="claim_trick" class="row overlay-button justify-content-center d-none"
     data-table="{{ table.name }}">
-    <button class="btn btn-success btn-block btn-lg">Stich nehmen</button>
+    <button class="btn btn-success btn-block btn-lg"><strong>Stich nehmen</strong></button>
 </div>
 
+<div id="turn_indicator" class="overlay-notification d-none">Your turn</div>
 
 <div class="row align-items-center w-100 h-50">
     <div class="w-100 h-100 d-flex justify-content-center align-items-center" id="table">
