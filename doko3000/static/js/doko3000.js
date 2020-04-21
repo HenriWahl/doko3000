@@ -69,6 +69,8 @@ $(document).ready(function () {
             }
             $('#claim_trick').addClass('d-none')
         }
+        // anyway there is no need anymore to deal cards
+        $('#deal_cards').addClass('d-none')
     })
 
     socket.on('grab-your-cards', function (msg) {
@@ -105,6 +107,8 @@ $(document).ready(function () {
     })
 
     socket.on('next-round', function (msg) {
+        console.log('next-round', msg)
+        $('#claim_trick').addClass('d-none')
         $('#next_round').removeClass('d-none')
     })
 

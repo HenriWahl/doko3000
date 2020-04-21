@@ -1,40 +1,68 @@
 {% extends "base.html" %}
 
 {% block custom_content %}
-    <div id="overlay-control">
-        <a href="{{ url_for('login') }}">login</a>
-        <a href="{{ url_for('logout') }}">logout</a>
-        {{ current_user.username }}
+<div id="overlay-control">
+    <a href="{{ url_for('logout') }}">logout</a>
+    {{ current_user.username }}
 
-        <div class="alert alert-info d-none" id="turn_indicator">Your turn</div>
+    <div class="alert alert-info d-none" id="turn_indicator">Your turn</div>
 
-        <p></p>
-        <button id="deal_cards" type="button" class="btn btn-info
+    <p></p>
+<!--    <button id="deal_cards" type="button" class="btn btn-info-->
+<!--    {% if current_user.username != dealer %}-->
+<!--    d-none-->
+<!--    {% endif %}-->
+<!--    " data-table="{{ table.name }}">Karten Geben-->
+<!--    </button>-->
+<!--    <p></p>-->
+
+<!--    <p></p>-->
+<!--    <button id="claim_trick" type="button" class="btn btn-info d-none" data-table="{{ table.name }}">Karten-->
+<!--        Schnappen-->
+<!--    </button>-->
+<!--    <p></p>-->
+<!--    <button id="next_round" type="button" class="btn btn-info d-none" data-table="{{ table.name }}">Nächste Runde-->
+<!--    </button>-->
+<!--    <p></p>-->
+</div>
+
+<!--<div id="button_deal_cards" class="row overlay-button justify-content-center">-->
+<!--    <button id="deal_cards" type="button" class="btn btn-primary btn-block btn-lg-->
+<!--    {% if current_user.username != dealer %}-->
+<!--    d-none-->
+<!--    {% endif %}-->
+<!--    " data-table="{{ table.name }}">Karten Geben-->
+<!--    </button>-->
+<!--</div>-->
+
+<div id="deal_cards" class="row overlay-button justify-content-center
     {% if current_user.username != dealer %}
     d-none
-    {% endif %}
-    " data-table="{{ table.name }}">Karten Geben
-        </button>
-        <p></p>
+    {% endif %}"
+    data-table="{{ table.name }}">
+    <button class="btn btn-primary btn-block btn-lg">Karten geben</button>
+</div>
 
-        <p></p>
-        <button id="claim_trick" type="button" class="btn btn-info d-none" data-table="{{ table.name }}">Karten
-            Schnappen
-        </button>
-        <p></p>
-        <button id="next_round" type="button" class="btn btn-info d-none" data-table="{{ table.name }}">Nächste Runde
-        </button>
-        <p></p>
-    </div>
-    <div class="row align-items-center w-100 h-50">
-        <div class="w-100 h-100 d-flex justify-content-center align-items-center" id="table">
-            Tisch
-        </div>
-    </div>
+<div id="next_round" class="row overlay-button justify-content-center d-none"
+    data-table="{{ table.name }}">
+    <button class="btn btn-warning btn-block btn-lg">Bereit zur nächsten Runde</button>
+</div>
 
-    <div class="row align-items-center w-100 h-50">
-        <div class="w-100 h-100 container-fluid d-inline-flex justify-content-center align-items-center" id="hand">
-            Hand
-        </div>
+<div id="claim_trick" class="row overlay-button justify-content-center d-none"
+    data-table="{{ table.name }}">
+    <button class="btn btn-success btn-block btn-lg">Stich nehmen</button>
+</div>
+
+
+<div class="row align-items-center w-100 h-50">
+    <div class="w-100 h-100 d-flex justify-content-center align-items-center" id="table">
+        Tisch
     </div>
+</div>
+
+<div class="row align-items-center w-100 h-50">
+    <div class="w-100 h-100 container-fluid d-inline-flex justify-content-center align-items-center" id="hand">
+        Hand
+    </div>
+</div>
 {% endblock custom_content %}
