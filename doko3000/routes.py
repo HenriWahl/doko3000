@@ -126,6 +126,7 @@ def claimed_trick(msg):
                 else:
                     # apparently the ownership of the previous trick is not clear - change it
                     table.current_round.previous_trick.owner = table.current_round.players[username]
+                    table.current_round.current_player = table.current_round.players[username]
                 socketio.emit('next-trick',
                               {'next_player': username},
                               broadcast=True)
