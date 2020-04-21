@@ -36,15 +36,12 @@ html, body {
 
 .overlay-notification {
     position: fixed;
-    width: 60%;
+    width: 40%;
     height: 10%;
-    top: 45%;
-    bottom: 45%;
-    left: 20%;
-    right: 20%;
+    top: 5%;
+    bottom: 85%;
+    left: 30%;
+    right: 30%;
     z-index: 2000;
     background-color: rgba(0,0,0,0.5);
-    display: table-cell;
-    text-align: center;
-    vertical-align: middle;
 }
