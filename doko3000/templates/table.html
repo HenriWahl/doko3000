@@ -1,40 +1,40 @@
 {% extends "base.html" %}
 
 {% block custom_content %}
-<a href="{{ url_for('login') }}">login</a>
-<a href="{{ url_for('logout') }}">logout</a>
-{{ current_user.username }}
+    <div id="overlay-control">
+        <a href="{{ url_for('login') }}">login</a>
+        <a href="{{ url_for('logout') }}">logout</a>
+        {{ current_user.username }}
 
-<div class="alert alert-info d-none" id="turn_indicator">Your turn</div>
+        <div class="alert alert-info d-none" id="turn_indicator">Your turn</div>
 
-<p></p>
-<button id="deal_cards" type="button" class="btn btn-info
+        <p></p>
+        <button id="deal_cards" type="button" class="btn btn-info
     {% if current_user.username != dealer %}
     d-none
     {% endif %}
     " data-table="{{ table.name }}">Karten Geben
-</button>
-<p></p>
+        </button>
+        <p></p>
 
-<p></p>
-<button id="claim_trick" type="button" class="btn btn-info d-none" data-table="{{ table.name }}">Karten Schnappen
-</button>
-<p></p>
-<button id="next_round" type="button" class="btn btn-info d-none" data-table="{{ table.name }}">Nächste Runde
-</button>
-<p></p>
-
-<div class="row align-items-center w-100 h-50">
-    <div class="col-12 w-100 h-50">
-        <div class="d-flex justify-content-center" id="table">
+        <p></p>
+        <button id="claim_trick" type="button" class="btn btn-info d-none" data-table="{{ table.name }}">Karten
+            Schnappen
+        </button>
+        <p></p>
+        <button id="next_round" type="button" class="btn btn-info d-none" data-table="{{ table.name }}">Nächste Runde
+        </button>
+        <p></p>
+    </div>
+    <div class="row align-items-center w-100 h-50">
+        <div class="w-100 h-100 d-flex justify-content-center align-items-center" id="table">
             Tisch
         </div>
     </div>
-</div>
 
-<div class="row w-100 h-50">
-    <div class="w-100 h-50 container-fluid d-inline-flex justify-content-center" id="hand">
-        Hand
+    <div class="row align-items-center w-100 h-50">
+        <div class="w-100 h-100 container-fluid d-inline-flex justify-content-center align-items-center" id="hand">
+            Hand
+        </div>
     </div>
-</div>
 {% endblock custom_content %}

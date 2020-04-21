@@ -14,14 +14,14 @@
             <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
             <link rel="stylesheet" href="{{ url_for('static', filename='css/dragula.min.css') }}">
             <link rel="stylesheet" href="{{ url_for('static', filename='css/open-iconic-bootstrap.min.css') }}">
-            <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
+            <link rel="stylesheet" href="{{ url_for('static', filename='css/doko3000.css') }}?timestamp={{ timestamp }}">
         {% endblock styles %}
     {% endblock head %}
 </head>
 <body>
 
 {% block content %}
-    <div class="container-fluid main-container background h-100" id="main_content">
+    <div class="container-fluid main-container background h-100 align" id="main_content">
         {% block custom_content %}
         {% endblock custom_content %}
     </div>
@@ -50,8 +50,8 @@
     <script type="text/javascript" src="{{ url_for('static', filename='js/dragula.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/socket.io.js') }}"></script>
     <!-- doko3000 stuff -->
-    <!-- dummy timestamp to make sure that always the latest client.js will be used -->
-    <script type="text/javascript" src="{{ url_for('static', filename='js/client.js') }}?timestamp={{ timestamp }}"></script>
+    <!-- dummy timestamp to make sure that always the latest doko3000.js will be used -->
+    <script type="text/javascript" src="{{ url_for('static', filename='js/doko3000.js') }}?timestamp={{ timestamp }}"></script>
 {% endblock scripts %}
 
 </body>

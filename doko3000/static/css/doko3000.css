@@ -1,0 +1,23 @@
+html, body {
+    height: 100%;
+}
+
+.background {
+    height: 100%;
+    background-image: url("/static/img/table.jpg");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.main-container {
+    height: 100vh;
+}
+
+#overlay-control {
+    position: fixed;
+    width: 30%;
+    height: 20%;
+    z-index: 2000;
+    background-color: rgba(0, 0, 0, 0.5);
+}

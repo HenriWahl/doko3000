@@ -35,7 +35,8 @@ class Deck:
              'Ober': 3,
              'König': 4,
              'Ass': 11}
-    NUMBER = 2 # Doppelkopf :-)!
+    #NUMBER = 2 # Doppelkopf :-)!
+    NUMBER = 1 # Debugging
     cards = {}
 
     # counter for card IDs in deck
