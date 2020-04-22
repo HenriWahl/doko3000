@@ -20,7 +20,7 @@ html, body {
     width: 30%;
     height: 20%;
     z-index: 2000;
-    background-color: rgba(0, 0, 0, 0.5);
+    /*background-color: rgba(0, 0, 0, 0.5);*/
 }
 
 .overlay-button {

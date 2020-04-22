@@ -31,12 +31,12 @@ class Deck:
                'Grün',
                'Eichel')
     RANKS = {'Zehn': 10,
-             #'Unter': 2,
-             #'Ober': 3,
-             #'König': 4,
+             'Unter': 2,
+             'Ober': 3,
+             'König': 4,
              'Ass': 11}
-    #NUMBER = 2 # Doppelkopf :-)!
-    NUMBER = 1 # Debugging
+    NUMBER = 2 # Doppelkopf :-)!
+    #NUMBER = 1 # Debugging
     cards = {}
 
     # counter for card IDs in deck
