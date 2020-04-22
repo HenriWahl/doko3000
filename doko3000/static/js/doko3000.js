@@ -83,7 +83,7 @@ $(document).ready(function () {
     socket.on('your-cards-please', function (msg) {
         next_player = msg.next_player
         cards_locked = false
-        $('#table').html('Tisch')
+        $('#table').html('')
         $('#hand').html(msg.html)
         $('#claim_trick').addClass('d-none')
         if (username == next_player) {
@@ -97,7 +97,7 @@ $(document).ready(function () {
         next_player = msg.next_player
         console.log(msg)
         cards_locked = false
-        $('#table').html('Tisch')
+        $('#table').html('')
         if (username == next_player) {
             $('#turn_indicator').removeClass('d-none')
         } else {
@@ -106,10 +106,14 @@ $(document).ready(function () {
 
     })
 
-    socket.on('next-round', function (msg) {
-        console.log('next-round', msg)
+    socket.on('round-finished', function (msg) {
+        console.log('round-finished', msg)
         $('#claim_trick').addClass('d-none')
-        $('#next_round').removeClass('d-none')
+        // $('#next_round').removeClass('d-none')
+        $('#modal_title').html('<strong>Runde beendet</strong>')
+        // Inhalt des Dialogs erst einmal leeren, damit keine alten Reste darin kleben
+        $('#modal_body').html(msg.html)
+        $("#modal_dialog").modal()
     })
 
     socket.on('start-next-round', function (msg) {

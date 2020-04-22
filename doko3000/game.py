@@ -31,12 +31,12 @@ class Deck:
                'Grün',
                'Eichel')
     RANKS = {'Zehn': 10,
-             'Unter': 2,
-             'Ober': 3,
-             'König': 4,
+             # 'Unter': 2,
+             # 'Ober': 3,
+             # 'König': 4,
              'Ass': 11}
-    NUMBER = 2 # Doppelkopf :-)!
-    #NUMBER = 1 # Debugging
+    #NUMBER = 2 # Doppelkopf :-)!
+    NUMBER = 1 # Debugging
     cards = {}
 
     # counter for card IDs in deck
@@ -72,14 +72,6 @@ class Player:
     def remove_all_cards(self):
         self.cards = []
 
-    # def get_cards_as_dict(self):
-    #     cards_as_dict = {}
-    #     for card in self.cards:
-    #         print(card.name, card.id)
-    #         cards_as_dict[card.id] = card.name
-    #     print(len(self.cards))
-    #     return cards_as_dict
-
 
 class Trick:
     """
@@ -95,12 +87,13 @@ class Trick:
     def __len__(self):
         return len(self.players)
 
-    def add_turn(self, player, card):
+    def add_turn(self, player_name, card_id):
         """
         when player plays card it will be added
+        player_name is enough here but card object is needed, at least for getting card value
         """
-        self.players.append(player)
-        self.cards.append(card)
+        self.players.append(player_name)
+        self.cards.append(Deck.cards[card_id])
 
     def get_turn(self, turn_number):
         """
@@ -213,6 +206,16 @@ class Round:
         """
         print(len(Deck.cards), self.turn_count)
         return len(Deck.cards) == self.turn_count
+
+    def get_score(self):
+        score = {}
+        for trick in self.tricks:
+            if trick.owner.name not in score:
+                score[trick.owner.name] = 0
+            for card in trick.cards:
+                score[trick.owner.name] += card.value
+        return score
+
 
 class Table:
     """
