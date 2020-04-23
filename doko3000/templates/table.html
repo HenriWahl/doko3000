@@ -1,17 +1,17 @@
 {% extends "base.html" %}
 
 {% block custom_content %}
+<div id="overlay-hud">
+
+</div>
+
+
 <div id="overlay-control">
     <div class="float-right m-2 top-bar">
         <span class="oi oi-person text-black-50"></span>
         <span class="text-black-50">{{ current_user.username }}</span>
         <a href="{{ url_for('logout') }}"><span class="oi oi-account-logout text-black-50"></span></a>
     </div>
-
-    <!--    <div class="alert alert-info d-none" id="turn_indicator">Your turn</div>-->
-
-    <p></p>
-
 </div>
 
 <div id="deal_cards" class="row overlay-button justify-content-center
@@ -21,11 +21,6 @@
      data-table="{{ table.name }}">
     <button class="btn btn-info btn-block btn-lg"><strong>Karten geben</strong></button>
 </div>
-
-<!--<div id="next_round" class="row overlay-button justify-content-center d-none"-->
-<!--     data-table="{{ table.name }}">-->
-<!--    <button class="btn btn-primary btn-block btn-lg"><strong>Bereit zur nächsten Runde</strong></button>-->
-<!--</div>-->
 
 <div id="claim_trick" class="row overlay-button justify-content-center d-none"
      data-table="{{ table.name }}">

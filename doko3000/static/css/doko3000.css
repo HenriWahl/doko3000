@@ -19,6 +19,16 @@ html, body {
     font-size: x-large;
 }
 
+#overlay-hud {
+    position: fixed;
+    width: 30%;
+    height: 30%;
+    right: 70%;
+    z-index: 1000;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+
 #overlay-control {
     position: fixed;
     width: 40%;
