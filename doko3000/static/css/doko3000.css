@@ -16,29 +16,42 @@ html, body {
 }
 
 .top-bar {
-    font-size: x-large;
+    font-size: large;
+    color: white;
 }
 
-#overlay-hud {
+#index_menu {
     position: fixed;
-    width: 30%;
+    top: 10%;
+    height: 90%;
+    width: 100%;
+    left: 0;
+    z-index: 100;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+#overlay_topbar {
+    position: fixed;
+    width: 100%;
+    height: 10%;
+    left: 0;
+    top: 0;
+    z-index: 100;
+    /*background-color: rgba(0, 0, 0, 0.5);*/
+    background: linear-gradient(to top, #cccccc00 0%, #333333cc 100%);
+}
+
+#overlay_hud {
+    position: fixed;
+    top: 10%;
+    width: 20%;
     height: 30%;
-    right: 70%;
+    right: 80%;
     z-index: 1000;
-    /*background-color: rgba(0, 0, 0, 0.5);*/
+    background-color: rgba(0, 0, 0, 0.5);
 }
 
-
-#overlay-control {
-    position: fixed;
-    width: 40%;
-    height: 20%;
-    left: 60%;
-    z-index: 1000;
-    /*background-color: rgba(0, 0, 0, 0.5);*/
-}
-
-.overlay-button {
+.overlay_button {
     position: fixed;
     width: 60%;
     height: 16%;
@@ -49,7 +62,7 @@ html, body {
     z-index: 2000;
 }
 
-.overlay-notification {
+.overlay_notification {
     position: fixed;
     width: 40%;
     height: 10%;
@@ -59,4 +72,8 @@ html, body {
     right: 30%;
     z-index: 2000;
     background-color: rgba(0,0,0,0.5);
+}
+
+.game_card {
+    z-index: 200;
 }

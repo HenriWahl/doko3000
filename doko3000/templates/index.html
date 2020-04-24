@@ -1,33 +1,38 @@
 {% extends "base.html" %}
 
 {% block custom_content %}
-    <a href="{{ url_for('login') }}">login</a>
-    <a href="{{ url_for('logout') }}">logout</a>
-    {{ current_user.username }}
-    <p>
-        <button id="new_table" type="button" class="btn btn-info">Neuer Tisch</button>
-    <p></p>
-    Tische:
-    <div class="list-group" id="list_tables">
-        {% include 'list_tables.html' %}
+{% include 'overlay_topbar.html' %}
+
+<div id="index_menu">
+    <!--    <button id="new_table" type="button" class="btn btn-info">Neuer Tisch</button>-->
+    <!--    <p></p>-->
+    <!--    Tische:-->
+    <!--    <div class="list-group" id="list_tables">-->
+    <!--        {% include 'list_tables.html' %}-->
+    <!--    </div>-->
+    <div class="row">
+        <div class="col-1"></div>
+        <div class="col-5 p-4">
+            <h3>
+                Spieler
+                <button class="btn btn-success btn-sm float-right"><span class="oi oi-plus mr-1"></span>Hinzufügen
+                </button>
+            </h3>
+            <div class="list-group" id="list_players">
+                {% include 'list_players.html' %}
+            </div>
+        </div>
+        <div class="col-5 p-4">
+            <h3>
+                Tische
+                <button class="btn btn-success btn-sm float-right"><span class="oi oi-plus mr-1"></span>Hinzufügen
+                </button>
+            </h3>
+            <div class="list-group" id="list_tables">
+                {% include 'list_tables.html' %}
+            </div>
+        </div>
+        <div class="col-1"></div>
     </div>
-    {#    <div class="row">#}
-    {#        <div class="col-md-12 w-100 h-75 bg-success container" id="table">#}
-    {#            Tisch#}
-    {#        </div>#}
-    {#    </div>#}
-    {#    <div class="row">#}
-    {#        <div class="col-md-12 w-100 h-25 bg-danger container" id="hand">#}
-    {#            Hand#}
-    {#            <div class="card" id="card1">#}
-    {#                <div class="card-body">card1</div>#}
-    {#            </div>#}
-    {#            <div class="card" id="card2">#}
-    {#                <div class="card-body">card2</div>#}
-    {#            </div>#}
-    {#            <div class="card" id="card3">#}
-    {#                <div class="card-body">card3</div>#}
-    {#            </div>#}
-    {#        </div>#}
-    {#    </div>#}
+</div>
 {% endblock custom_content %}

@@ -192,6 +192,7 @@ def logout():
 def index():
     return render_template('index.html',
                            tables=game.get_tables(),
+                           players=game.get_players(),
                            title='doko3000')
 
 

@@ -1,20 +1,15 @@
 {% extends "base.html" %}
 
 {% block custom_content %}
-<div id="overlay-hud">
+<div id="overlay_hud">
+    <div id="players">
 
-</div>
-
-
-<div id="overlay-control">
-    <div class="float-right m-2 top-bar">
-        <span class="oi oi-person text-black-50"></span>
-        <span class="text-black-50">{{ current_user.username }}</span>
-        <a href="{{ url_for('logout') }}"><span class="oi oi-account-logout text-black-50"></span></a>
     </div>
 </div>
 
-<div id="deal_cards" class="row overlay-button justify-content-center
+{% include 'overlay_topbar.html' %}
+
+<div id="deal_cards" class="row overlay_button justify-content-center
     {% if current_user.username != dealer %}
     d-none
     {% endif %}"
@@ -22,12 +17,12 @@
     <button class="btn btn-info btn-block btn-lg"><strong>Karten geben</strong></button>
 </div>
 
-<div id="claim_trick" class="row overlay-button justify-content-center d-none"
+<div id="claim_trick" class="row overlay_button justify-content-center d-none"
      data-table="{{ table.name }}">
     <button class="btn btn-success btn-block btn-lg"><strong>Stich nehmen</strong></button>
 </div>
 
-<button id="turn_indicator" class="overlay-notification btn btn-block btn-lg text-white d-none">Du bist am Zug</button>
+<button id="turn_indicator" class="overlay_notification btn btn-block btn-lg text-white d-none">Du bist am Zug</button>
 
 <div class="row align-items-center w-100 h-50">
     <div class="w-100 h-100 d-flex justify-content-center align-items-center" id="table">

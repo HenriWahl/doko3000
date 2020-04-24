@@ -1,3 +1,10 @@
 {% for table in tables %}
-<a href="/table/{{ table.name }}" class="list-group-item list-group-item-action list-item-table" id="{{ table.name }}" data-table="{{ table.name }}">{{ table.name }}</a>
+<a href="/table/{{ table.name }}"
+   class="list-group-item list-group-item-action list-item-table"
+   id="{{ table.name }}"
+   data-table="{{ table.name }}">
+    <strong>
+        {{ table.name }}
+    </strong>
+</a>
 {% endfor %}

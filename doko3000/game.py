@@ -282,6 +282,14 @@ class Game:
         seed()
         # store tables
         self.tables = {}
+        self.players = {}
+
+    def add_player(self, name):
+        """
+        adds a new player
+        """
+        self.players[name] = Player(name)
+        return self.players[name]
 
     def add_table(self, name):
         """
@@ -301,6 +309,9 @@ class Game:
     def get_tables_names(self):
         return list(self.tables.keys())
 
+    def get_players(self):
+        return self.players.values()
+
 
 game = Game()
 
@@ -309,7 +320,7 @@ def test_game():
     game.add_table('test')
     for name in ('test1', 'test2', 'test3', 'test4', 'test5'):
     #for name in ('test1', 'test2', 'test3', 'test4'):
-        player = Player(name)
+        player = game.add_player(name)
         game.tables['test'].add_player(player)
     game.tables['test'].order = ['test1', 'test2', 'test3', 'test4', 'test5']
     #game.tables['test'].order = ['test1', 'test2', 'test3', 'test4']
