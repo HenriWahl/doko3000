@@ -9,7 +9,7 @@
 {% include 'overlay_topbar.html' %}
 
 <div id="deal_cards" class="row overlay_button justify-content-center
-    {% if current_user.username != dealer %}
+    {% if current_user.name != dealer %}
     d-none
     {% endif %}"
      data-table="{{ table.name }}">

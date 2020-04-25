@@ -1,7 +1,14 @@
 # game logic part of doko3000
 
-from random import seed,\
-                   shuffle
+from random import seed, \
+    shuffle
+
+from flask_login import UserMixin
+from werkzeug.security import check_password_hash, \
+    generate_password_hash
+
+from doko3000 import db, \
+    login
 
 
 class Card:
@@ -53,18 +60,41 @@ class Deck:
     #         cards[card_id] = Card(symbol, rank, card_id)
     #         card_id += 1
 
-
-class Player:
+class Player(UserMixin, db.Model):
     """
     one single player on a table
     """
-    def __init__(self, name):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), index=True, unique=True)
+    password_hash = db.Column(db.String(128))
+
+    def __init__(self, name='', **kwargs):
         # Name of player
         self.name = name
         # current set of cards
         self.cards = []
         # gained cards
         self.tricks = []
+
+    def __repr__(self):
+        """
+        representation
+        """
+        return f'<User {self.name}>'
+
+    def set_password(self, password):
+        """
+        create hash of given password
+        """
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password):
+        """
+        compare hashed password with given one
+        """
+        return check_password_hash(self.password_hash, password)
+
+
 
     def add_card(self, card):
         self.cards.append(card)
@@ -315,6 +345,14 @@ class Game:
         return self.players.values()
 
 
+# # initialize database - has to be done here
+db.create_all()
+db.session.commit()
+
+@login.user_loader
+def load_user(id):
+    return Player.query.get(int(id))
+
 game = Game()
 
 
@@ -328,3 +366,12 @@ def test_game():
     #game.tables['test'].order = ['test1', 'test2', 'test3', 'test4']
 
     game.tables['test'].add_round()
+
+
+def test_models():
+    for test_user in ('admin', 'test1', 'test2', 'test3', 'test4', 'test5'):
+        if Player.query.filter_by(name=test_user).first() is None:
+            user = Player(name=test_user)
+            user.set_password(test_user)
+            db.session.add(user)
+            db.session.commit()

@@ -20,5 +20,5 @@ login.login_view = 'login'
 socketio = SocketIO(app)
 
 # workaround from Miguel Grinberg - even if not PEP8-ic
-from doko3000 import models,\
+from doko3000 import game,\
                      routes

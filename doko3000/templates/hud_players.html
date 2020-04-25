@@ -1,6 +1,6 @@
 <!--<ul class="list-group list-group-flush list-group-horizontal">-->
 {% for player in order %}
-<span class="{% if (player.name == next_player and not is_last_turn) or (player.name == current_user.username and is_last_turn) %}
+<span class="{% if (player.name == next_player and not is_last_turn) or (player.name == current_user.name and is_last_turn) %}
     font-weight-bolder text-uppercase
     {% endif %}">{{ player.name }}</span>
 {% endfor %}

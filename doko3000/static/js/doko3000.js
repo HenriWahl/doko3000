@@ -1,5 +1,5 @@
-// globally used username
-let username = ''
+// globally used playername
+let playername = ''
 // for staying in sync with the game this is global
 let turn_count = 0
 // keep an eye on next player to know if turns are allowed or not
@@ -19,17 +19,17 @@ $(document).ready(function () {
 
     dragging.on('drop', function (card, target, source) {
         console.log('cards_locked:', cards_locked)
-        if (source.id == 'hand' && target.id == 'table' && username == next_player && !cards_locked) {
+        if (source.id == 'hand' && target.id == 'table' && playername == next_player && !cards_locked) {
             $('#table').append(card)
             socket.emit('played-card', {
-                username: username,
+                playername: playername,
                 card_id: $(card).data('id'),
                 card_name: $(card).data('name'),
                 table: $(card).data('table')
             })
         } else if (source.id == 'hand' && target.id == 'hand') {
             return true
-        } else if (source.id == 'table' || cards_locked || username != next_player) {
+        } else if (source.id == 'table' || cards_locked || playername != next_player) {
             dragging.cancel(true)
         }
     })
@@ -42,8 +42,8 @@ $(document).ready(function () {
     })
 
     socket.on('you-are-what-you-is', function (msg) {
-        if (username == '') {
-            username = msg.username
+        if (playername == '') {
+            playername = msg.playername
         }
     })
 
@@ -57,7 +57,7 @@ $(document).ready(function () {
         $('#hud_players').html('')
         $('#hud_players').html(msg.html.hud_players)
 
-        if (username != msg.username) {
+        if (playername != msg.playername) {
             $('#table').append(msg.html.card)
         }
         if (msg.is_last_turn) {
@@ -66,7 +66,7 @@ $(document).ready(function () {
             $('#claim_trick').removeClass('d-none')
         } else {
             cards_locked = false
-            if (username == next_player) {
+            if (playername == next_player) {
                 $('#turn_indicator').removeClass('d-none')
             } else {
                 $('#turn_indicator').addClass('d-none')
@@ -79,7 +79,7 @@ $(document).ready(function () {
 
     socket.on('grab-your-cards', function (msg) {
         socket.emit('my-cards-please', {
-            username: username,
+            playername: playername,
             table: msg.table
         })
     })
@@ -91,7 +91,7 @@ $(document).ready(function () {
         $('#hud_players').html(msg.html.hud_players)
         $('#hand').html(msg.html.cards_hand)
         $('#claim_trick').addClass('d-none')
-        if (username == next_player) {
+        if (playername == next_player) {
             $('#turn_indicator').removeClass('d-none')
         } else {
             $('#turn_indicator').addClass('d-none')
@@ -103,7 +103,7 @@ $(document).ready(function () {
         console.log(msg)
         cards_locked = false
         $('#table').html('')
-        if (username == next_player) {
+        if (playername == next_player) {
             $('#turn_indicator').removeClass('d-none')
         } else {
             $('#turn_indicator').addClass('d-none')
@@ -122,7 +122,7 @@ $(document).ready(function () {
     })
 
     socket.on('start-next-round', function (msg) {
-        if (username == msg.dealer) {
+        if (playername == msg.dealer) {
             $('#deal_cards').removeClass('d-none')
         } else {
             $('#deal_cards').addClass('d-none')
@@ -139,14 +139,14 @@ $(document).ready(function () {
 
     $(document).on('click', '.list-item-table', function () {
         socket.emit('enter-table', {
-            username: username,
+            playername: playername,
             table: $(this).data('table')
         })
     })
 
     $(document).on('click', '#deal_cards', function () {
         socket.emit('deal-cards', {
-            username: username,
+            playername: playername,
             table: $(this).data('table')
         })
     })
@@ -154,7 +154,7 @@ $(document).ready(function () {
     $(document).on('click', '#claim_trick', function () {
         console.log('claim trick')
         socket.emit('claim-trick', {
-            username: username,
+            playername: playername,
             table: $(this).data('table')
         })
     })
@@ -163,7 +163,7 @@ $(document).ready(function () {
         console.log('next_round')
         $('#next_round').addClass('d-none')
         socket.emit('ready-for-next-round', {
-            username: username,
+            playername: playername,
             table: $(this).data('table')
         })
     })
