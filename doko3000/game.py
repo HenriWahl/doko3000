@@ -68,6 +68,7 @@ class Player(UserMixin, db.Model):
     name = db.Column(db.String(64), index=True, unique=True)
     password_hash = db.Column(db.String(128))
 
+
     def __init__(self, name='', **kwargs):
         # Name of player
         self.name = name
