@@ -53,8 +53,12 @@ $(document).ready(function () {
 
     socket.on('played-card-by-user', function (msg) {
         next_player = msg.next_player
+        console.log(msg)
+        $('#hud_players').html('')
+        $('#hud_players').html(msg.html.hud_players)
+
         if (username != msg.username) {
-            $('#table').append(msg.html)
+            $('#table').append(msg.html.card)
         }
         if (msg.is_last_turn) {
             cards_locked = true
@@ -84,7 +88,8 @@ $(document).ready(function () {
         next_player = msg.next_player
         cards_locked = false
         $('#table').html('')
-        $('#hand').html(msg.html)
+        $('#hud_players').html(msg.html.hud_players)
+        $('#hand').html(msg.html.cards_hand)
         $('#claim_trick').addClass('d-none')
         if (username == next_player) {
             $('#turn_indicator').removeClass('d-none')

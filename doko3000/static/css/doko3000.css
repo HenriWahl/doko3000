@@ -48,7 +48,7 @@ html, body {
     height: 30%;
     right: 80%;
     z-index: 1000;
-    background-color: rgba(0, 0, 0, 0.5);
+    /*background-color: rgba(0, 0, 0, 0.5);*/
 }
 
 .overlay_button {

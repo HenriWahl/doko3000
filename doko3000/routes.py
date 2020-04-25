@@ -54,16 +54,22 @@ def played_card(msg):
     if current_user.username == msg['username'] == table.current_round.current_player.name:
         table.current_round.current_trick.add_turn(msg['username'], card_id)
         table.current_round.turn_count += 1
+        is_last_turn = table.current_round.current_trick.is_last_turn()
         next_player = table.current_round.get_next_player()
         socketio.emit('played-card-by-user',
                       {'username': msg['username'],
                        'card_id': card_id,
                        'card_name': msg['card_name'],
-                       'is_last_turn': table.current_round.current_trick.is_last_turn(),
+                       'is_last_turn': is_last_turn,
                        'next_player': next_player.name,
-                       'html': render_template('card.html',
+                       'html': {'card': render_template('card.html',
                                                card=Deck.cards[card_id],
-                                               table=table)},
+                                               table=table),
+                                'hud_players': render_template('hud_players.html',
+                                                               order=table.current_round.order,
+                                                               is_last_turn=is_last_turn,
+                                                               next_player=next_player.name)
+                                }},
                       broadcast=True)
 
 
@@ -101,9 +107,13 @@ def deal_cards_to_player(msg):
                           {'username': username,
                            'turn_count': table.current_round.turn_count,
                            'next_player': table.current_round.order[1].name,
-                           'html': render_template('cards_hand.html',
-                                                   cards=cards,
-                                                   table=table)},
+                           # 'order_names': table.current_round.order_names,
+                           'html': {'cards_hand': render_template('cards_hand.html',
+                                                                  cards=cards,
+                                                                  table=table),
+                                    'hud_players': render_template('hud_players.html',
+                                                                   order=table.current_round.order,
+                                                                   next_player=table.current_round.order[1].name)}},
                           room=request.sid)
 
 
@@ -206,7 +216,7 @@ def table(table=''):
                                title=f'doko3000 {table}',
                                table=game.tables[table],
                                dealer=game.tables[table].current_round.order[0].name
-)
+                               )
     return render_template('index.html',
                            tables=game.tables,
                            title='doko3000')

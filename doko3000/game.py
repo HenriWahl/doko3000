@@ -129,6 +129,8 @@ class Round:
         self.players = players
         # order is important - index 0 is the dealer
         self.order = list(players.values())
+        # # list of players as names for JSON serialization
+        # self.order_names = [x.name for x in self.order]
         # cards are an important part but makes in a round context only sense if shuffled
         self.cards = list(Deck.cards.values())
         # needed to know how many cards are dealed
