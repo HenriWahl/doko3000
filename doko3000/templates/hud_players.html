@@ -1,7 +1,42 @@
 <!--<ul class="list-group list-group-flush list-group-horizontal">-->
-{% for player in order %}
-<span class="{% if (player.name == next_player and not is_last_turn) or (player.name == current_user.name and is_last_turn) %}
-    font-weight-bolder text-uppercase
-    {% endif %}">{{ player.name }}</span>
-{% endfor %}
+{#{% for player in players %}#}
+{#<span class="{% if (player.name == next_player and not is_last_turn) or (player.name == current_user.username and is_last_turn) %}#}
+{#    font-weight-bolder text-uppercase#}
+{#    {% endif %}">{{ player.name }}</span>#}
+{#{% endfor %}#}
+
+<span id="hud_player_{{ player.left.name }}" class="hud_player
+{% if player.left.name == next_player.name %}
+border rounded p-2 text-black-50 bg-white
+{% endif %}
+"><span class="oi oi-arrow-thick-left"></span>
+    {% if player.left.name == dealer.name %}
+        <span class="oi oi-layers"></span>
+    {% endif %}
+    {{ player.left.name }}
+</span>
+&nbsp;
+<span id="hud_player_{{ player.opposite.name }}" class="hud_player
+{% if player.opposite.name == next_player.name %}
+border rounded p-2 text-black-50 bg-white
+{% endif %}
+">
+        {% if player.opposite.name == dealer.name %}
+            <span class="oi oi-layers"></span>
+        {% endif %}
+    {{ player.opposite.name }}</span>
+&nbsp;
+<span id="hud_player_{{ player.right.name }}" class="hud_player
+{% if player.right.name == next_player.name %}
+border rounded p-2 text-black-50 bg-white
+{% endif %}
+">
+    {% if player.right.name == dealer.name %}
+        <span class="oi oi-layers"></span>
+    {% endif %}
+    {{ player.right.name }} <span
+        class="oi oi-arrow-thick-right">
+</span>
+</span>
+
 <!--</ul>-->

@@ -65,10 +65,6 @@ def played_card(msg):
                        'html': {'card': render_template('card.html',
                                                card=Deck.cards[card_id],
                                                table=table),
-                                'hud_players': render_template('hud_players.html',
-                                                               order=table.current_round.order,
-                                                               is_last_turn=is_last_turn,
-                                                               next_player=next_player.name)
                                 }},
                       broadcast=True)
 
@@ -103,6 +99,9 @@ def deal_cards_to_player(msg):
         table = game.tables[msg['table']]
         if playername in table.current_round.players:
             cards = table.current_round.players[playername].cards
+            player = table.current_round.players[playername]
+            dealer = table.current_round.order[0]
+            next_player = table.current_round.order[1]
             socketio.emit('your-cards-please',
                           {'playername': playername,
                            'turn_count': table.current_round.turn_count,
@@ -112,8 +111,9 @@ def deal_cards_to_player(msg):
                                                                   cards=cards,
                                                                   table=table),
                                     'hud_players': render_template('hud_players.html',
-                                                                   order=table.current_round.order,
-                                                                   next_player=table.current_round.order[1].name)}},
+                                                                   player=player,
+                                                                   dealer=dealer,
+                                                                   next_player=next_player)}},
                           room=request.sid)
 
 
