@@ -106,10 +106,12 @@ $(document).ready(function () {
         console.log(msg)
         cards_locked = false
         $('#table').html('')
+        $('.hud_player').removeClass('border rounded p-2 text-black-50 bg-white')
         if (username == next_player) {
             $('#turn_indicator').removeClass('d-none')
         } else {
             $('#turn_indicator').addClass('d-none')
+            $('#hud_player_' + next_player).addClass('border rounded p-2 text-black-50 bg-white')
         }
 
     })
