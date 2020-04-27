@@ -99,6 +99,9 @@ def deal_cards_to_player(msg):
         table = game.tables[msg['table']]
         if username in table.current_round.players:
             cards = table.current_round.players[username].cards
+            player = table.current_round.players[username]
+            dealer = table.current_round.order[0]
+            next_player = table.current_round.order[1]
             socketio.emit('your-cards-please',
                           {'username': username,
                            'turn_count': table.current_round.turn_count,
@@ -108,8 +111,9 @@ def deal_cards_to_player(msg):
                                                                   cards=cards,
                                                                   table=table),
                                     'hud_players': render_template('hud_players.html',
-                                                                   player=table.current_round.players[username],
-                                                                   next_player=table.current_round.order[1].name)}},
+                                                                   player=player,
+                                                                   dealer=dealer,
+                                                                   next_player=next_player)}},
                           room=request.sid)
 
 
