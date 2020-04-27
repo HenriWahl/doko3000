@@ -54,9 +54,12 @@ $(document).ready(function () {
     socket.on('played-card-by-user', function (msg) {
         next_player = msg.next_player
         console.log(msg)
-        $('#hud_players').html('')
-        $('#hud_players').html(msg.html.hud_players)
-
+        // $('#hud_players').html('')
+        // $('#hud_players').html(msg.html.hud_players)
+        $('.hud_player').removeClass('border rounded p-2 text-black-50 bg-white')
+        if (!msg.is_last_turn) {
+            $('#hud_player_' + msg.next_player).addClass('border rounded p-2 text-black-50 bg-white')
+        }
         if (username != msg.username) {
             $('#table').append(msg.html.card)
         }

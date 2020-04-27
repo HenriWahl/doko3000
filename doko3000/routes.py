@@ -65,10 +65,6 @@ def played_card(msg):
                        'html': {'card': render_template('card.html',
                                                card=Deck.cards[card_id],
                                                table=table),
-                                'hud_players': render_template('hud_players.html',
-                                                               order=table.current_round.order,
-                                                               is_last_turn=is_last_turn,
-                                                               next_player=next_player.name)
                                 }},
                       broadcast=True)
 
@@ -112,7 +108,7 @@ def deal_cards_to_player(msg):
                                                                   cards=cards,
                                                                   table=table),
                                     'hud_players': render_template('hud_players.html',
-                                                                   order=table.current_round.order,
+                                                                   player=table.current_round.players[username],
                                                                    next_player=table.current_round.order[1].name)}},
                           room=request.sid)
 

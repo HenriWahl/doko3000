@@ -1,5 +1,6 @@
 # game logic part of doko3000
 
+from copy import copy
 from random import seed,\
                    shuffle
 
@@ -65,6 +66,8 @@ class Player:
         self.cards = []
         # gained cards
         self.tricks = []
+        # other players to the left, opposite and right of table
+        self.left = self.opposite = self.right = None
 
     def add_card(self, card):
         self.cards.append(card)
@@ -129,6 +132,9 @@ class Round:
         self.players = players
         # order is important - index 0 is the dealer
         self.order = list(players.values())
+
+        self.tell_players_about_opponents()
+
         # # list of players as names for JSON serialization
         # self.order_names = [x.name for x in self.order]
         # cards are an important part but makes in a round context only sense if shuffled
@@ -217,6 +223,21 @@ class Round:
             for card in trick.cards:
                 score[trick.owner.name] += card.value
         return score
+
+    def tell_players_about_opponents(self):
+        """
+        give players info about whom they are playing against - interesting for HUD display
+        """
+        for player in self.players.values():
+            player_index = [x.name for x in self.order].index(player.name)
+            player_order_view = copy(self.order)
+            for i in range(player_index):
+                player_order_view.append(player_order_view.pop(0))
+            print([x.name for x in player_order_view])
+            player.left = player_order_view[1]
+            player.opposite = player_order_view[2]
+            player.right = player_order_view[3]
+
 
 
 class Table:
