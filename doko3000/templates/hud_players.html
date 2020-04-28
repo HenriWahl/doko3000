@@ -7,7 +7,7 @@
 
 <span id="hud_player_{{ player.left.name }}" class="hud_player
 {% if player.left.name == next_player.name %}
-border rounded p-2 text-black-50 bg-white
+hud_player_active
 {% endif %}
 "><span class="oi oi-arrow-thick-left"></span>
     {% if player.left.name == dealer.name %}
@@ -18,7 +18,7 @@ border rounded p-2 text-black-50 bg-white
 &nbsp;
 <span id="hud_player_{{ player.opposite.name }}" class="hud_player
 {% if player.opposite.name == next_player.name %}
-border rounded p-2 text-black-50 bg-white
+hud_player_active
 {% endif %}
 ">
         {% if player.opposite.name == dealer.name %}
@@ -28,7 +28,7 @@ border rounded p-2 text-black-50 bg-white
 &nbsp;
 <span id="hud_player_{{ player.right.name }}" class="hud_player
 {% if player.right.name == next_player.name %}
-border rounded p-2 text-black-50 bg-white
+hud_player_active
 {% endif %}
 ">
     {% if player.right.name == dealer.name %}

@@ -57,9 +57,9 @@ $(document).ready(function () {
         console.log(msg)
         // $('#hud_players').html('')
         // $('#hud_players').html(msg.html.hud_players)
-        $('.hud_player').removeClass('border rounded p-2 text-black-50 bg-white')
+        $('.hud_player').removeClass('hud_player_active')
         if (!msg.is_last_turn) {
-            $('#hud_player_' + msg.next_player).addClass('border rounded p-2 text-black-50 bg-white')
+            $('#hud_player_' + msg.next_player).addClass('hud_player_active')
         }
         if (playername != msg.playername) {
             $('#table').append(msg.html.card)
@@ -108,12 +108,12 @@ $(document).ready(function () {
         console.log(msg)
         cards_locked = false
         $('#table').html('')
-        $('.hud_player').removeClass('border rounded p-2 text-black-50 bg-white')
+        $('.hud_player').removeClass('hud_player_active')
         if (playername == next_player) {
             $('#turn_indicator').removeClass('d-none')
         } else {
             $('#turn_indicator').addClass('d-none')
-            $('#hud_player_' + next_player).addClass('border rounded p-2 text-black-50 bg-white')
+            $('#hud_player_' + next_player).addClass('hud_player_active')
         }
 
     })
