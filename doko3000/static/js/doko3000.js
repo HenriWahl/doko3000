@@ -18,9 +18,13 @@ $(document).ready(function () {
     ]);
 
     dragging.on('drop', function (card, target, source) {
-        console.log('cards_locked:', cards_locked)
-        if (source.id == 'hand' && target.id == 'table' && playername == next_player && !cards_locked) {
+        // do not drag your gained tricks around
+        if (card.id == 'cards_stack') {
+            dragging.cancel(true)
+        } else if (source.id == 'hand' && target.id == 'table' && playername == next_player && !cards_locked) {
+            console.log(card.id == 'cards_stack')
             $('#table').append(card)
+            // add tooltip
             $(card).attr('title', playername)
             socket.emit('played-card', {
                 playername: playername,
@@ -78,6 +82,9 @@ $(document).ready(function () {
             }
             $('#claim_trick').addClass('d-none')
         }
+
+        $('#card_' + msg.card_id).attr('alt', msg.username)
+
         // anyway there is no need anymore to deal cards
         $('#deal_cards').addClass('d-none')
     })

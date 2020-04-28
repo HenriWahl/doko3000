@@ -97,3 +97,10 @@ html, body {
 .game_card {
     z-index: 200;
 }
+
+.badge-notify{
+   position: relative;
+   background:red;
+   top: 20px;
+   right: 35px;
+}
