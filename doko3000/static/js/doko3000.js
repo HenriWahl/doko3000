@@ -83,7 +83,7 @@ $(document).ready(function () {
             $('#claim_trick').addClass('d-none')
         }
 
-        $('#card_' + msg.card_id).attr('alt', msg.username)
+        // $('#card_' + msg.card_id).attr('alt', msg.username)
 
         // anyway there is no need anymore to deal cards
         $('#deal_cards').addClass('d-none')
@@ -122,7 +122,15 @@ $(document).ready(function () {
             $('#turn_indicator').addClass('d-none')
             $('#hud_player_' + next_player).addClass('hud_player_active')
         }
-
+        console.log(msg.score)
+        console.log(playername in msg.score)
+        if (playername in msg.score) {
+            console.log(msg.score[playername])
+            $('#cards_stack').attr('title', msg.score[playername])
+            $('#cards_stack').removeClass('d-none')
+        } else {
+            $('#cards_stack').addClass('d-none')
+        }
     })
 
     socket.on('round-finished', function (msg) {

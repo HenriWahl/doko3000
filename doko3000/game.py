@@ -249,10 +249,11 @@ class Round:
     def get_score(self):
         score = {}
         for trick in self.tricks:
-            if trick.owner.name not in score:
-                score[trick.owner.name] = 0
-            for card in trick.cards:
-                score[trick.owner.name] += card.value
+            if trick.owner:
+                if trick.owner.name not in score:
+                    score[trick.owner.name] = 0
+                for card in trick.cards:
+                    score[trick.owner.name] += card.value
         return score
 
     def tell_players_about_opponents(self):
