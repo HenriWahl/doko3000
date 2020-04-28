@@ -21,6 +21,7 @@ $(document).ready(function () {
         console.log('cards_locked:', cards_locked)
         if (source.id == 'hand' && target.id == 'table' && playername == next_player && !cards_locked) {
             $('#table').append(card)
+            $(card).attr('title', playername)
             socket.emit('played-card', {
                 playername: playername,
                 card_id: $(card).data('id'),
@@ -62,6 +63,7 @@ $(document).ready(function () {
         }
         if (playername != msg.playername) {
             $('#table').append(msg.html.card)
+            $('#card_' + msg.card_id).attr('title', msg.playername)
         }
         if (msg.is_last_turn) {
             cards_locked = true
