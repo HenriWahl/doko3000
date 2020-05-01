@@ -30,6 +30,7 @@ class DB:
         """
         only shows player documents - might be filterable more one day
         """
-        result = Query(self.database, selector={'type': 'player'}).result
-        print(result)
-        return Query(self.database, selector={'type': 'player'}).result
+        result = {}
+        for item in  Query(self.database, selector={'type': 'player'}).result:
+            result[item['_id']] = item
+        return result

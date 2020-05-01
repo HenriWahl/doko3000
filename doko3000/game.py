@@ -71,9 +71,9 @@ class Player(UserMixin):
 
     def __init__(self, name='', **kwargs):
         # ID still name, going to be number
-        self._id = name
+        self._id = f'player-{name}'
         # type is for CouchDB
-        self.type = 'players'
+        self.type = 'player'
         # name of player
         self.name = name
         # password hash
@@ -378,6 +378,7 @@ class Game:
 @login.user_loader
 def load_user(id):
     # return Player.query.get(int(id))
+    print(db.players)
     return True
 
 game = Game()
@@ -397,7 +398,7 @@ def test_game():
 
 def test_database():
     for test_player in ('admin', 'test1', 'test2', 'test3', 'test4', 'test5'):
-        if test_player not in db.players:
+        if f'player-{test_player}' not in db.players:
             player = Player(name=test_player)
             player.set_password(test_player)
             db.add(player)
