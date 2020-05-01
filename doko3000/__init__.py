@@ -3,16 +3,16 @@ from time import time
 from flask import Flask
 from flask_login import LoginManager
 from flask_socketio import SocketIO
-from flask_sqlalchemy import SQLAlchemy
 
-from doko3000.config import Config
+from .config import Config
+from .database import DB
 
 # initialize app
 app = Flask(__name__)
 app.config.from_object(Config)
 app.jinja_env.globals.update(timestamp=int(time()))
 # initialize database
-db = SQLAlchemy(app)
+db = DB(app)
 # login
 login = LoginManager(app)
 login.login_view = 'login'

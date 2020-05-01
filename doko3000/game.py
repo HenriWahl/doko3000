@@ -8,7 +8,7 @@ from flask_login import UserMixin
 from werkzeug.security import check_password_hash, \
     generate_password_hash
 
-from doko3000 import db, \
+from . import db, \
     login
 
 
@@ -61,22 +61,25 @@ class Deck:
     #         cards[card_id] = Card(symbol, rank, card_id)
     #         card_id += 1
 
-class Player(UserMixin, db.Model):
+
+class Player(UserMixin):
     """
     one single player on a table
     """
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(64), index=True, unique=True)
-    password_hash = db.Column(db.String(128))
-
+    # current set of cards
+    cards = []
 
     def __init__(self, name='', **kwargs):
-        # Name of player
+        # ID still name, going to be number
+        self._id = name
+        # type is for CouchDB
+        self.type = 'players'
+        # name of player
         self.name = name
+        # password hash
+        self.password_hash = ''
         # current set of cards
         self.cards = []
-        # gained cards
-        self.tricks = []
         # other players to the left, opposite and right of table
         self.left = self.opposite = self.right = None
 
@@ -84,7 +87,7 @@ class Player(UserMixin, db.Model):
         """
         representation
         """
-        return f'<User {self.name}>'
+        return f'<Player {self.name}>'
 
     def set_password(self, password):
         """
@@ -97,8 +100,6 @@ class Player(UserMixin, db.Model):
         compare hashed password with given one
         """
         return check_password_hash(self.password_hash, password)
-
-
 
     def add_card(self, card):
         self.cards.append(card)
@@ -161,6 +162,7 @@ class Round:
         # if more than 4 players they change for every round
         # changing too because of the position of dealer changes with every round
         self.players = players
+        self.players_id = [x.id for x in self.players.values()]
         # order is important - index 0 is the dealer
         self.order = list(players.values())
 
@@ -265,7 +267,6 @@ class Round:
             player_order_view = copy(self.order)
             for i in range(player_index):
                 player_order_view.append(player_order_view.pop(0))
-            print([x.name for x in player_order_view])
             player.left = player_order_view[1]
             player.opposite = player_order_view[2]
             player.right = player_order_view[3]
@@ -276,18 +277,13 @@ class Table:
     """
     Definition of a table used by group of players
     """
+
     def __init__(self, name):
-        # ID
-        self.id = 0
         # what table?
         self.name = name
-        # who plays?
-        self.players = {}
-        # how are the players seated?
+        # default empty
         self.order = []
-        # rounds, one after another
         self.rounds = []
-        # players who are ready to play the next round
         self.players_ready = []
 
     def add_player(self, player):
@@ -348,9 +344,16 @@ class Game:
 
     def add_table(self, name):
         """
-        adds a new table
+        adds a new table (to sit and play on, no database table!)
         """
-        self.tables[name] = Table(name)
+        if Table.query.filter_by(name=name).first() is None:
+            table = Table(name)
+            self.tables[name] = table
+            db.session.add(table)
+        else:
+            self.tables[name] = Table.query.filter_by(name=name).first()
+
+        db.session.commit()
 
     def has_tables(self):
         if len(self.tables) == 0:
@@ -368,13 +371,14 @@ class Game:
         return self.players.values()
 
 
-# # initialize database - has to be done here
-db.create_all()
-db.session.commit()
+# # # initialize database - has to be done here
+# db.create_all()
+# db.session.commit()
 
 @login.user_loader
 def load_user(id):
-    return Player.query.get(int(id))
+    # return Player.query.get(int(id))
+    return True
 
 game = Game()
 
@@ -391,10 +395,10 @@ def test_game():
     game.tables['test'].add_round()
 
 
-def test_models():
-    for test_user in ('admin', 'test1', 'test2', 'test3', 'test4', 'test5'):
-        if Player.query.filter_by(name=test_user).first() is None:
-            user = Player(name=test_user)
-            user.set_password(test_user)
-            db.session.add(user)
-            db.session.commit()
+def test_database():
+    for test_player in ('admin', 'test1', 'test2', 'test3', 'test4', 'test5'):
+        if test_player not in db.players:
+            player = Player(name=test_player)
+            player.set_password(test_player)
+            db.add(player)
+
