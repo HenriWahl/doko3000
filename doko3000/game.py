@@ -65,12 +65,15 @@ class Deck:
 class Player(UserMixin, Document):
     """
     one single player on a table
+
+    due to CouchDB Document class everything is now a dictionary
     """
     def __init__(self, player_id='', document_id='', **kwargs):
         if player_id:
             # ID still name, going to be number - for CouchDB
             self['_id'] = f'player-{player_id}'
-            # ID for login
+            Document.__init__(self, db.database, document_id=document_id)
+            # ID for flask-login
             self['id'] = player_id
             # type is for CouchDB
             self['type'] = 'player'
@@ -82,6 +85,7 @@ class Player(UserMixin, Document):
             self['cards'] = []
             # other players to the left, opposite and right of table
             self['left'] = self['opposite'] = self['right'] = None
+            self.save()
         elif document_id:
             Document.__init__(self, db.database, document_id=document_id)
             # get document data from CouchDB
@@ -125,7 +129,8 @@ class Player(UserMixin, Document):
         """
         create hash of given password
         """
-        self.password_hash = generate_password_hash(password)
+        self['password_hash'] = generate_password_hash(password)
+        self.save()
 
     def check_password(self, password):
         """
@@ -134,7 +139,7 @@ class Player(UserMixin, Document):
         return check_password_hash(self.password_hash, password)
 
     def add_card(self, card):
-        self.cards.append(card)
+        self['cards'].append(card)
 
     def remove_all_cards(self):
         self['cards'] = []
@@ -305,18 +310,46 @@ class Round:
 
 
 
-class Table:
+class Table(Document):
     """
     Definition of a table used by group of players
     """
 
-    def __init__(self, name):
-        # what table?
-        self.name = name
-        # default empty
-        self.order = []
-        self.rounds = []
-        self.players_ready = []
+    def __init__(self, table_id='', document_id=''):
+        if table_id:
+            # ID still name, going to be number - for CouchDB
+            self['_id'] = f'table-{table_id}'
+            Document.__init__(self, db.database, document_id=document_id)
+            # type is for CouchDB
+            self['type'] = 'table'
+            # what table?
+            self['name'] = table_id
+            # default empty
+            self['order'] = []
+            self['rounds'] = []
+            self['players'] = []
+            self['players_ready'] = []
+            self.save()
+        elif document_id:
+            Document.__init__(self, db.database, document_id=document_id)
+            # get document data from CouchDB
+            self.fetch()
+
+    @property
+    def order(self):
+        return self['order']
+
+    @property
+    def rounds(self):
+        return self['rounds']
+
+    @property
+    def players(self):
+        return self['players']
+
+    @property
+    def players_ready(self):
+        return self['players_ready']
 
     def add_player(self, player):
         """
@@ -325,7 +358,7 @@ class Table:
         # str as well as Player object is OK
         if type(player) is str:
             player = Player(player)
-        self.players[player.name] = player
+        self['players'][player.name] = player
 
     def add_round(self):
         """
@@ -387,7 +420,7 @@ class Game:
             self.players[player_id] = Player(document_id=document_id)
         return self.players[player_id]
 
-    def add_table(self, table_id, document_id=''):
+    def add_table(self, table_id='', document_id=''):
         """
         adds a new table (to sit and play on, no database table!)
         """
@@ -428,7 +461,7 @@ class Game:
 game = Game()
 
 def test_game():
-    #game.add_table('test')
+    game.add_table('test')
     for player_id, document in db.player_documents_by_player_id().items():
         player = game.add_player(player_id, document_id=document['_id'])
         #game.tables['test'].add_player(player)
@@ -443,5 +476,5 @@ def test_database():
         if test_player not in db.player_documents_by_player_id():
             player = game.add_player(player_id=test_player)
             player.set_password(test_player)
-            db.add(player)
+            #db.add(player)
 
