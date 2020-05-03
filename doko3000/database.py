@@ -30,8 +30,10 @@ class DB:
         retrieves documents filtered by type and ordered by non-document-id
         """
         result = {}
+        for i in Query(self.database, selector={'type': filter_type}).result:
+            print(i)
         for item in Query(self.database, selector={'type': filter_type}).result:
-            item_id = item['_id'].split(f'{item}-', 1)[1]
+            item_id = item['_id'].split(f'{filter_type}-', 1)[1]
             result[item_id] = item
         return result
 
@@ -40,18 +42,20 @@ class DB:
         """
         retrieves player documents sorted by non-document-id
         """
-        result = {}
-        for player in Query(self.database, selector={'type': 'player'}).result:
-            player_id = player['_id'].split('player-', 1)[1]
-            result[player_id] = player
-        return result
+        # result = {}
+        # for player in Query(self.database, selector={'type': 'player'}).result:
+        #     player_id = player['_id'].split('player-', 1)[1]
+        #     result[player_id] = player
+        # return result
+        return self.filter_by_type('player')
 
     def table_documents_by_table_id(self):
         """
         retrieves table documents sorted by non-document-id
         """
-        result = {}
-        for player in Query(self.database, selector={'type': 'table'}).result:
-            player_id = player['_id'].split('player-', 1)[1]
-            result[player_id] = player
-        return result
+        # result = {}
+        # for player in Query(self.database, selector={'type': 'table'}).result:
+        #     player_id = player['_id'].split('player-', 1)[1]
+        #     result[player_id] = player
+        # return result
+        return self.filter_by_type('table')

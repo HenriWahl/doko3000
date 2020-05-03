@@ -357,6 +357,7 @@ class Table(Document):
         """
         # str as well as Player object is OK
         if type(player) is str:
+            print('TO BE CHANGED')
             player = Player(player)
         self['players'][player.name] = player
 
@@ -366,28 +367,28 @@ class Table(Document):
         """
         # since Python 3.6 or 3.7 dicts are ordered
         current_players = {}
-        for name in self.order[:4]:
-            current_players[name] = self.players[name]
-        self.rounds.append(Round(current_players))
+        for name in self['order'][:4]:
+            current_players[name] = self['players'][name]
+        self['rounds'].append(Round(current_players))
 
     def shift_players(self):
         """
         last dealer is moved to the end of the players list
         """
-        self.order.append(self.order.pop(0))
+        self['order'].append(self['order'].pop(0))
 
     @property
     def current_round(self):
-        return self.rounds[-1]
+        return self['rounds'][-1]
 
     def add_ready_player(self, player):
         """
         organize players who are ready for the next round in a list
         """
-        self.players_ready.append(player)
+        self['players_ready'].append(player)
 
     def reset_ready_players(self):
-        self.players_ready = []
+        self['players_ready'] = []
 
 class Game:
     """
@@ -398,6 +399,8 @@ class Game:
         seed()
         # store tables
         self.tables = {}
+        for table_id, document in db.table_documents_by_table_id().items():
+            self.tables[table_id] = Table(document_id=document['_id'])
 
         # get players from CouchDB
         self.players = {}
@@ -409,13 +412,12 @@ class Game:
             pass
 
 
-    def add_player(self, player_id, document_id=''):
+    def add_player(self, player_id='', document_id=''):
         """
         adds a new player
         """
         if player_id not in self.players:
             self.players[player_id] = Player(player_id=player_id)
-            #self.players[player_id].save()
         else:
             self.players[player_id] = Player(document_id=document_id)
         return self.players[player_id]
@@ -424,18 +426,11 @@ class Game:
         """
         adds a new table (to sit and play on, no database table!)
         """
-
         if table_id not in self.tables:
             self.tables[table_id] = Table(table_id=table_id)
-
-        if Table.query.filter_by(name=name).first() is None:
-            table = Table(name)
-            self.tables[name] = table
-            db.session.add(table)
         else:
-            self.tables[name] = Table.query.filter_by(name=name).first()
-
-        db.session.commit()
+            self.tables[table_id] = Table(document_id=document_id)
+        return self.tables[table_id]
 
     def has_tables(self):
         if len(self.tables) == 0:
