@@ -12,13 +12,11 @@ from flask_login import current_user, \
 from flask_socketio import join_room
 
 from . import app, \
-    db, \
     login, \
     socketio
 from .forms import Login
 from .game import Deck, \
-    game, \
-    Player
+    game
 
 
 @login.user_loader
@@ -186,12 +184,11 @@ def ready_for_next_round(msg):
 def login():
     form = Login()
     if form.validate_on_submit():
-        # player = Player.query.filter_by(name=form.playername.data).first()
-        if not f'player-{form.playername.data}' in db.players:
+        if not form.playername.data in game.players:
             flash('Unknown player :-(')
             return redirect(url_for('login'))
         else:
-            player = Player(document=db.players[f'player-{form.playername.data}'])
+            player = game.players[form.playername.data]
             if not player.check_password(form.password.data):
                 flash('Wrong password :-(')
                 return redirect(url_for('login'))

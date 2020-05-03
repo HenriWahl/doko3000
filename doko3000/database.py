@@ -25,12 +25,12 @@ class DB:
         print(type(data))
         self.database.create_document(data.__dict__)
 
-    @property
-    def players(self):
+    def player_documents_by_player_id(self):
         """
-        only shows player documents - might be filterable more one day
+        only retrieves player documents ids - might be filterable more one day
         """
         result = {}
-        for item in  Query(self.database, selector={'type': 'player'}).result:
-            result[item['_id']] = item
+        for player in Query(self.database, selector={'type': 'player'}).result:
+            player_id = player['_id'].split('player-', 1)[1]
+            result[player_id] = player
         return result

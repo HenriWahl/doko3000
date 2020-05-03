@@ -66,7 +66,7 @@ class Player(UserMixin, Document):
     """
     one single player on a table
     """
-    def __init__(self, name='', document=None, **kwargs):
+    def __init__(self, name='', document_id='', **kwargs):
         if name:
             # ID still name, going to be number - for CouchDB
             self._id = f'player-{name}'
@@ -82,16 +82,21 @@ class Player(UserMixin, Document):
             self.cards = []
             # other players to the left, opposite and right of table
             self.left = self.opposite = self.right = None
-        elif document:
-            Document.__init__(self, db.database, document_id=document['_id'])
-            self.__dict__ = document
+        elif document_id:
+            Document.__init__(self, db.database, document_id=document_id)
+            #self.__dict__ = document
+            self.fetch()
+            print(self.__dict__)
+            print(dict(self))
+            self.__dict__.update(dict(self))
             self.id = self.name
 
-    def __repr__(self):
-        """
-        representation
-        """
-        return f'<Player {self.name}>'
+
+    # def __repr__(self):
+    #     """
+    #     representation
+    #     """
+    #     return f'<Player {self.name}>'
 
     def set_password(self, password):
         """
@@ -340,19 +345,20 @@ class Game:
 
         # get players from CouchDB
         self.players = {}
-        for document in db.players.values():
-            self.players[document['id']] = Player(document=document)
-            self.players[document['id']]['bla'] = 'blubb'
-            self.players[document['id']].save()
+        for player_id, document in db.player_documents_by_player_id().items():
+            self.players[player_id] = Player(document_id=document['_id'])
+            self.players[player_id]['bla'] = 'blubb'
+            self.players[player_id].save()
+            print(self.players[player_id])
             pass
 
 
-    def add_player(self, document):
+    def add_player(self, player_id, document_id):
         """
         adds a new player
         """
-        self.players[document['id']] = Player(document=document)
-        return self.players[document['id']]
+        self.players[player_id] = Player(document_id=document_id)
+        return self.players[player_id]
 
     def add_table(self, name):
         """
@@ -392,9 +398,9 @@ game = Game()
 
 def test_game():
     #game.add_table('test')
-    for document in db.players.values():
-        player = game.add_player(document=document)
-        game.tables['test'].add_player(player)
+    for player_id, document in db.player_documents_by_player_id().items():
+        player = game.add_player(player_id, document_id=document['_id'])
+        #game.tables['test'].add_player(player)
     #game.tables['test'].order = ['test1', 'test2', 'test3', 'test4', 'test5']
     #game.tables['test'].order = ['test1', 'test2', 'test3', 'test4']
 
