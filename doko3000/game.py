@@ -327,13 +327,14 @@ class Table(Document):
             # default empty
             self['order'] = []
             self['rounds'] = []
-            self['players'] = []
+            self['players'] = {}
             self['players_ready'] = []
             self.save()
         elif document_id:
             Document.__init__(self, db.database, document_id=document_id)
             # get document data from CouchDB
             self.fetch()
+            print(self)
 
     @property
     def order(self):
@@ -447,19 +448,13 @@ class Game:
     def get_players(self):
         return self.players.values()
 
-
-# # # initialize database - has to be done here
-# db.create_all()
-# db.session.commit()
-
 # initialize game, load players etc.
 game = Game()
 
 def test_game():
-    game.add_table('test')
     for player_id, document in db.player_documents_by_player_id().items():
         player = game.add_player(player_id, document_id=document['_id'])
-        #game.tables['test'].add_player(player)
+        game.tables['test'].add_player(player)
     #game.tables['test'].order = ['test1', 'test2', 'test3', 'test4', 'test5']
     #game.tables['test'].order = ['test1', 'test2', 'test3', 'test4']
 
