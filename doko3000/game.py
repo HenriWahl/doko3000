@@ -327,7 +327,7 @@ class Table(Document):
             # default empty
             self['order'] = []
             self['rounds'] = []
-            self['players'] = {}
+            self['players'] = []
             self['players_ready'] = []
             self.save()
         elif document_id:
@@ -352,15 +352,12 @@ class Table(Document):
     def players_ready(self):
         return self['players_ready']
 
-    def add_player(self, player):
+    def add_player(self, player_id):
         """
         adding just one player to the party
         """
-        # str as well as Player object is OK
-        if type(player) is str:
-            print('TO BE CHANGED')
-            player = Player(player)
-        self['players'][player.name] = player
+        if player_id not in self['players']:
+            self['players'].append(player_id)
 
     def add_round(self):
         """
@@ -402,6 +399,7 @@ class Game:
         self.tables = {}
         for table_id, document in db.table_documents_by_table_id().items():
             self.tables[table_id] = Table(document_id=document['_id'])
+            self.tables[table_id].save()
 
         # get players from CouchDB
         self.players = {}
@@ -429,8 +427,8 @@ class Game:
         """
         if table_id not in self.tables:
             self.tables[table_id] = Table(table_id=table_id)
-        else:
-            self.tables[table_id] = Table(document_id=document_id)
+        # else:
+        #     self.tables[table_id] = Table(document_id=document_id)
         return self.tables[table_id]
 
     def has_tables(self):
@@ -452,6 +450,7 @@ class Game:
 game = Game()
 
 def test_game():
+    game.add_table('test')
     for player_id, document in db.player_documents_by_player_id().items():
         player = game.add_player(player_id, document_id=document['_id'])
         game.tables['test'].add_player(player)
