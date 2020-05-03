@@ -66,37 +66,60 @@ class Player(UserMixin, Document):
     """
     one single player on a table
     """
-    def __init__(self, name='', document_id='', **kwargs):
-        if name:
+    def __init__(self, player_id='', document_id='', **kwargs):
+        if player_id:
             # ID still name, going to be number - for CouchDB
-            self._id = f'player-{name}'
+            self['_id'] = f'player-{player_id}'
             # ID for login
-            self.id = name
+            self['id'] = player_id
             # type is for CouchDB
-            self.type = 'player'
+            self['type'] = 'player'
             # name of player
-            self.name = name
+            self['name'] = player_id
             # password hash
-            self.password_hash = ''
+            self['password_hash'] = ''
             # current set of cards
-            self.cards = []
+            self['cards'] = []
             # other players to the left, opposite and right of table
-            self.left = self.opposite = self.right = None
+            self['left'] = self['opposite'] = self['right'] = None
         elif document_id:
             Document.__init__(self, db.database, document_id=document_id)
-            #self.__dict__ = document
+            # get document data from CouchDB
             self.fetch()
-            print(self.__dict__)
-            print(dict(self))
-            self.__dict__.update(dict(self))
-            self.id = self.name
+            # id needed for flask-login
+            self['id'] = self['_id'].split('player-', 1)[1]
 
+    @property
+    def id(self):
+        return self['id']
 
-    # def __repr__(self):
-    #     """
-    #     representation
-    #     """
-    #     return f'<Player {self.name}>'
+    @property
+    def name(self):
+        return self['name']
+
+    @property
+    def password_hash(self):
+        return self['password_hash']
+
+    @property
+    def cards(self):
+        return self['cards']
+
+    @property
+    def left(self):
+        return self['left']
+
+    @property
+    def right(self):
+        return self['right']
+
+    @property
+    def opposite(self):
+        return self['opposite']
+
+    # @cards.setter
+    # def cards(self):
+    #     return self['cards']
 
     def set_password(self, password):
         """
@@ -114,7 +137,7 @@ class Player(UserMixin, Document):
         self.cards.append(card)
 
     def remove_all_cards(self):
-        self.cards = []
+        self['cards'] = []
 
 
 class Trick:
@@ -353,17 +376,25 @@ class Game:
             pass
 
 
-    def add_player(self, player_id, document_id):
+    def add_player(self, player_id, document_id=''):
         """
         adds a new player
         """
-        self.players[player_id] = Player(document_id=document_id)
+        if player_id not in self.players:
+            self.players[player_id] = Player(player_id=player_id)
+            #self.players[player_id].save()
+        else:
+            self.players[player_id] = Player(document_id=document_id)
         return self.players[player_id]
 
-    def add_table(self, name):
+    def add_table(self, table_id, document_id=''):
         """
         adds a new table (to sit and play on, no database table!)
         """
+
+        if table_id not in self.tables:
+            self.tables[table_id] = Table(table_id=table_id)
+
         if Table.query.filter_by(name=name).first() is None:
             table = Table(name)
             self.tables[name] = table
@@ -408,9 +439,9 @@ def test_game():
 
 
 def test_database():
-    for test_player in ('admin', 'test1', 'test2', 'test3', 'test4', 'test5'):
-        if f'player-{test_player}' not in db.players:
-            player = Player(name=test_player)
+    for test_player in ('admin', 'test1', 'test2', 'test3', 'test4', 'test5', 'test6'):
+        if test_player not in db.player_documents_by_player_id():
+            player = game.add_player(player_id=test_player)
             player.set_password(test_player)
             db.add(player)
 
