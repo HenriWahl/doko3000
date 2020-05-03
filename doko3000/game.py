@@ -340,6 +340,10 @@ class Table(Document):
     def order(self):
         return self['order']
 
+    @order.setter
+    def order(self, new_order):
+        self['order'] = new_order
+
     @property
     def rounds(self):
         return self['rounds']
