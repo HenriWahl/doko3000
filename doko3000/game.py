@@ -4,12 +4,12 @@ from copy import copy
 from random import seed, \
     shuffle
 
+from cloudant.document import Document
 from flask_login import UserMixin
 from werkzeug.security import check_password_hash, \
     generate_password_hash
 
-from . import db, \
-    login
+from . import db
 
 
 class Card:
@@ -62,26 +62,30 @@ class Deck:
     #         card_id += 1
 
 
-class Player(UserMixin):
+class Player(UserMixin, Document):
     """
     one single player on a table
     """
-    # current set of cards
-    cards = []
-
-    def __init__(self, name='', **kwargs):
-        # ID still name, going to be number
-        self._id = f'player-{name}'
-        # type is for CouchDB
-        self.type = 'player'
-        # name of player
-        self.name = name
-        # password hash
-        self.password_hash = ''
-        # current set of cards
-        self.cards = []
-        # other players to the left, opposite and right of table
-        self.left = self.opposite = self.right = None
+    def __init__(self, name='', document=None, **kwargs):
+        if name:
+            # ID still name, going to be number - for CouchDB
+            self._id = f'player-{name}'
+            # ID for login
+            self.id = name
+            # type is for CouchDB
+            self.type = 'player'
+            # name of player
+            self.name = name
+            # password hash
+            self.password_hash = ''
+            # current set of cards
+            self.cards = []
+            # other players to the left, opposite and right of table
+            self.left = self.opposite = self.right = None
+        elif document:
+            Document.__init__(self, db.database, document_id=document['_id'])
+            self.__dict__ = document
+            self.id = self.name
 
     def __repr__(self):
         """
@@ -333,14 +337,22 @@ class Game:
         seed()
         # store tables
         self.tables = {}
-        self.players = {}
 
-    def add_player(self, name):
+        # get players from CouchDB
+        self.players = {}
+        for document in db.players.values():
+            self.players[document['id']] = Player(document=document)
+            self.players[document['id']]['bla'] = 'blubb'
+            self.players[document['id']].save()
+            pass
+
+
+    def add_player(self, document):
         """
         adds a new player
         """
-        self.players[name] = Player(name)
-        return self.players[name]
+        self.players[document['id']] = Player(document=document)
+        return self.players[document['id']]
 
     def add_table(self, name):
         """
@@ -375,25 +387,18 @@ class Game:
 # db.create_all()
 # db.session.commit()
 
-@login.user_loader
-def load_user(id):
-    # return Player.query.get(int(id))
-    print(db.players)
-    return True
-
+# initialize game, load players etc.
 game = Game()
 
-
 def test_game():
-    game.add_table('test')
-    for name in ('test1', 'test2', 'test3', 'test4', 'test5'):
-    #for name in ('test1', 'test2', 'test3', 'test4'):
-        player = game.add_player(name)
+    #game.add_table('test')
+    for document in db.players.values():
+        player = game.add_player(document=document)
         game.tables['test'].add_player(player)
-    game.tables['test'].order = ['test1', 'test2', 'test3', 'test4', 'test5']
+    #game.tables['test'].order = ['test1', 'test2', 'test3', 'test4', 'test5']
     #game.tables['test'].order = ['test1', 'test2', 'test3', 'test4']
 
-    game.tables['test'].add_round()
+    #game.tables['test'].add_round()
 
 
 def test_database():

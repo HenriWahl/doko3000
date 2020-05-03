@@ -11,12 +11,20 @@ from flask_login import current_user, \
     logout_user
 from flask_socketio import join_room
 
-from doko3000 import app, \
+from . import app, \
+    db, \
+    login, \
     socketio
-from doko3000.forms import Login
-from doko3000.game import Deck, \
+from .forms import Login
+from .game import Deck, \
     game, \
     Player
+
+
+@login.user_loader
+def load_user(id):
+    # return Player.query.get(int(id))
+    return game.players[id]
 
 
 @socketio.on('my event')
@@ -178,12 +186,17 @@ def ready_for_next_round(msg):
 def login():
     form = Login()
     if form.validate_on_submit():
-        player = Player.query.filter_by(name=form.playername.data).first()
-        if player is None or not player.check_password(form.password.data):
-            flash('Unknown user or wrong password :-(')
+        # player = Player.query.filter_by(name=form.playername.data).first()
+        if not f'player-{form.playername.data}' in db.players:
+            flash('Unknown player :-(')
             return redirect(url_for('login'))
-        login_user(player)
-        return redirect(url_for('index'))
+        else:
+            player = Player(document=db.players[f'player-{form.playername.data}'])
+            if not player.check_password(form.password.data):
+                flash('Wrong password :-(')
+                return redirect(url_for('login'))
+            login_user(player)
+            return redirect(url_for('index'))
 
     print(current_user, current_user.is_authenticated)
 

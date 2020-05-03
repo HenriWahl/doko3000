@@ -9,7 +9,6 @@ from doko3000 import app,\
                      socketio
 
 from doko3000.game import test_database
-#from doko3000.models import test_models
 
 #test_game()
 test_database()
