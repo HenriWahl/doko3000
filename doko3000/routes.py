@@ -36,17 +36,17 @@ def who_am_i():
     print('who-am-i', current_user)
     if not current_user.is_anonymous:
         socketio.emit('you-are-what-you-is',
-                      {'player_id': current_user.name})
+                      {'player_id': current_user.id})
 
 
 @socketio.on('new-table')
 def new_table(msg):
     print('new_table', current_user)
     game.add_table('test2')
-    game.tables['test2'].add_player(current_user.name)
+    game.tables['test2'].add_player(current_user.id)
     socketio.emit('new-table-available',
                   {'tables': game.get_tables_names(),
-                   'player_id': current_user.name,
+                   'player_id': current_user.id,
                    'html': render_template('list_tables.html',
                                            tables=game.get_tables())},
                   broadcast=True)
@@ -57,7 +57,7 @@ def played_card(msg):
     print('played-card', current_user, msg['card_id'], msg['card_name'])
     card_id = msg['card_id']
     table = game.tables[msg['table']]
-    if current_user.name == msg['player_id'] == table.current_round.current_player:
+    if current_user.id == msg['player_id'] == table.current_round.current_player:
         table.current_round.current_trick.add_turn(msg['player_id'], card_id)
         table.current_round.turn_count += 1
         is_last_turn = table.current_round.current_trick.is_last_turn()
@@ -100,7 +100,7 @@ def deal_cards(msg):
 @socketio.on('my-cards-please')
 def deal_cards_to_player(msg):
     player_id = msg['player_id']
-    if player_id == current_user.name and \
+    if player_id == current_user.id and \
             msg['table'] in game.tables:
         print(msg)
         table = game.tables[msg['table']]
@@ -129,7 +129,7 @@ def deal_cards_to_player(msg):
 @socketio.on('claim-trick')
 def claimed_trick(msg):
     player_id = msg['player_id']
-    if player_id == current_user.name and \
+    if player_id == current_user.id and \
             msg['table'] in game.tables:
         print(msg)
         table = game.tables[msg['table']]
@@ -170,7 +170,7 @@ def claimed_trick(msg):
 @socketio.on('ready-for-next-round')
 def ready_for_next_round(msg):
     player_id = msg['player_id']
-    if player_id == current_user.name and \
+    if player_id == current_user.id and \
             msg['table'] in game.tables:
         print(msg)
         table = game.tables[msg['table']]
@@ -226,7 +226,7 @@ def index():
 @login_required
 def table(table=''):
     if table in game.tables and \
-            current_user.name in game.tables[table].players:
+            current_user.id in game.tables[table].players:
         print('user in table')
         return render_template('table.html',
                                title=f'doko3000 {table}',
