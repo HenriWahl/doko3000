@@ -113,13 +113,25 @@ class Player(UserMixin, Document):
     def left(self):
         return self['left']
 
+    @left.setter
+    def left(self, value):
+        self['left'] = value
+
     @property
     def right(self):
         return self['right']
 
+    @right.setter
+    def right(self, value):
+        self['right'] = value
+
     @property
     def opposite(self):
         return self['opposite']
+
+    @opposite.setter
+    def opposite(self, value):
+        self['opposite'] = value
 
     # @cards.setter
     # def cards(self):
@@ -199,9 +211,10 @@ class Round:
         # if more than 4 players they change for every round
         # changing too because of the position of dealer changes with every round
         self.players = players
-        self.players_id = [x.id for x in self.players.values()]
+        # self.players_id = [x.id for x in self.players.values()]
         # order is important - index 0 is the dealer
-        self.order = list(players.values())
+        # self.order = list(players.values())
+        self.order = players
 
         self.tell_players_about_opponents()
 
@@ -217,7 +230,8 @@ class Round:
         # counting all turns
         self.turn_count = 0
         # current player - starts with the one following the dealer
-        self.current_player = self.players[list(self.players.keys())[1]]
+        # self.current_player = self.players[list(self.players.keys())[1]]
+        self.current_player = self.players[1]
         print('current_player', self.current_player)
         # first shuffling...
         self.shuffle()
@@ -236,11 +250,11 @@ class Round:
         """
         deal cards
         """
-        for player in self.players.values():
-            player.remove_all_cards()
+        for player_id in self.players:
+            game.players[player_id].remove_all_cards()
             for card in range(self.cards_per_player):
                 # cards are given to players so the can be .pop()ed
-                player.add_card(self.cards.pop())
+                game.players[player_id].add_card(self.cards.pop())
 
     def add_trick(self, player):
         """
@@ -299,15 +313,15 @@ class Round:
         """
         give players info about whom they are playing against - interesting for HUD display
         """
-        for player in self.players.values():
-            player_index = [x.name for x in self.order].index(player.name)
+        # for player in self.players.values():
+        for player_id in self.players:
+            player_index = self.players.index(player_id)
             player_order_view = copy(self.order)
             for i in range(player_index):
                 player_order_view.append(player_order_view.pop(0))
-            player.left = player_order_view[1]
-            player.opposite = player_order_view[2]
-            player.right = player_order_view[3]
-
+            game.players[player_id].left = player_order_view[1]
+            game.players[player_id].opposite = player_order_view[2]
+            game.players[player_id].right = player_order_view[3]
 
 
 class Table(Document):
@@ -345,6 +359,10 @@ class Table(Document):
         self['order'] = new_order
 
     @property
+    def name(self):
+        return self['name']
+
+    @property
     def rounds(self):
         return self['rounds']
 
@@ -367,11 +385,11 @@ class Table(Document):
         """
         only 4 players can play at once - find out who and start a new round
         """
-        # since Python 3.6 or 3.7 dicts are ordered
-        current_players = {}
-        for name in self['order'][:4]:
-            current_players[name] = self['players'][name]
-        self['rounds'].append(Round(current_players))
+        # # since Python 3.6 or 3.7 dicts are ordered
+        # current_players = {}
+        # for player_id in self['order'][:4]:
+        #     current_players[player_id] = self['players'][player_id]
+        self['rounds'].append(Round(self['order'][:4]))
 
     def shift_players(self):
         """
@@ -457,17 +475,15 @@ def test_game():
     game.add_table('test')
     for player_id, document in db.player_documents_by_player_id().items():
         player = game.add_player(player_id, document_id=document['_id'])
-        game.tables['test'].add_player(player)
+        game.tables['test'].add_player(player.id)
     #game.tables['test'].order = ['test1', 'test2', 'test3', 'test4', 'test5']
-    #game.tables['test'].order = ['test1', 'test2', 'test3', 'test4']
-
-    #game.tables['test'].add_round()
+    game.tables['test'].order = ['test1', 'test2', 'test4', 'test3']
+    game.tables['test'].save()
+    game.tables['test'].add_round()
 
 
 def test_database():
-    for test_player in ('admin', 'test1', 'test2', 'test3', 'test4', 'test5', 'test6'):
+    for test_player in ('test1', 'test2', 'test3', 'test4'):
         if test_player not in db.player_documents_by_player_id():
             player = game.add_player(player_id=test_player)
             player.set_password(test_player)
-            #db.add(player)
-

@@ -20,6 +20,11 @@ class DB:
             print(self.couch.all_dbs())
             self.database = self.couch[app.config['COUCHDB_DATABASE']]
 
+        # workaround to avoid error message about missing '_users' database
+        if not '_users' in self.couch:
+            self.couch.create_database('_users')
+
+
     def add(self, data):
         print(data.__dict__)
         print(type(data))

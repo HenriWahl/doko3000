@@ -78,12 +78,13 @@ def played_card(msg):
 @socketio.on('enter-table')
 def enter_table(msg):
     print(msg)
-    table = game.tables[msg['table']]
+    # table = game.tables[msg['table']]
+    table = msg['table']
     playername = msg['playername']
     if table in game.tables:
         if playername not in game.tables[table].players:
             game.tables[table].add_player(playername)
-            join_room(table.name)
+        join_room(table)
 
 
 @socketio.on('deal-cards')
@@ -226,7 +227,7 @@ def table(table=''):
         return render_template('table.html',
                                title=f'doko3000 {table}',
                                table=game.tables[table],
-                               dealer=game.tables[table].current_round.order[0].name
+                               dealer=game.tables[table].current_round.order[0]
                                )
     return render_template('index.html',
                            tables=game.tables,
