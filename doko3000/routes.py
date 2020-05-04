@@ -36,7 +36,7 @@ def who_am_i():
     print('who-am-i', current_user)
     if not current_user.is_anonymous:
         socketio.emit('you-are-what-you-is',
-                      {'playername': current_user.name})
+                      {'player_id': current_user.name})
 
 
 @socketio.on('new-table')
@@ -46,7 +46,7 @@ def new_table(msg):
     game.tables['test2'].add_player(current_user.name)
     socketio.emit('new-table-available',
                   {'tables': game.get_tables_names(),
-                   'playername': current_user.name,
+                   'player_id': current_user.name,
                    'html': render_template('list_tables.html',
                                            tables=game.get_tables())},
                   broadcast=True)
@@ -57,17 +57,17 @@ def played_card(msg):
     print('played-card', current_user, msg['card_id'], msg['card_name'])
     card_id = msg['card_id']
     table = game.tables[msg['table']]
-    if current_user.name == msg['playername'] == table.current_round.current_player.name:
-        table.current_round.current_trick.add_turn(msg['playername'], card_id)
+    if current_user.name == msg['player_id'] == table.current_round.current_player:
+        table.current_round.current_trick.add_turn(msg['player_id'], card_id)
         table.current_round.turn_count += 1
         is_last_turn = table.current_round.current_trick.is_last_turn()
         next_player = table.current_round.get_next_player()
         socketio.emit('played-card-by-user',
-                      {'playername': msg['playername'],
+                      {'player_id': msg['player_id'],
                        'card_id': card_id,
                        'card_name': msg['card_name'],
                        'is_last_turn': is_last_turn,
-                       'next_player': next_player.name,
+                       'next_player': next_player,
                        'html': {'card': render_template('card.html',
                                                card=Deck.cards[card_id],
                                                table=table),
@@ -80,10 +80,10 @@ def enter_table(msg):
     print(msg)
     # table = game.tables[msg['table']]
     table = msg['table']
-    playername = msg['playername']
+    player_id = msg['player_id']
     if table in game.tables:
-        if playername not in game.tables[table].players:
-            game.tables[table].add_player(playername)
+        if player_id not in game.tables[table].players:
+            game.tables[table].add_player(player_id)
         join_room(table)
 
 
@@ -99,20 +99,22 @@ def deal_cards(msg):
 
 @socketio.on('my-cards-please')
 def deal_cards_to_player(msg):
-    playername = msg['playername']
-    if playername == current_user.name and \
+    player_id = msg['player_id']
+    if player_id == current_user.name and \
             msg['table'] in game.tables:
         print(msg)
         table = game.tables[msg['table']]
-        if playername in table.current_round.players:
-            cards = table.current_round.players[playername].cards
-            player = table.current_round.players[playername]
+        if player_id in table.current_round.players:
+            # cards = table.current_round.players[player_id].cards
+            cards = game.players[player_id].cards
+            # player = table.current_round.players[player_id]
+            player = game.players[player_id]
             dealer = table.current_round.order[0]
             next_player = table.current_round.order[1]
             socketio.emit('your-cards-please',
-                          {'playername': playername,
+                          {'player_id': player_id,
                            'turn_count': table.current_round.turn_count,
-                           'next_player': table.current_round.order[1].name,
+                           'next_player': table.current_round.order[1],
                            # 'order_names': table.current_round.order_names,
                            'html': {'cards_hand': render_template('cards_hand.html',
                                                                   cards=cards,
@@ -126,30 +128,32 @@ def deal_cards_to_player(msg):
 
 @socketio.on('claim-trick')
 def claimed_trick(msg):
-    playername = msg['playername']
-    if playername == current_user.name and \
+    player_id = msg['player_id']
+    if player_id == current_user.name and \
             msg['table'] in game.tables:
         print(msg)
         table = game.tables[msg['table']]
-        if playername in table.current_round.players:
+        if player_id in table.current_round.players:
             if not table.current_round.is_finished():
                 # when ownership changes it does at previous trick because normally there is a new one created
                 # so the new one becomes the current one and the reclaimed is the previous
                 if not len(table.current_round.current_trick) == 0:
                     # old trick, freshly claimed
-                    table.current_round.current_trick.owner = table.current_round.players[playername]
+                    # table.current_round.current_trick.owner = table.current_round.players[player_id]
+                    table.current_round.current_trick.owner = player_id
                     # new trick for next turns
-                    table.current_round.add_trick(table.players[playername])
+                    # table.current_round.add_trick(table.players[player_id])
+                    table.current_round.add_trick(player_id)
                 else:
                     # apparently the ownership of the previous trick is not clear - change it
-                    table.current_round.previous_trick.owner = table.current_round.players[playername]
-                    table.current_round.current_player = table.current_round.players[playername]
+                    table.current_round.previous_trick.owner = player_id
+                    table.current_round.current_player = player_id
                 socketio.emit('next-trick',
-                              {'next_player': playername,
+                              {'next_player': player_id,
                                'score': table.current_round.get_score()},
                               broadcast=True)
             else:
-                table.current_round.current_trick.owner = table.current_round.players[playername]
+                table.current_round.current_trick.owner = player_id
                 print('finished', table.current_round.turn_count, len(Deck.cards))
                 print(table.current_round.tricks)
                 print(table.current_round.get_score())
@@ -165,12 +169,12 @@ def claimed_trick(msg):
 
 @socketio.on('ready-for-next-round')
 def ready_for_next_round(msg):
-    playername = msg['playername']
-    if playername == current_user.name and \
+    player_id = msg['player_id']
+    if player_id == current_user.name and \
             msg['table'] in game.tables:
         print(msg)
         table = game.tables[msg['table']]
-        table.add_ready_player(playername)
+        table.add_ready_player(player_id)
         if len(table.players_ready) == len(table.players):
             table.shift_players()
             table.add_round()
@@ -178,18 +182,18 @@ def ready_for_next_round(msg):
             # just tell everybody to get personal cards
             socketio.emit('start-next-round',
                           {'table': table.name,
-                           'dealer': table.current_round.order[0].name})
+                           'dealer': table.current_round.order[0]})
 
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = Login()
     if form.validate_on_submit():
-        if not form.playername.data in game.players:
+        if not form.player_id.data in game.players:
             flash('Unknown player :-(')
             return redirect(url_for('login'))
         else:
-            player = game.players[form.playername.data]
+            player = game.players[form.player_id.data]
             if not player.check_password(form.password.data):
                 flash('Wrong password :-(')
                 return redirect(url_for('login'))

@@ -5,36 +5,36 @@
 {#    {% endif %}">{{ player.name }}</span>#}
 {#{% endfor %}#}
 
-<span id="hud_player_{{ player.left.name }}" class="hud_player
-{% if player.left.name == next_player.name %}
+<span id="hud_player_{{ player.left }}" class="hud_player
+{% if player.left == next_player %}
 hud_player_active
 {% endif %}
 "><span class="oi oi-arrow-thick-left"></span>
-    {% if player.left.name == dealer.name %}
+    {% if player.left == dealer %}
         <span class="oi oi-layers"></span>
     {% endif %}
-    {{ player.left.name }}
+    {{ player.left }}
 </span>
 &nbsp;
-<span id="hud_player_{{ player.opposite.name }}" class="hud_player
-{% if player.opposite.name == next_player.name %}
+<span id="hud_player_{{ player.opposite }}" class="hud_player
+{% if player.opposite == next_player %}
 hud_player_active
 {% endif %}
 ">
-        {% if player.opposite.name == dealer.name %}
+        {% if player.opposite == dealer %}
             <span class="oi oi-layers"></span>
         {% endif %}
-    {{ player.opposite.name }}</span>
+    {{ player.opposite }}</span>
 &nbsp;
-<span id="hud_player_{{ player.right.name }}" class="hud_player
-{% if player.right.name == next_player.name %}
+<span id="hud_player_{{ player.right }}" class="hud_player
+{% if player.right == next_player %}
 hud_player_active
 {% endif %}
 ">
-    {% if player.right.name == dealer.name %}
+    {% if player.right == dealer %}
         <span class="oi oi-layers"></span>
     {% endif %}
-    {{ player.right.name }} <span
+    {{ player.right }} <span
         class="oi oi-arrow-thick-right">
 </span>
 </span>

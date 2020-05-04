@@ -35,13 +35,13 @@ class Deck:
     full deck of cards - enough to be static
     """
     SYMBOLS = ('Schell',
-               'Herz',
-               'Grün',
+               # 'Herz',
+               # 'Grün',
                'Eichel')
     RANKS = {'Zehn': 10,
-             'Unter': 2,
-             'Ober': 3,
-             'König': 4,
+             # 'Unter': 2,
+             # 'Ober': 3,
+             # 'König': 4,
              'Ass': 11}
     NUMBER = 2 # Doppelkopf :-)!
     # NUMBER = 1 # Debugging
@@ -256,12 +256,12 @@ class Round:
                 # cards are given to players so the can be .pop()ed
                 game.players[player_id].add_card(self.cards.pop())
 
-    def add_trick(self, player):
+    def add_trick(self, player_id):
         """
         adds empty trick which will be filled by players one after another
         """
         self.tricks.append(Trick())
-        self.current_player = player
+        self.current_player = player_id
 
     @property
     def current_trick(self):
@@ -282,7 +282,7 @@ class Round:
         get player for next turn
         """
 
-        current_player_index = [x.name for x in self.order].index(self.current_player.name)
+        current_player_index = self.order.index(self.current_player)
 
         if current_player_index < 3:
             # set new current player
@@ -303,10 +303,10 @@ class Round:
         score = {}
         for trick in self.tricks:
             if trick.owner:
-                if trick.owner.name not in score:
-                    score[trick.owner.name] = 0
+                if trick.owner not in score:
+                    score[trick.owner] = 0
                 for card in trick.cards:
-                    score[trick.owner.name] += card.value
+                    score[trick.owner] += card.value
         return score
 
     def tell_players_about_opponents(self):
@@ -477,13 +477,13 @@ def test_game():
         player = game.add_player(player_id, document_id=document['_id'])
         game.tables['test'].add_player(player.id)
     #game.tables['test'].order = ['test1', 'test2', 'test3', 'test4', 'test5']
-    game.tables['test'].order = ['test1', 'test2', 'test4', 'test3']
+    game.tables['test'].order = ['test1', 'test2', 'test5', 'test4', 'test3']
     game.tables['test'].save()
     game.tables['test'].add_round()
 
 
 def test_database():
-    for test_player in ('test1', 'test2', 'test3', 'test4'):
+    for test_player in ('test1', 'test2', 'test3', 'test4', 'test5'):
         if test_player not in db.player_documents_by_player_id():
             player = game.add_player(player_id=test_player)
             player.set_password(test_player)

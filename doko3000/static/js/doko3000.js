@@ -1,5 +1,5 @@
-// globally used playername
-let playername = ''
+// globally used player_id
+let player_id = ''
 // for staying in sync with the game this is global
 let turn_count = 0
 // keep an eye on next player to know if turns are allowed or not
@@ -21,20 +21,20 @@ $(document).ready(function () {
         // do not drag your gained tricks around
         if (card.id == 'cards_stack') {
             dragging.cancel(true)
-        } else if (source.id == 'hand' && target.id == 'table' && playername == next_player && !cards_locked) {
+        } else if (source.id == 'hand' && target.id == 'table' && player_id == next_player && !cards_locked) {
             console.log(card.id == 'cards_stack')
             $('#table').append(card)
             // add tooltip
-            $(card).attr('title', playername)
+            $(card).attr('title', player_id)
             socket.emit('played-card', {
-                playername: playername,
+                player_id: player_id,
                 card_id: $(card).data('id'),
                 card_name: $(card).data('name'),
                 table: $(card).data('table')
             })
         } else if (source.id == 'hand' && target.id == 'hand') {
             return true
-        } else if (source.id == 'table' || cards_locked || playername != next_player) {
+        } else if (source.id == 'table' || cards_locked || player_id != next_player) {
             dragging.cancel(true)
         }
     })
@@ -47,8 +47,8 @@ $(document).ready(function () {
     })
 
     socket.on('you-are-what-you-is', function (msg) {
-        if (playername == '') {
-            playername = msg.playername
+        if (player_id == '') {
+            player_id = msg.player_id
         }
     })
 
@@ -65,9 +65,9 @@ $(document).ready(function () {
         if (!msg.is_last_turn) {
             $('#hud_player_' + msg.next_player).addClass('hud_player_active')
         }
-        if (playername != msg.playername) {
+        if (player_id != msg.player_id) {
             $('#table').append(msg.html.card)
-            $('#card_' + msg.card_id).attr('title', msg.playername)
+            $('#card_' + msg.card_id).attr('title', msg.player_id)
         }
         if (msg.is_last_turn) {
             cards_locked = true
@@ -75,7 +75,7 @@ $(document).ready(function () {
             $('#claim_trick').removeClass('d-none')
         } else {
             cards_locked = false
-            if (playername == next_player) {
+            if (player_id == next_player) {
                 $('#turn_indicator').removeClass('d-none')
             } else {
                 $('#turn_indicator').addClass('d-none')
@@ -91,7 +91,7 @@ $(document).ready(function () {
 
     socket.on('grab-your-cards', function (msg) {
         socket.emit('my-cards-please', {
-            playername: playername,
+            player_id: player_id,
             table: msg.table
         })
     })
@@ -103,7 +103,7 @@ $(document).ready(function () {
         $('#hud_players').html(msg.html.hud_players)
         $('#hand').html(msg.html.cards_hand)
         $('#claim_trick').addClass('d-none')
-        if (playername == next_player) {
+        if (player_id == next_player) {
             $('#turn_indicator').removeClass('d-none')
         } else {
             $('#turn_indicator').addClass('d-none')
@@ -116,17 +116,17 @@ $(document).ready(function () {
         cards_locked = false
         $('#table').html('')
         $('.hud_player').removeClass('hud_player_active')
-        if (playername == next_player) {
+        if (player_id == next_player) {
             $('#turn_indicator').removeClass('d-none')
         } else {
             $('#turn_indicator').addClass('d-none')
             $('#hud_player_' + next_player).addClass('hud_player_active')
         }
         console.log(msg.score)
-        console.log(playername in msg.score)
-        if (playername in msg.score) {
-            console.log(msg.score[playername])
-            $('#cards_stack').attr('title', msg.score[playername])
+        console.log(player_id in msg.score)
+        if (player_id in msg.score) {
+            console.log(msg.score[player_id])
+            $('#cards_stack').attr('title', msg.score[player_id])
             $('#cards_stack').removeClass('d-none')
         } else {
             $('#cards_stack').addClass('d-none')
@@ -144,7 +144,7 @@ $(document).ready(function () {
     })
 
     socket.on('start-next-round', function (msg) {
-        if (playername == msg.dealer) {
+        if (player_id == msg.dealer) {
             $('#deal_cards').removeClass('d-none')
         } else {
             $('#deal_cards').addClass('d-none')
@@ -161,14 +161,14 @@ $(document).ready(function () {
 
     $(document).on('click', '.list-item-table', function () {
         socket.emit('enter-table', {
-            playername: playername,
+            player_id: player_id,
             table: $(this).data('table')
         })
     })
 
     $(document).on('click', '#deal_cards', function () {
         socket.emit('deal-cards', {
-            playername: playername,
+            player_id: player_id,
             table: $(this).data('table')
         })
     })
@@ -176,7 +176,7 @@ $(document).ready(function () {
     $(document).on('click', '#claim_trick', function () {
         console.log('claim trick')
         socket.emit('claim-trick', {
-            playername: playername,
+            player_id: player_id,
             table: $(this).data('table')
         })
     })
@@ -185,7 +185,7 @@ $(document).ready(function () {
         console.log('next_round')
         $('#next_round').addClass('d-none')
         socket.emit('ready-for-next-round', {
-            playername: playername,
+            player_id: player_id,
             table: $(this).data('table')
         })
     })
