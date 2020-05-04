@@ -337,7 +337,7 @@ class Table(Document):
             # type is for CouchDB
             self['type'] = 'table'
             # what table?
-            self['name'] = table_id
+            self['id'] = table_id
             # default empty
             self['order'] = []
             self['rounds'] = []
@@ -359,8 +359,8 @@ class Table(Document):
         self['order'] = new_order
 
     @property
-    def name(self):
-        return self['name']
+    def id(self):
+        return self['id']
 
     @property
     def rounds(self):

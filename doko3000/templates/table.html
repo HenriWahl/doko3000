@@ -14,12 +14,12 @@
     {% if current_user.id != dealer %}
     d-none
     {% endif %}"
-     data-table="{{ table.name }}">
+     data-table="{{ table.id }}">
     <button class="btn btn-info btn-block btn-lg"><strong>Karten geben</strong></button>
 </div>
 
 <div id="claim_trick" class="row overlay_button justify-content-center d-none"
-     data-table="{{ table.name }}">
+     data-table="{{ table.id }}">
     <button class="btn btn-success btn-block btn-lg"><strong>Stich nehmen</strong></button>
 </div>
 

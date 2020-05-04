@@ -94,7 +94,7 @@ def deal_cards(msg):
 
     # just tell everybody to get personal cards
     socketio.emit('grab-your-cards',
-                  {'table': table.name})
+                  {'table': table.id})
 
 
 @socketio.on('my-cards-please')
@@ -159,7 +159,7 @@ def claimed_trick(msg):
                 print(table.current_round.get_score())
                 # tell everybody stats and wait for everybody confirming next round
                 socketio.emit('round-finished',
-                              {'table': table.name,
+                              {'table': table.id,
                                'html': render_template('score.html',
                                                        table=table,
                                                        score=table.current_round.get_score())
@@ -181,7 +181,7 @@ def ready_for_next_round(msg):
             table.reset_ready_players()
             # just tell everybody to get personal cards
             socketio.emit('start-next-round',
-                          {'table': table.name,
+                          {'table': table.id,
                            'dealer': table.current_round.order[0]})
 
 
