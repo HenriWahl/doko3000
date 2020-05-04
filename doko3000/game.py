@@ -77,7 +77,7 @@ class Player(UserMixin, Document):
             self['id'] = player_id
             # type is for CouchDB
             self['type'] = 'player'
-            # name of player
+            # name of player - to become somewhat more natural
             self['name'] = player_id
             # password hash
             self['password_hash'] = ''
@@ -203,101 +203,121 @@ class Trick:
             return False
 
 
-class Round:
+class Round(dict):
     """
     one round
     """
     def __init__(self, players):
+        super().__init__(self)
         # if more than 4 players they change for every round
         # changing too because of the position of dealer changes with every round
-        self.players = players
+        self['players'] = players
         # self.players_id = [x.id for x in self.players.values()]
         # order is important - index 0 is the dealer
         # self.order = list(players.values())
-        self.order = players
+        self['order'] = players
 
-        self.tell_players_about_opponents()
 
         # # list of players as names for JSON serialization
         # self.order_names = [x.name for x in self.order]
         # cards are an important part but makes in a round context only sense if shuffled
-        self.cards = list(Deck.cards.values())
+        #self.cards = list(Deck.cards.values())
+        self['cards'] = list(Deck.cards)
         # needed to know how many cards are dealed
         # same as number of tricks in a round
-        self.cards_per_player = len(self.cards) // len(self.players)
+        self['cards_per_player'] = len(self['cards']) // len(self['players'])
         # collection of tricks per round - its number should not exceed cards_per_player
-        self.tricks = []
+        self['tricks'] = []
         # counting all turns
-        self.turn_count = 0
+        self['turn_count'] = 0
         # current player - starts with the one following the dealer
         # self.current_player = self.players[list(self.players.keys())[1]]
-        self.current_player = self.players[1]
+        self['current_player'] = self['players'][1]
         print('current_player', self.current_player)
+
+        # send info to HUD displays on players tables
+        self.tell_players_about_opponents()
         # first shuffling...
         self.shuffle()
         # ...then dealing
         self.deal()
         # add initial empty trick
-        self.add_trick(self.current_player)
+        self.add_trick(self['current_player'])
+
+    @property
+    def players(self):
+        return self['players']
+
+    @property
+    def order(self):
+        return self['order']
+
+    @property
+    def tricks(self):
+        return self['tricks']
+
+    @property
+    def current_player(self):
+        return self['current_player']
 
     def shuffle(self):
         """
         shuffle cards
         """
-        shuffle(self.cards)
+        shuffle(self['cards'])
 
     def deal(self):
         """
         deal cards
         """
-        for player_id in self.players:
+        for player_id in self['players']:
             game.players[player_id].remove_all_cards()
-            for card in range(self.cards_per_player):
+            for card in range(self['cards_per_player']):
                 # cards are given to players so the can be .pop()ed
-                game.players[player_id].add_card(self.cards.pop())
+                game.players[player_id].add_card(self['cards'].pop())
 
     def add_trick(self, player_id):
         """
         adds empty trick which will be filled by players one after another
         """
-        self.tricks.append(Trick())
-        self.current_player = player_id
+        self['tricks'].append(Trick())
+        self['current_player'] = player_id
 
     @property
     def current_trick(self):
         """
         enable access to current trick
         """
-        return self.tricks[-1]
+        return self['tricks'][-1]
 
     @property
     def previous_trick(self):
         """
         return previous trick to enable reclaiming
         """
-        return self.tricks[-2]
+        return self['tricks'][-2]
 
     def get_next_player(self):
         """
         get player for next turn
         """
 
-        current_player_index = self.order.index(self.current_player)
+        current_player_index = self['order'].index(self['current_player'])
 
         if current_player_index < 3:
             # set new current player
-            self.current_player = self.order[current_player_index + 1]
+            self['current_player'] = self['order'][current_player_index + 1]
         else:
-            self.current_player = self.order[0]
+            self['current_player'] = self['order'][0]
         # current player is the next player
-        return self.current_player
+        return self['current_player']
 
     def is_finished(self):
         """
         check if round is over - reached when all cards are played
         """
-        print(len(Deck.cards), self.turn_count)
-        return len(Deck.cards) == self.turn_count
+        print(len(Deck.cards), self['turn_count'])
+        return len(Deck.cards) == self['turn_count']
 
     def get_score(self):
         score = {}
@@ -323,6 +343,8 @@ class Round:
             game.players[player_id].opposite = player_order_view[2]
             game.players[player_id].right = player_order_view[3]
 
+    def increase_turn_count(self):
+        self['turn_count'] += 1
 
 class Table(Document):
     """
@@ -390,6 +412,7 @@ class Table(Document):
         # for player_id in self['order'][:4]:
         #     current_players[player_id] = self['players'][player_id]
         self['rounds'].append(Round(self['order'][:4]))
+        self.save()
 
     def shift_players(self):
         """

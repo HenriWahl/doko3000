@@ -59,7 +59,7 @@ def played_card(msg):
     table = game.tables[msg['table']]
     if current_user.id == msg['player_id'] == table.current_round.current_player:
         table.current_round.current_trick.add_turn(msg['player_id'], card_id)
-        table.current_round.turn_count += 1
+        table.current_round.increase_turn_count()
         is_last_turn = table.current_round.current_trick.is_last_turn()
         next_player = table.current_round.get_next_player()
         socketio.emit('played-card-by-user',
@@ -154,7 +154,6 @@ def claimed_trick(msg):
                               broadcast=True)
             else:
                 table.current_round.current_trick.owner = player_id
-                print('finished', table.current_round.turn_count, len(Deck.cards))
                 print(table.current_round.tricks)
                 print(table.current_round.get_score())
                 # tell everybody stats and wait for everybody confirming next round
