@@ -153,48 +153,66 @@ class Player(UserMixin, Document):
     def add_card(self, card):
         self['cards'].append(card)
 
+    def get_cards(self):
+        """
+        give complete card objects to player to be displayed in browser
+        """
+        cards = []
+        for card_id in self['cards']:
+            cards.append(Deck.cards[card_id])
+        return cards
+
     def remove_all_cards(self):
         self['cards'] = []
 
 
-class Trick:
+class Trick(dict):
     """
     contains all players and cards of moves - always 4
     2 synchronized lists, players and cards, should be enough to be indexed
     """
     def __init__(self):
-        self.players = []
-        self.cards = []
+        super().__init__(self)
+        self['players'] = []
+        self['cards'] = []
         # owner of the trick
-        self.__owner = False
+        self['owner'] = False
 
     def __len__(self):
-        return len(self.players)
+        return len(self['players'])
 
-    def add_turn(self, player_name, card_id):
+    @property
+    def players(self):
+        return self['players']
+    
+    @property
+    def cards(self):
+        return self['cards']
+
+    @property
+    def owner(self):
+        return self['owner']
+
+    @owner.setter
+    def owner(self, player_id):
+        self['owner'] = player_id
+
+    def add_turn(self, player_id, card_id):
         """
         when player plays card it will be added
         player_name is enough here but card object is needed, at least for getting card value
         """
-        self.players.append(player_name)
-        self.cards.append(Deck.cards[card_id])
+        self['players'].append(player_id)
+        self['cards'].append(card_id)
 
     def get_turn(self, turn_number):
         """
         return indexed turn - count does not start from 0 as the aren't in the real game neither
         """
-        if 1 <= turn_number <= 4 and len(self.players) <= turn_number and len(self.cards) <= turn_number:
-            return self.players[turn_number - 1], self.cards[turn_number - 1]
+        if 1 <= turn_number <= 4 and len(self['players']) <= turn_number and len(self['cards']) <= turn_number:
+            return self['players'][turn_number - 1], self['cards'][turn_number - 1]
         else:
             return
-
-    @property
-    def owner(self):
-        return self.__owner
-
-    @owner.setter
-    def owner(self, player):
-        self.__owner = player
 
     def is_last_turn(self):
         if len(self) > 3:
@@ -216,8 +234,6 @@ class Round(dict):
         # order is important - index 0 is the dealer
         # self.order = list(players.values())
         self['order'] = players
-
-
         # # list of players as names for JSON serialization
         # self.order_names = [x.name for x in self.order]
         # cards are an important part but makes in a round context only sense if shuffled
@@ -255,6 +271,10 @@ class Round(dict):
     @property
     def tricks(self):
         return self['tricks']
+
+    @property
+    def turn_count(self):
+        return self['turn_count']
 
     @property
     def current_player(self):
@@ -325,8 +345,8 @@ class Round(dict):
             if trick.owner:
                 if trick.owner not in score:
                     score[trick.owner] = 0
-                for card in trick.cards:
-                    score[trick.owner] += card.value
+                for card_id in trick.cards:
+                    score[trick.owner] += Deck.cards[card_id].value
         return score
 
     def tell_players_about_opponents(self):
@@ -362,7 +382,7 @@ class Table(Document):
             self['id'] = table_id
             # default empty
             self['order'] = []
-            self['rounds'] = []
+            self['round'] = []
             self['players'] = []
             self['players_ready'] = []
             self.save()
@@ -385,8 +405,8 @@ class Table(Document):
         return self['id']
 
     @property
-    def rounds(self):
-        return self['rounds']
+    def round(self):
+        return self['round']
 
     @property
     def players(self):
@@ -403,7 +423,7 @@ class Table(Document):
         if player_id not in self['players']:
             self['players'].append(player_id)
 
-    def add_round(self):
+    def new_round(self):
         """
         only 4 players can play at once - find out who and start a new round
         """
@@ -411,7 +431,7 @@ class Table(Document):
         # current_players = {}
         # for player_id in self['order'][:4]:
         #     current_players[player_id] = self['players'][player_id]
-        self['rounds'].append(Round(self['order'][:4]))
+        self['round'] = (Round(self['order'][:4]))
         self.save()
 
     def shift_players(self):
@@ -420,9 +440,15 @@ class Table(Document):
         """
         self['order'].append(self['order'].pop(0))
 
+    def get_dealer(self):
+        """
+        give current dealer for next round back
+        """
+        return self['order'][0]
+
     @property
-    def current_round(self):
-        return self['rounds'][-1]
+    def round(self):
+        return self['round']
 
     def add_ready_player(self, player):
         """
@@ -432,6 +458,7 @@ class Table(Document):
 
     def reset_ready_players(self):
         self['players_ready'] = []
+
 
 class Game:
     """
@@ -502,7 +529,7 @@ def test_game():
     #game.tables['test'].order = ['test1', 'test2', 'test3', 'test4', 'test5']
     game.tables['test'].order = ['test1', 'test2', 'test5', 'test4', 'test3']
     game.tables['test'].save()
-    game.tables['test'].add_round()
+    #game.tables['test'].new_round()
 
 
 def test_database():

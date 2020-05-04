@@ -57,11 +57,11 @@ def played_card(msg):
     print('played-card', current_user, msg['card_id'], msg['card_name'])
     card_id = msg['card_id']
     table = game.tables[msg['table']]
-    if current_user.id == msg['player_id'] == table.current_round.current_player:
-        table.current_round.current_trick.add_turn(msg['player_id'], card_id)
-        table.current_round.increase_turn_count()
-        is_last_turn = table.current_round.current_trick.is_last_turn()
-        next_player = table.current_round.get_next_player()
+    if current_user.id == msg['player_id'] == table.round.current_player:
+        table.round.current_trick.add_turn(msg['player_id'], card_id)
+        table.round.increase_turn_count()
+        is_last_turn = table.round.current_trick.is_last_turn()
+        next_player = table.round.get_next_player()
         socketio.emit('played-card-by-user',
                       {'player_id': msg['player_id'],
                        'card_id': card_id,
@@ -90,7 +90,7 @@ def enter_table(msg):
 @socketio.on('deal-cards')
 def deal_cards(msg):
     table = game.tables[msg['table']]
-    table.add_round()
+    table.new_round()
 
     # just tell everybody to get personal cards
     socketio.emit('grab-your-cards',
@@ -104,18 +104,18 @@ def deal_cards_to_player(msg):
             msg['table'] in game.tables:
         print(msg)
         table = game.tables[msg['table']]
-        if player_id in table.current_round.players:
-            # cards = table.current_round.players[player_id].cards
-            cards = game.players[player_id].cards
-            # player = table.current_round.players[player_id]
+        if player_id in table.round.players:
+            # cards = table.round.players[player_id].cards
+            cards = game.players[player_id].get_cards()
+            # player = table.round.players[player_id]
             player = game.players[player_id]
-            dealer = table.current_round.order[0]
-            next_player = table.current_round.order[1]
+            dealer = table.get_dealer()
+            next_player = table.round.order[1]
             socketio.emit('your-cards-please',
                           {'player_id': player_id,
-                           'turn_count': table.current_round.turn_count,
-                           'next_player': table.current_round.order[1],
-                           # 'order_names': table.current_round.order_names,
+                           'turn_count': table.round.turn_count,
+                           'next_player': table.round.order[1],
+                           # 'order_names': table.round.order_names,
                            'html': {'cards_hand': render_template('cards_hand.html',
                                                                   cards=cards,
                                                                   table=table),
@@ -133,35 +133,35 @@ def claimed_trick(msg):
             msg['table'] in game.tables:
         print(msg)
         table = game.tables[msg['table']]
-        if player_id in table.current_round.players:
-            if not table.current_round.is_finished():
+        if player_id in table.round.players:
+            if not table.round.is_finished():
                 # when ownership changes it does at previous trick because normally there is a new one created
                 # so the new one becomes the current one and the reclaimed is the previous
-                if not len(table.current_round.current_trick) == 0:
+                if not len(table.round.current_trick) == 0:
                     # old trick, freshly claimed
-                    # table.current_round.current_trick.owner = table.current_round.players[player_id]
-                    table.current_round.current_trick.owner = player_id
+                    # table.round.current_trick.owner = table.round.players[player_id]
+                    table.round.current_trick.owner = player_id
                     # new trick for next turns
-                    # table.current_round.add_trick(table.players[player_id])
-                    table.current_round.add_trick(player_id)
+                    # table.round.add_trick(table.players[player_id])
+                    table.round.add_trick(player_id)
                 else:
                     # apparently the ownership of the previous trick is not clear - change it
-                    table.current_round.previous_trick.owner = player_id
-                    table.current_round.current_player = player_id
+                    table.round.previous_trick.owner = player_id
+                    table.round.current_player = player_id
                 socketio.emit('next-trick',
                               {'next_player': player_id,
-                               'score': table.current_round.get_score()},
+                               'score': table.round.get_score()},
                               broadcast=True)
             else:
-                table.current_round.current_trick.owner = player_id
-                print(table.current_round.tricks)
-                print(table.current_round.get_score())
+                table.round.current_trick.owner = player_id
+                print(table.round.tricks)
+                print(table.round.get_score())
                 # tell everybody stats and wait for everybody confirming next round
                 socketio.emit('round-finished',
                               {'table': table.id,
                                'html': render_template('score.html',
                                                        table=table,
-                                                       score=table.current_round.get_score())
+                                                       score=table.round.get_score())
                                },
                               broadcast=True)
 
@@ -176,12 +176,12 @@ def ready_for_next_round(msg):
         table.add_ready_player(player_id)
         if len(table.players_ready) == len(table.players):
             table.shift_players()
-            table.add_round()
+            dealer = table.get_dealer()
             table.reset_ready_players()
             # just tell everybody to get personal cards
             socketio.emit('start-next-round',
                           {'table': table.id,
-                           'dealer': table.current_round.order[0]})
+                           'dealer': dealer})
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -221,16 +221,16 @@ def index():
                            title='doko3000')
 
 
-@app.route('/table/<table>')
+@app.route('/table/<table_id>')
 @login_required
-def table(table=''):
-    if table in game.tables and \
-            current_user.id in game.tables[table].players:
+def table(table_id=''):
+    if table_id in game.tables and \
+            current_user.id in game.tables[table_id].players:
         print('user in table')
         return render_template('table.html',
-                               title=f'doko3000 {table}',
-                               table=game.tables[table],
-                               dealer=game.tables[table].current_round.order[0]
+                               title=f'doko3000 {table_id}',
+                               table=game.tables[table_id],
+                               dealer=game.tables[table_id].get_dealer()
                                )
     return render_template('index.html',
                            tables=game.tables,
