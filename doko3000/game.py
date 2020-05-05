@@ -72,7 +72,7 @@ class Player(UserMixin, Document):
         if player_id:
             # ID still name, going to be number - for CouchDB
             self['_id'] = f'player-{player_id}'
-            Document.__init__(self, db.database, document_id=document_id)
+            Document.__init__(self, db.database)
             # ID for flask-login
             self['id'] = player_id
             # type is for CouchDB
@@ -221,35 +221,44 @@ class Trick(dict):
             return False
 
 
-class Round(dict):
+class Round(Document):
     """
-    one round
+    eternal round, part of a table
     """
-    def __init__(self, players):
-        super().__init__(self)
-        # if more than 4 players they change for every round
-        # changing too because of the position of dealer changes with every round
-        self['players'] = players
-        # self.players_id = [x.id for x in self.players.values()]
-        # order is important - index 0 is the dealer
-        # self.order = list(players.values())
-        self['order'] = players
-        # # list of players as names for JSON serialization
-        # self.order_names = [x.name for x in self.order]
+    def __init__(self, players=[], round_id='', document_id=''):
+        if round_id:
+            # ID still name, going to be number - for CouchDB
+            self['_id'] = f'round-{round_id}'
+            Document.__init__(self, db.database)
+            # type is for CouchDB
+            self['type'] = 'round'
+            # what table?
+            self['id'] = round_id
+            # # if more than 4 players they change for every round
+            # # changing too because of the position of dealer changes with every round
+            # self['players'] = players
+            # # order is important - but might be obsolete
+            # self['order'] = players
+            # # collection of tricks per round - its number should not exceed cards_per_player
+            # self['tricks'] = []
+            # # counting all turns
+            # self['turn_count'] = 0
+            # # current player - starts with the one following the dealer
+            # self['current_player'] = self['players'][1]
+            # self.save()
+            self.reset(players=players)
+        elif document_id:
+            Document.__init__(self, db.database, document_id=document_id)
+            # get document data from CouchDB
+            self.fetch()
+            print(self)
+
         # cards are an important part but makes in a round context only sense if shuffled
-        #self.cards = list(Deck.cards.values())
-        self['cards'] = list(Deck.cards)
+        # not needed outside or in CouchDB
+        self.cards = list(Deck.cards)
         # needed to know how many cards are dealed
         # same as number of tricks in a round
-        self['cards_per_player'] = len(self['cards']) // len(self['players'])
-        # collection of tricks per round - its number should not exceed cards_per_player
-        self['tricks'] = []
-        # counting all turns
-        self['turn_count'] = 0
-        # current player - starts with the one following the dealer
-        # self.current_player = self.players[list(self.players.keys())[1]]
-        self['current_player'] = self['players'][1]
-        print('current_player', self.current_player)
+        self.cards_per_player = len(self.cards) // 4
 
         # send info to HUD displays on players tables
         self.tell_players_about_opponents()
@@ -259,14 +268,19 @@ class Round(dict):
         self.deal()
         # add initial empty trick
         self.add_trick(self['current_player'])
+        print(self['tricks'])
 
     @property
     def players(self):
         return self['players']
 
     @property
-    def order(self):
-        return self['order']
+    def id(self):
+        return self['id']
+
+    # @property
+    # def order(self):
+    #     return self['order']
 
     @property
     def tricks(self):
@@ -280,11 +294,31 @@ class Round(dict):
     def current_player(self):
         return self['current_player']
 
+    def reset(self, players=[]):
+        """
+        used by __init__ and by table at start of a new round
+        """
+        # if more than 4 players they change for every round
+        # changing too because of the position of dealer changes with every round
+        self['players'] = players
+        # # order is important - but might be obsolete
+        # self['order'] = players
+        # collection of tricks per round - its number should not exceed cards_per_player
+        self['tricks'] = []
+        # counting all turns
+        self['turn_count'] = 0
+        # current player - starts with the one following the dealer
+        if self['players']:
+            self['current_player'] = self['players'][1]
+        else:
+            self['current_player'] = None
+        self.save()
+
     def shuffle(self):
         """
         shuffle cards
         """
-        shuffle(self['cards'])
+        shuffle(self.cards)
 
     def deal(self):
         """
@@ -292,9 +326,9 @@ class Round(dict):
         """
         for player_id in self['players']:
             game.players[player_id].remove_all_cards()
-            for card in range(self['cards_per_player']):
+            for card in range(self.cards_per_player):
                 # cards are given to players so the can be .pop()ed
-                game.players[player_id].add_card(self['cards'].pop())
+                game.players[player_id].add_card(self.cards.pop())
 
     def add_trick(self, player_id):
         """
@@ -308,6 +342,7 @@ class Round(dict):
         """
         enable access to current trick
         """
+        print(self['tricks'])
         return self['tricks'][-1]
 
     @property
@@ -322,13 +357,13 @@ class Round(dict):
         get player for next turn
         """
 
-        current_player_index = self['order'].index(self['current_player'])
+        current_player_index = self['player'].index(self['current_player'])
 
         if current_player_index < 3:
             # set new current player
-            self['current_player'] = self['order'][current_player_index + 1]
+            self['current_player'] = self['player'][current_player_index + 1]
         else:
-            self['current_player'] = self['order'][0]
+            self['current_player'] = self['player'][0]
         # current player is the next player
         return self['current_player']
 
@@ -353,10 +388,9 @@ class Round(dict):
         """
         give players info about whom they are playing against - interesting for HUD display
         """
-        # for player in self.players.values():
-        for player_id in self.players:
-            player_index = self.players.index(player_id)
-            player_order_view = copy(self.order)
+        for player_id in self['players']:
+            player_index = self['players'].index(player_id)
+            player_order_view = copy(self['players'])
             for i in range(player_index):
                 player_order_view.append(player_order_view.pop(0))
             game.players[player_id].left = player_order_view[1]
@@ -375,22 +409,25 @@ class Table(Document):
         if table_id:
             # ID still name, going to be number - for CouchDB
             self['_id'] = f'table-{table_id}'
-            Document.__init__(self, db.database, document_id=document_id)
+            Document.__init__(self, db.database)
             # type is for CouchDB
             self['type'] = 'table'
             # what table?
             self['id'] = table_id
             # default empty
             self['order'] = []
-            self['round'] = []
+            self['round'] = ''
             self['players'] = []
             self['players_ready'] = []
-            self.save()
         elif document_id:
             Document.__init__(self, db.database, document_id=document_id)
             # get document data from CouchDB
             self.fetch()
             print(self)
+        # either is not set yet or just a new table with new round
+        if self['round'] == '':
+            self['round'] = self.new_round()
+            self.save()
 
     @property
     def order(self):
@@ -427,12 +464,19 @@ class Table(Document):
         """
         only 4 players can play at once - find out who and start a new round
         """
-        # # since Python 3.6 or 3.7 dicts are ordered
-        # current_players = {}
-        # for player_id in self['order'][:4]:
-        #     current_players[player_id] = self['players'][player_id]
-        self['round'] = (Round(self['order'][:4]))
-        self.save()
+        if self['order']:
+            players = self['order'][:4]
+        else:
+            players = []
+        new_round = Round(players=players, round_id=self['id'])
+        return new_round.id
+
+    def reset_round(self):
+        if self['order']:
+            players = self['order'][:4]
+        else:
+            players = []
+        game.rounds[self['round']].reset(players=players)
 
     def shift_players(self):
         """
@@ -448,7 +492,7 @@ class Table(Document):
 
     @property
     def round(self):
-        return self['round']
+        return game.rounds[self['round']]
 
     def add_ready_player(self, player):
         """
@@ -467,21 +511,25 @@ class Game:
     def __init__(self):
         # very important for game - some randomness
         seed()
-        # store tables
-        self.tables = {}
-        for table_id, document in db.table_documents_by_table_id().items():
-            self.tables[table_id] = Table(document_id=document['_id'])
-            self.tables[table_id].save()
 
+    def initialize_components(self):
+        """
+        initialize all game components like tables and players
+        """
         # get players from CouchDB
         self.players = {}
-        for player_id, document in db.player_documents_by_player_id().items():
+        for player_id, document in db.player_documents_by_id().items():
             self.players[player_id] = Player(document_id=document['_id'])
-            self.players[player_id]['bla'] = 'blubb'
-            self.players[player_id].save()
-            print(self.players[player_id])
-            pass
 
+        # get rounds from CouchDB
+        self.rounds = {}
+        for round_id, document in db.round_documents_by_id().items():
+            self.rounds[round_id] = Round(document_id=document['_id'])
+
+        # store tables
+        self.tables = {}
+        for table_id, document in db.table_documents_by_id().items():
+            self.tables[table_id] = Table(document_id=document['_id'])
 
     def add_player(self, player_id='', document_id=''):
         """
@@ -489,8 +537,8 @@ class Game:
         """
         if player_id not in self.players:
             self.players[player_id] = Player(player_id=player_id)
-        else:
-            self.players[player_id] = Player(document_id=document_id)
+        # else:
+        #     self.players[player_id] = Player(document_id=document_id)
         return self.players[player_id]
 
     def add_table(self, table_id='', document_id=''):
@@ -499,8 +547,6 @@ class Game:
         """
         if table_id not in self.tables:
             self.tables[table_id] = Table(table_id=table_id)
-        # else:
-        #     self.tables[table_id] = Table(document_id=document_id)
         return self.tables[table_id]
 
     def has_tables(self):
@@ -520,20 +566,22 @@ class Game:
 
 # initialize game, load players etc.
 game = Game()
+game.initialize_components()
 
 def test_game():
     game.add_table('test')
-    for player_id, document in db.player_documents_by_player_id().items():
+    for player_id, document in db.player_documents_by_id().items():
         player = game.add_player(player_id, document_id=document['_id'])
         game.tables['test'].add_player(player.id)
     #game.tables['test'].order = ['test1', 'test2', 'test3', 'test4', 'test5']
     game.tables['test'].order = ['test1', 'test2', 'test5', 'test4', 'test3']
     game.tables['test'].save()
-    #game.tables['test'].new_round()
+    #if 'test' not in game.rounds:
+    #    game.tables['test'].new_round()
 
 
 def test_database():
     for test_player in ('test1', 'test2', 'test3', 'test4', 'test5'):
-        if test_player not in db.player_documents_by_player_id():
+        if test_player not in db.player_documents_by_id():
             player = game.add_player(player_id=test_player)
             player.set_password(test_player)

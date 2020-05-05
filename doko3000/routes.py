@@ -57,7 +57,9 @@ def played_card(msg):
     print('played-card', current_user, msg['card_id'], msg['card_name'])
     card_id = msg['card_id']
     table = game.tables[msg['table']]
+    print(current_user.id, msg['player_id'], table.round.current_player)
     if current_user.id == msg['player_id'] == table.round.current_player:
+        print(table.round.current_trick)
         table.round.current_trick.add_turn(msg['player_id'], card_id)
         table.round.increase_turn_count()
         is_last_turn = table.round.current_trick.is_last_turn()
@@ -90,7 +92,7 @@ def enter_table(msg):
 @socketio.on('deal-cards')
 def deal_cards(msg):
     table = game.tables[msg['table']]
-    table.new_round()
+    table.reset_round()
 
     # just tell everybody to get personal cards
     socketio.emit('grab-your-cards',
@@ -110,11 +112,11 @@ def deal_cards_to_player(msg):
             # player = table.round.players[player_id]
             player = game.players[player_id]
             dealer = table.get_dealer()
-            next_player = table.round.order[1]
+            next_player = table.round.players[1]
             socketio.emit('your-cards-please',
                           {'player_id': player_id,
                            'turn_count': table.round.turn_count,
-                           'next_player': table.round.order[1],
+                           'next_player': table.round.players[1],
                            # 'order_names': table.round.order_names,
                            'html': {'cards_hand': render_template('cards_hand.html',
                                                                   cards=cards,
