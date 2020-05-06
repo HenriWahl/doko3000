@@ -166,17 +166,24 @@ class Player(UserMixin, Document):
         self['cards'] = []
 
 
-class Trick(dict):
+class Trick(Document):
     """
     contains all players and cards of moves - always 4
     2 synchronized lists, players and cards, should be enough to be indexed
     """
-    def __init__(self):
-        super().__init__(self)
-        self['players'] = []
-        self['cards'] = []
-        # owner of the trick
-        self['owner'] = False
+    def __init__(self, trick_id='', document_id=''):
+        if trick_id:
+            # ID generated from Round object
+            self['_id'] = f'trick-{trick_id}'
+            Document.__init__(self)
+            self['players'] = []
+            self['cards'] = []
+            # owner of the trick
+            self['owner'] = False
+        elif document_id:
+            Document.__init__(self, db.database, document_id=document_id)
+            # get document data from CouchDB
+            self.fetch()
 
     def __len__(self):
         return len(self['players'])
@@ -267,7 +274,7 @@ class Round(Document):
         # ...then dealing
         self.deal()
         # add initial empty trick
-        self.add_trick(self['current_player'])
+        # self.add_trick(self['current_player'])
         print(self['tricks'])
 
     @property
@@ -304,7 +311,9 @@ class Round(Document):
         # # order is important - but might be obsolete
         # self['order'] = players
         # collection of tricks per round - its number should not exceed cards_per_player
-        self['tricks'] = []
+        self['tricks'] = {}
+        for trick_number in range(self.cards_per_player):
+            self.tricks[trick_number] = Trick(trick_id=)
         # counting all turns
         self['turn_count'] = 0
         # current player - starts with the one following the dealer
