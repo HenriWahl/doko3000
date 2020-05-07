@@ -175,11 +175,14 @@ class Trick(Document):
         if trick_id:
             # ID generated from Round object
             self['_id'] = f'trick-{trick_id}'
-            Document.__init__(self)
-            self['players'] = []
-            self['cards'] = []
-            # owner of the trick
-            self['owner'] = False
+            Document.__init__(self, db.database)
+            self['type'] = 'trick'
+            # self['players'] = []
+            # self['cards'] = []
+            # # owner of the trick
+            # self['owner'] = False
+            # self.save()
+            self.reset()
         elif document_id:
             Document.__init__(self, db.database, document_id=document_id)
             # get document data from CouchDB
@@ -203,6 +206,13 @@ class Trick(Document):
     @owner.setter
     def owner(self, player_id):
         self['owner'] = player_id
+
+    def reset(self):
+        self['players'] = []
+        self['cards'] = []
+        # owner of the trick
+        self['owner'] = False
+        self.save()
 
     def add_turn(self, player_id, card_id):
         """
@@ -232,6 +242,14 @@ class Round(Document):
     """
     eternal round, part of a table
     """
+
+    # cards are an important part but makes in a round context only sense if shuffled
+    # not needed outside or in CouchDB
+    cards = list(Deck.cards)
+    # needed to know how many cards are dealed
+    # same as number of tricks in a round
+    cards_per_player = len(cards) // 4
+
     def __init__(self, players=[], round_id='', document_id=''):
         if round_id:
             # ID still name, going to be number - for CouchDB
@@ -260,12 +278,12 @@ class Round(Document):
             self.fetch()
             print(self)
 
-        # cards are an important part but makes in a round context only sense if shuffled
-        # not needed outside or in CouchDB
-        self.cards = list(Deck.cards)
-        # needed to know how many cards are dealed
-        # same as number of tricks in a round
-        self.cards_per_player = len(self.cards) // 4
+        # # cards are an important part but makes in a round context only sense if shuffled
+        # # not needed outside or in CouchDB
+        # self.cards = list(Deck.cards)
+        # # needed to know how many cards are dealed
+        # # same as number of tricks in a round
+        # self.cards_per_player = len(self.cards) // 4
 
         # send info to HUD displays on players tables
         self.tell_players_about_opponents()
@@ -275,7 +293,7 @@ class Round(Document):
         self.deal()
         # add initial empty trick
         # self.add_trick(self['current_player'])
-        print(self['tricks'])
+
 
     @property
     def players(self):
@@ -311,9 +329,17 @@ class Round(Document):
         # # order is important - but might be obsolete
         # self['order'] = players
         # collection of tricks per round - its number should not exceed cards_per_player
-        self['tricks'] = {}
-        for trick_number in range(self.cards_per_player):
-            self.tricks[trick_number] = Trick(trick_id=)
+        #self['tricks'] = {}
+        # for trick_number in range(self.cards_per_player):
+        #     self.tricks[trick_number] = Trick(trick_id=)
+        # + 1 due to range counting behaviour
+        for trick_number in range(1, self.cards_per_player + 1):
+            trick = game.tricks.get(f'trick-{self.id}-{trick_number}')
+            if not trick:
+                game.tricks[f'trick-{self.id}-{trick_number}'] = Trick(trick_id=f'{self.id}-{trick_number}')
+            else:
+                trick.reset()
+
         # counting all turns
         self['turn_count'] = 0
         # current player - starts with the one following the dealer
@@ -527,17 +553,22 @@ class Game:
         """
         # get players from CouchDB
         self.players = {}
-        for player_id, document in db.player_documents_by_id().items():
+        for player_id, document in db.filter_by_type('player').items():
             self.players[player_id] = Player(document_id=document['_id'])
+
+        # all tricks belonging to certain rounds shall stay in CouchDB too
+        self.tricks = {}
+        for trick_id, document in db.filter_by_type('trick').items():
+            self.tricks[trick_id] = Trick(document_id=document['_id'])
 
         # get rounds from CouchDB
         self.rounds = {}
-        for round_id, document in db.round_documents_by_id().items():
+        for round_id, document in db.filter_by_type('round').items():
             self.rounds[round_id] = Round(document_id=document['_id'])
 
         # store tables
         self.tables = {}
-        for table_id, document in db.table_documents_by_id().items():
+        for table_id, document in db.filter_by_type('table').items():
             self.tables[table_id] = Table(document_id=document['_id'])
 
     def add_player(self, player_id='', document_id=''):
@@ -579,18 +610,18 @@ game.initialize_components()
 
 def test_game():
     game.add_table('test')
-    for player_id, document in db.player_documents_by_id().items():
+    for player_id, document in db.filter_by_type('player').items():
         player = game.add_player(player_id, document_id=document['_id'])
         game.tables['test'].add_player(player.id)
     #game.tables['test'].order = ['test1', 'test2', 'test3', 'test4', 'test5']
     game.tables['test'].order = ['test1', 'test2', 'test5', 'test4', 'test3']
     game.tables['test'].save()
-    #if 'test' not in game.rounds:
-    #    game.tables['test'].new_round()
+    if 'test' not in game.rounds:
+        game.tables['test'].new_round()
 
 
 def test_database():
     for test_player in ('test1', 'test2', 'test3', 'test4', 'test5'):
-        if test_player not in db.player_documents_by_id():
+        if test_player not in db.filter_by_type('player').items():
             player = game.add_player(player_id=test_player)
             player.set_password(test_player)

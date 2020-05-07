@@ -39,21 +39,3 @@ class DB:
             item_id = item['_id'].split(f'{filter_type}-', 1)[1]
             result[item_id] = item
         return result
-
-    def player_documents_by_id(self):
-        """
-        retrieves player documents sorted by non-document-id
-        """
-        return self.filter_by_type('player')
-
-    def table_documents_by_id(self):
-        """
-        retrieves table documents sorted by non-document-id
-        """
-        return self.filter_by_type('table')
-
-    def round_documents_by_id(self):
-        """
-        retrieves round documents sorted by non-document-id
-        """
-        return self.filter_by_type('round')
