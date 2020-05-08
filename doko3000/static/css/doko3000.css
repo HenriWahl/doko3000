@@ -11,8 +11,18 @@ html, body {
     background-size: cover;
 }
 
-.main-container {
+#main-content {
     height: 100vh;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+
+#table_hand {
+    position: fixed;
+    top: 10%;
+    height: 90%;
+    bottom: 0%;
 }
 
 .top-bar {
@@ -95,5 +105,5 @@ html, body {
 }
 
 .game_card {
-    z-index: 200;
+    z-index: 99;
 }
