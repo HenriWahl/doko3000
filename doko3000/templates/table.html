@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 
 {% block custom_content %}
-<div id="overlay_hud">
-<!--    <div id="hud_players">-->
-<!--    </div>-->
-</div>
+<!--<div id="overlay_hud">-->
+<!--&lt;!&ndash;    <div id="hud_players">&ndash;&gt;-->
+<!--&lt;!&ndash;    </div>&ndash;&gt;-->
+<!--</div>-->
 
-<div class="row">
-{% include 'overlay_topbar.html' %}
+<div class="container-fluid">
+    {% include 'overlay_topbar.html' %}
 </div>
 
 <div id="deal_cards" class="row overlay_button justify-content-center
@@ -25,13 +25,16 @@
 
 <button id="turn_indicator" class="overlay_notification btn btn-block btn-lg text-white d-none">Du bist am Zug</button>
 
-<div class="row align-items-center w-100 h-50">
-    <div class="w-100 h-100 d-flex justify-content-center align-items-center" id="table">
+<div id="table_hand">
+    <div class="row align-items-center w-100 h-50">
+        <div class="container-fluid w-100 h-100 d-flex justify-content-center align-items-center" id="table">
+        </div>
     </div>
-</div>
 
-<div class="row align-items-center w-100 h-50">
-    <div class="w-100 h-100 container-fluid d-inline-flex justify-content-center align-items-center" id="hand">
+    <div class="row align-items-center w-100 h-50">
+        <div class="container-fluid w-100 h-100 container-fluid d-inline-flex justify-content-center align-items-center"
+             id="hand">
+        </div>
     </div>
 </div>
 {% endblock custom_content %}
