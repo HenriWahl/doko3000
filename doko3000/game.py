@@ -250,6 +250,8 @@ class Round(Document):
     # same as number of tricks in a round
     cards_per_player = len(cards) // 4
 
+    tricks = {}
+
     def __init__(self, players=[], round_id='', document_id=''):
         if round_id:
             # ID still name, going to be number - for CouchDB
@@ -292,8 +294,7 @@ class Round(Document):
         # ...then dealing
         self.deal()
         # add initial empty trick
-        # self.add_trick(self['current_player'])
-
+        self.increase_trick_count()
 
     @property
     def players(self):
@@ -307,9 +308,9 @@ class Round(Document):
     # def order(self):
     #     return self['order']
 
-    @property
-    def tricks(self):
-        return self['tricks']
+    # @property
+    # def tricks(self):
+    #     return self['tricks']
 
     @property
     def turn_count(self):
@@ -333,15 +334,21 @@ class Round(Document):
         # for trick_number in range(self.cards_per_player):
         #     self.tricks[trick_number] = Trick(trick_id=)
         # + 1 due to range counting behaviour
+        self.tricks = {}
         for trick_number in range(1, self.cards_per_player + 1):
-            trick = game.tricks.get(f'trick-{self.id}-{trick_number}')
-            if not trick:
-                game.tricks[f'trick-{self.id}-{trick_number}'] = Trick(trick_id=f'{self.id}-{trick_number}')
+            trick = game.tricks.get(f'{self.id}-{trick_number}')
+            if trick is None:
+                game.tricks[f'{self.id}-{trick_number}'] = Trick(trick_id=f'{self.id}-{trick_number}')
             else:
                 trick.reset()
+            self.tricks[trick_number] = trick
 
         # counting all turns
         self['turn_count'] = 0
+
+        # counting all tricks
+        self['trick_count'] = 0
+
         # current player - starts with the one following the dealer
         if self['players']:
             self['current_player'] = self['players'][1]
@@ -377,8 +384,8 @@ class Round(Document):
         """
         enable access to current trick
         """
-        print(self['tricks'])
-        return self['tricks'][-1]
+        print(self.tricks)
+        return self.tricks[self['trick_count']]
 
     @property
     def previous_trick(self):
@@ -434,6 +441,14 @@ class Round(Document):
 
     def increase_turn_count(self):
         self['turn_count'] += 1
+        self.save()
+
+    def increase_trick_count(self):
+        self['trick_count'] += 1
+        print(self)
+        self.save()
+        pass
+
 
 class Table(Document):
     """
@@ -608,20 +623,20 @@ class Game:
 game = Game()
 game.initialize_components()
 
-def test_game():
-    game.add_table('test')
-    for player_id, document in db.filter_by_type('player').items():
-        player = game.add_player(player_id, document_id=document['_id'])
-        game.tables['test'].add_player(player.id)
-    #game.tables['test'].order = ['test1', 'test2', 'test3', 'test4', 'test5']
-    game.tables['test'].order = ['test1', 'test2', 'test5', 'test4', 'test3']
-    game.tables['test'].save()
-    if 'test' not in game.rounds:
-        game.tables['test'].new_round()
-
-
-def test_database():
-    for test_player in ('test1', 'test2', 'test3', 'test4', 'test5'):
-        if test_player not in db.filter_by_type('player').items():
-            player = game.add_player(player_id=test_player)
-            player.set_password(test_player)
+# def test_game():
+#     game.add_table('test')
+#     for player_id, document in db.filter_by_type('player').items():
+#         player = game.add_player(player_id, document_id=document['_id'])
+#         game.tables['test'].add_player(player.id)
+#     #game.tables['test'].order = ['test1', 'test2', 'test3', 'test4', 'test5']
+#     game.tables['test'].order = ['test1', 'test2', 'test5', 'test4', 'test3']
+#     game.tables['test'].save()
+#     #if 'test' not in game.rounds:
+#     #    game.tables['test'].new_round()
+#
+#
+# def test_database():
+#     for test_player in ('test1', 'test2', 'test3', 'test4', 'test5'):
+#         if test_player not in db.filter_by_type('player'):
+#             player = game.add_player(player_id=test_player)
+#             player.set_password(test_player)
