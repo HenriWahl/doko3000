@@ -9,7 +9,9 @@ from flask_login import UserMixin
 from werkzeug.security import check_password_hash, \
     generate_password_hash
 
-from . import db
+
+#
+# from . import db
 
 
 class Card:
@@ -68,11 +70,12 @@ class Player(UserMixin, Document):
 
     due to CouchDB Document class everything is now a dictionary
     """
-    def __init__(self, player_id='', document_id='', **kwargs):
+    def __init__(self, player_id='', document_id='', game=None):
+        self.game = game
         if player_id:
             # ID still name, going to be number - for CouchDB
             self['_id'] = f'player-{player_id}'
-            Document.__init__(self, db.database)
+            Document.__init__(self, self.game.db.database)
             # ID for flask-login
             self['id'] = player_id
             # type is for CouchDB
@@ -87,7 +90,7 @@ class Player(UserMixin, Document):
             self['left'] = self['opposite'] = self['right'] = None
             self.save()
         elif document_id:
-            Document.__init__(self, db.database, document_id=document_id)
+            Document.__init__(self, self.game.db.database, document_id=document_id)
             # get document data from CouchDB
             self.fetch()
             # id needed for flask-login
@@ -171,11 +174,12 @@ class Trick(Document):
     contains all players and cards of moves - always 4
     2 synchronized lists, players and cards, should be enough to be indexed
     """
-    def __init__(self, trick_id='', document_id=''):
+    def __init__(self, trick_id='', document_id='', game=None):
+        self.game = game
         if trick_id:
             # ID generated from Round object
             self['_id'] = f'trick-{trick_id}'
-            Document.__init__(self, db.database)
+            Document.__init__(self, self.game.db.database)
             self['type'] = 'trick'
             # self['players'] = []
             # self['cards'] = []
@@ -184,7 +188,7 @@ class Trick(Document):
             # self.save()
             self.reset()
         elif document_id:
-            Document.__init__(self, db.database, document_id=document_id)
+            Document.__init__(self, self.game.db.database, document_id=document_id)
             # get document data from CouchDB
             self.fetch()
 
@@ -252,11 +256,12 @@ class Round(Document):
 
     tricks = {}
 
-    def __init__(self, players=[], round_id='', document_id=''):
+    def __init__(self, players=[], game=None, round_id='', document_id=''):
+        self.game = game
         if round_id:
             # ID still name, going to be number - for CouchDB
             self['_id'] = f'round-{round_id}'
-            Document.__init__(self, db.database)
+            Document.__init__(self, self.game.db.database)
             # type is for CouchDB
             self['type'] = 'round'
             # what table?
@@ -275,7 +280,7 @@ class Round(Document):
             # self.save()
             self.reset(players=players)
         elif document_id:
-            Document.__init__(self, db.database, document_id=document_id)
+            Document.__init__(self, self.game.db.database, document_id=document_id)
             # get document data from CouchDB
             self.fetch()
             print(self)
@@ -336,9 +341,9 @@ class Round(Document):
         # + 1 due to range counting behaviour
         self.tricks = {}
         for trick_number in range(1, self.cards_per_player + 1):
-            trick = game.tricks.get(f'{self.id}-{trick_number}')
+            trick = self.game.tricks.get(f'{self.id}-{trick_number}')
             if trick is None:
-                game.tricks[f'{self.id}-{trick_number}'] = Trick(trick_id=f'{self.id}-{trick_number}')
+                self.game.tricks[f'{self.id}-{trick_number}'] = Trick(trick_id=f'{self.id}-{trick_number}', game=self.game)
             else:
                 trick.reset()
             self.tricks[trick_number] = trick
@@ -367,16 +372,16 @@ class Round(Document):
         deal cards
         """
         for player_id in self['players']:
-            game.players[player_id].remove_all_cards()
+            self.game.players[player_id].remove_all_cards()
             for card in range(self.cards_per_player):
                 # cards are given to players so the can be .pop()ed
-                game.players[player_id].add_card(self.cards.pop())
+                self.game.players[player_id].add_card(self.cards.pop())
 
     def add_trick(self, player_id):
         """
         adds empty trick which will be filled by players one after another
         """
-        self['tricks'].append(Trick())
+        self['tricks'].append(Trick(game=self.game))
         self['current_player'] = player_id
 
     @property
@@ -435,9 +440,9 @@ class Round(Document):
             player_order_view = copy(self['players'])
             for i in range(player_index):
                 player_order_view.append(player_order_view.pop(0))
-            game.players[player_id].left = player_order_view[1]
-            game.players[player_id].opposite = player_order_view[2]
-            game.players[player_id].right = player_order_view[3]
+            self.game.players[player_id].left = player_order_view[1]
+            self.game.players[player_id].opposite = player_order_view[2]
+            self.game.players[player_id].right = player_order_view[3]
 
     def increase_turn_count(self):
         self['turn_count'] += 1
@@ -455,11 +460,12 @@ class Table(Document):
     Definition of a table used by group of players
     """
 
-    def __init__(self, table_id='', document_id=''):
+    def __init__(self, table_id='', document_id='', game=None):
+        self.game = game
         if table_id:
             # ID still name, going to be number - for CouchDB
             self['_id'] = f'table-{table_id}'
-            Document.__init__(self, db.database)
+            Document.__init__(self, self.game.db.database)
             # type is for CouchDB
             self['type'] = 'table'
             # what table?
@@ -470,7 +476,7 @@ class Table(Document):
             self['players'] = []
             self['players_ready'] = []
         elif document_id:
-            Document.__init__(self, db.database, document_id=document_id)
+            Document.__init__(self, self.game.db.database, document_id=document_id)
             # get document data from CouchDB
             self.fetch()
             print(self)
@@ -493,7 +499,7 @@ class Table(Document):
 
     @property
     def round(self):
-        return self['round']
+        return self.game.rounds[self['round']]
 
     @property
     def players(self):
@@ -518,7 +524,7 @@ class Table(Document):
             players = self['order'][:4]
         else:
             players = []
-        new_round = Round(players=players, round_id=self['id'])
+        new_round = Round(players=players, round_id=self['id'], game=self.game)
         return new_round.id
 
     def reset_round(self):
@@ -526,7 +532,7 @@ class Table(Document):
             players = self['order'][:4]
         else:
             players = []
-        game.rounds[self['round']].reset(players=players)
+        self.game.rounds[self['round']].reset(players=players)
 
     def shift_players(self):
         """
@@ -542,7 +548,7 @@ class Table(Document):
 
     @property
     def round(self):
-        return game.rounds[self['round']]
+        return self.game.rounds[self['round']]
 
     def add_ready_player(self, player):
         """
@@ -558,9 +564,10 @@ class Game:
     """
     organizes tables
     """
-    def __init__(self):
+    def __init__(self, db=None):
         # very important for game - some randomness
         seed()
+        self.db = db
 
     def initialize_components(self):
         """
@@ -568,30 +575,30 @@ class Game:
         """
         # get players from CouchDB
         self.players = {}
-        for player_id, document in db.filter_by_type('player').items():
-            self.players[player_id] = Player(document_id=document['_id'])
+        for player_id, document in self.db.filter_by_type('player').items():
+            self.players[player_id] = Player(document_id=document['_id'], game=self)
 
         # all tricks belonging to certain rounds shall stay in CouchDB too
         self.tricks = {}
-        for trick_id, document in db.filter_by_type('trick').items():
-            self.tricks[trick_id] = Trick(document_id=document['_id'])
+        for trick_id, document in self.db.filter_by_type('trick').items():
+            self.tricks[trick_id] = Trick(document_id=document['_id'], game=self)
 
         # get rounds from CouchDB
         self.rounds = {}
-        for round_id, document in db.filter_by_type('round').items():
-            self.rounds[round_id] = Round(document_id=document['_id'])
+        for round_id, document in self.db.filter_by_type('round').items():
+            self.rounds[round_id] = Round(document_id=document['_id'], game=self)
 
         # store tables
         self.tables = {}
-        for table_id, document in db.filter_by_type('table').items():
-            self.tables[table_id] = Table(document_id=document['_id'])
+        for table_id, document in self.db.filter_by_type('table').items():
+            self.tables[table_id] = Table(document_id=document['_id'], game=self)
 
     def add_player(self, player_id='', document_id=''):
         """
         adds a new player
         """
         if player_id not in self.players:
-            self.players[player_id] = Player(player_id=player_id)
+            self.players[player_id] = Player(player_id=player_id, game=self)
         # else:
         #     self.players[player_id] = Player(document_id=document_id)
         return self.players[player_id]
@@ -601,7 +608,7 @@ class Game:
         adds a new table (to sit and play on, no database table!)
         """
         if table_id not in self.tables:
-            self.tables[table_id] = Table(table_id=table_id)
+            self.tables[table_id] = Table(table_id=table_id, game=self)
         return self.tables[table_id]
 
     def has_tables(self):
@@ -620,20 +627,20 @@ class Game:
         return self.players.values()
 
 # initialize game, load players etc.
-game = Game()
-game.initialize_components()
+# game = Game()
+# game.initialize_components()
 
-# def test_game():
-#     game.add_table('test')
-#     for player_id, document in db.filter_by_type('player').items():
-#         player = game.add_player(player_id, document_id=document['_id'])
-#         game.tables['test'].add_player(player.id)
-#     #game.tables['test'].order = ['test1', 'test2', 'test3', 'test4', 'test5']
-#     game.tables['test'].order = ['test1', 'test2', 'test5', 'test4', 'test3']
-#     game.tables['test'].save()
-#     #if 'test' not in game.rounds:
-#     #    game.tables['test'].new_round()
-#
+    def test_game(self):
+        self.add_table('test')
+        for player_id, document in self.db.filter_by_type('player').items():
+            player = self.add_player(player_id, document_id=document['_id'])
+            self.tables['test'].add_player(player.id)
+        #game.tables['test'].order = ['test1', 'test2', 'test3', 'test4', 'test5']
+        self.tables['test'].order = ['test1', 'test2', 'test5', 'test4', 'test3']
+        self.tables['test'].save()
+    #if 'test' not in game.rounds:
+    #    game.tables['test'].new_round()
+
 #
 # def test_database():
 #     for test_player in ('test1', 'test2', 'test3', 'test4', 'test5'):

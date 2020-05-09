@@ -10,19 +10,19 @@ class DB:
     def __init__(self, app):
         self.couch = CouchDB(app.config['COUCHDB_USER'],
                              app.config['COUCHDB_PASSWORD'],
-                             url= app.config['COUCHDB_URL'],
+                             url=app.config['COUCHDB_URL'],
                              connect=True,
                              auto_renew=True)
         # if not existing create needed databases
         if app.config['COUCHDB_DATABASE'] not in self.couch.all_dbs():
             self.database = self.couch.create_database(app.config['COUCHDB_DATABASE'])
         else:
-            print(self.couch.all_dbs())
             self.database = self.couch[app.config['COUCHDB_DATABASE']]
 
         # workaround to avoid error message about missing '_users' database
         if not '_users' in self.couch:
             self.couch.create_database('_users')
+
 
 
     def add(self, data):

@@ -8,13 +8,6 @@
 from doko3000 import app,\
                      socketio
 
-# from doko3000.game import test_database,\
-#                           test_game
-#
-# test_database()
-# test_game()
-
-
 
 if __name__ == '__main__':
     socketio.run(app,
