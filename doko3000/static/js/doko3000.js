@@ -144,6 +144,7 @@ $(document).ready(function () {
     })
 
     socket.on('start-next-round', function (msg) {
+        console.log(msg)
         if (player_id == msg.dealer) {
             $('#deal_cards').removeClass('d-none')
         } else {

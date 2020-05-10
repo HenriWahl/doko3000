@@ -299,7 +299,7 @@ class Round(Document):
         # ...then dealing
         self.deal()
         # add initial empty trick
-        self.increase_trick_count()
+        #self.increase_trick_count()
 
     @property
     def players(self):
@@ -325,6 +325,10 @@ class Round(Document):
     def current_player(self):
         return self['current_player']
 
+    @current_player.setter
+    def current_player(self, new_current_player):
+        self['current_player'] = new_current_player
+
     def reset(self, players=[]):
         """
         used by __init__ and by table at start of a new round
@@ -341,9 +345,10 @@ class Round(Document):
         # + 1 due to range counting behaviour
         self.tricks = {}
         for trick_number in range(1, self.cards_per_player + 1):
-            trick = self.game.tricks.get(f'{self.id}-{trick_number}')
+            trick = self.game.tricks.get(f"{self['id']}-{trick_number}")
             if trick is None:
-                self.game.tricks[f'{self.id}-{trick_number}'] = Trick(trick_id=f'{self.id}-{trick_number}', game=self.game)
+                self.game.tricks[f"{self['id']}-{trick_number}"] = Trick(trick_id=f"{self['id']}-{trick_number}",
+                                                                      game=self.game)
             else:
                 trick.reset()
             self.tricks[trick_number] = trick
@@ -352,7 +357,8 @@ class Round(Document):
         self['turn_count'] = 0
 
         # counting all tricks
-        self['trick_count'] = 0
+        # starting with first trick number 1
+        self['trick_count'] = 1
 
         # current player - starts with the one following the dealer
         if self['players']:
@@ -379,9 +385,11 @@ class Round(Document):
 
     def add_trick(self, player_id):
         """
-        adds empty trick which will be filled by players one after another
+        set player as owner of current trick
         """
-        self['tricks'].append(Trick(game=self.game))
+        # self['tricks'].append(Trick(game=self.game))
+        self.game.tricks[f"{self.id}-{self['trick_count']}"].owner = player_id
+        self.increase_trick_count()
         self['current_player'] = player_id
 
     @property
@@ -397,20 +405,20 @@ class Round(Document):
         """
         return previous trick to enable reclaiming
         """
-        return self['tricks'][-2]
+        return self.tricks[self['trick_count'] - 1]
 
     def get_next_player(self):
         """
         get player for next turn
         """
 
-        current_player_index = self['player'].index(self['current_player'])
+        current_player_index = self['players'].index(self['current_player'])
 
         if current_player_index < 3:
             # set new current player
-            self['current_player'] = self['player'][current_player_index + 1]
+            self['current_player'] = self['players'][current_player_index + 1]
         else:
-            self['current_player'] = self['player'][0]
+            self['current_player'] = self['players'][0]
         # current player is the next player
         return self['current_player']
 
@@ -423,7 +431,7 @@ class Round(Document):
 
     def get_score(self):
         score = {}
-        for trick in self.tricks:
+        for trick in self.tricks.values():
             if trick.owner:
                 if trick.owner not in score:
                     score[trick.owner] = 0
@@ -472,7 +480,7 @@ class Table(Document):
             self['id'] = table_id
             # default empty
             self['order'] = []
-            self['round'] = ''
+            #self['round'] = ''
             self['players'] = []
             self['players_ready'] = []
         elif document_id:
@@ -481,9 +489,12 @@ class Table(Document):
             self.fetch()
             print(self)
         # either is not set yet or just a new table with new round
-        if self['round'] == '':
-            self['round'] = self.new_round()
-            self.save()
+        # if self['round'] == '':
+        #     self['round'] = self.new_round()
+        # yes, table_id
+        if not self['id'] in self.game.rounds:
+            self.new_round()
+        self.save()
 
     @property
     def order(self):
@@ -524,8 +535,8 @@ class Table(Document):
             players = self['order'][:4]
         else:
             players = []
-        new_round = Round(players=players, round_id=self['id'], game=self.game)
-        return new_round.id
+        self.game.rounds[f"round-{self['id']}"] = Round(players=players, round_id=self['id'], game=self.game)
+        return self.game.rounds[f"round-{self['id']}"]
 
     def reset_round(self):
         if self['order']:
@@ -539,6 +550,7 @@ class Table(Document):
         last dealer is moved to the end of the players list
         """
         self['order'].append(self['order'].pop(0))
+        self.save()
 
     def get_dealer(self):
         """
@@ -626,17 +638,13 @@ class Game:
     def get_players(self):
         return self.players.values()
 
-# initialize game, load players etc.
-# game = Game()
-# game.initialize_components()
-
     def test_game(self):
         self.add_table('test')
         for player_id, document in self.db.filter_by_type('player').items():
             player = self.add_player(player_id, document_id=document['_id'])
             self.tables['test'].add_player(player.id)
         #game.tables['test'].order = ['test1', 'test2', 'test3', 'test4', 'test5']
-        self.tables['test'].order = ['test1', 'test2', 'test5', 'test4', 'test3']
+        self.tables['test'].order = ['test1', 'test2', 'test3', 'test4', 'test5']
         self.tables['test'].save()
     #if 'test' not in game.rounds:
     #    game.tables['test'].new_round()
