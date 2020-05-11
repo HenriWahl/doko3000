@@ -245,10 +245,6 @@ class Round(Document):
     """
     eternal round, part of a table
     """
-
-    # access to tricks in round, not in CouchDB
-    tricks = {}
-
     def __init__(self, players=[], game=None, round_id='', document_id=''):
         self.game = game
         # cards are an important part but makes in a round context only sense if shuffled
@@ -275,6 +271,20 @@ class Round(Document):
             self.shuffle()
             # ...then dealing
             self.deal()
+
+        # collection of tricks per round - its number should not exceed cards_per_player
+        self.tricks = {}
+        # + 1 due to range counting behaviour
+        for trick_number in range(1, self.cards_per_player + 1):
+            trick = self.game.tricks.get(f'{self.id}-{trick_number}')
+            if trick is None:
+                # create trick in CouchDB if it does not exist yet
+                self.game.tricks[f'{self.id}-{trick_number}'] = Trick(trick_id=f'{self.id}-{trick_number}',
+                                                                      game=self.game)
+            # else:
+            #     trick.reset()
+            # access tricks per trick_count number, not as index starting from 0
+            self.tricks[trick_number] = trick
 
     @property
     def id(self):
@@ -333,19 +343,6 @@ class Round(Document):
         # if more than 4 players they change for every round
         # changing too because of the position of dealer changes with every round
         self.players = players
-        # collection of tricks per round - its number should not exceed cards_per_player
-        self.tricks = {}
-        # + 1 due to range counting behaviour
-        for trick_number in range(1, self.cards_per_player + 1):
-            trick = self.game.tricks.get(f'{self.id}-{trick_number}')
-            if trick is None:
-                # create trick in CouchDB if it does not exist yet
-                self.game.tricks[f'{self.id}-{trick_number}'] = Trick(trick_id=f'{self.id}-{trick_number}',
-                                                                      game=self.game)
-            else:
-                trick.reset()
-            # access tricks per trick_count number, not as index starting from 0
-            self.tricks[trick_number] = trick
 
         # counting all turns
         self.turn_count = 0
@@ -353,6 +350,9 @@ class Round(Document):
         # counting all tricks
         # starting with first trick number 1
         self.trick_count = 1
+        # tricks have to be reset too when round is reset
+        for trick in self.tricks.values():
+            trick.reset()
 
         # current player - starts with the one following the dealer
         if self.players:
