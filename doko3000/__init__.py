@@ -37,10 +37,13 @@ game = Game(db=db)
 game.initialize_components()
 #game.test_game()
 
+
 @login.user_loader
 def load_user(id):
-    # return Player.query.get(int(id))
-    return game.players[id]
+    try:
+        return game.players[id]
+    except KeyError:
+        return False
 
 
 @socketio.on('who-am-i')
