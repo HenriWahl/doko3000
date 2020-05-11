@@ -411,7 +411,7 @@ class Round(Document):
         self.increase_trick_count()
         self.current_player = player_id
 
-    def get_next_player(self):
+    def shift_player(self):
         """
         get player for next turn
         """

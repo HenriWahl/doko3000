@@ -19,6 +19,7 @@ $(document).ready(function () {
 
     dragging.on('drop', function (card, target, source) {
         // do not drag your gained tricks around
+        console.log(card, source, target, cards_locked)
         if (card.id == 'cards_stack') {
             dragging.cancel(true)
         } else if (source.id == 'hand' && target.id == 'table' && player_id == next_player && !cards_locked) {

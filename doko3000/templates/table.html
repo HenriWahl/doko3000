@@ -23,7 +23,11 @@
     <button class="btn btn-success btn-block btn-lg"><strong>Stich nehmen</strong></button>
 </div>
 
-<button id="turn_indicator" class="overlay_notification btn btn-block btn-lg text-white d-none">Du bist am Zug</button>
+<button id="turn_indicator" class="overlay_notification btn btn-block btn-lg text-white
+{% if next_player != current_user.id %}
+d-none
+{% endif %}
+">Du bist am Zug</button>
 
 <div id="table_hand">
     <div class="row align-items-center w-100 h-50">

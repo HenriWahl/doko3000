@@ -78,7 +78,7 @@ def played_card(msg):
         table.round.increase_turn_count()
         game.players[player_id].remove_card(card_id)
         is_last_turn = table.round.current_trick.is_last_turn()
-        next_player = table.round.get_next_player()
+        next_player = table.round.shift_player()
         socketio.emit('played-card-by-user',
                       {'player_id': player_id,
                        'card_id': card_id,
@@ -243,7 +243,7 @@ def table(table_id=''):
         player = game.players[current_user.id]
         table = game.tables[table_id]
         dealer = table.get_dealer()
-        next_player = table.round.get_next_player()
+        next_player = table.round.current_player
         cards = player.get_cards()
         return render_template('table.html',
                                title=f'doko3000 {table_id}',
@@ -251,8 +251,7 @@ def table(table_id=''):
                                dealer=dealer,
                                player=player,
                                next_player=next_player,
-                               cards=cards
-                               )
+                               cards=cards)
     return render_template('index.html',
                            tables=game.tables,
                            title='doko3000')
