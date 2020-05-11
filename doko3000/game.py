@@ -400,14 +400,13 @@ class Round(Document):
         """
         get player for next turn
         """
-
         current_player_index = self.players.index(self.current_player)
-
         if current_player_index < 3:
             # set new current player
             self.current_player = self.players[current_player_index + 1]
         else:
             self.current_player = self.players[0]
+        self.save()
         # current player is the next player
         return self.current_player
 
