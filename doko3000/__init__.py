@@ -250,14 +250,17 @@ def table(table_id=''):
         player = game.players[current_user.id]
         table = game.tables[table_id]
         dealer = table.get_dealer()
-        current_player = table.round.current_player
+        # if no card is played already the dealer might deal
+        dealing_needed = table.round.turn_count == 0
+        current_player_id = table.round.current_player
         cards = player.get_cards()
         return render_template('table.html',
                                title=f'doko3000 {table_id}',
                                table=game.tables[table_id],
                                dealer=dealer,
+                               dealing_needed=dealing_needed,
                                player=player,
-                               current_player=current_player,
+                               current_player_id=current_player_id,
                                cards=cards)
     return render_template('index.html',
                            tables=game.tables,

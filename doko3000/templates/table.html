@@ -11,7 +11,7 @@
 </div>
 
 <div id="deal_cards" class="row overlay_button justify-content-center
-    {% if current_user.id != dealer %}
+    {% if current_user.id != dealer or not dealing_needed %}
     d-none
     {% endif %}"
      data-table="{{ table.id }}">
