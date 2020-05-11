@@ -1,12 +1,6 @@
 <!--<ul class="list-group list-group-flush list-group-horizontal">-->
-{#{% for player in players %}#}
-{#<span class="{% if (player.name == next_player and not is_last_turn) or (player.name == current_user.username and is_last_turn) %}#}
-{#    font-weight-bolder text-uppercase#}
-{#    {% endif %}">{{ player.name }}</span>#}
-{#{% endfor %}#}
-
 <span id="hud_player_{{ player.left }}" class="hud_player
-{% if player.left == next_player %}
+{% if player.left == current_player_id %}
 hud_player_active
 {% endif %}
 "><span class="oi oi-arrow-thick-left"></span>
@@ -17,7 +11,7 @@ hud_player_active
 </span>
 &nbsp;
 <span id="hud_player_{{ player.opposite }}" class="hud_player
-{% if player.opposite == next_player %}
+{% if player.opposite == current_player_id %}
 hud_player_active
 {% endif %}
 ">
@@ -27,7 +21,7 @@ hud_player_active
     {{ player.opposite }}</span>
 &nbsp;
 <span id="hud_player_{{ player.right }}" class="hud_player
-{% if player.right == next_player %}
+{% if player.right == current_player_id %}
 hud_player_active
 {% endif %}
 ">

@@ -3,7 +3,7 @@ let player_id = ''
 // for staying in sync with the game this is global
 let turn_count = 0
 // keep an eye on next player to know if turns are allowed or not
-let next_player = ''
+let current_player_id = ''
 // lock dragging of cards while waiting for trick being claimed
 let cards_locked = false
 
@@ -22,7 +22,7 @@ $(document).ready(function () {
         console.log(card, source, target, cards_locked)
         if (card.id == 'cards_stack') {
             dragging.cancel(true)
-        } else if (source.id == 'hand' && target.id == 'table' && player_id == next_player && !cards_locked) {
+        } else if (source.id == 'hand' && target.id == 'table' && player_id == current_player_id && !cards_locked) {
             console.log(card.id == 'cards_stack')
             $('#table').append(card)
             // add tooltip
@@ -35,7 +35,7 @@ $(document).ready(function () {
             })
         } else if (source.id == 'hand' && target.id == 'hand') {
             return true
-        } else if (source.id == 'table' || cards_locked || player_id != next_player) {
+        } else if (source.id == 'table' || cards_locked || player_id != current_player_id) {
             dragging.cancel(true)
         }
     })
@@ -49,6 +49,9 @@ $(document).ready(function () {
         if (player_id == '') {
             player_id = msg.player_id
         }
+        if (current_player_id == '') {
+            current_player_id = msg.current_player_id
+        }
     })
 
     socket.on('new-table-available', function (msg) {
@@ -56,13 +59,13 @@ $(document).ready(function () {
     })
 
     socket.on('played-card-by-user', function (msg) {
-        next_player = msg.next_player
+        current_player_id = msg.current_player_id
         console.log(msg)
         // $('#hud_players').html('')
         // $('#hud_players').html(msg.html.hud_players)
         $('.hud_player').removeClass('hud_player_active')
         if (!msg.is_last_turn) {
-            $('#hud_player_' + msg.next_player).addClass('hud_player_active')
+            $('#hud_player_' + msg.current_player_id).addClass('hud_player_active')
         }
         if (player_id != msg.player_id) {
             $('#table').append(msg.html.card)
@@ -74,7 +77,7 @@ $(document).ready(function () {
             $('#claim_trick').removeClass('d-none')
         } else {
             cards_locked = false
-            if (player_id == next_player) {
+            if (player_id == current_player_id) {
                 $('#turn_indicator').removeClass('d-none')
             } else {
                 $('#turn_indicator').addClass('d-none')
@@ -96,13 +99,15 @@ $(document).ready(function () {
     })
 
     socket.on('your-cards-please', function (msg) {
-        next_player = msg.next_player
+        current_player_id = msg.current_player_id
         cards_locked = false
         $('#table').html('')
         $('#hud_players').html(msg.html.hud_players)
         $('#hand').html(msg.html.cards_hand)
         $('#claim_trick').addClass('d-none')
-        if (player_id == next_player) {
+        console.log(msg)
+        console.log(player_id, current_player_id)
+        if (player_id == current_player_id) {
             $('#turn_indicator').removeClass('d-none')
         } else {
             $('#turn_indicator').addClass('d-none')
@@ -110,16 +115,16 @@ $(document).ready(function () {
     })
 
     socket.on('next-trick', function (msg) {
-        next_player = msg.next_player
+        current_player_id = msg.current_player_id
         console.log(msg)
         cards_locked = false
         $('#table').html('')
         $('.hud_player').removeClass('hud_player_active')
-        if (player_id == next_player) {
+        if (player_id == current_player_id) {
             $('#turn_indicator').removeClass('d-none')
         } else {
             $('#turn_indicator').addClass('d-none')
-            $('#hud_player_' + next_player).addClass('hud_player_active')
+            $('#hud_player_' + current_player_id).addClass('hud_player_active')
         }
         console.log(msg.score)
         console.log(player_id in msg.score)

@@ -47,8 +47,15 @@ def load_user(id):
 def who_am_i():
     print('who-am-i', current_user)
     if not current_user.is_anonymous:
+        player_id = current_user.id
+        table_id = game.players[player_id].table
+        if table_id:
+            current_player_id = game.tables[table_id].round.current_player
+        else:
+            current_player_id = ''
         socketio.emit('you-are-what-you-is',
-                      {'player_id': current_user.id})
+                      {'player_id': player_id,
+                       'current_player_id': current_player_id})
 
 
 
@@ -78,13 +85,13 @@ def played_card(msg):
         table.round.increase_turn_count()
         game.players[player_id].remove_card(card_id)
         is_last_turn = table.round.current_trick.is_last_turn()
-        next_player = table.round.shift_player()
+        current_player_id = table.round.shift_player()
         socketio.emit('played-card-by-user',
                       {'player_id': player_id,
                        'card_id': card_id,
                        'card_name': msg['card_name'],
                        'is_last_turn': is_last_turn,
-                       'next_player': next_player,
+                       'current_player_id': current_player_id,
                        'html': {'card': render_template('card.html',
                                                         card=Deck.cards[card_id],
                                                         table=table),
@@ -124,11 +131,11 @@ def deal_cards_to_player(msg):
             player = game.players[player_id]
             cards = player.get_cards()
             dealer = table.get_dealer()
-            next_player = table.round.players[1]
+            current_player_id = table.round.players[1]
             socketio.emit('your-cards-please',
                           {'player_id': player_id,
                            'turn_count': table.round.turn_count,
-                           'next_player': table.round.players[1],
+                           'current_player_id': current_player_id,
                            # 'order_names': table.round.order_names,
                            'html': {'cards_hand': render_template('cards_hand.html',
                                                                   cards=cards,
@@ -136,7 +143,7 @@ def deal_cards_to_player(msg):
                                     'hud_players': render_template('hud_players.html',
                                                                    player=player,
                                                                    dealer=dealer,
-                                                                   next_player=next_player)}},
+                                                                   current_player_id=current_player_id)}},
                           room=request.sid)
 
 
@@ -163,7 +170,7 @@ def claimed_trick(msg):
                     table.round.previous_trick.owner = player_id
                     table.round.current_player = player_id
                 socketio.emit('next-trick',
-                              {'next_player': player_id,
+                              {'current_player_id': player_id,
                                'score': table.round.get_score()},
                               broadcast=True)
             else:
@@ -243,14 +250,14 @@ def table(table_id=''):
         player = game.players[current_user.id]
         table = game.tables[table_id]
         dealer = table.get_dealer()
-        next_player = table.round.current_player
+        current_player = table.round.current_player
         cards = player.get_cards()
         return render_template('table.html',
                                title=f'doko3000 {table_id}',
                                table=game.tables[table_id],
                                dealer=dealer,
                                player=player,
-                               next_player=next_player,
+                               current_player=current_player,
                                cards=cards)
     return render_template('index.html',
                            tables=game.tables,

@@ -87,6 +87,8 @@ class Player(UserMixin, Document):
             self['password_hash'] = ''
             # current set of cards
             self['cards'] = []
+            # which table player sits on
+            self['table'] = ''
             # other players to the left, opposite and right of table
             self['left'] = self['opposite'] = self['right'] = None
             self.save()
@@ -120,6 +122,14 @@ class Player(UserMixin, Document):
     @cards.setter
     def cards(self, new_cards):
         self['cards'] = new_cards
+
+    @property
+    def table(self):
+        return self['table']
+
+    @table.setter
+    def table(self, new_table):
+        self['table'] = new_table
 
     @property
     def left(self):
