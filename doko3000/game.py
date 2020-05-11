@@ -109,9 +109,17 @@ class Player(UserMixin, Document):
     def password_hash(self):
         return self['password_hash']
 
+    @password_hash.setter
+    def password_hash(self, new_password_hash):
+        self['password_hash'] = new_password_hash
+
     @property
     def cards(self):
         return self['cards']
+
+    @cards.setter
+    def cards(self, new_cards):
+        self['cards'] = new_cards
 
     @property
     def left(self):
@@ -144,7 +152,7 @@ class Player(UserMixin, Document):
         """
         create hash of given password
         """
-        self['password_hash'] = generate_password_hash(password)
+        self.password_hash = generate_password_hash(password)
         self.save()
 
     def check_password(self, password):
@@ -154,19 +162,26 @@ class Player(UserMixin, Document):
         return check_password_hash(self.password_hash, password)
 
     def add_card(self, card):
-        self['cards'].append(card)
+        self.cards.append(card)
 
     def get_cards(self):
         """
         give complete card objects to player to be displayed in browser
         """
         cards = []
-        for card_id in self['cards']:
+        for card_id in self.cards:
             cards.append(Deck.cards[card_id])
         return cards
 
+    def remove_card(self, card_id):
+        """
+        remove card after having played it
+        """
+        self.cards.pop(self.cards.index(card_id))
+        self.save()
+
     def remove_all_cards(self):
-        self['cards'] = []
+        self.cards = []
 
 
 class Trick(Document):
@@ -495,6 +510,7 @@ class Table(Document):
     @order.setter
     def order(self, new_order):
         self['order'] = new_order
+        self.save()
 
     @property
     def id(self):
@@ -519,6 +535,7 @@ class Table(Document):
     @players_ready.setter
     def players_ready(self, new_players_ready):
         self['players_ready'] = new_players_ready
+        self.save()
 
     def add_player(self, player_id):
         """
@@ -564,6 +581,7 @@ class Table(Document):
         organize players who are ready for the next round in a list
         """
         self.players_ready.append(player)
+        self.save()
 
     def reset_ready_players(self):
         self.players_ready = []

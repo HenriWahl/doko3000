@@ -40,9 +40,7 @@ $(document).ready(function () {
     })
 
     socket.on('connect', function () {
-        socket.emit('my event',
-            {data: 'I\'m connected!'})
-
+        // revalidate user ID
         socket.emit('who-am-i')
     })
 

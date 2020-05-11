@@ -35,18 +35,12 @@ socketio = SocketIO(app, manage_session=False)
 
 game = Game(db=db)
 game.initialize_components()
-game.test_game()
+#game.test_game()
 
 @login.user_loader
 def load_user(id):
     # return Player.query.get(int(id))
     return game.players[id]
-
-
-@socketio.on('my event')
-def handle_my_custom_event(json, methods=['GET', 'POST']):
-    print(f'received event: {json}')
-    socketio.emit('my response', json)
 
 
 @socketio.on('who-am-i')
@@ -55,6 +49,7 @@ def who_am_i():
     if not current_user.is_anonymous:
         socketio.emit('you-are-what-you-is',
                       {'player_id': current_user.id})
+
 
 
 @socketio.on('new-table')
@@ -74,16 +69,18 @@ def new_table(msg):
 def played_card(msg):
     print('played-card', current_user, msg['card_id'], msg['card_name'])
     card_id = msg['card_id']
+    player_id = msg['player_id']
     table = game.tables[msg['table']]
-    print(current_user.id, msg['player_id'], table.round.current_player)
-    if current_user.id == msg['player_id'] == table.round.current_player:
+    print(current_user.id, player_id, table.round.current_player)
+    if current_user.id == player_id == table.round.current_player:
         print(table.round.current_trick)
-        table.round.current_trick.add_turn(msg['player_id'], card_id)
+        table.round.current_trick.add_turn(player_id, card_id)
         table.round.increase_turn_count()
+        game.players[player_id].remove_card(card_id)
         is_last_turn = table.round.current_trick.is_last_turn()
         next_player = table.round.get_next_player()
         socketio.emit('played-card-by-user',
-                      {'player_id': msg['player_id'],
+                      {'player_id': player_id,
                        'card_id': card_id,
                        'card_name': msg['card_name'],
                        'is_last_turn': is_last_turn,
@@ -124,10 +121,8 @@ def deal_cards_to_player(msg):
         print(msg)
         table = game.tables[msg['table']]
         if player_id in table.round.players:
-            # cards = table.round.players[player_id].cards
-            cards = game.players[player_id].get_cards()
-            # player = table.round.players[player_id]
             player = game.players[player_id]
+            cards = player.get_cards()
             dealer = table.get_dealer()
             next_player = table.round.players[1]
             socketio.emit('your-cards-please',
@@ -245,10 +240,18 @@ def index():
 def table(table_id=''):
     if table_id in game.tables and \
             current_user.id in game.tables[table_id].players:
+        player = game.players[current_user.id]
+        table = game.tables[table_id]
+        dealer = table.get_dealer()
+        next_player = table.round.get_next_player()
+        cards = player.get_cards()
         return render_template('table.html',
                                title=f'doko3000 {table_id}',
                                table=game.tables[table_id],
-                               dealer=game.tables[table_id].get_dealer()
+                               dealer=dealer,
+                               player=player,
+                               next_player=next_player,
+                               cards=cards
                                )
     return render_template('index.html',
                            tables=game.tables,
