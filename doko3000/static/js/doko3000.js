@@ -168,6 +168,7 @@ $(document).ready(function () {
     })
 
     $(document).on('click', '#deal_cards', function () {
+        console.log('deal_cards')
         socket.emit('deal-cards', {
             player_id: player_id,
             table: $(this).data('table')

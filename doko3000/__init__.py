@@ -31,7 +31,7 @@ db = DB(app)
 login = LoginManager(app)
 login.login_view = 'login'
 # extend by socket.io
-socketio = SocketIO(app)
+socketio = SocketIO(app, manage_session=False)
 
 game = Game(db=db)
 game.initialize_components()
@@ -120,8 +120,7 @@ def deal_cards(msg):
 @socketio.on('my-cards-please')
 def deal_cards_to_player(msg):
     player_id = msg['player_id']
-    if player_id == current_user.id and \
-            msg['table'] in game.tables:
+    if player_id == current_user.id and msg['table'] in game.tables:
         print(msg)
         table = game.tables[msg['table']]
         if player_id in table.round.players:
@@ -246,7 +245,6 @@ def index():
 def table(table_id=''):
     if table_id in game.tables and \
             current_user.id in game.tables[table_id].players:
-        print('user in table')
         return render_template('table.html',
                                title=f'doko3000 {table_id}',
                                table=game.tables[table_id],

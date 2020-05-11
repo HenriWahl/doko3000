@@ -119,6 +119,7 @@ class Player(UserMixin, Document):
     @left.setter
     def left(self, value):
         self['left'] = value
+        self.save()
 
     @property
     def right(self):
@@ -127,6 +128,7 @@ class Player(UserMixin, Document):
     @right.setter
     def right(self, value):
         self['right'] = value
+        self.save()
 
     @property
     def opposite(self):
@@ -135,10 +137,7 @@ class Player(UserMixin, Document):
     @opposite.setter
     def opposite(self, value):
         self['opposite'] = value
-
-    # @cards.setter
-    # def cards(self):
-    #     return self['cards']
+        self.save()
 
     def set_password(self, password):
         """
@@ -210,6 +209,7 @@ class Trick(Document):
     @owner.setter
     def owner(self, player_id):
         self['owner'] = player_id
+        self.save()
 
     def reset(self):
         self['players'] = []
@@ -247,17 +247,16 @@ class Round(Document):
     eternal round, part of a table
     """
 
-    # cards are an important part but makes in a round context only sense if shuffled
-    # not needed outside or in CouchDB
-    cards = list(Deck.cards)
-    # needed to know how many cards are dealed
-    # same as number of tricks in a round
-    cards_per_player = len(cards) // 4
-
-    tricks = {}
 
     def __init__(self, players=[], game=None, round_id='', document_id=''):
         self.game = game
+        # cards are an important part but makes in a round context only sense if shuffled
+        # not needed outside or in CouchDB
+        self.cards = list(Deck.cards)
+        # needed to know how many cards are dealed
+        # same as number of tricks in a round
+        self.cards_per_player = len(self.cards) // 4
+        self.tricks = {}
         if round_id:
             # ID still name, going to be number - for CouchDB
             self['_id'] = f'round-{round_id}'
@@ -293,13 +292,12 @@ class Round(Document):
         # self.cards_per_player = len(self.cards) // 4
 
         # send info to HUD displays on players tables
-        self.tell_players_about_opponents()
+        #self.tell_players_about_opponents()
         # first shuffling...
         self.shuffle()
         # ...then dealing
         self.deal()
-        # add initial empty trick
-        #self.increase_trick_count()
+
 
     @property
     def players(self):
@@ -365,6 +363,14 @@ class Round(Document):
             self['current_player'] = self['players'][1]
         else:
             self['current_player'] = None
+
+        self.calculate_opponents()
+
+        self.cards = list(Deck.cards)
+        # first shuffling...
+        self.shuffle()
+        # ...then dealing
+        self.deal()
         self.save()
 
     def shuffle(self):
@@ -372,6 +378,7 @@ class Round(Document):
         shuffle cards
         """
         shuffle(self.cards)
+        pass
 
     def deal(self):
         """
@@ -439,7 +446,7 @@ class Round(Document):
                     score[trick.owner] += Deck.cards[card_id].value
         return score
 
-    def tell_players_about_opponents(self):
+    def calculate_opponents(self):
         """
         give players info about whom they are playing against - interesting for HUD display
         """
@@ -510,7 +517,11 @@ class Table(Document):
 
     @property
     def round(self):
-        return self.game.rounds[self['round']]
+        return self.game.rounds[self['id']]
+
+    @round.setter
+    def round(self, new_round):
+        self.game.rounds[self['id']] = new_round
 
     @property
     def players(self):
@@ -535,15 +546,16 @@ class Table(Document):
             players = self['order'][:4]
         else:
             players = []
-        self.game.rounds[f"round-{self['id']}"] = Round(players=players, round_id=self['id'], game=self.game)
-        return self.game.rounds[f"round-{self['id']}"]
+        self.round = Round(players=players, round_id=self['id'], game=self.game)
 
     def reset_round(self):
         if self['order']:
             players = self['order'][:4]
         else:
             players = []
-        self.game.rounds[self['round']].reset(players=players)
+        self.round.reset(players=players)
+        self.reset_ready_players()
+        self.save()
 
     def shift_players(self):
         """
@@ -558,10 +570,6 @@ class Table(Document):
         """
         return self['order'][0]
 
-    @property
-    def round(self):
-        return self.game.rounds[self['round']]
-
     def add_ready_player(self, player):
         """
         organize players who are ready for the next round in a list
@@ -570,6 +578,7 @@ class Table(Document):
 
     def reset_ready_players(self):
         self['players_ready'] = []
+        self.save()
 
 
 class Game:
