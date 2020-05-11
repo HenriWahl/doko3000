@@ -30,6 +30,8 @@ db = DB(app)
 # login
 login = LoginManager(app)
 login.login_view = 'login'
+# empty message avoids useless errorflash-messae-by-default
+login.login_message = ''
 # extend by socket.io
 socketio = SocketIO(app, manage_session=False)
 
@@ -40,10 +42,13 @@ game.initialize_components()
 
 @login.user_loader
 def load_user(id):
+    """
+    give user back if it exists, otherwise force login
+    """
     try:
         return game.players[id]
     except KeyError:
-        return False
+        return None
 
 
 @socketio.on('who-am-i')
