@@ -31,7 +31,7 @@ $(document).ready(function () {
                 player_id: player_id,
                 card_id: $(card).data('id'),
                 card_name: $(card).data('name'),
-                table: $(card).data('table')
+                table_id: $(card).data('table_id')
             })
         } else if (source.id == 'hand' && target.id == 'hand') {
             return true
@@ -74,7 +74,7 @@ $(document).ready(function () {
         if (msg.is_last_turn) {
             cards_locked = true
             $('#turn_indicator').addClass('d-none')
-            $('#claim_trick').removeClass('d-none')
+            $('#button_claim_trick').removeClass('d-none')
         } else {
             cards_locked = false
             if (player_id == current_player_id) {
@@ -82,19 +82,19 @@ $(document).ready(function () {
             } else {
                 $('#turn_indicator').addClass('d-none')
             }
-            $('#claim_trick').addClass('d-none')
+            $('#button_claim_trick').addClass('d-none')
         }
 
         // $('#card_' + msg.card_id).attr('alt', msg.username)
 
         // anyway there is no need anymore to deal cards
-        $('#deal_cards').addClass('d-none')
+        $('#button_deal_cards').addClass('d-none')
     })
 
     socket.on('grab-your-cards', function (msg) {
         socket.emit('my-cards-please', {
             player_id: player_id,
-            table: msg.table
+            table_id: msg.table_id
         })
     })
 
@@ -104,7 +104,7 @@ $(document).ready(function () {
         $('#table').html('')
         $('#hud_players').html(msg.html.hud_players)
         $('#hand').html(msg.html.cards_hand)
-        $('#claim_trick').addClass('d-none')
+        $('#button_claim_trick').addClass('d-none')
         console.log(msg)
         console.log(player_id, current_player_id)
         if (player_id == current_player_id) {
@@ -113,9 +113,9 @@ $(document).ready(function () {
             $('#turn_indicator').addClass('d-none')
         }
         if (player_id == msg.dealer) {
-            $('#deal_cards').removeClass('d-none')
+            $('#button_deal_cards').removeClass('d-none')
         } else {
-            $('#deal_cards').addClass('d-none')
+            $('#button_deal_cards').addClass('d-none')
         }
     })
 
@@ -144,10 +144,9 @@ $(document).ready(function () {
 
     socket.on('round-finished', function (msg) {
         console.log('round-finished', msg)
-        $('#claim_trick').addClass('d-none')
-        // $('#next_round').removeClass('d-none')
+        $('#button_claim_trick').addClass('d-none')
         $('#modal_title').html('<strong>Runde beendet</strong>')
-        // Inhalt des Dialogs erst einmal leeren, damit keine alten Reste darin kleben
+        // cleanup content of dialog
         $('#modal_body').html(msg.html)
         $("#modal_dialog").modal()
     })
@@ -155,12 +154,12 @@ $(document).ready(function () {
     socket.on('start-next-round', function (msg) {
         console.log(msg)
         if (player_id == msg.dealer) {
-            $('#deal_cards').removeClass('d-none')
+            $('#button_deal_cards').removeClass('d-none')
         } else {
-            $('#deal_cards').addClass('d-none')
+            $('#button_deal_cards').addClass('d-none')
         }
-        $('#next_round').addClass('d-none')
-        $('#claim_trick').addClass('d-none')
+        $('#button_next_round').addClass('d-none')
+        $('#button_claim_trick').addClass('d-none')
 
     })
 
@@ -172,32 +171,31 @@ $(document).ready(function () {
     $(document).on('click', '.list-item-table', function () {
         socket.emit('enter-table', {
             player_id: player_id,
-            table: $(this).data('table')
+            table_id: $(this).data('table_id')
         })
     })
 
-    $(document).on('click', '#deal_cards', function () {
-        console.log('deal_cards')
+    $(document).on('click', '#button_deal_cards', function () {
+        console.log('button_deal_cards')
         socket.emit('deal-cards', {
             player_id: player_id,
-            table: $(this).data('table')
+            table_id: $(this).data('table_id')
         })
     })
 
-    $(document).on('click', '#claim_trick', function () {
+    $(document).on('click', '#button_claim_trick', function () {
         console.log('claim trick')
         socket.emit('claim-trick', {
             player_id: player_id,
-            table: $(this).data('table')
+            table_id: $(this).data('table_id')
         })
     })
 
-    $(document).on('click', '#next_round', function () {
-        console.log('next_round')
-        $('#next_round').addClass('d-none')
+    $(document).on('click', '#button_next_round', function () {
+        $('#button_next_round').addClass('d-none')
         socket.emit('ready-for-next-round', {
             player_id: player_id,
-            table: $(this).data('table')
+            table_id: $(this).data('table_id')
         })
     })
 

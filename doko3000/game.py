@@ -138,7 +138,7 @@ class Player(UserMixin, Document):
     @left.setter
     def left(self, value):
         self['left'] = value
-        self.save()
+        # self.save()
 
     @property
     def right(self):
@@ -147,7 +147,7 @@ class Player(UserMixin, Document):
     @right.setter
     def right(self, value):
         self['right'] = value
-        self.save()
+        # self.save()
 
     @property
     def opposite(self):
@@ -156,7 +156,7 @@ class Player(UserMixin, Document):
     @opposite.setter
     def opposite(self, value):
         self['opposite'] = value
-        self.save()
+        # self.save()
 
     def set_password(self, password):
         """
@@ -170,10 +170,6 @@ class Player(UserMixin, Document):
         compare hashed password with given one
         """
         return check_password_hash(self.password_hash, password)
-
-    def add_card(self, card):
-        self.cards.append(card)
-        self.save()
 
     def get_cards(self):
         """
@@ -421,7 +417,8 @@ class Round(Document):
             self.game.players[player_id].remove_all_cards()
             for card in range(self.cards_per_player):
                 # cards are given to players so the can be .pop()ed
-                self.game.players[player_id].add_card(self.cards.pop())
+                self.game.players[player_id].cards.append(self.cards.pop())
+            self.game.players[player_id].save()
         self.save()
 
     def add_trick(self, player_id):
@@ -434,7 +431,7 @@ class Round(Document):
         self.current_player = player_id
         self.save()
 
-    def shift_player(self):
+    def shift_players(self):
         """
         get player for next turn
         """
@@ -477,6 +474,7 @@ class Round(Document):
             self.game.players[player_id].left = player_order_view[1]
             self.game.players[player_id].opposite = player_order_view[2]
             self.game.players[player_id].right = player_order_view[3]
+            self.game.players[player_id].save()
 
     def increase_turn_count(self):
         self.turn_count += 1
@@ -486,7 +484,6 @@ class Round(Document):
         self.trick_count += 1
         print(self)
         self.save()
-        pass
 
 
 class Table(Document):

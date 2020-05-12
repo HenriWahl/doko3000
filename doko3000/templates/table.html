@@ -10,20 +10,20 @@
     {% include 'overlay_topbar.html' %}
 </div>
 
-<div id="deal_cards" class="row overlay_button justify-content-center
+<div id="button_deal_cards" class="row overlay_button justify-content-center
     {% if current_user.id != dealer or not dealing_needed %}
     d-none
     {% endif %}"
-     data-table="{{ table.id }}">
+     data-table_id="{{ table.id }}">
     <button class="btn btn-info btn-block btn-lg"><strong>Karten geben</strong></button>
 </div>
 
-<div id="claim_trick" class="row overlay_button justify-content-center
+<div id="button_claim_trick" class="row overlay_button justify-content-center
      {% if not trick_claiming_needed %}
      d-none
      {% endif %}
      "
-     data-table="{{ table.id }}">
+     data-table_id="{{ table.id }}">
     <button class="btn btn-success btn-block btn-lg"><strong>Stich nehmen</strong></button>
 </div>
 
