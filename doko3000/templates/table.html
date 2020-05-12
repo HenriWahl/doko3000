@@ -18,7 +18,11 @@
     <button class="btn btn-info btn-block btn-lg"><strong>Karten geben</strong></button>
 </div>
 
-<div id="claim_trick" class="row overlay_button justify-content-center d-none"
+<div id="claim_trick" class="row overlay_button justify-content-center
+     {% if not trick_claiming_needed %}
+     d-none
+     {% endif %}
+     "
      data-table="{{ table.id }}">
     <button class="btn btn-success btn-block btn-lg"><strong>Stich nehmen</strong></button>
 </div>
@@ -27,7 +31,8 @@
 {% if current_player_id != current_user.id %}
 d-none
 {% endif %}
-">Du bist am Zug</button>
+">Du bist am Zug
+</button>
 
 <div id="table_hand">
     <div class="row align-items-center w-100 h-50">

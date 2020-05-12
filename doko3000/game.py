@@ -173,6 +173,7 @@ class Player(UserMixin, Document):
 
     def add_card(self, card):
         self.cards.append(card)
+        self.save()
 
     def get_cards(self):
         """
@@ -192,6 +193,7 @@ class Player(UserMixin, Document):
 
     def remove_all_cards(self):
         self.cards = []
+        self.save()
 
 
 class Trick(Document):
@@ -302,9 +304,9 @@ class Round(Document):
             # get document data from CouchDB
             self.fetch()
             # first shuffling...
-            self.shuffle()
+            #self.shuffle()
             # ...then dealing
-            self.deal()
+            #self.deal()
 
         # collection of tricks per round - its number should not exceed cards_per_player
         self.tricks = {}
@@ -420,6 +422,7 @@ class Round(Document):
             for card in range(self.cards_per_player):
                 # cards are given to players so the can be .pop()ed
                 self.game.players[player_id].add_card(self.cards.pop())
+        self.save()
 
     def add_trick(self, player_id):
         """
@@ -429,6 +432,7 @@ class Round(Document):
         self.game.tricks[f'{self.id}-{self.trick_count}'].owner = player_id
         self.increase_trick_count()
         self.current_player = player_id
+        self.save()
 
     def shift_player(self):
         """
