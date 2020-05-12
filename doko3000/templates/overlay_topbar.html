@@ -1,16 +1,30 @@
 <div id="overlay_topbar">
     <div class="m-2 top-bar text-white">
-        <span class="oi oi-menu float-left p-1" data-toggle="dropdown" id="hamburger_menu"></span>
-        <div class="dropdown-menu">
-            <a class="dropdown-item" href="#" id="menu_request_round_reset" data-table_id="{{ table.id }}">Runde neu starten</a>
-<!--             <div class="dropdown-divider"></div> -->
-<!--            <a class="dropdown-item" href="#" id="request_round_reset">Runde neu starten</a>-->
+        <div class="dropdown">
+            <span class="oi oi-menu float-left p-1 topbar_menu" data-toggle="dropdown" id="hamburger_menu"></span>
+            <div class="dropdown-menu">
+                <a class="dropdown-item" href="#" id="menu_request_round_finish" data-table_id="{{ table.id }}">
+                    <span class="oi oi-media-skip-forward mr-1"></span>
+                    Runde beenden</a>
+                 <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="#" id="menu_request_round_reset" data-table_id="{{ table.id }}">
+                    <span class="oi oi-media-skip-backward mr-1"></span>
+                    Runde neu starten</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="#" id="menu_request_round_reset" data-table_id="{{ table.id }}">
+                    <span class="oi oi-reload mr-1"></span>
+                    Runde neu starten</a>
+            </div>
         </div>
-
-        <a href="{{ url_for('logout') }}" class="text-white"><span
-                class="oi oi-account-logout ml-2 mr-2 float-right"></span></a>
-        <span class="float-right">{{ current_user.id }}</span>
-        <span class="oi oi-person float-right mr-1"></span>
+        <div class="dropdown">
+            <span class="float-right" data-toggle="dropdown">{{ current_user.id }}</span>
+            <span class="oi oi-person float-right mr-1" data-toggle="dropdown"></span>
+            <div class="dropdown-menu">
+                <a href="{{ url_for('logout') }}" class="dropdown-item">
+                    <span class="oi oi-power-standby mr-2">
+                    </span>Abmelden</a>
+            </div>
+        </div>
     </div>
     <div id="hud_players">
         {% include 'hud_players.html' %}

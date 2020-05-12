@@ -109,7 +109,13 @@ html, body {
     z-index: 99;
 }
 
-#hamburger_menu {
+.topbar_menu {
     cursor: pointer;
     font-size: 1.2em;
+}
+
+.topbar_menu:hover {
+    background-color: white;
+    color: darkgrey;
+    border-radius: 0.15em;
 }
