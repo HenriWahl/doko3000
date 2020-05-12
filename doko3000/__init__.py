@@ -46,7 +46,8 @@ def load_user(id):
     give user back if it exists, otherwise force login
     """
     try:
-        return game.players[id]
+        player = game.players[id]
+        return player
     except KeyError:
         return None
 
@@ -60,6 +61,7 @@ def who_am_i():
         # if player already sits on a table inform client
         if table_id:
             current_player_id = game.tables[table_id].round.current_player
+            join_room(table_id)
         else:
             current_player_id = ''
         socketio.emit('you-are-what-you-is',
@@ -105,7 +107,7 @@ def played_card(msg):
                                                         card=Deck.cards[card_id],
                                                         table=table),
                                 }},
-                      broadcast=True)
+                      room=table.id)
 
 
 @socketio.on('enter-table')
@@ -188,7 +190,7 @@ def claimed_trick(msg):
                 socketio.emit('next-trick',
                               {'current_player_id': player_id,
                                'score': score},
-                              broadcast=True)
+                              room=table.id)
             else:
                 table.round.current_trick.owner = player_id
                 print(table.round.tricks)
@@ -200,7 +202,7 @@ def claimed_trick(msg):
                                                        table=table,
                                                        score=table.round.get_score())
                                },
-                              broadcast=True)
+                              room=table.id)
 
 
 @socketio.on('ready-for-next-round')
@@ -225,10 +227,17 @@ def ready_for_next_round(msg):
 @socketio.on('request-round-reset')
 def reset_round_temp_func(msg):
     table = game.tables[msg['table_id']]
-    table.reset_round()
+    #table.reset_round()
     # just tell everybody to get personal cards
-    socketio.emit('grab-your-cards',
-                  {'table_id': table.id})
+    socketio.emit('round-reset-requested',
+                  {'table_id': table.id,
+                   'html': render_template('request_round_reset.html',
+                                           table=table)
+                   },
+                 room=table.id)
+
+    # socketio.emit('grab-your-cards',
+    #               {'table_id': table.id})
 
 
 
