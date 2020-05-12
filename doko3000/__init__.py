@@ -69,7 +69,6 @@ def who_am_i():
                        'current_player_id': current_player_id})
 
 
-
 @socketio.on('new-table')
 def new_table(msg):
     print('new_table', current_user)
@@ -214,7 +213,7 @@ def ready_for_next_round(msg):
         table = game.tables[msg['table_id']]
         table.add_ready_player(player_id)
         # if len(table.players_ready) == len(table.players):
-        if set(table.players_ready) == set(table.round.players):
+        if {table.players_ready} == {table.round.players}:
             table.shift_players()
             dealer = table.get_dealer()
             table.reset_ready_players()
@@ -225,7 +224,7 @@ def ready_for_next_round(msg):
 
 
 @socketio.on('request-round-reset')
-def reset_round_temp_func(msg):
+def request_round_reset(msg):
     table = game.tables[msg['table_id']]
     #table.reset_round()
     # just tell everybody to get personal cards
@@ -235,6 +234,12 @@ def reset_round_temp_func(msg):
                                            table=table)
                    },
                  room=table.id)
+
+@socketio.on('ready-for-round-reset')
+def reset_round(msg):
+
+
+
 
     # socketio.emit('grab-your-cards',
     #               {'table_id': table.id})

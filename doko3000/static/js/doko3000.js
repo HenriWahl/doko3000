@@ -160,9 +160,16 @@ $(document).ready(function () {
         }
         $('#button_next_round').addClass('d-none')
         $('#button_claim_trick').addClass('d-none')
-
     })
 
+    socket.on('round-reset-requested', function (msg) {
+        console.log('round-reset-requested', msg)
+        // $('#button_claim_trick').addClass('d-none')
+        // $('#modal_title').html('<strong>Runde beendet</strong>')
+        // cleanup content of dialog
+        $('#modal_body').html(msg.html)
+        $("#modal_dialog").modal()
+    })
 
     $(document).on('click', '#new_table', function () {
         socket.emit('new-table', {button: 'new_table'})
@@ -199,9 +206,16 @@ $(document).ready(function () {
         })
     })
 
-    $(document).on('click', '#request_round_reset', function () {
+    $(document).on('click', '#menu_request_round_reset', function () {
         console.log('request_round_reset')
         socket.emit('request-round-reset', {
+            player_id: player_id,
+            table_id: $(this).data('table_id')
+        })
+    })
+
+    $(document).on('click', '#button_round_reset_yes"', function () {
+        socket.emit('ready-for-round-reset', {
             player_id: player_id,
             table_id: $(this).data('table_id')
         })
