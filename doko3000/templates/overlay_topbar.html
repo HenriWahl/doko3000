@@ -1,32 +1,34 @@
 <div id="overlay_topbar">
-    <div class="m-2 top-bar text-white">
-        <div class="dropdown">
-            <span class="oi oi-menu float-left p-1 topbar_menu" data-toggle="dropdown" id="hamburger_menu"></span>
-            <div class="dropdown-menu">
-                <a class="dropdown-item" href="#" id="menu_request_round_finish" data-table_id="{{ table.id }}">
-                    <span class="oi oi-media-skip-forward mr-1"></span>
-                    Runde beenden</a>
-                 <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="#" id="menu_request_round_reset" data-table_id="{{ table.id }}">
-                    <span class="oi oi-media-skip-backward mr-1"></span>
-                    Runde neu starten</a>
-                <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="#" id="menu_request_round_reset" data-table_id="{{ table.id }}">
-                    <span class="oi oi-reload mr-1"></span>
-                    Runde neu starten</a>
-            </div>
+    <!--    <span class="m-2 topbar text-white">-->
+    <div class="dropdown">
+        <div class="btn btn-outline-light oi oi-menu float-left ml-2 mt-2" data-toggle="dropdown" id="hamburger_menu"></div>
+        <div class="dropdown-menu">
+            <a class="dropdown-item" href="#" id="menu_request_round_finish" data-table_id="{{ table.id }}">
+                <span class="oi oi-media-skip-forward mr-1"></span>
+                Spiel beenden</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="#" id="menu_request_round_reset" data-table_id="{{ table.id }}">
+                <span class="oi oi-media-skip-backward mr-1"></span>
+                Spiel neu starten</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="#" id="menu_request_round_restart" data-table_id="{{ table.id }}">
+                <span class="oi oi-reload mr-1"></span>
+                Runde neu starten</a>
         </div>
-        <div class="dropdown">
-            <span class="float-right" data-toggle="dropdown">{{ current_user.id }}</span>
-            <span class="oi oi-person float-right mr-1" data-toggle="dropdown"></span>
-            <div class="dropdown-menu">
-                <a href="{{ url_for('logout') }}" class="dropdown-item">
+    </div>
+    <div class="dropdown">
+        <!--            <span class="topbar-menu">-->
+        <div class="btn btn-outline-light oi oi-person float-right mr-2 mt-2" data-toggle="dropdown"></div>
+        <!--            </span>-->
+        <div class="dropdown-menu">
+            <a href="{{ url_for('logout') }}" class="dropdown-item">
                     <span class="oi oi-power-standby mr-2">
                     </span>Abmelden</a>
-            </div>
         </div>
     </div>
-    <div id="hud_players">
-        {% include 'hud_players.html' %}
-    </div>
+    <!--    </span>-->
+</div>
+<div id="hud_players">
+    {% include 'hud_players.html' %}
+</div>
 </div>

@@ -63,9 +63,9 @@ $(document).ready(function () {
         console.log(msg)
         // $('#hud_players').html('')
         // $('#hud_players').html(msg.html.hud_players)
-        $('.hud_player').removeClass('hud_player_active')
+        $('.hud_player').removeClass('hud-player-active')
         if (!msg.is_last_turn) {
-            $('#hud_player_' + msg.current_player_id).addClass('hud_player_active')
+            $('#hud_player_' + msg.current_player_id).addClass('hud-player-active')
         }
         if (player_id != msg.player_id) {
             $('#table').append(msg.html.card)
@@ -124,12 +124,12 @@ $(document).ready(function () {
         console.log(msg)
         cards_locked = false
         $('#table').html('')
-        $('.hud_player').removeClass('hud_player_active')
+        $('.hud_player').removeClass('hud-player-active')
         if (player_id == current_player_id) {
             $('#turn_indicator').removeClass('d-none')
         } else {
             $('#turn_indicator').addClass('d-none')
-            $('#hud_player_' + current_player_id).addClass('hud_player_active')
+            $('#hud_player_' + current_player_id).addClass('hud-player-active')
         }
         console.log(msg.score)
         console.log(player_id in msg.score)
@@ -166,7 +166,7 @@ $(document).ready(function () {
         console.log('round-reset-requested', msg)
         // $('#button_claim_trick').addClass('d-none')
         // $('#modal_title').html('<strong>Runde beendet</strong>')
-        $('.overlay_button').addClass('d-none')
+        $('.overlay-button').addClass('d-none')
         // cleanup content of dialog
         $('#modal_body').html(msg.html)
         $('#modal_dialog').modal()

@@ -1,7 +1,7 @@
 <!--<ul class="list-group list-group-flush list-group-horizontal">-->
 <span id="hud_player_{{ player.left }}" class="hud_player
 {% if player.left == current_player_id %}
-hud_player_active
+hud-player-active
 {% endif %}
 "><span class="oi oi-arrow-thick-left"></span>
     {% if player.left == dealer %}
@@ -12,7 +12,7 @@ hud_player_active
 &nbsp;
 <span id="hud_player_{{ player.opposite }}" class="hud_player
 {% if player.opposite == current_player_id %}
-hud_player_active
+hud-player-active
 {% endif %}
 ">
         {% if player.opposite == dealer %}
@@ -22,7 +22,7 @@ hud_player_active
 &nbsp;
 <span id="hud_player_{{ player.right }}" class="hud_player
 {% if player.right == current_player_id %}
-hud_player_active
+hud-player-active
 {% endif %}
 ">
     {% if player.right == dealer %}
