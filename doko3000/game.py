@@ -265,6 +265,15 @@ class Trick(Document):
         else:
             return False
 
+    def get_cards(self):
+        """
+        give complete card objects to table to be displayed in browser
+        """
+        cards = []
+        for card_id in self.cards:
+            cards.append(Deck.cards[card_id])
+        return cards
+
 
 class Round(Document):
     """

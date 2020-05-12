@@ -57,6 +57,7 @@ def who_am_i():
     if not current_user.is_anonymous:
         player_id = current_user.id
         table_id = game.players[player_id].table
+        # if player already sits on a table inform client
         if table_id:
             current_player_id = game.tables[table_id].round.current_player
         else:
@@ -137,7 +138,8 @@ def deal_cards_to_player(msg):
         table = game.tables[msg['table']]
         if player_id in table.round.players:
             player = game.players[player_id]
-            cards = player.get_cards()
+            cards_hand = player.get_cards()
+            # cards_table = table.round.current_trick.get_cards()
             dealer = table.get_dealer()
             current_player_id = table.round.players[1]
             socketio.emit('your-cards-please',
@@ -146,8 +148,11 @@ def deal_cards_to_player(msg):
                            'current_player_id': current_player_id,
                            # 'order_names': table.round.order_names,
                            'html': {'cards_hand': render_template('cards_hand.html',
-                                                                  cards=cards,
+                                                                  cards_hand=cards_hand,
                                                                   table=table),
+                                    # 'cards_table': render_template('cards_table.html',
+                                    #                               cards_table=cards_table,
+                                    #                               table=table),
                                     'hud_players': render_template('hud_players.html',
                                                                    player=player,
                                                                    dealer=dealer,
@@ -261,7 +266,8 @@ def table(table_id=''):
         # if no card is played already the dealer might deal
         dealing_needed = table.round.turn_count == 0
         current_player_id = table.round.current_player
-        cards = player.get_cards()
+        cards_hand = player.get_cards()
+        cards_table = table.round.current_trick.get_cards()
         return render_template('table.html',
                                title=f'doko3000 {table_id}',
                                table=game.tables[table_id],
@@ -269,7 +275,8 @@ def table(table_id=''):
                                dealing_needed=dealing_needed,
                                player=player,
                                current_player_id=current_player_id,
-                               cards=cards)
+                               cards_hand=cards_hand,
+                               cards_table=cards_table)
     return render_template('index.html',
                            tables=game.tables,
                            title='doko3000')
