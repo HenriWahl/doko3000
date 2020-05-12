@@ -1,6 +1,10 @@
 {% for card in cards_hand %}
 {% include 'card.html' %}
 {% endfor %}
-<div id="cards_stack" class="game_card ml-2 d-none">
+<div id="cards_stack" class="game_card ml-2
+{% if player.id not in score %}
+d-none
+{% endif%}
+">
 <img class="img-fluid p-1" src="/static/img/cards/back.png">
 </div>

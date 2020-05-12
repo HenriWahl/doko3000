@@ -6,7 +6,8 @@ RUN apt -y update &&\
 
 RUN pip install --upgrade pip
 
-RUN pip install cloudant\
+RUN pip install click\
+                cloudant\
                 eventlet\
                 flask\
                 flask-login\

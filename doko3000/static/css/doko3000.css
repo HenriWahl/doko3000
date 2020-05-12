@@ -43,7 +43,7 @@ html, body {
 
 #hud_players {
     position: fixed;
-    top: 10px;
+    top: 13px;
     height: 10%;
     width: 50%;
     left: 25%;
@@ -107,4 +107,9 @@ html, body {
 
 .game_card {
     z-index: 99;
+}
+
+#hamburger_menu {
+    cursor: pointer;
+    font-size: 1.2em;
 }

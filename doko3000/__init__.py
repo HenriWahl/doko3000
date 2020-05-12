@@ -146,10 +146,12 @@ def deal_cards_to_player(msg):
                           {'player_id': player_id,
                            'turn_count': table.round.turn_count,
                            'current_player_id': current_player_id,
+                           'dealer': dealer,
                            # 'order_names': table.round.order_names,
                            'html': {'cards_hand': render_template('cards_hand.html',
                                                                   cards_hand=cards_hand,
-                                                                  table=table),
+                                                                  table=table,
+                                                                  player=player),
                                     # 'cards_table': render_template('cards_table.html',
                                     #                               cards_table=cards_table,
                                     #                               table=table),
@@ -182,9 +184,10 @@ def claimed_trick(msg):
                     # apparently the ownership of the previous trick is not clear - change it
                     table.round.previous_trick.owner = player_id
                     table.round.current_player = player_id
+                score = table.round.get_score()
                 socketio.emit('next-trick',
                               {'current_player_id': player_id,
-                               'score': table.round.get_score()},
+                               'score': score},
                               broadcast=True)
             else:
                 table.round.current_trick.owner = player_id
@@ -208,7 +211,8 @@ def ready_for_next_round(msg):
         print(msg)
         table = game.tables[msg['table']]
         table.add_ready_player(player_id)
-        if len(table.players_ready) == len(table.players):
+        # if len(table.players_ready) == len(table.players):
+        if set(table.players_ready) == set(table.round.players):
             table.shift_players()
             dealer = table.get_dealer()
             table.reset_ready_players()
@@ -216,6 +220,16 @@ def ready_for_next_round(msg):
             socketio.emit('start-next-round',
                           {'table': table.id,
                            'dealer': dealer})
+
+
+@socketio.on('request-round-reset')
+def reset_round_temp_func(msg):
+    table = game.tables[msg['table_id']]
+    table.reset_round()
+    # just tell everybody to get personal cards
+    socketio.emit('grab-your-cards',
+                  {'table': table.id})
+
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -268,15 +282,17 @@ def table(table_id=''):
         current_player_id = table.round.current_player
         cards_hand = player.get_cards()
         cards_table = table.round.current_trick.get_cards()
+        score = table.round.get_score()
         return render_template('table.html',
                                title=f'doko3000 {table_id}',
-                               table=game.tables[table_id],
+                               table=table,
                                dealer=dealer,
                                dealing_needed=dealing_needed,
                                player=player,
                                current_player_id=current_player_id,
                                cards_hand=cards_hand,
-                               cards_table=cards_table)
+                               cards_table=cards_table,
+                               score=score)
     return render_template('index.html',
                            tables=game.tables,
                            title='doko3000')

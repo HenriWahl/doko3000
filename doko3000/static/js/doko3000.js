@@ -112,6 +112,11 @@ $(document).ready(function () {
         } else {
             $('#turn_indicator').addClass('d-none')
         }
+        if (player_id == msg.dealer) {
+            $('#deal_cards').removeClass('d-none')
+        } else {
+            $('#deal_cards').addClass('d-none')
+        }
     })
 
     socket.on('next-trick', function (msg) {
@@ -193,6 +198,14 @@ $(document).ready(function () {
         socket.emit('ready-for-next-round', {
             player_id: player_id,
             table: $(this).data('table')
+        })
+    })
+
+    $(document).on('click', '#request_round_reset', function () {
+        console.log('request_round_reset')
+        socket.emit('request-round-reset', {
+            player_id: player_id,
+            table_id: $(this).data('table_id')
         })
     })
 

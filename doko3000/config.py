@@ -18,3 +18,8 @@ class Config:
     COUCHDB_DATABASE = os.environ.get('COUCHDB_DATABASE') or 'doko3000'
     COUCHDB_USER = os.environ.get('COUCHDB_USER') or 'admin'
     COUCHDB_PASSWORD = os.environ.get('COUCHDB_PASSWORD') or 'doko3000'
+
+
+class DummyApp:
+    def __init__(self):
+        self.config = Config.__dict__

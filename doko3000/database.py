@@ -23,8 +23,6 @@ class DB:
         if not '_users' in self.couch:
             self.couch.create_database('_users')
 
-
-
     def add(self, data):
         print(data.__dict__)
         print(type(data))
