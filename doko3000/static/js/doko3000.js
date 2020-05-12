@@ -166,9 +166,10 @@ $(document).ready(function () {
         console.log('round-reset-requested', msg)
         // $('#button_claim_trick').addClass('d-none')
         // $('#modal_title').html('<strong>Runde beendet</strong>')
+        $('.overlay_button').addClass('d-none')
         // cleanup content of dialog
         $('#modal_body').html(msg.html)
-        $("#modal_dialog").modal()
+        $('#modal_dialog').modal()
     })
 
     $(document).on('click', '#new_table', function () {
@@ -214,7 +215,8 @@ $(document).ready(function () {
         })
     })
 
-    $(document).on('click', '#button_round_reset_yes"', function () {
+    $(document).on('click', '#button_round_reset_yes', function () {
+        console.log('button ready round reset')
         socket.emit('ready-for-round-reset', {
             player_id: player_id,
             table_id: $(this).data('table_id')

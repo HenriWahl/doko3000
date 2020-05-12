@@ -112,24 +112,24 @@ class Player(UserMixin, Document):
         return self['password_hash']
 
     @password_hash.setter
-    def password_hash(self, new_password_hash):
-        self['password_hash'] = new_password_hash
+    def password_hash(self, value):
+        self['password_hash'] = value
 
     @property
     def cards(self):
         return self['cards']
 
     @cards.setter
-    def cards(self, new_cards):
-        self['cards'] = new_cards
+    def cards(self, value):
+        self['cards'] = value
 
     @property
     def table(self):
         return self['table']
 
     @table.setter
-    def table(self, new_table):
-        self['table'] = new_table
+    def table(self, value):
+        self['table'] = value
 
     @property
     def left(self):
@@ -138,7 +138,6 @@ class Player(UserMixin, Document):
     @left.setter
     def left(self, value):
         self['left'] = value
-        # self.save()
 
     @property
     def right(self):
@@ -147,7 +146,6 @@ class Player(UserMixin, Document):
     @right.setter
     def right(self, value):
         self['right'] = value
-        # self.save()
 
     @property
     def opposite(self):
@@ -156,7 +154,6 @@ class Player(UserMixin, Document):
     @opposite.setter
     def opposite(self, value):
         self['opposite'] = value
-        # self.save()
 
     def set_password(self, password):
         """
@@ -228,8 +225,8 @@ class Trick(Document):
         return self['owner']
 
     @owner.setter
-    def owner(self, player_id):
-        self['owner'] = player_id
+    def owner(self, value):
+        self['owner'] = value
         self.save()
 
     def reset(self):
@@ -327,32 +324,32 @@ class Round(Document):
         return self['players']
 
     @players.setter
-    def players(self, new_players):
-        self['players'] = new_players
+    def players(self, value):
+        self['players'] = value
 
     @property
     def turn_count(self):
         return self['turn_count']
 
     @turn_count.setter
-    def turn_count(self, new_turn_count):
-        self['turn_count'] = new_turn_count
+    def turn_count(self, value):
+        self['turn_count'] = value
 
     @property
     def trick_count(self):
         return self['trick_count']
 
     @trick_count.setter
-    def trick_count(self, new_trick_count):
-        self['trick_count'] = new_trick_count
+    def trick_count(self, value):
+        self['trick_count'] = value
 
     @property
     def current_player(self):
         return self['current_player']
 
     @current_player.setter
-    def current_player(self, new_current_player):
-        self['current_player'] = new_current_player
+    def current_player(self, value):
+        self['current_player'] = value
 
     @property
     def current_trick(self):
@@ -503,7 +500,6 @@ class Table(Document):
             self['id'] = table_id
             # default empty
             self['order'] = []
-            # self['round'] = ''
             self['players'] = []
             self['players_ready'] = []
         elif document_id:
@@ -511,9 +507,6 @@ class Table(Document):
             # get document data from CouchDB
             self.fetch()
             print(self)
-        # either is not set yet or just a new table with new round
-        # if self['round'] == '':
-        #     self['round'] = self.new_round()
         # yes, table_id
         if not self['id'] in self.game.rounds:
             self.new_round()
@@ -528,8 +521,8 @@ class Table(Document):
         return self['order']
 
     @order.setter
-    def order(self, new_order):
-        self['order'] = new_order
+    def order(self, value):
+        self['order'] = value
         self.save()
 
     @property
@@ -541,8 +534,8 @@ class Table(Document):
         return self.game.rounds[self.id]
 
     @round.setter
-    def round(self, new_round):
-        self.game.rounds[self.id] = new_round
+    def round(self, value):
+        self.game.rounds[self.id] = value
 
     @property
     def players(self):
@@ -553,8 +546,8 @@ class Table(Document):
         return self['players_ready']
 
     @players_ready.setter
-    def players_ready(self, new_players_ready):
-        self['players_ready'] = new_players_ready
+    def players_ready(self, value):
+        self['players_ready'] = value
         self.save()
 
     def add_player(self, player_id):
