@@ -164,13 +164,22 @@ $(document).ready(function () {
 
     socket.on('round-reset-requested', function (msg) {
         console.log('round-reset-requested', msg)
-        // $('#button_claim_trick').addClass('d-none')
-        // $('#modal_title').html('<strong>Runde beendet</strong>')
         $('.overlay-button').addClass('d-none')
+        $('.overlay-notification').addClass('d-none')
         // cleanup content of dialog
         $('#modal_body').html(msg.html)
         $('#modal_dialog').modal()
     })
+
+    socket.on('round-finish-requested', function (msg) {
+        console.log('round-finish-requested', msg)
+        $('.overlay-button').addClass('d-none')
+        $('.overlay-notification').addClass('d-none')
+        // cleanup content of dialog
+        $('#modal_body').html(msg.html)
+        $('#modal_dialog').modal()
+    })
+
 
     $(document).on('click', '#new_table', function () {
         socket.emit('new-table', {button: 'new_table'})
@@ -223,4 +232,19 @@ $(document).ready(function () {
         })
     })
 
+    $(document).on('click', '#menu_request_round_finish', function () {
+        console.log('request_round_finish')
+        socket.emit('request-round-finish', {
+            player_id: player_id,
+            table_id: $(this).data('table_id')
+        })
+    })
+
+    $(document).on('click', '#button_round_finish_yes', function () {
+        console.log('button ready finish reset')
+        socket.emit('ready-for-round-finish', {
+            player_id: player_id,
+            table_id: $(this).data('table_id')
+        })
+    })
 })

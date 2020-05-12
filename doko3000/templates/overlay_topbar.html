@@ -1,32 +1,26 @@
 <div id="overlay_topbar">
-    <!--    <span class="m-2 topbar text-white">-->
     <div class="dropdown">
         <div class="btn btn-outline-light oi oi-menu float-left ml-2 mt-2" data-toggle="dropdown" id="hamburger_menu"></div>
         <div class="dropdown-menu">
-            <a class="dropdown-item" href="#" id="menu_request_round_finish" data-table_id="{{ table.id }}">
+            <a class="dropdown-item py-3" href="#" id="menu_request_round_finish" data-table_id="{{ table.id }}">
                 <span class="oi oi-media-skip-forward mr-1"></span>
                 Spiel beenden</a>
-            <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="#" id="menu_request_round_reset" data-table_id="{{ table.id }}">
+            <a class="dropdown-item py-3" href="#" id="menu_request_round_reset" data-table_id="{{ table.id }}">
                 <span class="oi oi-media-skip-backward mr-1"></span>
                 Spiel neu starten</a>
-            <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="#" id="menu_request_round_restart" data-table_id="{{ table.id }}">
+            <a class="dropdown-item py-3 disabled" href="#" id="menu_request_round_restart" data-table_id="{{ table.id }}">
                 <span class="oi oi-reload mr-1"></span>
                 Runde neu starten</a>
         </div>
     </div>
     <div class="dropdown">
-        <!--            <span class="topbar-menu">-->
         <div class="btn btn-outline-light oi oi-person float-right mr-2 mt-2" data-toggle="dropdown"></div>
-        <!--            </span>-->
         <div class="dropdown-menu">
-            <a href="{{ url_for('logout') }}" class="dropdown-item">
+            <a href="{{ url_for('logout') }}" class="dropdown-item py-3">
                     <span class="oi oi-power-standby mr-2">
                     </span>Abmelden</a>
         </div>
     </div>
-    <!--    </span>-->
 </div>
 <div id="hud_players">
     {% include 'hud_players.html' %}

@@ -85,7 +85,7 @@ html, body {
     bottom: 42%;
     left: 20%;
     right: 20%;
-    z-index: 2000;
+    z-index: 300;
 }
 
 .overlay-notification {
@@ -96,7 +96,7 @@ html, body {
     bottom: 85%;
     left: 30%;
     right: 30%;
-    z-index: 2000;
+    z-index: 300;
     background-color: rgba(0,0,0,0.5);
 }
 
@@ -104,18 +104,6 @@ html, body {
     z-index: 99;
 }
 
-.topbar {
-    /*font-size: large;*/
-    color: white;
-}
-
-.topbar-menu {
-    cursor: pointer;
-    font-size: 1.2em;
-}
-
-.topbar-menu:hover {
-    background-color: white;
-    color: darkgrey;
-    border-radius: 0.15em;
+.dropdown-item {
+    z-index: 1000; !important;
 }

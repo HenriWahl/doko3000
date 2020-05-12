@@ -233,6 +233,17 @@ def request_round_reset(msg):
                    },
                  room=table.id)
 
+@socketio.on('request-round-finish')
+def request_round_reset(msg):
+    table = game.tables[msg['table_id']]
+    # just tell everybody to get personal cards
+    socketio.emit('round-finish-requested',
+                  {'table_id': table.id,
+                   'html': render_template('request_round_finish.html',
+                                           table=table)
+                   },
+                 room=table.id)
+
 
 @socketio.on('ready-for-round-reset')
 def reset_round(msg):
@@ -245,6 +256,23 @@ def reset_round(msg):
             table.reset_round()
             socketio.emit('grab-your-cards',
                           {'table_id': table.id})
+
+@socketio.on('ready-for-round-finish')
+def reset_round(msg):
+    player_id = msg['player_id']
+    if player_id == current_user.id and \
+            msg['table_id'] in game.tables:
+        table = game.tables[msg['table_id']]
+        table.add_ready_player(player_id)
+        if set(table.players_ready) == set(table.round.players):
+            table.shift_players()
+            dealer = table.get_dealer()
+            table.reset_ready_players()
+            # just tell everybody to get personal cards
+            socketio.emit('start-next-round',
+                          {'table_id': table.id,
+                           'dealer': dealer})
+
 
 
 @app.route('/login', methods=['GET', 'POST'])
