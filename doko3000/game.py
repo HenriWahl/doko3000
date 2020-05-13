@@ -37,13 +37,13 @@ class Deck:
     full deck of cards - enough to be static
     """
     SYMBOLS = ('Schell',
-               # 'Herz',
-               # 'Grün',
+               'Herz',
+               'Grün',
                'Eichel')
     RANKS = {'Zehn': 10,
-             # 'Unter': 2,
-             # 'Ober': 3,
-             # 'König': 4,
+             'Unter': 2,
+             'Ober': 3,
+             'König': 4,
              'Ass': 11}
     NUMBER = 2  # Doppelkopf :-)!
     # NUMBER = 1 # Debugging
@@ -381,7 +381,8 @@ class Round(Document):
         self.trick_count = 1
         # tricks have to be reset too when round is reset
         for trick in self.tricks.values():
-            trick.reset()
+            if trick is not None:
+                trick.reset()
 
         # current player - starts with the one following the dealer
         if self.players:
@@ -452,7 +453,6 @@ class Round(Document):
         """
         check if round is over - reached when all cards are played
         """
-        print(len(Deck.cards), self.turn_count)
         return len(Deck.cards) == self.turn_count
 
     def get_score(self):
@@ -485,7 +485,6 @@ class Round(Document):
 
     def increase_trick_count(self):
         self.trick_count += 1
-        print(self)
         self.save()
 
 
@@ -512,7 +511,6 @@ class Table(Document):
             Document.__init__(self, self.game.db.database, document_id=document_id)
             # get document data from CouchDB
             self.fetch()
-            print(self)
         # yes, table_id
         if not self['id'] in self.game.rounds:
             self.new_round()

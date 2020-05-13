@@ -24,8 +24,6 @@ class DB:
             self.couch.create_database('_users')
 
     def add(self, data):
-        print(data.__dict__)
-        print(type(data))
         self.database.create_document(data.__dict__)
 
     def filter_by_type(self, filter_type):
