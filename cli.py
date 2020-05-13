@@ -30,6 +30,11 @@ def add_player(player_id, password, is_admin):
     if is_admin:
         game.players[player_id].is_admin = True
 
+@run.command(help='Add table <table_id>')
+@click.argument('table_id', default=False)
+def add_table(table_id):
+    if table_id:
+        game.add_table(table_id)
 
 if __name__ == '__main__':
     run()

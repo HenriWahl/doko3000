@@ -294,6 +294,8 @@ class Round(Document):
         # needed to know how many cards are dealed
         # same as number of tricks in a round
         self.cards_per_player = len(self.cards) // 4
+        # collection of tricks per round - its number should not exceed cards_per_player
+        self.tricks = {}
         if round_id:
             # ID still name, going to be number - for CouchDB
             self['_id'] = f'round-{round_id}'
@@ -313,8 +315,6 @@ class Round(Document):
             # ...then dealing
             #self.deal()
 
-        # collection of tricks per round - its number should not exceed cards_per_player
-        self.tricks = {}
         # + 1 due to range counting behaviour
         for trick_number in range(1, self.cards_per_player + 1):
             trick = self.game.tricks.get(f'{self.id}-{trick_number}')

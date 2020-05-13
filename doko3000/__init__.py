@@ -292,9 +292,11 @@ def logout():
 @app.route('/', methods=['GET', 'POST'])
 @login_required
 def index():
+    players = game.get_players()
+    tables = game.get_tables()
     return render_template('index.html',
-                           tables=game.get_tables(),
-                           players=game.get_players(),
+                           tables=tables,
+                           players=players,
                            title='doko3000')
 
 
