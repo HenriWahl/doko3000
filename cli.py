@@ -15,9 +15,10 @@ db = DB(app)
 def run():
     pass
 
-@run.command(help='Reset table <table>')
-@click.argument('table_id')
-def reset_table(table_id):
+@run.command(help='Add player <player> with password <password>')
+@click.argument('player_id')
+@click.argument('password')
+def add_player(player_id):
     click.echo(db.couch.all_dbs())
 
 if __name__ == '__main__':

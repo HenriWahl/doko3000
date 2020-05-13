@@ -396,6 +396,11 @@ class Round(Document):
         self.shuffle()
         # ...then dealing
         self.deal()
+
+        # avoid multiple time-consuming .save(), concentrating them here
+        for player_id in self.players:
+            self.game.players[player_id].save()
+
         self.save()
 
     def shuffle(self):
@@ -415,8 +420,9 @@ class Round(Document):
             for card in range(self.cards_per_player):
                 # cards are given to players so the can be .pop()ed
                 self.game.players[player_id].cards.append(self.cards.pop())
-            self.game.players[player_id].save()
-        self.save()
+            #self.game.players[player_id].save()
+        # not needed, is saved by .reset()
+        #self.save()
 
     def add_trick(self, player_id):
         """
@@ -471,7 +477,7 @@ class Round(Document):
             self.game.players[player_id].left = player_order_view[1]
             self.game.players[player_id].opposite = player_order_view[2]
             self.game.players[player_id].right = player_order_view[3]
-            self.game.players[player_id].save()
+            #self.game.players[player_id].save()
 
     def increase_turn_count(self):
         self.turn_count += 1
@@ -548,7 +554,6 @@ class Table(Document):
     @players_ready.setter
     def players_ready(self, value):
         self['players_ready'] = value
-        self.save()
 
     def add_player(self, player_id):
         """
@@ -556,6 +561,7 @@ class Table(Document):
         """
         if player_id not in self.players:
             self.players.append(player_id)
+            self.save()
 
     def new_round(self):
         """
