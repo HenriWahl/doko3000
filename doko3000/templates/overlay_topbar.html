@@ -14,7 +14,10 @@
         </div>
     </div>
     <div class="dropdown">
-        <div class="btn btn-outline-light oi oi-person float-right mr-2 mt-2" data-toggle="dropdown"></div>
+        <div class="btn btn-outline-light float-right mr-2 mt-2" data-toggle="dropdown">
+        <span class="oi oi-person mr-1"></span>
+            {{ current_user.id }}
+        </div>
         <div class="dropdown-menu">
             <a href="{{ url_for('logout') }}" class="dropdown-item py-3">
                     <span class="oi oi-power-standby mr-2">

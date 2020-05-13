@@ -128,14 +128,16 @@ def deal_cards(msg):
 @socketio.on('my-cards-please')
 def deal_cards_to_player(msg):
     player_id = msg['player_id']
-    if player_id == current_user.id and msg['table_id'] in game.tables:
-        table = game.tables[msg['table_id']]
+    table_id = msg['table_id']
+    if player_id == current_user.id and table_id in game.tables:
+        table = game.tables[table_id]
         if player_id in table.round.players:
             player = game.players[player_id]
             cards_hand = player.get_cards()
             # cards_table = table.round.current_trick.get_cards()
             dealer = table.get_dealer()
             current_player_id = table.round.players[1]
+            join_room(table_id)
             socketio.emit('your-cards-please',
                           {'player_id': player_id,
                            'turn_count': table.round.turn_count,
@@ -197,9 +199,10 @@ def claimed_trick(msg):
 @socketio.on('ready-for-next-round')
 def ready_for_next_round(msg):
     player_id = msg['player_id']
+    table_id = msg['table_id']
     if player_id == current_user.id and \
-            msg['table_id'] in game.tables:
-        table = game.tables[msg['table_id']]
+             table_id in game.tables:
+        table = game.tables[table_id]
         table.add_ready_player(player_id)
         if set(table.players_ready) == set(table.round.players):
             table.shift_players()
@@ -237,9 +240,10 @@ def request_round_reset(msg):
 @socketio.on('ready-for-round-reset')
 def reset_round(msg):
     player_id = msg['player_id']
+    table_id = msg['table_id']
     if player_id == current_user.id and \
-            msg['table_id'] in game.tables:
-        table = game.tables[msg['table_id']]
+             table_id in game.tables:
+        table = game.tables[table_id]
         table.add_ready_player(player_id)
         if set(table.players_ready) == set(table.round.players):
             table.reset_round()
@@ -249,9 +253,10 @@ def reset_round(msg):
 @socketio.on('ready-for-round-finish')
 def reset_round(msg):
     player_id = msg['player_id']
+    table_id = msg['table_id']
     if player_id == current_user.id and \
-            msg['table_id'] in game.tables:
-        table = game.tables[msg['table_id']]
+            table_id in game.tables:
+        table = game.tables[table_id]
         table.add_ready_player(player_id)
         if set(table.players_ready) == set(table.round.players):
             table.shift_players()
@@ -279,7 +284,7 @@ def login():
             login_user(player)
             return redirect(url_for('index'))
     return render_template('login.html',
-                           title='doko3000 Login',
+                           title=f"{app.config['TITLE']} Login",
                            form=form)
 
 
@@ -297,7 +302,7 @@ def index():
     return render_template('index.html',
                            tables=tables,
                            players=players,
-                           title='doko3000')
+                           title=f"{app.config['TITLE']}")
 
 
 @app.route('/table/<table_id>')
@@ -317,7 +322,7 @@ def table(table_id=''):
         cards_table = table.round.current_trick.get_cards()
         score = table.round.get_score()
         return render_template('table.html',
-                               title=f'doko3000 {table_id}',
+                               title=f"{app.config['TITLE']} {table_id}",
                                table=table,
                                dealer=dealer,
                                dealing_needed=dealing_needed,
@@ -327,6 +332,7 @@ def table(table_id=''):
                                cards_hand=cards_hand,
                                cards_table=cards_table,
                                score=score)
+    tables = game.get_tables()
     return render_template('index.html',
-                           tables=game.tables,
-                           title='doko3000')
+                           tables=tables,
+                           title=f"{app.config['TITLE']}")

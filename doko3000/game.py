@@ -481,15 +481,16 @@ class Round(Document):
         """
         give players info about whom they are playing against - interesting for HUD display
         """
-        for player_id in self.players:
-            player_index = self.players.index(player_id)
-            player_order_view = copy(self.players)
-            for i in range(player_index):
-                player_order_view.append(player_order_view.pop(0))
-            self.game.players[player_id].left = player_order_view[1]
-            self.game.players[player_id].opposite = player_order_view[2]
-            self.game.players[player_id].right = player_order_view[3]
-            #self.game.players[player_id].save()
+        if len(self.players) == 4:
+            for player_id in self.players:
+                player_index = self.players.index(player_id)
+                player_order_view = copy(self.players)
+                for i in range(player_index):
+                    player_order_view.append(player_order_view.pop(0))
+                self.game.players[player_id].left = player_order_view[1]
+                self.game.players[player_id].opposite = player_order_view[2]
+                self.game.players[player_id].right = player_order_view[3]
+                #self.game.players[player_id].save()
 
     def increase_turn_count(self):
         self.turn_count += 1
@@ -516,6 +517,7 @@ class Table(Document):
             # what table?
             self['id'] = table_id
             # default empty
+            # quite likely order is about to vanish
             self['order'] = []
             self['players'] = []
             self['players_ready'] = []
@@ -571,6 +573,7 @@ class Table(Document):
         """
         if player_id not in self.players:
             self.players.append(player_id)
+            self.order.append(player_id)
             self.save()
 
     def new_round(self):
