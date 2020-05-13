@@ -12,16 +12,24 @@ from doko3000.game import Game
 app = DummyApp()
 db = DB(app)
 game = Game(db)
-game.initialize_components()
+game.load_from_db()
 
 @click.group()
 def run():
     pass
 
-@run.command(help='Add player <player> with password <password>')
+@run.command(help='Add player <player_id> with password <password>')
 @click.argument('player_id')
-@click.argument('password')
-def add_player(player_id):
-    print(game)
+@click.option('--password', default=None, help='Set password. If not set, the player_id is used.')
+@click.option('--is-admin', default=False, is_flag=True, help='Gives admin rights to player.')
+def add_player(player_id, password, is_admin):
+    if password == None:
+        password = player_id
+    game.add_player(player_id)
+    game.players[player_id].set_password(password)
+    if is_admin:
+        game.players[player_id].is_admin = True
+
+
 if __name__ == '__main__':
     run()

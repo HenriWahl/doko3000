@@ -89,6 +89,8 @@ class Player(UserMixin, Document):
             self['cards'] = []
             # which table player sits on
             self['table'] = ''
+            # has admin rights
+            self['is_admin'] = False
             # other players to the left, opposite and right of table
             self['left'] = self['opposite'] = self['right'] = None
             self.save()
@@ -122,6 +124,16 @@ class Player(UserMixin, Document):
     @cards.setter
     def cards(self, value):
         self['cards'] = value
+
+    @property
+    def is_admin(self):
+        # better via .get() in case the player is not updated yet
+        return self.get('is_admin', False)
+
+    @is_admin.setter
+    def is_admin(self, value):
+        self['is_admin'] = value
+        self.save()
 
     @property
     def table(self):
@@ -614,7 +626,7 @@ class Game:
 
         self.db = db
 
-    def initialize_components(self):
+    def load_from_db(self):
         """
         initialize all game components like tables and players
         """

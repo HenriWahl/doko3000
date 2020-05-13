@@ -36,7 +36,7 @@ login.login_message = ''
 socketio = SocketIO(app, manage_session=False)
 
 game = Game(db)
-game.initialize_components()
+game.load_from_db()
 #game.test_game()
 
 
