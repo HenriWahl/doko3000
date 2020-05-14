@@ -225,7 +225,6 @@ $(document).ready(function () {
     })
 
     $(document).on('click', '#button_round_reset_yes', function () {
-        console.log('button ready round reset')
         socket.emit('ready-for-round-reset', {
             player_id: player_id,
             table_id: $(this).data('table_id')
@@ -233,8 +232,15 @@ $(document).ready(function () {
     })
 
     $(document).on('click', '#menu_request_round_finish', function () {
-        console.log('request_round_finish')
         socket.emit('request-round-finish', {
+            player_id: player_id,
+            table_id: $(this).data('table_id')
+        })
+    })
+
+    $(document).on('click', '#menu_request_round_restart', function () {
+        console.log('request_round_restart')
+        socket.emit('request-round-restart', {
             player_id: player_id,
             table_id: $(this).data('table_id')
         })
@@ -243,6 +249,14 @@ $(document).ready(function () {
     $(document).on('click', '#button_round_finish_yes', function () {
         console.log('button ready finish reset')
         socket.emit('ready-for-round-finish', {
+            player_id: player_id,
+            table_id: $(this).data('table_id')
+        })
+    })
+
+    $(document).on('click', '#button_round_restart_yes', function () {
+        console.log('button ready restart')
+        socket.emit('ready-for-round-restart', {
             player_id: player_id,
             table_id: $(this).data('table_id')
         })

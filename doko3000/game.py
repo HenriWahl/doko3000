@@ -142,6 +142,7 @@ class Player(UserMixin, Document):
     @table.setter
     def table(self, value):
         self['table'] = value
+        self.save()
 
     @property
     def left(self):
@@ -575,6 +576,8 @@ class Table(Document):
             self.players.append(player_id)
             self.order.append(player_id)
             self.save()
+        # store table in player too
+        self.game.players[player_id].table = self.id
 
     def new_round(self):
         """
@@ -608,12 +611,13 @@ class Table(Document):
         """
         return self.order[0]
 
-    def add_ready_player(self, player):
+    def add_ready_player(self, player_id):
         """
         organize players who are ready for the next round in a list
         """
-        self.players_ready.append(player)
-        self.save()
+        if not player_id in self.players_ready:
+            self.players_ready.append(player_id)
+            self.save()
 
     def reset_ready_players(self):
         self.players_ready = []

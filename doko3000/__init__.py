@@ -110,8 +110,9 @@ def enter_table(msg):
     table_id = msg['table_id']
     player_id = msg['player_id']
     if table_id in game.tables:
-        if player_id not in game.tables[table_id].players:
-            game.tables[table_id].add_player(player_id)
+        # if player_id not in game.tables[table_id].players:
+        #     game.tables[table_id].add_player(player_id)
+        game.tables[table_id].add_player(player_id)
         join_room(table_id)
 
 
@@ -236,6 +237,16 @@ def request_round_reset(msg):
                    },
                  room=table.id)
 
+@socketio.on('request-round-restart')
+def request_round_reset(msg):
+    table = game.tables[msg['table_id']]
+    # just tell everybody to get personal cards
+    socketio.emit('round-finish-requested',
+                  {'table_id': table.id,
+                   'html': render_template('request_round_restart.html',
+                                           table=table)
+                   },
+                 room=table.id)
 
 @socketio.on('ready-for-round-reset')
 def reset_round(msg):
@@ -267,6 +278,22 @@ def reset_round(msg):
                           {'table_id': table.id,
                            'dealer': dealer})
 
+@socketio.on('ready-for-round-restart')
+def reset_round(msg):
+    player_id = msg['player_id']
+    table_id = msg['table_id']
+    if player_id == current_user.id and \
+            table_id in game.tables:
+        table = game.tables[table_id]
+        table.add_ready_player(player_id)
+        if len(table.players_ready) >= 4:
+            table.reset_round()
+            dealer = table.get_dealer()
+            table.reset_ready_players()
+            # just tell everybody to get personal cards
+            socketio.emit('start-next-round',
+                          {'table_id': table.id,
+                           'dealer': dealer})
 
 
 @app.route('/login', methods=['GET', 'POST'])
