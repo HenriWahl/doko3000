@@ -205,7 +205,7 @@ def ready_for_next_round(msg):
              table_id in game.tables:
         table = game.tables[table_id]
         table.add_ready_player(player_id)
-        if set(table.players_ready) == set(table.round.players):
+        if set(table.players_ready) >= set(table.round.players):
             table.shift_players()
             dealer = table.get_dealer()
             table.reset_ready_players()
@@ -256,7 +256,7 @@ def reset_round(msg):
              table_id in game.tables:
         table = game.tables[table_id]
         table.add_ready_player(player_id)
-        if set(table.players_ready) == set(table.round.players):
+        if set(table.players_ready) >= set(table.round.players):
             table.reset_round()
             socketio.emit('grab-your-cards',
                           {'table_id': table.id})
@@ -269,7 +269,7 @@ def reset_round(msg):
             table_id in game.tables:
         table = game.tables[table_id]
         table.add_ready_player(player_id)
-        if set(table.players_ready) == set(table.round.players):
+        if set(table.players_ready) >= set(table.round.players):
             table.shift_players()
             dealer = table.get_dealer()
             table.reset_ready_players()
