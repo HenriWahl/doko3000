@@ -74,8 +74,11 @@ html, body {
     left: 0;
     top: 0;
     z-index: 100;
-    /*background-color: rgba(0, 0, 0, 0.5);*/
     background: linear-gradient(to top, #cccccc00 0%, #333333cc 100%);
+}
+
+.overlay-topbar-button {
+    border-style: none;
 }
 
 #overlay_hud {
@@ -85,7 +88,6 @@ html, body {
     height: 30%;
     right: 80%;
     z-index: 1000;
-    /*background-color: rgba(0, 0, 0, 0.5);*/
 }
 
 .overlay-button {
