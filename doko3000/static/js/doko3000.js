@@ -105,6 +105,7 @@ $(document).ready(function () {
         $('#hud_players').html(msg.html.hud_players)
         $('#hand').html(msg.html.cards_hand)
         $('#button_claim_trick').addClass('d-none')
+        $('#modal_dialog').modal('hide')
         console.log(msg)
         console.log(player_id, current_player_id)
         if (player_id == current_player_id) {
@@ -145,7 +146,6 @@ $(document).ready(function () {
     socket.on('round-finished', function (msg) {
         console.log('round-finished', msg)
         $('#button_claim_trick').addClass('d-none')
-        $('#modal_title').html('<strong>Runde beendet</strong>')
         // cleanup content of dialog
         $('#modal_body').html(msg.html)
         $("#modal_dialog").modal()
@@ -179,6 +179,16 @@ $(document).ready(function () {
         $('#modal_body').html(msg.html)
         $('#modal_dialog').modal()
     })
+
+    socket.on('round-restart-options', function (msg) {
+        console.log('round-restart-requested', msg)
+        $('.overlay-button').addClass('d-none')
+        $('.overlay-notification').addClass('d-none')
+        // cleanup content of dialog
+        $('#modal_body').html(msg.html)
+        $('#modal_dialog').modal()
+    })
+
 
 
     $(document).on('click', '#new_table', function () {

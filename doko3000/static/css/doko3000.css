@@ -17,7 +17,6 @@ html, body {
     margin-right: 0 !important;
 }
 
-
 #table_hand {
     position: fixed;
     top: 10%;
@@ -43,8 +42,6 @@ html, body {
     height: 90%;
     width: 100%;
     left: 0;
-    z-index: 100;
-    background-color: rgba(0, 0, 0, 0.5);
 }
 
 #hud_players {

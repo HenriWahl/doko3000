@@ -227,7 +227,7 @@ def request_round_reset(msg):
                  room=table.id)
 
 @socketio.on('request-round-finish')
-def request_round_reset(msg):
+def request_round_finish(msg):
     table = game.tables[msg['table_id']]
     # just tell everybody to get personal cards
     socketio.emit('round-finish-requested',
@@ -238,18 +238,25 @@ def request_round_reset(msg):
                  room=table.id)
 
 @socketio.on('request-round-restart')
-def request_round_reset(msg):
+def request_round_restart(msg):
     table = game.tables[msg['table_id']]
     # just tell everybody to get personal cards
-    socketio.emit('round-finish-requested',
+    socketio.emit('round-restart-options',
                   {'table_id': table.id,
-                   'html': render_template('request_round_restart.html',
+                   'html': render_template('round_restart_options.html',
                                            table=table)
                    },
-                 room=table.id)
+                 room=request.sid)
+    # socketio.emit('round-restart-requested',
+    #               {'table_id': table.id,
+    #                'html': render_template('request_round_restart.html',
+    #                                        table=table)
+    #                },
+    #              room=table.id)
+
 
 @socketio.on('ready-for-round-reset')
-def reset_round(msg):
+def round_reset(msg):
     player_id = msg['player_id']
     table_id = msg['table_id']
     if player_id == current_user.id and \
@@ -262,7 +269,7 @@ def reset_round(msg):
                           {'table_id': table.id})
 
 @socketio.on('ready-for-round-finish')
-def reset_round(msg):
+def round_finish(msg):
     player_id = msg['player_id']
     table_id = msg['table_id']
     if player_id == current_user.id and \
@@ -279,7 +286,7 @@ def reset_round(msg):
                            'dealer': dealer})
 
 @socketio.on('ready-for-round-restart')
-def reset_round(msg):
+def round_restart(msg):
     player_id = msg['player_id']
     table_id = msg['table_id']
     if player_id == current_user.id and \
