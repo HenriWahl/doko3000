@@ -3,20 +3,8 @@
 {% block custom_content %}
 
 <div id="overlay_topbar">
-
-    <div class="dropdown">
-        <div class="btn btn-outline-light float-right m-2 overlay-topbar-button" data-toggle="dropdown">
-        <span class="oi oi-person mr-1"></span>
-            {{ current_user.id }}
-        </div>
-        <div class="dropdown-menu">
-            <a href="{{ url_for('logout') }}" class="dropdown-item py-3">
-                    <span class="oi oi-power-standby mr-2">
-                    </span>Abmelden</a>
-        </div>
-    </div>
+    {% include "top/user.html" %}
 </div>
-
 
 <div id="index_menu">
     <div class="row">

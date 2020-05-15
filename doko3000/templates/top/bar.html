@@ -1,6 +1,7 @@
 <div id="overlay_topbar">
     <div class="dropdown">
-        <div class="btn btn-outline-light oi oi-menu float-left m-2 overlay-topbar-button" data-toggle="dropdown" id="hamburger_menu"></div>
+        <div class="btn btn-outline-light oi oi-menu float-left m-2 overlay-topbar-button" data-toggle="dropdown"
+             id="hamburger_menu"></div>
         <div class="dropdown-menu">
             <a class="dropdown-item py-3" href="#" id="menu_request_round_finish" data-table_id="{{ table.id }}">
                 <span class="oi oi-media-skip-forward mr-1"></span>
@@ -13,17 +14,9 @@
                 Runde neu starten</a>
         </div>
     </div>
-    <div class="dropdown">
-        <div class="btn btn-outline-light float-right m-2 overlay-topbar-button" data-toggle="dropdown">
-        <span class="oi oi-person mr-1"></span>
-            {{ current_user.id }}
-        </div>
-        <div class="dropdown-menu">
-            <a href="{{ url_for('logout') }}" class="dropdown-item py-3">
-                    <span class="oi oi-power-standby mr-2">
-                    </span>Abmelden</a>
-        </div>
-    </div>
+
+    {% include "top/user.html" %}
+
 </div>
 <div id="hud_players">
     {% include 'hud_players.html' %}
