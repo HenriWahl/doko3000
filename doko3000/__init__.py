@@ -372,7 +372,9 @@ def table(table_id=''):
         # if no card is played already the dealer might deal
         dealing_needed = table.round.turn_count == 0
         # if one trick right now was finished the claim-trick-button should be displayed again
-        trick_claiming_needed = table.round.turn_count % 4 == 0 and table.round.turn_count > 0
+        trick_claiming_needed = table.round.turn_count % 4 == 0 and\
+                                table.round.turn_count > 0 and\
+                                not table.round.is_finished()
         current_player_id = table.round.current_player
         cards_hand = player.get_cards()
         cards_table = table.round.current_trick.get_cards()

@@ -16,9 +16,6 @@ $(document).ready(function () {
             revertOnSpill: true,
             direction: 'horizontal'
         }
-
-        // ask after reload if a round was finished already
-
     ]);
 
     dragging.on('drop', function (card, target, source) {
