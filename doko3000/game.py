@@ -472,7 +472,7 @@ class Round(Document):
     def get_score(self):
         score = {}
         for trick in self.tricks.values():
-            if trick.owner:
+            if trick and trick.owner:
                 if trick.owner not in score:
                     score[trick.owner] = 0
                 for card_id in trick.cards:
