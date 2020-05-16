@@ -10,11 +10,15 @@ let cards_locked = false
 $(document).ready(function () {
     const socket = io()
 
+    // initialize drag&drop
     let dragging = dragula([document.querySelector('#hand'),
         document.querySelector('#table'), {
             revertOnSpill: true,
             direction: 'horizontal'
         }
+
+        // ask after reload if a round was finished already
+
     ]);
 
     dragging.on('drop', function (card, target, source) {
@@ -51,6 +55,12 @@ $(document).ready(function () {
         }
         if (current_player_id == '') {
             current_player_id = msg.current_player_id
+        }
+        if (msg.round_finished) {
+            socket.emit('need-final-result', {
+            player_id: player_id,
+            table_id: msg.table_id
+        })
         }
     })
 

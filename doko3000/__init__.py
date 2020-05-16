@@ -37,7 +37,9 @@ socketio = SocketIO(app, manage_session=False)
 
 game = Game(db)
 game.load_from_db()
-#game.test_game()
+
+
+# game.test_game()
 
 
 @login.user_loader
@@ -60,12 +62,15 @@ def who_am_i():
         # if player already sits on a table inform client
         if table_id:
             current_player_id = game.tables[table_id].round.current_player
+            round_finished = game.tables[table_id].round.is_finished()
             join_room(table_id)
         else:
             current_player_id = ''
         socketio.emit('you-are-what-you-is',
                       {'player_id': player_id,
-                       'current_player_id': current_player_id})
+                       'table_id': table_id,
+                       'current_player_id': current_player_id,
+                       'round_finished': round_finished})
 
 
 @socketio.on('new-table')
@@ -187,22 +192,35 @@ def claimed_trick(msg):
                               room=table.id)
             else:
                 table.round.current_trick.owner = player_id
+                score = table.round.get_score()
                 # tell everybody stats and wait for everybody confirming next round
                 socketio.emit('round-finished',
                               {'table_id': table.id,
                                'html': render_template('score.html',
                                                        table=table,
-                                                       score=table.round.get_score())
+                                                       score=score)
                                },
                               room=table.id)
 
+@socketio.on('need-final-result')
+def send_final_result(msg):
+    table = game.tables[msg['table_id']]
+    score = table.round.get_score()
+    # tell single player stats and wait for everybody confirming next round
+    socketio.emit('round-finished',
+                  {'table_id': table.id,
+                   'html': render_template('score.html',
+                                           table=table,
+                                           score=score)
+                   },
+                  room=request.sid)
 
 @socketio.on('ready-for-next-round')
 def ready_for_next_round(msg):
     player_id = msg['player_id']
     table_id = msg['table_id']
     if player_id == current_user.id and \
-             table_id in game.tables:
+            table_id in game.tables:
         table = game.tables[table_id]
         table.add_ready_player(player_id)
         if set(table.players_ready) >= set(table.round.players):
@@ -224,7 +242,8 @@ def request_round_reset(msg):
                    'html': render_template('request_round_reset.html',
                                            table=table)
                    },
-                 room=table.id)
+                  room=table.id)
+
 
 @socketio.on('request-round-finish')
 def request_round_finish(msg):
@@ -235,7 +254,8 @@ def request_round_finish(msg):
                    'html': render_template('request_round_finish.html',
                                            table=table)
                    },
-                 room=table.id)
+                  room=table.id)
+
 
 @socketio.on('request-round-restart')
 def request_round_restart(msg):
@@ -246,7 +266,7 @@ def request_round_restart(msg):
                    'html': render_template('round_restart_options.html',
                                            table=table)
                    },
-                 room=request.sid)
+                  room=request.sid)
     # socketio.emit('round-restart-requested',
     #               {'table_id': table.id,
     #                'html': render_template('request_round_restart.html',
@@ -260,13 +280,14 @@ def round_reset(msg):
     player_id = msg['player_id']
     table_id = msg['table_id']
     if player_id == current_user.id and \
-             table_id in game.tables:
+            table_id in game.tables:
         table = game.tables[table_id]
         table.add_ready_player(player_id)
         if set(table.players_ready) >= set(table.round.players):
             table.reset_round()
             socketio.emit('grab-your-cards',
                           {'table_id': table.id})
+
 
 @socketio.on('ready-for-round-finish')
 def round_finish(msg):
@@ -284,6 +305,7 @@ def round_finish(msg):
             socketio.emit('start-next-round',
                           {'table_id': table.id,
                            'dealer': dealer})
+
 
 @socketio.on('ready-for-round-restart')
 def round_restart(msg):
