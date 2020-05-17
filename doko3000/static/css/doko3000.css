@@ -46,7 +46,7 @@ html, body {
 
 #hud_players {
     position: fixed;
-    top: 13px;
+    top: 1em;
     height: 10%;
     width: 80%;
     left: 10%;
@@ -57,7 +57,7 @@ html, body {
 }
 
 .hud-player-active {
-    color: black;
+    color: darkslategray;
     padding: 0.5rem;
     border-radius: 0.25rem;
     border: 1px solid white;
@@ -107,7 +107,7 @@ html, body {
     bottom: 85%;
     left: 30%;
     right: 30%;
-    z-index: 300;
+    z-index: 500;
     background-color: rgba(0,0,0,0.5);
 }
 

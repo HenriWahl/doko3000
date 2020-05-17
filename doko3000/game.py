@@ -37,14 +37,14 @@ class Deck:
     full deck of cards - enough to be static
     """
     SYMBOLS = ('Schell',
-               'Herz',
-               'Grün',
+               # 'Herz',
+               # 'Grün',
                'Eichel')
     RANKS = {'Neun':0,
-             'Zehn': 10,
-             'Unter': 2,
-             'Ober': 3,
-             'König': 4,
+             # 'Zehn': 10,
+             # 'Unter': 2,
+             # 'Ober': 3,
+             # 'König': 4,
              'Ass': 11}
     NUMBER = 2  # Doppelkopf :-)!
     # NUMBER = 1 # Debugging
@@ -590,6 +590,20 @@ class Table(Document):
     def players_ready(self, value):
         self['players_ready'] = value
 
+    @property
+    def dealer(self):
+        """
+        give current dealer for next round back
+        """
+        return self.order[0]
+
+    @property
+    def idle_players(self):
+        """
+        players who have to wait until round is over - all which are more than 4
+        """
+        return self.order[4:]
+
     def add_player(self, player_id):
         """
         adding just one player to the party
@@ -626,12 +640,6 @@ class Table(Document):
         """
         self.order.append(self.order.pop(0))
         self.save()
-
-    def get_dealer(self):
-        """
-        give current dealer for next round back
-        """
-        return self.order[0]
 
     def add_ready_player(self, player_id):
         """

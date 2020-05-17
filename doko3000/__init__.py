@@ -141,7 +141,7 @@ def deal_cards_to_player(msg):
             player = game.players[player_id]
             cards_hand = player.get_cards()
             # cards_table = table.round.current_trick.get_cards()
-            dealer = table.get_dealer()
+            dealer = table.dealer
             current_player_id = table.round.players[1]
             join_room(table_id)
             socketio.emit('your-cards-please',
@@ -187,7 +187,7 @@ def claimed_trick(msg):
                     # apparently the ownership of the previous trick is not clear - change it
                     table.round.previous_trick.owner = player.id
                     table.round.current_player = player.id
-                dealer = table.get_dealer()
+                dealer = table.dealer
                 score = table.round.get_score()
                 table.round.calculate_trick_order()
                 socketio.emit('next-trick',
@@ -234,7 +234,7 @@ def ready_for_next_round(msg):
         table.add_ready_player(player_id)
         if set(table.players_ready) >= set(table.round.players):
             table.shift_players()
-            dealer = table.get_dealer()
+            dealer = table.dealer
             table.reset_ready_players()
             # just tell everybody to get personal cards
             socketio.emit('start-next-round',
@@ -308,7 +308,7 @@ def round_finish(msg):
         table.add_ready_player(player_id)
         if set(table.players_ready) >= set(table.round.players):
             table.shift_players()
-            dealer = table.get_dealer()
+            dealer = table.dealer
             table.reset_ready_players()
             # just tell everybody to get personal cards
             socketio.emit('start-next-round',
@@ -326,7 +326,7 @@ def round_restart(msg):
         table.add_ready_player(player_id)
         if len(table.players_ready) >= 4:
             table.reset_round()
-            dealer = table.get_dealer()
+            dealer = table.dealer
             table.reset_ready_players()
             # just tell everybody to get personal cards
             socketio.emit('start-next-round',
@@ -377,7 +377,7 @@ def table(table_id=''):
             current_user.id in game.tables[table_id].players:
         player = game.players[current_user.id]
         table = game.tables[table_id]
-        dealer = table.get_dealer()
+        dealer = table.dealer
         # if no card is played already the dealer might deal
         dealing_needed = table.round.turn_count == 0
         # if one trick right now was finished the claim-trick-button should be displayed again
