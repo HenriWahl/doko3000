@@ -134,37 +134,36 @@ def deal_cards(msg):
 
 @socketio.on('my-cards-please')
 def deal_cards_to_player(msg):
-    player_id = msg['player_id']
-    table_id = msg['table_id']
-    if player_id == current_user.id and table_id in game.tables:
-        table = game.tables[table_id]
-        if player_id in table.round.players:
-            player = game.players[player_id]
-            cards_hand = player.get_cards()
-            # cards_table = table.round.current_trick.get_cards()
+    player = game.players[msg['player_id']]
+    table = game.tables[msg['table_id']]
+    if player.id == current_user.id and table.id in game.tables:
+        if player.id in table.players:
             dealer = table.dealer
-            current_player_id = table.round.players[1]
-            join_room(table_id)
-            socketio.emit('your-cards-please',
-                          {'player_id': player_id,
-                           'turn_count': table.round.turn_count,
-                           'current_player_id': current_player_id,
-                           'dealer': dealer,
-                           # 'order_names': table.round.order_names,
-                           'html': {'cards_hand': render_template('cards_hand.html',
-                                                                  cards_hand=cards_hand,
-                                                                  table=table,
-                                                                  player=player),
-                                    # 'cards_table': render_template('cards_table.html',
-                                    #                               cards_table=cards_table,
-                                    #                               table=table),
-                                    'hud_players': render_template('top/hud_players.html',
-                                                                   table=table,
-                                                                   player=player,
-                                                                   dealer=dealer,
-                                                                   current_player_id=current_player_id)}},
-                          room=request.sid)
-
+            # just in case
+            join_room(table.id)
+            if player.id in table.round.players:
+                cards_hand = player.get_cards()
+                current_player_id = table.round.players[1]
+                socketio.emit('your-cards-please',
+                              {'player_id': player.id,
+                               'turn_count': table.round.turn_count,
+                               'current_player_id': current_player_id,
+                               'dealer': dealer,
+                               # 'order_names': table.round.order_names,
+                               'html': {'cards_hand': render_template('cards_hand.html',
+                                                                      cards_hand=cards_hand,
+                                                                      table=table,
+                                                                      player=player),
+                                        'hud_players': render_template('top/hud_players.html',
+                                                                       table=table,
+                                                                       player=player,
+                                                                       dealer=dealer,
+                                                                       current_player_id=current_player_id)}},
+                              room=request.sid)
+            else:
+                # one day becoming spectator mode
+                socketio.emit('sorry-no-cards-for-you',
+                                room=table.id)
 
 @socketio.on('claim-trick')
 def claimed_trick(msg):

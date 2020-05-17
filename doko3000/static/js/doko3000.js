@@ -127,6 +127,11 @@ $(document).ready(function () {
         }
     })
 
+    socket.on('sorry-no-cards-for-you', function (msg) {
+        $('#table').html('')
+        $('#hand').html('')
+    })
+
     socket.on('next-trick', function (msg) {
         current_player_id = msg.current_player_id
         console.log(msg)
