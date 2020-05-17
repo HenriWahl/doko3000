@@ -37,17 +37,17 @@ class Deck:
     full deck of cards - enough to be static
     """
     SYMBOLS = ('Schell',
-               # 'Herz',
-               # 'Grün',
+               'Herz',
+               'Grün',
                'Eichel')
     RANKS = {'Neun':0,
-             # 'Zehn': 10,
-             # 'Unter': 2,
-             # 'Ober': 3,
-             # 'König': 4,
+             'Zehn': 10,
+             'Unter': 2,
+             'Ober': 3,
+             'König': 4,
              'Ass': 11}
-    # NUMBER = 2  # Doppelkopf :-)!
-    NUMBER = 1 # Debugging
+    NUMBER = 2  # Doppelkopf :-)!
+    # NUMBER = 1 # Debugging
     cards = {}
 
     # counter for card IDs in deck
@@ -358,6 +358,15 @@ class Round(Document):
         self['trick_count'] = value
 
     @property
+    def trick_order(self):
+        # backward compatibility, might be changed once if stable
+        return self.get('trick_order', [])
+
+    @trick_order.setter
+    def trick_order(self, value):
+        self['trick_order'] = value
+
+    @property
     def current_player(self):
         return self['current_player']
 
@@ -398,14 +407,20 @@ class Round(Document):
             if trick is not None:
                 trick.reset()
 
+        # dynamic order, depending on who gets tricks
+        self.trick_order = []
+
         # current player - starts with the one following the dealer
         if self.players:
             self.current_player = self.players[1]
         else:
             self.current_player = None
 
+        # needed for player HUD
         self.calculate_opponents()
+        self.calculate_trick_order()
 
+        # a new card deck for every round
         self.cards = list(Deck.cards)
         # first shuffling...
         self.shuffle()
@@ -449,7 +464,7 @@ class Round(Document):
         self.current_player = player_id
         self.save()
 
-    def shift_players(self):
+    def get_current_player(self):
         """
         get player for next turn
         """
@@ -492,7 +507,13 @@ class Round(Document):
                 self.game.players[player_id].left = player_order_view[1]
                 self.game.players[player_id].opposite = player_order_view[2]
                 self.game.players[player_id].right = player_order_view[3]
-                #self.game.players[player_id].save()
+
+    def calculate_trick_order(self):
+        """
+        get order by arranging players list starting from current player who is first in this trick
+        """
+        current_player_index = self.players.index(self.current_player)
+        self.trick_order = self.players[current_player_index:] + self.players[:current_player_index]
 
     def increase_turn_count(self):
         self.turn_count += 1

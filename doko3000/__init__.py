@@ -95,7 +95,7 @@ def played_card(msg):
         table.round.increase_turn_count()
         game.players[player_id].remove_card(card_id)
         is_last_turn = table.round.current_trick.is_last_turn()
-        current_player_id = table.round.shift_players()
+        current_player_id = table.round.get_current_player()
         socketio.emit('played-card-by-user',
                       {'player_id': player_id,
                        'card_id': card_id,
@@ -157,7 +157,8 @@ def deal_cards_to_player(msg):
                                     # 'cards_table': render_template('cards_table.html',
                                     #                               cards_table=cards_table,
                                     #                               table=table),
-                                    'hud_players': render_template('hud_players.html',
+                                    'hud_players': render_template('top/hud_players.html',
+                                                                   table=table,
                                                                    player=player,
                                                                    dealer=dealer,
                                                                    current_player_id=current_player_id)}},
@@ -167,28 +168,36 @@ def deal_cards_to_player(msg):
 @socketio.on('claim-trick')
 def claimed_trick(msg):
     player_id = msg['player_id']
-    if player_id == current_user.id and \
+    player = game.players[msg['player_id']]
+    if player.id == current_user.id and \
             msg['table_id'] in game.tables:
         table = game.tables[msg['table_id']]
-        if player_id in table.round.players:
+        if player.id in table.round.players:
             if not table.round.is_finished():
                 # when ownership changes it does at previous trick because normally there is a new one created
                 # so the new one becomes the current one and the reclaimed is the previous
                 if not len(table.round.current_trick.cards) == 0:
                     # old trick, freshly claimed
                     # table.round.current_trick.owner = table.round.players[player_id]
-                    table.round.current_trick.owner = player_id
+                    table.round.current_trick.owner = player.id
                     # new trick for next turns
                     # table.round.add_trick(table.players[player_id])
-                    table.round.add_trick(player_id)
+                    table.round.add_trick(player.id)
                 else:
                     # apparently the ownership of the previous trick is not clear - change it
-                    table.round.previous_trick.owner = player_id
-                    table.round.current_player = player_id
+                    table.round.previous_trick.owner = player.id
+                    table.round.current_player = player.id
+                dealer = table.get_dealer()
                 score = table.round.get_score()
+                table.round.calculate_trick_order()
                 socketio.emit('next-trick',
-                              {'current_player_id': player_id,
-                               'score': score},
+                              {'current_player_id': player.id,
+                               'score': score,
+                               'html': {'hud_players': render_template('top/hud_players.html',
+                                                                       table=table,
+                                                                       player=player,
+                                                                       dealer=dealer,
+                                                                       current_player_id=player.id)}},
                               room=table.id)
             else:
                 table.round.current_trick.owner = player_id

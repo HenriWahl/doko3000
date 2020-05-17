@@ -132,13 +132,14 @@ $(document).ready(function () {
         console.log(msg)
         cards_locked = false
         $('#table').html('')
-        $('.hud_player').removeClass('hud-player-active')
+        // $('.hud_player').removeClass('hud-player-active')
         if (player_id == current_player_id) {
             $('#turn_indicator').removeClass('d-none')
         } else {
             $('#turn_indicator').addClass('d-none')
-            $('#hud_player_' + current_player_id).addClass('hud-player-active')
+            // $('#hud_player_' + current_player_id).addClass('hud-player-active')
         }
+        $('#hud_players').html(msg.html.hud_players)
         console.log(msg.score)
         console.log(player_id in msg.score)
         if (player_id in msg.score) {
