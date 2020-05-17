@@ -508,8 +508,9 @@ class Round(Document):
         """
         get order by arranging players list starting from current player who is first in this trick
         """
-        current_player_index = self.players.index(self.current_player)
-        self.trick_order = self.players[current_player_index:] + self.players[:current_player_index]
+        if self.current_player:
+            current_player_index = self.players.index(self.current_player)
+            self.trick_order = self.players[current_player_index:] + self.players[:current_player_index]
 
     def increase_turn_count(self):
         self.turn_count += 1
