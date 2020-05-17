@@ -59,6 +59,7 @@ def who_am_i():
     if not current_user.is_anonymous:
         player_id = current_user.id
         table_id = game.players[player_id].table
+        round_finished = False
         # if player already sits on a table inform client
         if table_id:
             current_player_id = game.tables[table_id].round.current_player
