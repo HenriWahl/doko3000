@@ -141,9 +141,9 @@ def deal_cards_to_player(msg):
             dealer = table.dealer
             # just in case
             join_room(table.id)
+            current_player_id = table.round.current_player
             if player.id in table.round.players:
                 cards_hand = player.get_cards()
-                current_player_id = table.round.players[1]
                 socketio.emit('your-cards-please',
                               {'player_id': player.id,
                                'turn_count': table.round.turn_count,
@@ -163,11 +163,15 @@ def deal_cards_to_player(msg):
             else:
                 # one day becoming spectator mode
                 socketio.emit('sorry-no-cards-for-you',
-                                room=table.id)
+                              {'html': {'hud_players': render_template('top/hud_players.html',
+                                                                      table=table,
+                                                                      player=player,
+                                                                      dealer=dealer,
+                                                                      current_player_id=current_player_id)}},
+                                room=request.sid)
 
 @socketio.on('claim-trick')
 def claimed_trick(msg):
-    player_id = msg['player_id']
     player = game.players[msg['player_id']]
     if player.id == current_user.id and \
             msg['table_id'] in game.tables:
@@ -200,7 +204,7 @@ def claimed_trick(msg):
                                                                        current_player_id=player.id)}},
                               room=table.id)
             else:
-                table.round.current_trick.owner = player_id
+                table.round.current_trick.owner = player.id
                 score = table.round.get_score()
                 # tell everybody stats and wait for everybody confirming next round
                 socketio.emit('round-finished',

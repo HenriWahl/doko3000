@@ -171,7 +171,7 @@ $(document).ready(function () {
         } else {
             $('#button_deal_cards').addClass('d-none')
         }
-        $('#button_next_round').addClass('d-none')
+        // $('#button_next_round').addClass('d-none')
         $('#button_claim_trick').addClass('d-none')
     })
 
@@ -232,7 +232,7 @@ $(document).ready(function () {
     })
 
     $(document).on('click', '#button_next_round', function () {
-        $('#button_next_round').addClass('d-none')
+        // $('#button_next_round').addClass('d-none')
         socket.emit('ready-for-next-round', {
             player_id: player_id,
             table_id: $(this).data('table_id')
