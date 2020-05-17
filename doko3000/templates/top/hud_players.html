@@ -1,0 +1,62 @@
+<div id="hud_players">
+    {% for hud_player_id in table.round.trick_order %}
+    <span id="hud_player_{{ hud_player_id }}" class="hud_player mx-1
+{% if hud_player_id == current_player_id %}
+hud-player-active
+{% endif %}
+    ">
+    {% if hud_player_id == player.left %}
+        <span class="oi oi-arrow-thick-left"></span>
+    {% endif %}
+    {% if hud_player_id == player.right %}
+        <span class="oi oi-arrow-thick-right"></span>
+    {% endif %}
+    {% if hud_player_id == dealer %}
+        <span class="oi oi-layers"></span>
+    {% endif %}
+        {{ hud_player_id }}</span>
+    {% endfor %}
+
+    {% for idle_player in table.idle_players %}
+        <span class="text-muted">
+            {{ idle_player }}
+        </span>
+
+    {% endfor %}
+
+    <!--<span id="hud_player_{{ player.left }}" class="hud_player-->
+    <!--{% if player.left == current_player_id %}-->
+    <!--hud-player-active-->
+    <!--{% endif %}-->
+
+    <!--"><span class="oi oi-arrow-thick-left"></span>-->
+    <!--    {% if player.left == dealer %}-->
+    <!--        <span class="oi oi-layers"></span>-->
+    <!--    {% endif %}-->
+    <!--    {{ player.left }}-->
+    <!--</span>-->
+    <!--&nbsp;-->
+    <!--<span id="hud_player_{{ player.opposite }}" class="hud_player-->
+    <!--{% if player.opposite == current_player_id %}-->
+    <!--hud-player-active-->
+    <!--{% endif %}-->
+    <!--">-->
+    <!--        {% if player.opposite == dealer %}-->
+    <!--            <span class="oi oi-layers"></span>-->
+    <!--        {% endif %}-->
+    <!--    {{ player.opposite }}</span>-->
+    <!--&nbsp;-->
+    <!--<span id="hud_player_{{ player.right }}" class="hud_player-->
+    <!--{% if player.right == current_player_id %}-->
+    <!--hud-player-active-->
+    <!--{% endif %}-->
+    <!--">-->
+    <!--    {% if player.right == dealer %}-->
+    <!--        <span class="oi oi-layers"></span>-->
+    <!--    {% endif %}-->
+    <!--    {{ player.right }} <span-->
+    <!--        class="oi oi-arrow-thick-right">-->
+    <!--</span>-->
+    <!--</span>-->
+
+</div>

@@ -6,21 +6,20 @@ RUN apt -y update &&\
 
 RUN pip install --upgrade pip
 
-RUN pip install eventlet\
+RUN pip install click\
+                cloudant\
+                eventlet\
                 flask\
                 flask-login\
-                flask-sqlalchemy\
                 flask-socketio\
                 flask-wtf\
                 gunicorn
 
 COPY ./ /doko3000
 WORKDIR /doko3000
+
 # run gunicorn workers as unprivileged user
 RUN useradd doko3000
-# just for devel - in production this directory should be mounted as volume
-RUN mkdir doko3000/data &&\
-    chown -R doko3000:doko3000 doko3000/data
 
 # gunicorn now cares about TLS because secured websockets and flask-socketio did not work
 EXPOSE 443

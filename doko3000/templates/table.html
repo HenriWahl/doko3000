@@ -7,33 +7,44 @@
 <!--</div>-->
 
 <div class="container-fluid">
-    {% include 'overlay_topbar.html' %}
+    {% include 'top/bar.html' %}
 </div>
 
-<div id="deal_cards" class="row overlay_button justify-content-center
-    {% if current_user.name != dealer %}
+<div id="button_deal_cards" class="row overlay-button justify-content-center
+    {% if current_user.id != dealer or not dealing_needed %}
     d-none
     {% endif %}"
-     data-table="{{ table.name }}">
+     data-table_id="{{ table.id }}">
     <button class="btn btn-info btn-block btn-lg"><strong>Karten geben</strong></button>
 </div>
 
-<div id="claim_trick" class="row overlay_button justify-content-center d-none"
-     data-table="{{ table.name }}">
+<div id="button_claim_trick" class="row overlay-button justify-content-center
+     {% if not trick_claiming_needed %}
+     d-none
+     {% endif %}
+     "
+     data-table_id="{{ table.id }}">
     <button class="btn btn-success btn-block btn-lg"><strong>Stich nehmen</strong></button>
 </div>
 
-<button id="turn_indicator" class="overlay_notification btn btn-block btn-lg text-white d-none">Du bist am Zug</button>
+<button id="turn_indicator" class="overlay-notification btn btn-block btn-lg text-white
+{% if current_player_id != current_user.id %}
+d-none
+{% endif %}
+">Du bist am Zug
+</button>
 
 <div id="table_hand">
     <div class="row align-items-center w-100 h-50">
         <div class="container-fluid w-100 h-100 d-flex justify-content-center align-items-center" id="table">
+            {% include 'cards_table.html' %}
         </div>
     </div>
 
     <div class="row align-items-center w-100 h-50">
         <div class="container-fluid w-100 h-100 container-fluid d-inline-flex justify-content-center align-items-center"
              id="hand">
+            {% include 'cards_hand.html' %}
         </div>
     </div>
 </div>

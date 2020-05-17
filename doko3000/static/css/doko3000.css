@@ -11,23 +11,29 @@ html, body {
     background-size: cover;
 }
 
-#main-content {
+#main_content {
     height: 100vh;
     margin-left: 0 !important;
     margin-right: 0 !important;
 }
 
-
 #table_hand {
     position: fixed;
     top: 10%;
     height: 90%;
+    width: 100%;
     bottom: 0%;
+    margin-right: 0; !important;
+    padding-right: 0; !important;
 }
 
-.top-bar {
-    /*font-size: large;*/
-    color: white;
+#table{
+    margin-right: 0; !important;
+    padding-right: 0; !important;
+}
+#hand{
+    margin-right: 0; !important;
+    padding-right: 0; !important;
 }
 
 #index_menu {
@@ -42,12 +48,12 @@ html, body {
 
 #hud_players {
     position: fixed;
-    top: 10px;
+    top: 1em;
     height: 10%;
-    width: 50%;
-    left: 25%;
-    right: 25%;
-    z-index: 500;
+    width: 80%;
+    left: 10%;
+    right: 10%;
+    z-index: 300;
     color: white;
     text-align: center;
 }
@@ -60,7 +66,7 @@ html, body {
     background-color: white;
 }
 
-#overlay_topbar {
+#topbar {
     position: fixed;
     width: 100%;
     height: 10%;
@@ -71,17 +77,21 @@ html, body {
     background: linear-gradient(to top, #cccccc00 0%, #333333cc 100%);
 }
 
+.topbar-button {
+    border-style: none;
+    z-index: 600;
+}
+
 #overlay_hud {
     position: fixed;
     top: 10%;
     width: 20%;
     height: 30%;
     right: 80%;
-    z-index: 1000;
-    /*background-color: rgba(0, 0, 0, 0.5);*/
+    z-index: 900;
 }
 
-.overlay_button {
+.overlay-button {
     position: fixed;
     width: 60%;
     height: 16%;
@@ -89,10 +99,10 @@ html, body {
     bottom: 42%;
     left: 20%;
     right: 20%;
-    z-index: 2000;
+    z-index: 300;
 }
 
-.overlay_notification {
+.overlay-notification {
     position: fixed;
     width: 40%;
     height: 10%;
@@ -100,10 +110,14 @@ html, body {
     bottom: 85%;
     left: 30%;
     right: 30%;
-    z-index: 2000;
+    z-index: 500;
     background-color: rgba(0,0,0,0.5);
 }
 
-.game_card {
+.game-card {
     z-index: 99;
+}
+
+.dropdown-item {
+    z-index: 1000; !important;
 }
