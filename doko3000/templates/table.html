@@ -6,10 +6,6 @@
 <!--&lt;!&ndash;    </div>&ndash;&gt;-->
 <!--</div>-->
 
-<div class="container-fluid">
-    {% include 'top/bar.html' %}
-</div>
-
 <div id="button_deal_cards" class="row overlay-button justify-content-center
     {% if current_user.id != dealer or not dealing_needed %}
     d-none
@@ -33,6 +29,10 @@ d-none
 {% endif %}
 ">Du bist am Zug
 </button>
+
+<!--<div class="container-fluid">-->
+    {% include 'top/bar.html' %}
+<!--</div>-->
 
 <div id="table_hand">
     <div class="row align-items-center w-100 h-50">
