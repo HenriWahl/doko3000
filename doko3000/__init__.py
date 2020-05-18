@@ -103,7 +103,7 @@ def played_card(msg):
                        'card_name': msg['card_name'],
                        'is_last_turn': is_last_turn,
                        'current_player_id': current_player_id,
-                       'html': {'card': render_template('card.html',
+                       'html': {'card': render_template('cards/card.html',
                                                         card=Deck.cards[card_id],
                                                         table=table),
                                 }},
@@ -150,7 +150,7 @@ def deal_cards_to_player(msg):
                                'current_player_id': current_player_id,
                                'dealer': dealer,
                                # 'order_names': table.round.order_names,
-                               'html': {'cards_hand': render_template('cards_hand.html',
+                               'html': {'cards_hand': render_template('cards/hand.html',
                                                                       cards_hand=cards_hand,
                                                                       table=table,
                                                                       player=player),
@@ -236,6 +236,7 @@ def ready_for_next_round(msg):
             table_id in game.tables:
         table = game.tables[table_id]
         table.add_ready_player(player_id)
+        game.players[player_id].remove_all_cards()
         if set(table.players_ready) >= set(table.round.players):
             table.shift_players()
             dealer = table.dealer
@@ -243,7 +244,11 @@ def ready_for_next_round(msg):
             # just tell everybody to get personal cards
             socketio.emit('start-next-round',
                           {'table_id': table.id,
-                           'dealer': dealer})
+                           'dealer': dealer,
+                           'html': render_template('round/info.html',
+                                                   table=table,
+                                                   dealer=dealer)
+                           })
 
 
 @socketio.on('request-round-reset')
@@ -252,7 +257,7 @@ def request_round_reset(msg):
     # just tell everybody to get personal cards
     socketio.emit('round-reset-requested',
                   {'table_id': table.id,
-                   'html': render_template('request_round_reset.html',
+                   'html': render_template('round/request_reset.html',
                                            table=table)
                    },
                   room=table.id)
@@ -264,7 +269,7 @@ def request_round_finish(msg):
     # just tell everybody to get personal cards
     socketio.emit('round-finish-requested',
                   {'table_id': table.id,
-                   'html': render_template('request_round_finish.html',
+                   'html': render_template('round/request_finish.html',
                                            table=table)
                    },
                   room=table.id)
@@ -276,7 +281,7 @@ def request_round_restart(msg):
     # just tell everybody to get personal cards
     socketio.emit('round-restart-options',
                   {'table_id': table.id,
-                   'html': render_template('round_restart_options.html',
+                   'html': render_template('round/restart_options.html',
                                            table=table)
                    },
                   room=request.sid)

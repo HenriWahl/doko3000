@@ -166,13 +166,14 @@ $(document).ready(function () {
 
     socket.on('start-next-round', function (msg) {
         console.log(msg)
-        if (player_id == msg.dealer) {
-            $('#button_deal_cards').removeClass('d-none')
-        } else {
-            $('#button_deal_cards').addClass('d-none')
-        }
-        // $('#button_next_round').addClass('d-none')
+        // if (player_id == msg.dealer) {
+        //     $('#button_deal_cards').removeClass('d-none')
+        // } else {
+        //     $('#button_deal_cards').addClass('d-none')
+        // }
         $('#button_claim_trick').addClass('d-none')
+        $('#modal_body').html(msg.html)
+        $("#modal_dialog").modal()
     })
 
     socket.on('round-reset-requested', function (msg) {
