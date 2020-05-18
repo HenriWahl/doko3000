@@ -30,19 +30,27 @@ d-none
 ">Du bist am Zug
 </button>
 
-<!--<div class="container-fluid">-->
-    {% include 'top/bar.html' %}
-<!--</div>-->
+<div class="container-fluid row p-0 m-0" id="topbar">
+    <div class="col-3 p-0">
+        {% include "top/menu.html" %}
+    </div>
+    <div class="col-6 p-0 mt-2">
+        {% include 'top/hud_players.html' %}
+    </div>
+    <div class="col-3 p-0">
+        {% include "top/user.html" %}
+    </div>
+</div>
 
 <div id="table_hand">
-    <div class="row align-items-center w-100 h-50">
-        <div class="container-fluid w-100 h-100 d-flex justify-content-center align-items-center" id="table">
+    <div class="row align-items-center w-100 h-50 m-0 p-0">
+        <div class="container-fluid w-100 h-100 m-0 p-0 d-flex justify-content-center align-items-center" id="table">
             {% include 'cards_table.html' %}
         </div>
     </div>
 
-    <div class="row align-items-center w-100 h-50">
-        <div class="container-fluid w-100 h-100 container-fluid d-inline-flex justify-content-center align-items-center"
+    <div class="row align-items-center w-100 h-50 m-0 p-0">
+        <div class="container-fluid w-100 h-100 m-0 p-0 container-fluid d-inline-flex justify-content-center align-items-center"
              id="hand">
             {% include 'cards_hand.html' %}
         </div>
