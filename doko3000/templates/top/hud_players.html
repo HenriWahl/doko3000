@@ -1,6 +1,6 @@
 <div id="hud_players">
     {% for hud_player_id in table.round.trick_order %}
-    <span id="hud_player_{{ hud_player_id }}" class="hud_player mx-1
+    <span id="hud_player_{{ hud_player_id }}" class="hud_player mx-1 text-nowrap
 {% if hud_player_id == current_player_id %}
 hud-player-active
 {% endif %}

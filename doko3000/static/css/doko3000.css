@@ -57,9 +57,9 @@ html, body {
     text-align: center;
 }
 
-.hud_player_active {
-    color: black;
-    padding: 0.5rem;
+.hud-player-active {
+    color: #212529;
+    padding: 0.25rem;
     border-radius: 0.25rem;
     border: 1px solid white;
     background-color: white;
