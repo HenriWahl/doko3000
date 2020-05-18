@@ -88,26 +88,36 @@ def new_table(msg):
 
 @socketio.on('played-card')
 def played_card(msg):
-    card_id = msg['card_id']
-    player_id = msg['player_id']
-    table = game.tables[msg['table_id']]
-    if current_user.id == player_id == table.round.current_player:
-        table.round.current_trick.add_turn(player_id, card_id)
-        table.round.increase_turn_count()
-        game.players[player_id].remove_card(card_id)
-        is_last_turn = table.round.current_trick.is_last_turn()
-        current_player_id = table.round.get_current_player()
-        socketio.emit('played-card-by-user',
-                      {'player_id': player_id,
-                       'card_id': card_id,
-                       'card_name': msg['card_name'],
-                       'is_last_turn': is_last_turn,
-                       'current_player_id': current_player_id,
-                       'html': {'card': render_template('cards/card.html',
-                                                        card=Deck.cards[card_id],
-                                                        table=table),
-                                }},
-                      room=table.id)
+    card_id = msg.get('card_id')
+    player_id = msg.get('player_id')
+    table_id = msg.get('table_id')
+    if card_id in Deck.cards and player_id and table_id:
+        table = game.tables[table_id]
+        if current_user.id == player_id == table.round.current_player:
+            table.round.current_trick.add_turn(player_id, card_id)
+            table.round.increase_turn_count()
+            card = Deck.cards[card_id]
+            player = game.players[player_id]
+            player.remove_card(card.id)
+            is_last_turn = table.round.current_trick.is_last_turn()
+            current_player_id = table.round.get_current_player()
+            idle_players = table.idle_players
+            socketio.emit('played-card-by-user',
+                          {'player_id': player.id,
+                           'card_id': card.id,
+                           'card_name': card.name,
+                           'is_last_turn': is_last_turn,
+                           'current_player_id': current_player_id,
+                           'idle_players': idle_players,
+                           'html': {'card': render_template('cards/card.html',
+                                                            card=Deck.cards[card_id],
+                                                            table=table),
+                                    'hud_players': render_template('top/hud_players.html',
+                                                                   table=table,
+                                                                   player=player,
+                                                                   current_player_id=current_player_id)
+                                    }},
+                          room=table.id)
 
 
 @socketio.on('enter-table')
@@ -132,6 +142,7 @@ def deal_cards(msg):
         socketio.emit('grab-your-cards',
                       {'table_id': table.id})
 
+
 @socketio.on('deal-cards-again')
 def deal_cards_again(msg):
     table_id = msg.get('table_id')
@@ -143,7 +154,6 @@ def deal_cards_again(msg):
                       'html': render_template('round/request_deal_again.html',
                        table=table)},
                       room=request.sid)
-
 
 
 @socketio.on('my-cards-please')

@@ -68,14 +68,14 @@ $(document).ready(function () {
     socket.on('played-card-by-user', function (msg) {
         current_player_id = msg.current_player_id
         console.log(msg)
-        // $('#hud_players').html('')
-        // $('#hud_players').html(msg.html.hud_players)
+        //$('#hud_players').html('')
+        $('#hud_players').html(msg.html.hud_players)
         $('.overlay-button').addClass('d-none')
 
-        $('.hud_player').removeClass('hud-player-active')
-        if (!msg.is_last_turn) {
-            $('#hud_player_' + msg.current_player_id).addClass('hud-player-active')
-        }
+        // $('.hud_player').removeClass('hud-player-active')
+        // if (!msg.is_last_turn) {
+        //     $('#hud_player_' + msg.current_player_id).addClass('hud-player-active')
+        // }
         if (player_id != msg.player_id) {
             $('#table').append(msg.html.card)
             $('#card_' + msg.card_id).attr('title', msg.player_id)
@@ -83,7 +83,10 @@ $(document).ready(function () {
         if (msg.is_last_turn) {
             cards_locked = true
             $('#turn_indicator').addClass('d-none')
-            $('#button_claim_trick').removeClass('d-none')
+            console.log(msg.idle_players.includes(player_id))
+            if (!msg.idle_players.includes(player_id)) {
+                $('#button_claim_trick').removeClass('d-none')
+            }
         } else {
             cards_locked = false
             if (player_id == current_player_id) {
