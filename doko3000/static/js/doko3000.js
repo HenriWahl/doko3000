@@ -96,11 +96,8 @@ $(document).ready(function () {
             }
             $('#button_claim_trick').addClass('d-none')
         }
-
-        // $('#card_' + msg.card_id).attr('alt', msg.username)
-
         // anyway there is no need anymore to deal cards
-        $('#button_deal_cards').addClass('d-none')
+        $('#button_deal_cards_again').addClass('d-none')
     })
 
     socket.on('grab-your-cards', function (msg) {
@@ -127,9 +124,9 @@ $(document).ready(function () {
             $('#turn_indicator').addClass('d-none')
         }
         if (player_id == msg.dealer) {
-            $('#button_deal_cards').removeClass('d-none')
+            $('#button_deal_cards_again').removeClass('d-none')
         } else {
-            $('#button_deal_cards').addClass('d-none')
+            $('#button_deal_cards_again').addClass('d-none')
         }
     })
 
