@@ -206,6 +206,7 @@ def claimed_trick(msg):
             else:
                 table.round.current_trick.owner = player.id
                 score = table.round.get_score()
+                table.shift_players()
                 # tell everybody stats and wait for everybody confirming next round
                 socketio.emit('round-finished',
                               {'table_id': table.id,
@@ -230,25 +231,27 @@ def send_final_result(msg):
 
 @socketio.on('ready-for-next-round')
 def ready_for_next_round(msg):
-    player_id = msg['player_id']
-    table_id = msg['table_id']
+    player_id = msg.get('player_id')
+    table_id = msg.get('table_id')
     if player_id == current_user.id and \
             table_id in game.tables:
         table = game.tables[table_id]
         table.add_ready_player(player_id)
         game.players[player_id].remove_all_cards()
+        dealer = table.dealer
         if set(table.players_ready) >= set(table.round.players):
-            table.shift_players()
-            dealer = table.dealer
+            # now shifted when round is finished
+            # table.shift_players()
             table.reset_ready_players()
             # just tell everybody to get personal cards
-            socketio.emit('start-next-round',
-                          {'table_id': table.id,
-                           'dealer': dealer,
-                           'html': render_template('round/info.html',
-                                                   table=table,
-                                                   dealer=dealer)
-                           })
+        socketio.emit('start-next-round',
+                      {'table_id': table.id,
+                       'dealer': dealer,
+                       'html': render_template('round/info.html',
+                                               table=table,
+                                               dealer=dealer)
+                       },
+                      room=request.sid)
 
 
 @socketio.on('request-round-reset')

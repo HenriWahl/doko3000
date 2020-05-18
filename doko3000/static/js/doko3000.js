@@ -108,6 +108,7 @@ $(document).ready(function () {
     socket.on('your-cards-please', function (msg) {
         current_player_id = msg.current_player_id
         cards_locked = false
+        console.log('your-cards-please')
         $('#table').html('')
         $('#hud_players').html(msg.html.hud_players)
         $('#hand').html(msg.html.cards_hand)
@@ -161,19 +162,21 @@ $(document).ready(function () {
         $('#button_claim_trick').addClass('d-none')
         // cleanup content of dialog
         $('#modal_body').html(msg.html)
-        $("#modal_dialog").modal()
+        $("#modal_dialog").modal('show')
     })
 
     socket.on('start-next-round', function (msg) {
-        console.log(msg)
+        console.log('start-next-round', msg)
         // if (player_id == msg.dealer) {
         //     $('#button_deal_cards').removeClass('d-none')
         // } else {
         //     $('#button_deal_cards').addClass('d-none')
         // }
-        $('#button_claim_trick').addClass('d-none')
+        $('.overlay-button').addClass('d-none')
+        $('.overlay-notification').addClass('d-none')
         $('#modal_body').html(msg.html)
-        $("#modal_dialog").modal()
+        console.log('why???')
+        $("#modal_dialog").modal('show')
     })
 
     socket.on('round-reset-requested', function (msg) {
@@ -182,7 +185,7 @@ $(document).ready(function () {
         $('.overlay-notification').addClass('d-none')
         // cleanup content of dialog
         $('#modal_body').html(msg.html)
-        $('#modal_dialog').modal()
+        $('#modal_dialog').modal('show')
     })
 
     socket.on('round-finish-requested', function (msg) {
@@ -191,7 +194,7 @@ $(document).ready(function () {
         $('.overlay-notification').addClass('d-none')
         // cleanup content of dialog
         $('#modal_body').html(msg.html)
-        $('#modal_dialog').modal()
+        $('#modal_dialog').modal('show')
     })
 
     socket.on('round-restart-options', function (msg) {
@@ -200,10 +203,8 @@ $(document).ready(function () {
         $('.overlay-notification').addClass('d-none')
         // cleanup content of dialog
         $('#modal_body').html(msg.html)
-        $('#modal_dialog').modal()
+        $('#modal_dialog').modal('show')
     })
-
-
 
     $(document).on('click', '#new_table', function () {
         socket.emit('new-table', {button: 'new_table'})
@@ -233,7 +234,6 @@ $(document).ready(function () {
     })
 
     $(document).on('click', '#button_next_round', function () {
-        // $('#button_next_round').addClass('d-none')
         socket.emit('ready-for-next-round', {
             player_id: player_id,
             table_id: $(this).data('table_id')
