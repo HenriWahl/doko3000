@@ -124,12 +124,26 @@ def enter_table(msg):
 
 @socketio.on('deal-cards')
 def deal_cards(msg):
-    table = game.tables[msg['table_id']]
-    table.reset_round()
+    table_id = msg.get('table_id')
+    if table_id:
+        table = game.tables[table_id]
+        table.reset_round()
+        # just tell everybody to get personal cards
+        socketio.emit('grab-your-cards',
+                      {'table_id': table.id})
 
-    # just tell everybody to get personal cards
-    socketio.emit('grab-your-cards',
-                  {'table_id': table.id})
+@socketio.on('deal-cards-again')
+def deal_cards_again(msg):
+    table_id = msg.get('table_id')
+    if table_id:
+        table = game.tables[table_id]
+        # ask dealer if really should be re-dealt
+        socketio.emit('really-deal-again',
+                      {'table_id': table.id,
+                      'html': render_template('round/request_deal_again.html',
+                       table=table)},
+                      room=request.sid)
+
 
 
 @socketio.on('my-cards-please')
@@ -239,6 +253,7 @@ def ready_for_next_round(msg):
         table.add_ready_player(player_id)
         game.players[player_id].remove_all_cards()
         dealer = table.dealer
+        next_players = table.order[:4]
         if set(table.players_ready) >= set(table.round.players):
             # now shifted when round is finished
             # table.shift_players()
@@ -249,7 +264,8 @@ def ready_for_next_round(msg):
                        'dealer': dealer,
                        'html': render_template('round/info.html',
                                                table=table,
-                                               dealer=dealer)
+                                               dealer=dealer,
+                                               next_players=next_players)
                        },
                       room=request.sid)
 

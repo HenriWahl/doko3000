@@ -2,8 +2,12 @@
     <div class="col-md-6">
         <strong>Es spielen:</strong>
         <ul class="list-group list-group-flush">
-            {% for player in table.round.players %}
-            <li class="list-group-item text-success">{{ player }}</li>
+            {% for player_id in next_players %}
+            <li class="list-group-item text-success">{{ player_id }}
+                {% if player_id == dealer %}
+                <span class="oi oi-layers text-success"></span>
+                {% endif %}
+            </li>
             {% endfor %}
         </ul>
     </div>
@@ -19,10 +23,10 @@
     </div>
 </div>
 <div id="row">
-    <button id="button_deal_cards" class="btn btn-info btn-block btn-lg
-    {% if current_user.id != dealer%}
-    d-none
-    {% endif %}"
-    data-table_id="{{ table.id }}"
-    ><strong>Karten geben</strong></button>
+    {% if current_user.id == dealer%}
+    <button id="button_deal_cards" class="btn btn-info btn-block btn-lg" data-table_id="{{ table.id }}">
+        <strong>Karten geben</strong></button>
+    {% else %}
+    <button class="btn btn-success btn-block btn-lg" data-dismiss="modal"><strong>OK</strong></button>
+    {% endif %}
 </div>

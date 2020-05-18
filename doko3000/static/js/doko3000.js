@@ -55,9 +55,9 @@ $(document).ready(function () {
         }
         if (msg.round_finished) {
             socket.emit('need-final-result', {
-            player_id: player_id,
-            table_id: msg.table_id
-        })
+                player_id: player_id,
+                table_id: msg.table_id
+            })
         }
     })
 
@@ -70,6 +70,8 @@ $(document).ready(function () {
         console.log(msg)
         // $('#hud_players').html('')
         // $('#hud_players').html(msg.html.hud_players)
+        $('.overlay-button').addClass('d-none')
+
         $('.hud_player').removeClass('hud-player-active')
         if (!msg.is_last_turn) {
             $('#hud_player_' + msg.current_player_id).addClass('hud-player-active')
@@ -131,6 +133,12 @@ $(document).ready(function () {
     socket.on('sorry-no-cards-for-you', function (msg) {
         $('#table').html('')
         $('#hand').html('')
+    })
+
+    socket.on('really-deal-again', function (msg) {
+        $('.overlay-notification').addClass('d-none')
+        $('#modal_body').html(msg.html)
+        $("#modal_dialog").modal('show')
     })
 
     socket.on('next-trick', function (msg) {
@@ -220,6 +228,14 @@ $(document).ready(function () {
     $(document).on('click', '#button_deal_cards', function () {
         console.log('button_deal_cards')
         socket.emit('deal-cards', {
+            player_id: player_id,
+            table_id: $(this).data('table_id')
+        })
+    })
+
+    $(document).on('click', '#button_deal_cards_again', function () {
+        console.log('button_deal_cards_again')
+        socket.emit('deal-cards-again', {
             player_id: player_id,
             table_id: $(this).data('table_id')
         })
