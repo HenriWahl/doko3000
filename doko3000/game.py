@@ -183,8 +183,14 @@ class Player(UserMixin, Document):
         give complete card objects to player to be displayed in browser
         """
         cards = []
-        for card_id in self.cards:
-            cards.append(Deck.cards[card_id])
+        try:
+            for card_id in self.cards:
+                cards.append(Deck.cards[card_id])
+        except KeyError:
+            # cards might have been here from debugging or an earlier game - just reset them
+            cards = []
+            self.cards = cards
+            self.save()
         return cards
 
     def remove_card(self, card_id):
