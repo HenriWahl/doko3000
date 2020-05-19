@@ -186,6 +186,7 @@ $(document).ready(function () {
             $('#button_deal_cards').addClass('d-none')
             $('#button_close_info').removeClass('d-none')
         }
+
         $("#modal_dialog").modal('show')
     })
 

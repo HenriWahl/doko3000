@@ -373,10 +373,16 @@ def round_restart(msg):
             table.reset_round()
             dealer = table.dealer
             table.reset_ready_players()
+            next_players = table.order[:4]
+            number_of_rows = max(len(next_players), len(table.idle_players))
             # just tell everybody to get personal cards
             socketio.emit('start-next-round',
                           {'table_id': table.id,
-                           'dealer': dealer})
+                           'dealer': dealer,
+                          'html': render_template('round/info.html',
+                                                  table=table,
+                                                  next_players=next_players,
+                                                  number_of_rows=number_of_rows)})
 
 
 @app.route('/login', methods=['GET', 'POST'])
