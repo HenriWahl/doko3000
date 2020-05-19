@@ -1,15 +1,22 @@
-{% for table in tables %}
-<a href="/table/{{ table.id }}"
-   class="list-group-item list-group-item-action list-item-table"
-   id="{{ table.id }}"
-   data-table_id="{{ table.id }}">
-    <strong>
-        {{ table.id }}
-    </strong><br>
-    <span class="text-secondary">
+<div class="list-group">
+    {% for table in tables %}
+    <a href="/table/{{ table.id }}"
+       class="list-group-item list-group-item-action list-item-table"
+       id="{{ table.id }}"
+       data-table_id="{{ table.id }}">
+        <strong>
+            {{ table.id }}
+            <button class="btn btn-secondary float-right button-edit-table" data-table_id="{{ table.id }}">
+                <span class="oi oi-wrench"></span>
+            </button>
+
+        </strong><br>
+
+        <span class="text-secondary">
     {% for player_id in table.players %}
         {{ player_id }}&nbsp;
     {% endfor %}
     </span>
-</a>
-{% endfor %}
+    </a>
+    {% endfor %}
+</div>

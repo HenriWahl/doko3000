@@ -627,8 +627,12 @@ class Table(Document):
         """
         remove player - mostly if entering another table
         """
-        if player_id in self.players:
+        # make sure really no trace of player sticks somewhere
+        while player_id in self.players:
             self.players.pop(self.players.index(player_id))
+        while player_id in self.order:
+            self.order.pop(self.order.index(player_id))
+        if player_id not in self.players and player_id not in self.order:
             self.save()
 
     def add_round(self):
