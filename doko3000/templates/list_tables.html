@@ -5,6 +5,11 @@
    data-table_id="{{ table.id }}">
     <strong>
         {{ table.id }}
-    </strong>
+    </strong><br>
+    <span class="text-secondary">
+    {% for player_id in table.players %}
+        {{ player_id }}&nbsp;
+    {% endfor %}
+    </span>
 </a>
 {% endfor %}

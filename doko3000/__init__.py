@@ -126,8 +126,6 @@ def enter_table(msg):
     table_id = msg['table_id']
     player_id = msg['player_id']
     if table_id in game.tables:
-        # if player_id not in game.tables[table_id].players:
-        #     game.tables[table_id].add_player(player_id)
         game.tables[table_id].add_player(player_id)
         join_room(table_id)
 
@@ -386,12 +384,12 @@ def login():
     form = Login()
     if form.validate_on_submit():
         if not form.player_id.data in game.players:
-            flash('Unknown player :-(')
+            flash('Spieler nicht bekannt :-(')
             return redirect(url_for('login'))
         else:
             player = game.players[form.player_id.data]
             if not player.check_password(form.password.data):
-                flash('Wrong password :-(')
+                flash('Falsches Passwort :-(')
                 return redirect(url_for('login'))
             login_user(player)
             return redirect(url_for('index'))

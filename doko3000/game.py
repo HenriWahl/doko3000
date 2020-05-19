@@ -553,7 +553,7 @@ class Table(Document):
             self.fetch()
         # yes, table_id
         if not self['id'] in self.game.rounds:
-            self.new_round()
+            self.add_round()
         self.save()
 
     @property
@@ -615,10 +615,23 @@ class Table(Document):
             self.players.append(player_id)
             self.order.append(player_id)
             self.save()
+        # remove old remains of previous table
+        if self.game.players[player_id].table != self.id:
+             table = self.game.players[player_id].table
+             if table in self.game.tables:
+                self.game.tables[table].remove_player(player_id)
         # store table in player too
         self.game.players[player_id].table = self.id
 
-    def new_round(self):
+    def remove_player(self, player_id):
+        """
+        remove player - mostly if entering another table
+        """
+        if player_id in self.players:
+            self.players.pop(self.players.index(player_id))
+            self.save()
+
+    def add_round(self):
         """
         only 4 players can play at once - find out who and start a new round
         """
