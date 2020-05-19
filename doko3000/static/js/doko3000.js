@@ -175,15 +175,16 @@ $(document).ready(function () {
 
     socket.on('start-next-round', function (msg) {
         console.log('start-next-round', msg)
-        // if (player_id == msg.dealer) {
-        //     $('#button_deal_cards').removeClass('d-none')
-        // } else {
-        //     $('#button_deal_cards').addClass('d-none')
-        // }
         $('.overlay-button').addClass('d-none')
         $('.overlay-notification').addClass('d-none')
         $('#modal_body').html(msg.html)
-        console.log('why???')
+        if (player_id == msg.dealer) {
+            $('#button_deal_cards').removeClass('d-none')
+            $('#button_close_info').addClass('d-none')
+        } else {
+            $('#button_deal_cards').addClass('d-none')
+            $('#button_close_info').removeClass('d-none')
+        }
         $("#modal_dialog").modal('show')
     })
 

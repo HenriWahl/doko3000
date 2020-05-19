@@ -1,36 +1,38 @@
-<div class="row">
-    <div class="col-md-6">
-        <strong>Es spielen:</strong>
-        <ul class="list-group list-group-flush">
-            {% for player_id in next_players %}
-            <li class="list-group-item text-success">{{ player_id }}
-                {% if player_id == dealer %}
-                <span class="oi oi-layers text-success"></span>
-                {% endif %}
-            </li>
-            {% endfor %}
-        </ul>
-    </div>
-    <div class="col-md-6">
+<table class="table table-borderless">
+    <thead>
+    <tr>
+        <th>Es spielen:</th>
         {% if table.idle_players %}
-        {% if table.idle_players|length == 1 %}
-        <strong>Es spielt nicht:</strong>
+        <th>Es spielen nicht:</th>
+        {% endif %}
+    </tr>
+    </thead>
+    <tbody>
+    {% for row in range(number_of_rows) %}
+    <tr>
+        {% if row < 4 %}
+        <td>{{ next_players[row] }}</td>
         {% else %}
-        <strong>Es spielen nicht:</strong>
+        <td></td>
         {% endif %}
-        <ul class="list-group list-group-flush">
-            {% for player in table.idle_players %}
-            <li class="list-group-item text-danger">{{ player }}</li>
-            {% endfor %}
-        </ul>
+             {% if table.idle_players %}
+                {% if row < table.idle_players|length %}
+        <td>{{ table.idle_players[row] }}</td>
+             {% else %}
+        <td></td>
+             {% endif %}
         {% endif %}
-    </div>
-</div>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+
 <div id="row">
-    {% if current_user.id == dealer%}
     <button id="button_deal_cards" class="btn btn-info btn-block btn-lg" data-table_id="{{ table.id }}">
-        <strong>Karten geben</strong></button>
-    {% else %}
-    <button class="btn btn-success btn-block btn-lg" data-dismiss="modal"><strong>OK</strong></button>
-    {% endif %}
+        <strong>Karten geben</strong>
+    </button>
+    <button id="button_close_info" class="btn btn-success btn-block btn-lg" data-dismiss="modal">
+        <strong>Los!</strong>
+    </button>
 </div>

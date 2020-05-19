@@ -234,7 +234,7 @@ def claimed_trick(msg):
                 # tell everybody stats and wait for everybody confirming next round
                 socketio.emit('round-finished',
                               {'table_id': table.id,
-                               'html': render_template('score.html',
+                               'html': render_template('round/score.html',
                                                        table=table,
                                                        score=score)
                                },
@@ -247,7 +247,7 @@ def send_final_result(msg):
     # tell single player stats and wait for everybody confirming next round
     socketio.emit('round-finished',
                   {'table_id': table.id,
-                   'html': render_template('score.html',
+                   'html': render_template('round/score.html',
                                            table=table,
                                            score=score)
                    },
@@ -264,6 +264,7 @@ def ready_for_next_round(msg):
         game.players[player_id].remove_all_cards()
         dealer = table.dealer
         next_players = table.order[:4]
+        number_of_rows = max(len(next_players), len(table.idle_players))
         if set(table.players_ready) >= set(table.round.players):
             # now shifted when round is finished
             # table.shift_players()
@@ -275,7 +276,8 @@ def ready_for_next_round(msg):
                        'html': render_template('round/info.html',
                                                table=table,
                                                dealer=dealer,
-                                               next_players=next_players)
+                                               next_players=next_players,
+                                               number_of_rows=number_of_rows)
                        },
                       room=request.sid)
 
@@ -348,10 +350,17 @@ def round_finish(msg):
             table.shift_players()
             dealer = table.dealer
             table.reset_ready_players()
+            next_players = table.order[:4]
+            number_of_rows = max(len(next_players), len(table.idle_players))
             # just tell everybody to get personal cards
             socketio.emit('start-next-round',
                           {'table_id': table.id,
-                           'dealer': dealer})
+                           'dealer': dealer,
+                          'html': render_template('round/info.html',
+                                                  table=table,
+                                                  next_players=next_players,
+                                                  number_of_rows=number_of_rows)}
+            )
 
 
 @socketio.on('ready-for-round-restart')
