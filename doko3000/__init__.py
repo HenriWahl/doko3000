@@ -273,16 +273,24 @@ def claimed_trick(msg):
 
 @socketio.on('need-final-result')
 def send_final_result(msg):
-    table = game.tables[msg['table_id']]
-    score = table.round.get_score()
-    # tell single player stats and wait for everybody confirming next round
-    socketio.emit('round-finished',
-                  {'table_id': table.id,
-                   'html': render_template('round/score.html',
-                                           table=table,
-                                           score=score)
-                   },
-                  room=request.sid)
+    player_id = msg.get('player_id')
+    table_id = msg.get('table_id')
+    if player_id and table_id:
+        if player_id == current_user.id and \
+                player_id in game.players and \
+                table_id in game.tables:
+            player = game.players[player_id]
+            if table_id == player.table:
+                table = game.tables[msg['table_id']]
+                score = table.round.get_score()
+                # tell single player stats and wait for everybody confirming next round
+                socketio.emit('round-finished',
+                              {'table_id': table.id,
+                               'html': render_template('round/score.html',
+                                                       table=table,
+                                                       score=score)
+                               },
+                              room=request.sid)
 
 
 @socketio.on('ready-for-next-round')
