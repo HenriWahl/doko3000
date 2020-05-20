@@ -149,8 +149,8 @@ def deal_cards_again(msg):
         # ask dealer if really should be re-dealt
         socketio.emit('really-deal-again',
                       {'table_id': table.id,
-                      'html': render_template('round/request_deal_again.html',
-                       table=table)},
+                       'html': render_template('round/request_deal_again.html',
+                                               table=table)},
                       room=request.sid)
 
 
@@ -186,11 +186,32 @@ def deal_cards_to_player(msg):
                 # one day becoming spectator mode
                 socketio.emit('sorry-no-cards-for-you',
                               {'html': {'hud_players': render_template('top/hud_players.html',
-                                                                      table=table,
-                                                                      player=player,
-                                                                      dealer=dealer,
-                                                                      current_player_id=current_player_id)}},
-                                room=request.sid)
+                                                                       table=table,
+                                                                       player=player,
+                                                                       dealer=dealer,
+                                                                       current_player_id=current_player_id)}},
+                              room=request.sid)
+
+
+@socketio.on('sorted-cards')
+def sorted_cards(msg):
+    """
+    while player sorts cards every card placed somewhere causes transmission of current card sort order
+    which gets saved here
+    """
+    player_id = msg.get('player_id')
+    table_id = msg.get('table_id')
+    if player_id and table_id:
+        if player_id == current_user.id and \
+                player_id in game.players and \
+                table_id in game.tables:
+            player = game.players[player_id]
+            if table_id == player.table:
+                cards_hand_ids = msg.get('cards_hand_ids')
+                if set(cards_hand_ids) == set(player.cards):
+                    player.cards = cards_hand_ids
+                    player.save()
+
 
 @socketio.on('claim-trick')
 def claimed_trick(msg):
@@ -238,6 +259,7 @@ def claimed_trick(msg):
                                },
                               room=table.id)
 
+
 @socketio.on('need-final-result')
 def send_final_result(msg):
     table = game.tables[msg['table_id']]
@@ -250,6 +272,7 @@ def send_final_result(msg):
                                            score=score)
                    },
                   room=request.sid)
+
 
 @socketio.on('ready-for-next-round')
 def ready_for_next_round(msg):
@@ -354,11 +377,11 @@ def round_finish(msg):
             socketio.emit('start-next-round',
                           {'table_id': table.id,
                            'dealer': dealer,
-                          'html': render_template('round/info.html',
-                                                  table=table,
-                                                  next_players=next_players,
-                                                  number_of_rows=number_of_rows)}
-            )
+                           'html': render_template('round/info.html',
+                                                   table=table,
+                                                   next_players=next_players,
+                                                   number_of_rows=number_of_rows)}
+                          )
 
 
 @socketio.on('ready-for-round-restart')
@@ -379,10 +402,10 @@ def round_restart(msg):
             socketio.emit('start-next-round',
                           {'table_id': table.id,
                            'dealer': dealer,
-                          'html': render_template('round/info.html',
-                                                  table=table,
-                                                  next_players=next_players,
-                                                  number_of_rows=number_of_rows)})
+                           'html': render_template('round/info.html',
+                                                   table=table,
+                                                   next_players=next_players,
+                                                   number_of_rows=number_of_rows)})
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -432,8 +455,8 @@ def table(table_id=''):
         # if no card is played already the dealer might deal
         dealing_needed = table.round.turn_count == 0
         # if one trick right now was finished the claim-trick-button should be displayed again
-        trick_claiming_needed = table.round.turn_count % 4 == 0 and\
-                                table.round.turn_count > 0 and\
+        trick_claiming_needed = table.round.turn_count % 4 == 0 and \
+                                table.round.turn_count > 0 and \
                                 not table.round.is_finished()
         current_player_id = table.round.current_player
         cards_hand = player.get_cards()

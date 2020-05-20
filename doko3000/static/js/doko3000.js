@@ -35,6 +35,18 @@ $(document).ready(function () {
                 table_id: $(card).data('table_id')
             })
         } else if (source.id == 'hand' && target.id == 'hand') {
+            // get cards order to end it to server for storing it
+            // let cards_hand = $('#hand').children('.game-card-hand')
+            let cards_hand_ids = []
+            for (let card_hand of $('#hand').children('.game-card-hand')) {
+                cards_hand_ids.push($(card_hand).data('id'))
+            }
+            console.log(cards_hand_ids)
+            socket.emit('sorted-cards', {
+                player_id: player_id,
+                table_id: $(card).data('table_id'),
+                cards_hand_ids: cards_hand_ids
+            })
             return true
         } else if (source.id == 'table' || cards_locked || player_id != current_player_id) {
             dragging.cancel(true)
