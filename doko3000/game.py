@@ -201,6 +201,9 @@ class Player(UserMixin, Document):
         self.save()
 
     def remove_all_cards(self):
+        """
+        if player is idle or gets new cards it doesn't need its old cards
+        """
         self.cards = []
         self.save()
 
@@ -620,6 +623,9 @@ class Table(Document):
              table = self.game.players[player_id].table
              if table in self.game.tables:
                 self.game.tables[table].remove_player(player_id)
+        # clean player cards if being idle
+        if player_id in self.idle_players:
+            self.game.players[player_id].remove_all_cards()
         # store table in player too
         self.game.players[player_id].table = self.id
 
