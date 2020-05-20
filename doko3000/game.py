@@ -642,6 +642,8 @@ class Table(Document):
             self.round.players.pop(self.round.players.index(player_id))
         while player_id in self.round.trick_order:
             self.round.trick_order.pop(self.round.trick_order.index(player_id))
+        if self.round.current_player == player_id:
+            self.round.current_player == ''
         if player_id not in self.players and \
                 player_id not in self.order and \
                 player_id not in self.round.players and\
