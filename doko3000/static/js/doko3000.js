@@ -41,12 +41,13 @@ $(document).ready(function () {
             for (let card_hand of $('#hand').children('.game-card-hand')) {
                 cards_hand_ids.push($(card_hand).data('id'))
             }
-            console.log(cards_hand_ids)
             socket.emit('sorted-cards', {
                 player_id: player_id,
                 table_id: $(card).data('table_id'),
                 cards_hand_ids: cards_hand_ids
             })
+            // to avoid later mess (cards stack inside the cards at hand) move stack to end
+            $('#cards_stack').appendTo('#hand')
             return true
         } else if (source.id == 'table' || cards_locked || player_id != current_player_id) {
             dragging.cancel(true)
