@@ -1,6 +1,5 @@
 # game logic part of doko3000
 
-from copy import copy
 from random import seed, \
     shuffle
 
@@ -88,8 +87,8 @@ class Player(UserMixin, Document):
             self['table'] = ''
             # has admin rights
             self['is_admin'] = False
-            # other players to the left, opposite and right of table
-            self['left'] = self['opposite'] = self['right'] = None
+            # # other players to the left, opposite and right of table
+            # self['left'] = self['opposite'] = self['right'] = None
             self.save()
         elif document_id:
             Document.__init__(self, self.game.db.database, document_id=document_id)
@@ -141,29 +140,29 @@ class Player(UserMixin, Document):
         self['table'] = value
         self.save()
 
-    @property
-    def left(self):
-        return self['left']
-
-    @left.setter
-    def left(self, value):
-        self['left'] = value
-
-    @property
-    def right(self):
-        return self['right']
-
-    @right.setter
-    def right(self, value):
-        self['right'] = value
-
-    @property
-    def opposite(self):
-        return self['opposite']
-
-    @opposite.setter
-    def opposite(self, value):
-        self['opposite'] = value
+    # @property
+    # def left(self):
+    #     return self['left']
+    #
+    # @left.setter
+    # def left(self, value):
+    #     self['left'] = value
+    #
+    # @property
+    # def right(self):
+    #     return self['right']
+    #
+    # @right.setter
+    # def right(self, value):
+    #     self['right'] = value
+    #
+    # @property
+    # def opposite(self):
+    #     return self['opposite']
+    #
+    # @opposite.setter
+    # def opposite(self, value):
+    #     self['opposite'] = value
 
     def set_password(self, password):
         """
@@ -293,6 +292,7 @@ class Round(Document):
     """
     eternal round, part of a table
     """
+
     def __init__(self, players=[], game=None, round_id='', document_id=''):
         self.game = game
         # cards are an important part but makes in a round context only sense if shuffled
@@ -318,9 +318,9 @@ class Round(Document):
             # get document data from CouchDB
             self.fetch()
             # first shuffling...
-            #self.shuffle()
+            # self.shuffle()
             # ...then dealing
-            #self.deal()
+            # self.deal()
 
         # + 1 due to range counting behaviour
         for trick_number in range(1, self.cards_per_player + 1):
@@ -422,7 +422,7 @@ class Round(Document):
             self.current_player = None
 
         # needed for player HUD
-        self.calculate_opponents()
+        #self.calculate_opponents()
         self.calculate_trick_order()
 
         # a new card deck for every round
@@ -455,9 +455,9 @@ class Round(Document):
             for card in range(self.cards_per_player):
                 # cards are given to players so the can be .pop()ed
                 self.game.players[player_id].cards.append(self.cards.pop())
-            #self.game.players[player_id].save()
+            # self.game.players[player_id].save()
         # not needed, is saved by .reset()
-        #self.save()
+        # self.save()
 
     def add_trick(self, player_id):
         """
@@ -499,19 +499,19 @@ class Round(Document):
                     score[trick.owner] += Deck.cards[card_id].value
         return score
 
-    def calculate_opponents(self):
-        """
-        give players info about whom they are playing against - interesting for HUD display
-        """
-        if len(self.players) == 4:
-            for player_id in self.players:
-                player_index = self.players.index(player_id)
-                player_order_view = copy(self.players)
-                for i in range(player_index):
-                    player_order_view.append(player_order_view.pop(0))
-                self.game.players[player_id].left = player_order_view[1]
-                self.game.players[player_id].opposite = player_order_view[2]
-                self.game.players[player_id].right = player_order_view[3]
+    # def calculate_opponents(self):
+    #     """
+    #     give players info about whom they are playing against - interesting for HUD display
+    #     """
+    #     if len(self.players) == 4:
+    #         for player_id in self.players:
+    #             player_index = self.players.index(player_id)
+    #             player_order_view = copy(self.players)
+    #             for i in range(player_index):
+    #                 player_order_view.append(player_order_view.pop(0))
+    #             self.game.players[player_id].left = player_order_view[1]
+    #             self.game.players[player_id].opposite = player_order_view[2]
+    #             self.game.players[player_id].right = player_order_view[3]
 
     def calculate_trick_order(self):
         """
@@ -620,8 +620,8 @@ class Table(Document):
             self.save()
         # remove old remains of previous table
         if self.game.players[player_id].table != self.id:
-             table = self.game.players[player_id].table
-             if table in self.game.tables:
+            table = self.game.players[player_id].table
+            if table in self.game.tables:
                 self.game.tables[table].remove_player(player_id)
         # clean player cards if being idle
         if player_id in self.idle_players:
@@ -638,7 +638,15 @@ class Table(Document):
             self.players.pop(self.players.index(player_id))
         while player_id in self.order:
             self.order.pop(self.order.index(player_id))
-        if player_id not in self.players and player_id not in self.order:
+        while player_id in self.round.players:
+            self.round.players.pop(self.round.players.index(player_id))
+        while player_id in self.round.trick_order:
+            self.round.trick_order.pop(self.round.trick_order.index(player_id))
+        if player_id not in self.players and \
+                player_id not in self.order and \
+                player_id not in self.round.players and\
+                player_id not in self.round.trick_order:
+            self.round.save()
             self.save()
 
     def add_round(self):
