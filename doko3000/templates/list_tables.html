@@ -1,22 +1,30 @@
-<div class="list-group">
+<ul class="list-group">
     {% for table in tables %}
-    <a href="/table/{{ table.id }}"
-       class="list-group-item list-group-item-action list-item-table"
-       id="{{ table.id }}"
-       data-table_id="{{ table.id }}">
-        <strong>
-            {{ table.id }}
-            <button class="btn btn-secondary float-right button-edit-table" data-table_id="{{ table.id }}">
-                <span class="oi oi-wrench"></span>
-            </button>
+        <li class="list-group-item list-group-item-action"
+            id="{{ table.id }}"
+            data-table_id="{{ table.id }}">
+            <div class="row">
+                <div class="col-md-7 col-sm-12">
+                    <strong>
+                        {{ table.id }}
+                    </strong><br>
 
-        </strong><br>
-
-        <span class="text-secondary">
+                    <span class="text-secondary">
     {% for player_id in table.players %}
         {{ player_id }}&nbsp;
     {% endfor %}
     </span>
-    </a>
+                </div>
+                <div class="col-md-5 col-sm-12 d-flex align-items-center">
+                    <a href="/table/{{ table.id }}" class="btn btn-success ml-auto text-nowrap button-list-table" data-table_id="{{ table.id }}">
+                        <span class="oi oi-account-login mr-1"></span>
+                        Tisch beitreten
+                    </a>
+                    <button class="btn btn-info ml-2" data-table_id="{{ table.id }}">
+                        <span class="oi oi-wrench"></span>
+                    </button>
+                </div>
+            </div>
+        </li>
     {% endfor %}
-</div>
+</ul>

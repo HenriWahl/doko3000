@@ -234,11 +234,12 @@ $(document).ready(function () {
         socket.emit('new-table', {button: 'new_table'})
     })
 
-    $(document).on('click', '.list-item-table', function () {
+    $(document).on('click', '.button-list-table', function () {
         socket.emit('enter-table', {
             player_id: player_id,
             table_id: $(this).data('table_id')
         })
+        return false
     })
 
     $(document).on('click', '#button_deal_cards', function () {
