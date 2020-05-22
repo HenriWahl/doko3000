@@ -723,23 +723,21 @@ class Game:
         for table_id, document in self.db.filter_by_type('table').items():
             self.tables[table_id] = Table(document_id=document['_id'], game=self)
 
-    def add_player(self, player_id='', document_id=''):
+    def add_player(self, player_id=''):
         """
         adds a new player
         """
-        if player_id not in self.players:
+        if player_id and player_id not in self.players:
             self.players[player_id] = Player(player_id=player_id, game=self)
-        # else:
-        #     self.players[player_id] = Player(document_id=document_id)
-        return self.players[player_id]
+        return self.players.get(player_id)
 
-    def add_table(self, table_id='', document_id=''):
+    def add_table(self, table_id=''):
         """
         adds a new table (to sit and play on, no database table!)
         """
-        if table_id not in self.tables:
+        if table_id and table_id not in self.tables:
             self.tables[table_id] = Table(table_id=table_id, game=self)
-        return self.tables[table_id]
+        return self.tables.get(table_id)
 
     def has_tables(self):
         if len(self.tables) == 0:
