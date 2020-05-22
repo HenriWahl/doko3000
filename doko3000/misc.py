@@ -6,7 +6,18 @@ from wtforms.fields import StringField,\
                     SubmitField
 from wtforms.validators import DataRequired
 
+ACCEPTED_JSON_MIMETYPES = ['*/*', 'text/javascript', 'application/json']
+
+
 class Login(FlaskForm):
     player_id = StringField('Username', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()])
     submit = SubmitField('Log in')
+
+
+# request.is_xhr()-Ersatz
+def is_xhr(request):
+    if request.accept_mimetypes.accept_json and \
+            request.accept_mimetypes.best in ACCEPTED_JSON_MIMETYPES:
+        return True
+    return False

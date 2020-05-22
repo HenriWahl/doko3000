@@ -2,6 +2,7 @@ from time import time
 
 from flask import flash, \
     Flask, \
+    jsonify, \
     redirect, \
     render_template, \
     request, \
@@ -16,9 +17,10 @@ from flask_socketio import join_room, \
 
 from .config import Config
 from .database import DB
-from .forms import Login
 from .game import Deck, \
     Game
+from .misc import is_xhr, \
+    Login
 
 # initialize app
 app = Flask(__name__)
@@ -496,3 +498,15 @@ def table(table_id=''):
     return render_template('index.html',
                            tables=tables,
                            title=f"{app.config['TITLE']}")
+
+
+@app.route('/table/setup/<table_id>')
+@login_required
+def setup_table(table_id):
+    """
+    configure table, its players and start - should be no socket bur xhr here for easier formular check
+    """
+    if is_xhr(request):
+        return jsonify({'html': render_template('setup_table.html')})
+    else:
+        return redirect(url_for('index'))

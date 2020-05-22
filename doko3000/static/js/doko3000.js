@@ -234,13 +234,26 @@ $(document).ready(function () {
         socket.emit('new-table', {button: 'new_table'})
     })
 
-    $(document).on('click', '.button-list-table', function () {
+    $(document).on('click', '.button-enter-table', function () {
         socket.emit('enter-table', {
             player_id: player_id,
             table_id: $(this).data('table_id')
         })
         return false
     })
+
+    $(document).on('click', '.button-setup-table', function () {
+        $.getJSON('/table/setup/' + $(this).data('table_id'), function (data, status) {
+
+            console.log(data)
+
+            $("#modal_body").html(data.html)
+            $('#modal_dialog').modal('show')
+        })
+        return false
+    })
+
+
 
     $(document).on('click', '#button_deal_cards', function () {
         console.log('button_deal_cards')
