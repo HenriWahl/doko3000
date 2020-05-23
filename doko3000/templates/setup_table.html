@@ -10,10 +10,10 @@
                     class="oi oi-lock-unlocked"></span></label>
         </div>
     </div>
-    <div clas="mt-2"><strong>Spieler:</strong></div>
-    <div class="container d-flex flex-column">
+    <div clas="mt-2 mb-4"><strong>Spieler:</strong></div>
+    <div class="container d-flex flex-column" id="setup_table_players">
         {% for player_id in table.players %}
-        <div class="p-2 m-1 border" id="player_{{ player_id }}">
+        <div class="p-2 m-1 border" data-player_id="{{ player_id }}">
             <span class="oi oi-person"></span>
             {{ player_id }}
             <span class="oi oi-x float-right text-danger btn btn-outline-light btn-sm button-remove-player-from-table"

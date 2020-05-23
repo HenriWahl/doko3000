@@ -11,18 +11,18 @@ $(document).ready(function () {
     const socket = io()
 
     // initialize drag&drop
-    let dragging = dragula([document.querySelector('#hand'),
+    let dragging_cards = dragula([document.querySelector('#hand'),
         document.querySelector('#table'), {
             revertOnSpill: true,
             direction: 'horizontal'
         }
     ]);
 
-    dragging.on('drop', function (card, target, source) {
+    dragging_cards.on('drop', function (card, target, source) {
         // do not drag your gained tricks around
         console.log(card, source, target, cards_locked)
         if (card.id == 'cards_stack') {
-            dragging.cancel(true)
+            dragging_cards.cancel(true)
         } else if (source.id == 'hand' && target.id == 'table' && player_id == current_player_id && !cards_locked) {
             console.log(card.id == 'cards_stack')
             $('#table').append(card)
@@ -50,7 +50,7 @@ $(document).ready(function () {
             $('#cards_stack').appendTo('#hand')
             return true
         } else if (source.id == 'table' || cards_locked || player_id != current_player_id) {
-            dragging.cancel(true)
+            dragging_cards.cancel(true)
         }
     })
 
@@ -249,10 +249,20 @@ $(document).ready(function () {
 
             $("#modal_body").html(data.html)
             $('#modal_dialog').modal('show')
+
+            let dragging_players = dragula([document.querySelector('#setup_table_players'),
+                {
+                    revertOnSpill: true,
+                    direction: 'vertical'
+                }
+            ]);
+
+            console.log(dragging_players)
+
+
         })
         return false
     })
-
 
 
     $(document).on('click', '#button_deal_cards', function () {
