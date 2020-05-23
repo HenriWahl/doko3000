@@ -141,18 +141,22 @@ def enter_table(msg):
     player_id = msg.get('player_id')
     action = msg.get('action')
     if table_id in game.tables:
-        if action == 'delete_player' and \
-            player_id in game.players:
-            game.tables[table_id].remove_player(player_id)
-            leave_room(table_id)
-        elif action == 'lock_table':
-            game.tables[table_id].locked = True
-        elif action == 'unlock_table':
-            game.tables[table_id].locked = False
-        elif action == 'play_with_9':
-            game.tables[table_id].with_9 = True
-        elif action == 'play_without_9':
-            game.tables[table_id].with_9 = False
+        table = game.tables[table_id]
+        if player_id in table.players:
+            if action == 'delete_player':
+                table.remove_player(player_id)
+                leave_room(table_id)
+            elif action == 'lock_table':
+                table.locked = True
+            elif action == 'unlock_table':
+                table.locked = False
+            elif action == 'play_with_9':
+                table.with_9 = True
+            elif action == 'play_without_9':
+                table.with_9 = False
+            elif action == 'start_table':
+                table.start()
+
 
 
 @socketio.on('deal-cards')

@@ -240,27 +240,21 @@ $(document).ready(function () {
             table_id: $(this).data('table_id')
         })
         return false
+        // return true
     })
 
     // draggable list of players in setup table dialog
     $(document).on('click', '.button-setup-table', function () {
         $.getJSON('/table/setup/' + $(this).data('table_id'), function (data, status) {
-
-            console.log(data)
-
             $("#modal_body").html(data.html)
             $('#modal_dialog').modal('show')
-
             let dragging_players = dragula([document.querySelector('#setup_table_players'),
                 {
                     revertOnSpill: true,
                     direction: 'vertical'
                 }
             ]);
-
             console.log(dragging_players)
-
-
         })
         return false
     })
@@ -272,6 +266,7 @@ $(document).ready(function () {
             $('#table_lock_icon').addClass('oi-lock-locked')
             socket.emit('setup-table-change', {
                 action: 'lock_table',
+                player_id: player_id,
                 table_id: $(this).data('table_id')
             })
         } else {
@@ -279,6 +274,7 @@ $(document).ready(function () {
             $('#table_lock_icon').removeClass('oi-lock-locked')
             socket.emit('setup-table-change', {
                 action: 'unlock_table',
+                player_id: player_id,
                 table_id: $(this).data('table_id')
             })
         }
@@ -287,20 +283,21 @@ $(document).ready(function () {
     // enable playing with card '9'
     $(document).on('click', '#switch_card_9', function () {
         if (this.checked) {
-            console.log('checked')
             socket.emit('setup-table-change', {
                 action: 'play_with_9',
+                player_id: player_id,
                 table_id: $(this).data('table_id')
             })
         } else {
             socket.emit('setup-table-change', {
                 action: 'play_without_9',
+                player_id: player_id,
                 table_id: $(this).data('table_id')
             })
         }
     })
 
-
+    // delete a player in the draggable players order
     $(document).on('click', '.button-remove-player-from-table', function () {
         console.log('remove player', $(this).data('player_id'))
         if (player_id != $(this).data('player_id')) {
@@ -317,6 +314,14 @@ $(document).ready(function () {
     $(document).on('click', '#button_deal_cards', function () {
         console.log('button_deal_cards')
         socket.emit('deal-cards', {
+            player_id: player_id,
+            table_id: $(this).data('table_id')
+        })
+    })
+
+    $(document).on('click', '#button_start_table', function () {
+        socket.emit('setup-table-change', {
+            action: 'start_table',
             player_id: player_id,
             table_id: $(this).data('table_id')
         })

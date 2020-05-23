@@ -698,6 +698,13 @@ class Table(Document):
         self.reset_ready_players()
         self.save()
 
+    def start(self):
+        """
+        completely new start from setup dialog
+        """
+        self.order = self.players[:]
+        self.reset_round()
+
     def shift_players(self):
         """
         last dealer is moved to the end of the players list
