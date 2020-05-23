@@ -1,1 +1,44 @@
-setup
+<form>
+    <div class="row">
+        <div class="col-9">
+            <h4>Tisch {{ table.id }}</h4>
+        </div>
+
+        <div class="col-3 custom-control custom-switch">
+            <input type="checkbox" class="custom-control-input" id="locked">
+            <label class="custom-control-label float-right" for="locked"><span
+                    class="oi oi-lock-unlocked"></span></label>
+        </div>
+    </div>
+    <div clas="mt-2"><strong>Spieler:</strong></div>
+    <div class="container d-flex flex-column">
+        {% for player_id in table.players %}
+        <div class="p-2 m-1 border" id="player_{{ player_id }}">
+            <span class="oi oi-person"></span>
+            {{ player_id }}
+            <span class="oi oi-x float-right text-danger btn btn-outline-light btn-sm button-remove-player-from-table"
+                  data-player_id="{{ player_id }}"></span>
+
+        </div>
+        {% endfor %}
+    </div>
+    <div class="row mt-2">
+        <div class="col-12">
+            <strong>Optionen:</strong>
+            <div class="custom-control custom-switch">
+                <input type="checkbox" class="custom-control-input" id="with_9">
+                <label class="custom-control-label" for="with_9">Mit 9er Karten</label>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-3">
+        <div class="col-6" data-table_id="{{ table.id }}">
+            <button class="btn btn-outline-success btn-block" data-dismiss="modal"><strong>Los geht's!</strong></button>
+        </div>
+        <div class="col-6" id="button_round_finish_yes" data-table_id="{{ table.id }}">
+            <button class="btn btn-outline-danger btn-block btn" data-dismiss="modal"><strong>Abbrechen</strong>
+            </button>
+        </div>
+
+    </div>
+</form>

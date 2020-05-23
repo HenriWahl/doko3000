@@ -506,7 +506,12 @@ def setup_table(table_id):
     """
     configure table, its players and start - should be no socket bur xhr here for easier formular check
     """
-    if is_xhr(request):
-        return jsonify({'html': render_template('setup_table.html')})
+    if is_xhr(request) and table_id:
+        if table_id in game.tables:
+            table = game.tables[table_id]
+            return jsonify({'html': render_template('setup_table.html',
+                                                    table=table)})
+        else:
+            return redirect(url_for('index'))
     else:
         return redirect(url_for('index'))
