@@ -151,11 +151,16 @@ def enter_table(msg):
             elif action == 'unlock_table':
                 table.locked = False
             elif action == 'play_with_9':
-                table.with_9 = True
+                table.round.with_9 = True
             elif action == 'play_without_9':
-                table.with_9 = False
+                table.round.with_9 = False
             elif action == 'start_table':
                 table.start()
+                # just tell everybody to get personal cards
+                socketio.emit('grab-your-cards',
+                              {'table_id': table.id},
+                              room=table.id)
+
 
 
 
@@ -167,7 +172,8 @@ def deal_cards(msg):
         table.reset_round()
         # just tell everybody to get personal cards
         socketio.emit('grab-your-cards',
-                      {'table_id': table.id})
+                      {'table_id': table.id},
+                      room=table.id)
 
 
 @socketio.on('deal-cards-again')

@@ -35,8 +35,8 @@ class Deck:
                'Herz',
                'Grün',
                'Eichel')
-    # RANKS = {'Neun':0,
-    RANKS = {'Zehn': 10,
+    RANKS = {'Neun':0,
+             'Zehn': 10,
              'Unter': 2,
              'Ober': 3,
              'König': 4,
@@ -311,17 +311,24 @@ class Round(Document):
             self['type'] = 'round'
             # what table?
             self['id'] = round_id
+            # as default play without '9'-cards
+            self['with_9'] = False
             # initialize
             self.reset(players=players)
         elif document_id:
             Document.__init__(self, self.game.db.database, document_id=document_id)
             # get document data from CouchDB
             self.fetch()
-            # first shuffling...
-            # self.shuffle()
-            # ...then dealing
-            # self.deal()
+            # a new card deck for every round
+            # decide if the '9'-cards are needed and do not give them to round if not
+            if self.with_9:
+                self.cards = list(Deck.cards)
+            else:
+                self.cards = [x.id for x in Deck.cards.values() if x.rank != 'Neun']
+            # cards per player depend on playing with '9'-cards or not
+            self.cards_per_player = len(self.cards) // 4
 
+        # just make sure tricks exist
         # + 1 due to range counting behaviour
         for trick_number in range(1, self.cards_per_player + 1):
             trick = self.game.tricks.get(f'{self.id}-{trick_number}')
@@ -380,6 +387,19 @@ class Round(Document):
         self['current_player'] = value
 
     @property
+    def with_9(self):
+        # better via .get() in case the table is not updated yet
+        return self.get('with_9', False)
+
+    @with_9.setter
+    def with_9(self, value):
+        if type(value) == bool:
+            self['with_9'] = value
+        else:
+            self['with_9'] = False
+        self.save()
+
+    @property
     def current_trick(self):
         """
         enable access to current trick
@@ -426,7 +446,14 @@ class Round(Document):
         self.calculate_trick_order()
 
         # a new card deck for every round
-        self.cards = list(Deck.cards)
+        # decide if the '9'-cards are needed and do not give them to round if not
+        if self.with_9:
+            self.cards = list(Deck.cards)
+        else:
+            self.cards = [x.id for x in Deck.cards.values() if x.rank != 'Neun']
+        # cards per player depend on playing with '9'-cards or not
+        self.cards_per_player = len(self.cards) // 4
+
         # first shuffling...
         self.shuffle()
         # ...then dealing
@@ -450,11 +477,15 @@ class Round(Document):
         """
         deal cards
         """
+        player_number = 0
         for player_id in self.players:
-            self.game.players[player_id].remove_all_cards()
+            #self.game.players[player_id].remove_all_cards()
             for card in range(self.cards_per_player):
                 # cards are given to players so the can be .pop()ed
-                self.game.players[player_id].cards.append(self.cards.pop())
+                # self.game.players[player_id].cards.append(self.cards.pop())
+                self.game.players[player_id].cards = self.cards[player_number * self.cards_per_player:\
+                                                                player_number * self.cards_per_player +\
+                                                                self.cards_per_player]
             # self.game.players[player_id].save()
         # not needed, is saved by .reset()
         # self.save()
@@ -487,7 +518,7 @@ class Round(Document):
         """
         check if round is over - reached when all cards are played
         """
-        return len(Deck.cards) == self.turn_count
+        return len(self.cards) == self.turn_count
 
     def get_score(self):
         score = {}
@@ -551,7 +582,6 @@ class Table(Document):
             self['players'] = []
             self['players_ready'] = []
             self['locked'] = False
-            self['with_9'] = False
         elif document_id:
             Document.__init__(self, self.game.db.database, document_id=document_id)
             # get document data from CouchDB
@@ -609,19 +639,6 @@ class Table(Document):
             self['locked'] = value
         else:
             self['locked'] = False
-        self.save()
-
-    @property
-    def with_9(self):
-        # better via .get() in case the table is not updated yet
-        return self.get('with_9', False)
-
-    @with_9.setter
-    def with_9(self, value):
-        if type(value) == bool:
-            self['with_9'] = value
-        else:
-            self['with_9'] = False
         self.save()
 
     @property
@@ -690,6 +707,9 @@ class Table(Document):
         self.round = Round(players=players, round_id=self.id, game=self.game)
 
     def reset_round(self):
+        """
+        reset round either when starting a new round on table or when restarting during game
+        """
         if self.order:
             players = self.order[:4]
         else:
@@ -702,6 +722,7 @@ class Table(Document):
         """
         completely new start from setup dialog
         """
+        # beginning order is the same like players
         self.order = self.players[:]
         self.reset_round()
 
@@ -788,21 +809,3 @@ class Game:
 
     def get_players(self):
         return self.players.values()
-
-    def test_game(self):
-        self.add_table('test')
-        for player_id, document in self.db.filter_by_type('player').items():
-            player = self.add_player(player_id, document_id=document['_id'])
-            self.tables['test'].add_player(player.id)
-        # game.tables['test'].order = ['test1', 'test2', 'test3', 'test4', 'test5']
-        self.tables['test'].order = ['test1', 'test2', 'test3', 'test4', 'test5']
-        self.tables['test'].save()
-    # if 'test' not in game.rounds:
-    #    game.tables['test'].new_round()
-
-#
-# def test_database():
-#     for test_player in ('test1', 'test2', 'test3', 'test4', 'test5'):
-#         if test_player not in db.filter_by_type('player'):
-#             player = game.add_player(player_id=test_player)
-#             player.set_password(test_player)

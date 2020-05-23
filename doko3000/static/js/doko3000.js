@@ -239,8 +239,8 @@ $(document).ready(function () {
             player_id: player_id,
             table_id: $(this).data('table_id')
         })
-        return false
-        // return true
+        // return false
+        return true
     })
 
     // draggable list of players in setup table dialog
