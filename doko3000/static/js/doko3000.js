@@ -242,6 +242,7 @@ $(document).ready(function () {
         return false
     })
 
+    // draggable list of players in setup table dialog
     $(document).on('click', '.button-setup-table', function () {
         $.getJSON('/table/setup/' + $(this).data('table_id'), function (data, status) {
 
@@ -264,6 +265,54 @@ $(document).ready(function () {
         return false
     })
 
+    // lock table number of players
+    $(document).on('click', '#table_lock', function () {
+        if (this.checked) {
+            $('#table_lock_icon').removeClass('oi-lock-unlocked')
+            $('#table_lock_icon').addClass('oi-lock-locked')
+            socket.emit('setup-table-change', {
+                action: 'lock_table',
+                table_id: $(this).data('table_id')
+            })
+        } else {
+            $('#table_lock_icon').addClass('oi-lock-unlocked')
+            $('#table_lock_icon').removeClass('oi-lock-locked')
+            socket.emit('setup-table-change', {
+                action: 'unlock_table',
+                table_id: $(this).data('table_id')
+            })
+        }
+    })
+
+    // enable playing with card '9'
+    $(document).on('click', '#switch_card_9', function () {
+        if (this.checked) {
+            console.log('checked')
+            socket.emit('setup-table-change', {
+                action: 'play_with_9',
+                table_id: $(this).data('table_id')
+            })
+        } else {
+            socket.emit('setup-table-change', {
+                action: 'play_without_9',
+                table_id: $(this).data('table_id')
+            })
+        }
+    })
+
+
+    $(document).on('click', '.button-remove-player-from-table', function () {
+        console.log('remove player', $(this).data('player_id'))
+        if (player_id != $(this).data('player_id')) {
+            // used too if player leaves table via menu
+            socket.emit('setup-table-change', {
+                action: 'delete_player',
+                player_id: $(this).data('player_id'),
+                table_id: $(this).data('table_id')
+            })
+            $('.table_' + $(this).data('table_id') + '_player_' + $(this).data('player_id')).remove()
+        }
+    })
 
     $(document).on('click', '#button_deal_cards', function () {
         console.log('button_deal_cards')

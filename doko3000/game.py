@@ -550,6 +550,8 @@ class Table(Document):
             self['order'] = []
             self['players'] = []
             self['players_ready'] = []
+            self['locked'] = False
+            self['with_9'] = False
         elif document_id:
             Document.__init__(self, self.game.db.database, document_id=document_id)
             # get document data from CouchDB
@@ -595,6 +597,32 @@ class Table(Document):
     @players_ready.setter
     def players_ready(self, value):
         self['players_ready'] = value
+
+    @property
+    def locked(self):
+        # better via .get() in case the table is not updated yet
+        return self.get('locked', False)
+
+    @locked.setter
+    def locked(self, value):
+        if type(value) == bool:
+            self['locked'] = value
+        else:
+            self['locked'] = False
+        self.save()
+
+    @property
+    def with_9(self):
+        # better via .get() in case the table is not updated yet
+        return self.get('with_9', False)
+
+    @with_9.setter
+    def with_9(self, value):
+        if type(value) == bool:
+            self['with_9'] = value
+        else:
+            self['with_9'] = False
+        self.save()
 
     @property
     def dealer(self):

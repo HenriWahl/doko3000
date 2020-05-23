@@ -13,6 +13,7 @@ from flask_login import current_user, \
     login_user, \
     logout_user
 from flask_socketio import join_room, \
+    leave_room, \
     SocketIO
 
 from .config import Config
@@ -132,6 +133,26 @@ def enter_table(msg):
     if table_id in game.tables and player_id in game.players:
         game.tables[table_id].add_player(player_id)
         join_room(table_id)
+
+
+@socketio.on('setup-table-change')
+def enter_table(msg):
+    table_id = msg.get('table_id')
+    player_id = msg.get('player_id')
+    action = msg.get('action')
+    if table_id in game.tables:
+        if action == 'delete_player' and \
+            player_id in game.players:
+            game.tables[table_id].remove_player(player_id)
+            leave_room(table_id)
+        elif action == 'lock_table':
+            game.tables[table_id].locked = True
+        elif action == 'unlock_table':
+            game.tables[table_id].locked = False
+        elif action == 'play_with_9':
+            game.tables[table_id].with_9 = True
+        elif action == 'play_without_9':
+            game.tables[table_id].with_9 = False
 
 
 @socketio.on('deal-cards')
