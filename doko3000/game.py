@@ -478,6 +478,7 @@ class Round(Document):
         deal cards
         """
         player_number = 0
+        self.cards_per_player = len(self.cards) // 4
         for player_id in self.players:
             #self.game.players[player_id].remove_all_cards()
             for card in range(self.cards_per_player):
@@ -486,6 +487,7 @@ class Round(Document):
                 self.game.players[player_id].cards = self.cards[player_number * self.cards_per_player:\
                                                                 player_number * self.cards_per_player +\
                                                                 self.cards_per_player]
+            player_number += 1
             # self.game.players[player_id].save()
         # not needed, is saved by .reset()
         # self.save()
