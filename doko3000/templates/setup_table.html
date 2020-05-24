@@ -13,9 +13,9 @@
     </div>
 </div>
 <!--    <div clas="mt-2 mb-4"><strong>Spieler:</strong></div>-->
-<div class="container d-flex flex-column" id="setup_table_players">
+<div class="container d-flex flex-column" id="setup_table_players" data-table_id="{{ table.id }}">
     {% for player_id in table.players %}
-    <div class="p-2 m-1 border table_{{ table.id }}_player_{{ player_id }}"
+    <div class="p-2 m-1 border table_{{ table.id }}_player_{{ player_id }} player"
          data-player_id="{{ player_id }}">
         <span class="oi oi-person"></span>
         {{ player_id }}
@@ -29,7 +29,7 @@
 <div class="row mt-2">
     <div class="col-12">
         <!--            <strong>Optionen:</strong>-->
-        <div class="custom-control custom-switch">
+        <div class="custom-control custom-switch my-2 mx-3">
             <input type="checkbox"
                    class="custom-control-input"
                    id="switch_card_9"

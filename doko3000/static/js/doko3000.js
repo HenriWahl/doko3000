@@ -254,7 +254,20 @@ $(document).ready(function () {
                     direction: 'vertical'
                 }
             ]);
-            console.log(dragging_players)
+
+            dragging_players.on('drop', function (player, target) {
+                // players order has been changed
+                let order = []
+                for (let player of $(target).children('.player')) {
+                    order.push($(player).data('player_id'))
+                }
+                socket.emit('setup-table-change', {
+                    action: 'changed_order',
+                    player_id: player_id,
+                    table_id: $(target).data('table_id'),
+                    order: order
+                })
+            })
         })
         return false
     })

@@ -154,14 +154,16 @@ def enter_table(msg):
                 table.round.with_9 = True
             elif action == 'play_without_9':
                 table.round.with_9 = False
+            elif action == 'changed_order':
+                order = msg.get('order')
+                if set(order) == set(table.order):
+                    table.players = order
             elif action == 'start_table':
                 table.start()
                 # just tell everybody to get personal cards
                 socketio.emit('grab-your-cards',
                               {'table_id': table.id},
                               room=table.id)
-
-
 
 
 @socketio.on('deal-cards')

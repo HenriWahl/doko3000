@@ -620,6 +620,10 @@ class Table(Document):
     def players(self):
         return self['players']
 
+    @players.setter
+    def players(self, value):
+        self['players'] = value
+
     @property
     def players_ready(self):
         return self['players_ready']

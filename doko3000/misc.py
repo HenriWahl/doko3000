@@ -15,7 +15,7 @@ class Login(FlaskForm):
     submit = SubmitField('Log in')
 
 
-# request.is_xhr()-Ersatz
+# request.is_xhr()-replacement
 def is_xhr(request):
     if request.accept_mimetypes.accept_json and \
             request.accept_mimetypes.best in ACCEPTED_JSON_MIMETYPES:
