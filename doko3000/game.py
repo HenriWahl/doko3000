@@ -294,13 +294,10 @@ class Round(Document):
     """
 
     def __init__(self, players=[], game=None, round_id='', document_id=''):
+        """
+        either initialize new round or load it from CouchDB
+        """
         self.game = game
-        # cards are an important part but makes in a round context only sense if shuffled
-        # not needed outside or in CouchDB
-        self.cards = list(Deck.cards)
-        # needed to know how many cards are dealed
-        # same as number of tricks in a round
-        self.cards_per_player = len(self.cards) // 4
         # collection of tricks per round - its number should not exceed cards_per_player
         self.tricks = {}
         if round_id:
@@ -330,14 +327,13 @@ class Round(Document):
 
         # just make sure tricks exist
         # + 1 due to range counting behaviour
-        for trick_number in range(1, self.cards_per_player + 1):
+        # no matter if '9'-cards are used just create database entries for all 12 possible tricks
+        for trick_number in range(1, 13):
             trick = self.game.tricks.get(f'{self.id}-{trick_number}')
             if trick is None:
                 # create trick in CouchDB if it does not exist yet
                 self.game.tricks[f'{self.id}-{trick_number}'] = Trick(trick_id=f'{self.id}-{trick_number}',
                                                                       game=self.game)
-            # else:
-            #     trick.reset()
             # access tricks per trick_count number, not as index starting from 0
             self.tricks[trick_number] = trick
 
@@ -477,17 +473,18 @@ class Round(Document):
         """
         deal cards
         """
-        player_number = 0
-        self.cards_per_player = len(self.cards) // 4
+        # simple counter to deal cards to all players
+        player_count = 0
+        # self.cards_per_player = len(self.cards) // 4
         for player_id in self.players:
             #self.game.players[player_id].remove_all_cards()
             for card in range(self.cards_per_player):
                 # cards are given to players so the can be .pop()ed
                 # self.game.players[player_id].cards.append(self.cards.pop())
-                self.game.players[player_id].cards = self.cards[player_number * self.cards_per_player:\
-                                                                player_number * self.cards_per_player +\
+                self.game.players[player_id].cards = self.cards[player_count * self.cards_per_player:\
+                                                                player_count * self.cards_per_player +\
                                                                 self.cards_per_player]
-            player_number += 1
+            player_count += 1
             # self.game.players[player_id].save()
         # not needed, is saved by .reset()
         # self.save()
