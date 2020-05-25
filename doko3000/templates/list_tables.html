@@ -7,6 +7,9 @@
             <div class="col-md-7 col-sm-12">
                 <strong>
                     {{ table.id }}
+                    {% if table.locked %}
+                    <span class="oi oi-lock-locked"></span>
+                    {% endif %}
                 </strong><br>
 
                 <span class="text-secondary">
@@ -17,7 +20,9 @@
             </div>
             <div class="col-md-5 col-sm-12 d-flex align-items-center">
                 <a href="/table/{{ table.id }}" class="btn btn-outline-success ml-auto text-nowrap button-enter-table"
-                   data-table_id="{{ table.id }}">
+                   data-table_id="{{ table.id }}"
+                   data-table_locked="{{ table.locked }}"
+                   data-table_players="{{ table.players }}">
                     <span class="oi oi-account-login mr-1"></span>
                     Beitreten
                 </a>

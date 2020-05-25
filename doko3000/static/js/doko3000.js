@@ -235,11 +235,12 @@ $(document).ready(function () {
     })
 
     $(document).on('click', '.button-enter-table', function () {
+        console.log($(this))
         socket.emit('enter-table', {
             player_id: player_id,
             table_id: $(this).data('table_id')
         })
-        // return false
+        //return false
         return true
     })
 
@@ -380,14 +381,6 @@ $(document).ready(function () {
 
     $(document).on('click', '#menu_request_round_finish', function () {
         socket.emit('request-round-finish', {
-            player_id: player_id,
-            table_id: $(this).data('table_id')
-        })
-    })
-
-    $(document).on('click', '#menu_request_round_restart', function () {
-        console.log('request_round_restart')
-        socket.emit('request-round-restart', {
             player_id: player_id,
             table_id: $(this).data('table_id')
         })

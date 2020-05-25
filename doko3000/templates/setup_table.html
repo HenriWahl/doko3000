@@ -1,15 +1,27 @@
 <div class="row">
     <div class="col-9">
-        <h4>Tisch {{ table.id }}</h4>
+        <h4>{{ table.id }}</h4>
     </div>
 
     <div class="col-3 custom-control custom-switch">
         <input type="checkbox"
                class="custom-control-input"
                id="table_lock"
-               data-table_id="{{ table.id }}">
-        <label class="custom-control-label float-right" for="table_lock"><span
-                class="oi oi-lock-unlocked" id="table_lock_icon"></span></label>
+               data-table_id="{{ table.id }}"
+               {% if table.locked %}
+               checked=""
+               {% endif %}>
+        <label class="custom-control-label float-right" for="table_lock">
+            <span
+                    class="oi
+                {% if table.locked %}
+                oi-lock-locked
+                {% else %}
+                oi-lock-unlocked
+                {% endif %}"
+                    id="table_lock_icon">
+            </span>
+        </label>
     </div>
 </div>
 <!--    <div clas="mt-2 mb-4"><strong>Spieler:</strong></div>-->
@@ -49,7 +61,7 @@
            id="button_start_table"
            data-table_id="{{ table.id }}">
             <strong>
-                Los geht's!
+                Neu starten
             </strong>
         </a>
     </div>

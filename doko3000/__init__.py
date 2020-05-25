@@ -130,9 +130,13 @@ def played_card(msg):
 def enter_table(msg):
     table_id = msg.get('table_id')
     player_id = msg.get('player_id')
-    if table_id in game.tables and player_id in game.players:
-        game.tables[table_id].add_player(player_id)
-        join_room(table_id)
+    if table_id in game.tables and \
+       player_id in game.players:
+        table = game.tables[table_id]
+        if (table.locked and player_id in table.players) or \
+           not table.locked:
+            game.tables[table_id].add_player(player_id)
+            join_room(table_id)
 
 
 @socketio.on('setup-table-change')
@@ -381,24 +385,6 @@ def request_round_finish(msg):
                   room=table.id)
 
 
-@socketio.on('request-round-restart')
-def request_round_restart(msg):
-    table = game.tables[msg['table_id']]
-    # just tell everybody to get personal cards
-    socketio.emit('round-restart-options',
-                  {'table_id': table.id,
-                   'html': render_template('round/restart_options.html',
-                                           table=table)
-                   },
-                  room=request.sid)
-    # socketio.emit('round-restart-requested',
-    #               {'table_id': table.id,
-    #                'html': render_template('request_round_restart.html',
-    #                                        table=table)
-    #                },
-    #              room=table.id)
-
-
 @socketio.on('ready-for-round-reset')
 def round_reset(msg):
     player_id = msg['player_id']
@@ -537,7 +523,8 @@ def table(table_id=''):
 @login_required
 def setup_table(table_id):
     """
-    configure table, its players and start - should be no socket bur xhr here for easier formular check
+    configure table, its players and start - should be no socket but xhr here for easier formular check
+    well, formular check seems to be unnecessary for now, but anyway it is an easy way to deliver it
     """
     if is_xhr(request) and table_id:
         if table_id in game.tables:

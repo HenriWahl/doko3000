@@ -25,11 +25,12 @@ html, body {
     bottom: 0%;
 }
 
-#table{
+#table {
     /*margin-right: 0; !important;*/
     /*padding-right: 0; !important;*/
 }
-#hand{
+
+#hand {
     /*margin-right: 0; !important;*/
     /*padding-right: 0; !important;*/
 }
@@ -110,7 +111,7 @@ html, body {
     left: 30%;
     right: 30%;
     z-index: 500;
-    background-color: rgba(0,0,0,0.5);
+    background-color: rgba(0, 0, 0, 0.5);
 }
 
 .game-card {
@@ -118,5 +119,10 @@ html, body {
 }
 
 .dropdown-item {
-    z-index: 1000; !important;
+    z-index: 1000;
+!important;
+}
+
+.button-remove-player-from-table {
+    border-style: none;
 }

@@ -1,11 +1,14 @@
 <div class="dropdown">
     <div class="btn btn-outline-light float-right m-2 topbar-button text-nowrap" data-toggle="dropdown">
-    <span class="oi oi-person mr-1"></span>
+        <span class="oi oi-person mr-1"></span>
         {{ current_user.id }}
     </div>
     <div class="dropdown-menu">
+        <a href="{{ url_for('index') }}" class="dropdown-item py-2">
+                <span class="oi oi-home mr-1">
+                </span>Start</a>
         <a href="{{ url_for('logout') }}" class="dropdown-item py-2">
-                <span class="oi oi-power-standby mr-2">
+                <span class="oi oi-power-standby mr-1">
                 </span>Abmelden</a>
     </div>
 </div>
