@@ -235,13 +235,18 @@ $(document).ready(function () {
     })
 
     $(document).on('click', '.button-enter-table', function () {
-        console.log($(this))
+        console.log($(this).data('table_players'), $(this).data('table_locked'))
         socket.emit('enter-table', {
             player_id: player_id,
             table_id: $(this).data('table_id')
         })
-        //return false
-        return true
+        if ($(this).data('table_locked') && player_id in $(this).data('table_players')) {
+            return true
+        } else if (!$(this).data('table_locked')) {
+            return true
+        } else {
+            return false
+        }
     })
 
     // draggable list of players in setup table dialog

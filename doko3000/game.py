@@ -1,5 +1,6 @@
 # game logic part of doko3000
 
+from json import dumps
 from random import seed, \
     shuffle
 
@@ -630,6 +631,13 @@ class Table(Document):
     @players_ready.setter
     def players_ready(self, value):
         self['players_ready'] = value
+
+    @property
+    def players_json(self):
+        """
+        needed for data-* in HTML for JS
+        """
+        return dumps(self['players'])
 
     @property
     def locked(self):
