@@ -131,10 +131,10 @@ def enter_table_socket(msg):
     table_id = msg.get('table_id')
     player_id = msg.get('player_id')
     if table_id in game.tables and \
-       player_id in game.players:
+            player_id in game.players:
         table = game.tables[table_id]
         if (table.locked and player_id in table.players) or \
-           not table.locked:
+                not table.locked:
             game.tables[table_id].add_player(player_id)
             join_room(table_id)
 
@@ -547,12 +547,22 @@ def enter_table_json(table_id='', player_id=''):
     if is_xhr(request) and table_id:
         allowed = False
         if table_id in game.tables and \
-           player_id in game.players:
+                player_id in game.players:
             table = game.tables[table_id]
             if (table.locked and player_id in table.players) or \
-               not table.locked:
+                    not table.locked:
                 allowed = True
         return jsonify({'allowed': allowed})
     else:
         return redirect(url_for('index'))
 
+
+@app.route('/get/html/tables')
+@login_required
+def get_html_tables():
+    if is_xhr(request):
+        tables = game.get_tables()
+        return render_template('list_tables.html',
+                               tables=tables)
+    else:
+        return redirect(url_for('index'))

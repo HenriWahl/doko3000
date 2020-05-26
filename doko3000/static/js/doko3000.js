@@ -355,7 +355,14 @@ $(document).ready(function () {
 
     // reload page after setup
     $(document).on('click', '#button_finish_table_setup', function () {
-        location.reload()
+        // location.reload()
+        $.get('/get/html/tables',
+            function (data, status) {
+                console.log(data, status)
+                if (status == 'success') {
+                          $('#list_tables').html(data)
+                }
+            })
     })
 
     $(document).on('click', '#button_deal_cards_again', function () {
