@@ -353,6 +353,11 @@ $(document).ready(function () {
         })
     })
 
+    // reload page after setup
+    $(document).on('click', '#button_finish_table_setup', function () {
+        location.reload()
+    })
+
     $(document).on('click', '#button_deal_cards_again', function () {
         console.log('button_deal_cards_again')
         socket.emit('deal-cards-again', {

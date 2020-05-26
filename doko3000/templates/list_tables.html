@@ -19,8 +19,13 @@
                 </span>
             </div>
             <div class="col-md-5 col-sm-12 d-flex align-items-center">
+                {% if current_user.id in table.players or not table.locked %}
+                {% set disabled = '' %}
+                {% else %}
+                {% set disabled = 'disabled' %}
+                {% endif %}
                 <a href="/table/{{ table.id }}"
-                   class="btn btn-outline-success ml-auto text-nowrap button-enter-table"
+                   class="btn btn-outline-success ml-auto text-nowrap button-enter-table {{ disabled }}"
                    data-table_id="{{ table.id }}">
                     <span class="oi oi-account-login mr-1"></span>
                     Beitreten
