@@ -252,35 +252,35 @@ $(document).ready(function () {
                 // dummy return just in case
                 return false
             })
-        // console.log(allowed)
-        // return allowed
     })
 
     // draggable list of players in setup table dialog
     $(document).on('click', '.button-setup-table', function () {
         $.getJSON('/table/setup/' + $(this).data('table_id'), function (data, status) {
-            $("#modal_body").html(data.html)
-            $('#modal_dialog').modal('show')
-            let dragging_players = dragula([document.querySelector('#setup_table_players'),
-                {
-                    revertOnSpill: true,
-                    direction: 'vertical'
-                }
-            ]);
-
-            dragging_players.on('drop', function (player, target) {
-                // players order has been changed
-                let order = []
-                for (let player of $(target).children('.player')) {
-                    order.push($(player).data('player_id'))
-                }
-                socket.emit('setup-table-change', {
-                    action: 'changed_order',
-                    player_id: player_id,
-                    table_id: $(target).data('table_id'),
-                    order: order
+            console.log(data)
+            if (data.allowed) {
+                $("#modal_body").html(data.html)
+                $('#modal_dialog').modal('show')
+                let dragging_players = dragula([document.querySelector('#setup_table_players'),
+                    {
+                        revertOnSpill: true,
+                        direction: 'vertical'
+                    }
+                ]);
+                dragging_players.on('drop', function (player, target) {
+                    // players order has been changed
+                    let order = []
+                    for (let player of $(target).children('.player')) {
+                        order.push($(player).data('player_id'))
+                    }
+                    socket.emit('setup-table-change', {
+                        action: 'changed_order',
+                        player_id: player_id,
+                        table_id: $(target).data('table_id'),
+                        order: order
+                    })
                 })
-            })
+            }
         })
         return false
     })
@@ -360,7 +360,7 @@ $(document).ready(function () {
             function (data, status) {
                 console.log(data, status)
                 if (status == 'success') {
-                          $('#list_tables').html(data)
+                    $('#list_tables').html(data)
                 }
             })
     })

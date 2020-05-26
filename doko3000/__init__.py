@@ -529,8 +529,15 @@ def setup_table(table_id):
     if is_xhr(request) and table_id:
         if table_id in game.tables:
             table = game.tables[table_id]
-            return jsonify({'html': render_template('setup_table.html',
-                                                    table=table)})
+            if current_user.id in game.players and \
+                    (current_user.id in table.players or
+                not table.locked):
+                    return jsonify({'allowed': True,
+                                    'html': render_template('setup_table.html',
+                                                            table=table)})
+            else:
+                return jsonify({'allowed': False})
+
         else:
             return redirect(url_for('index'))
     else:
@@ -560,6 +567,9 @@ def enter_table_json(table_id='', player_id=''):
 @app.route('/get/html/tables')
 @login_required
 def get_html_tables():
+    """
+    get HTML list of tables to refresh index.html tables list after changes
+    """
     if is_xhr(request):
         tables = game.get_tables()
         return render_template('list_tables.html',
