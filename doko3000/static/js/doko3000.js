@@ -240,14 +240,20 @@ $(document).ready(function () {
             player_id: player_id,
             table_id: $(this).data('table_id')
         })
-        // if ($(this).data('table_locked') && player_id in $(this).data('table_players')) {
-        //     return true
-        // } else if (!$(this).data('table_locked')) {
-        //     return true
-        // } else {
-        //     return false
-        // }
-        return true
+        // ask server via json if player is allowed to enter or not
+        return $.getJSON('/table/enter/' + $(this).data('table_id') + '/' + player_id,
+            function (data, status) {
+                if (status == 'success') {
+                    if (data.allowed) {
+                        return data.allowed
+                    }
+                    return false
+                }
+                // dummy return just in case
+                return false
+            })
+        // console.log(allowed)
+        // return allowed
     })
 
     // draggable list of players in setup table dialog
