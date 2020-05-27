@@ -17,7 +17,7 @@ class Login(FlaskForm):
 
 class CreateTable(FlaskForm):
     new_table_id = StringField('Table', validators=[DataRequired()])
-    submit = SubmitField('Anlegen')
+    # submit = SubmitField('Anlegen')
 
 
 

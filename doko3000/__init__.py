@@ -579,19 +579,28 @@ def get_html_tables():
         return redirect(url_for('index'))
 
 
-@app.route('/create/table')
+@app.route('/create/table', methods=['GET', 'POST'])
 @login_required
 def create_table():
     """
     create table via button
     """
     if is_xhr(request):
-        form = CreateTable()
+        # form = CreateTable()
         if request.method == 'GET':
-            return jsonify({'html': render_template('index/create_table.html',
-                                                    form=form)})
+            return jsonify({'html': render_template('index/create_table.html')})
         elif request.method == 'POST':
-            pass
+            new_table_id = request.values.get('new_table_id')
+            if new_table_id:
+                if new_table_id in game.tables:
+                    return jsonify({'status': 'error',
+                                    'message': 'Diesen Tisch gibt es schon :-('})
+                else:
+                    game.add_table(new_table_id)
+                    return jsonify({'status': 'ok'})
+            else:
+                return jsonify({'status': 'error',
+                                'message': 'Der Tisch braucht einen Namen'})
         else:
             return redirect(url_for('index'))
     else:

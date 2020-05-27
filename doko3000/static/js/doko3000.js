@@ -7,6 +7,14 @@ let current_player_id = ''
 // lock dragging of cards while waiting for trick being claimed
 let cards_locked = false
 
+// show alert messages
+function show_message (place, message) {
+    $(place).after('<div class="mx-3 mt-3 mb-1 alert alert-danger alert-dismissible dialog-message">' +
+        '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
+        message +
+        '</div>')
+}
+
 $(document).ready(function () {
     const socket = io()
 
@@ -264,6 +272,23 @@ $(document).ready(function () {
             }
         }, 'json')
         console.log('done')
+        return false
+    })
+
+    // parameter 'json' makes it equivalent to non-existing .postJSON
+    $(document).on('click', '#button_finish_create_table', function () {
+        console.log('create table pressed button')
+        $.post('/create/table', $('#form_create_table').serialize(), function (data, status) {
+            console.log(data)
+            if (status == 'success') {
+                            if (data.status == 'error') {
+                                // $('#message_boxes').removeClass('d-none')
+                                // $('#message_boxes').html(data.message)
+                                show_message('#message_boxes', data.message)
+                            }
+
+            }
+        }, 'json')
         return false
     })
 
