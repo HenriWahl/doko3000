@@ -20,7 +20,8 @@ from .config import Config
 from .database import DB
 from .game import Deck, \
     Game
-from .misc import is_xhr, \
+from .misc import CreateTable, \
+    is_xhr, \
     Login
 
 # initialize app
@@ -84,7 +85,7 @@ def new_table(msg):
     socketio.emit('new-table-available',
                   {'tables': game.get_tables_names(),
                    'player_id': current_user.id,
-                   'html': render_template('list_tables.html',
+                   'html': render_template('index/list_tables.html',
                                            tables=game.get_tables())},
                   broadcast=True)
 
@@ -531,10 +532,10 @@ def setup_table(table_id):
             table = game.tables[table_id]
             if current_user.id in game.players and \
                     (current_user.id in table.players or
-                not table.locked):
-                    return jsonify({'allowed': True,
-                                    'html': render_template('setup_table.html',
-                                                            table=table)})
+                     not table.locked):
+                return jsonify({'allowed': True,
+                                'html': render_template('setup_table.html',
+                                                        table=table)})
             else:
                 return jsonify({'allowed': False})
 
@@ -564,7 +565,7 @@ def enter_table_json(table_id='', player_id=''):
         return redirect(url_for('index'))
 
 
-@app.route('/get/html/tables')
+@app.route('/get/tables')
 @login_required
 def get_html_tables():
     """
@@ -572,7 +573,26 @@ def get_html_tables():
     """
     if is_xhr(request):
         tables = game.get_tables()
-        return render_template('list_tables.html',
-                               tables=tables)
+        return jsonify({'html': render_template('index/list_tables.html',
+                                                tables=tables)})
+    else:
+        return redirect(url_for('index'))
+
+
+@app.route('/create/table')
+@login_required
+def create_table():
+    """
+    create table via button
+    """
+    if is_xhr(request):
+        form = CreateTable()
+        if request.method == 'GET':
+            return jsonify({'html': render_template('index/create_table.html',
+                                                    form=form)})
+        elif request.method == 'POST':
+            pass
+        else:
+            return redirect(url_for('index'))
     else:
         return redirect(url_for('index'))

@@ -1,0 +1,33 @@
+<form>
+    <div class="row">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+        <div class="alert alert-danger alert-dissmissible">
+            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                  {{ message }}
+        </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <!--                <input type="text" class="form-control" id="new_table_name" placeholder="Neuer Tisch"-->
+            <!--                       name="new_table_name">-->
+            {{ form.new_table_id(class='form-control', placeholder='Neuer Tisch') }}
+        </div>
+    </div>
+    <div class="row mt-3">
+        <!--        <div class="col-6" id="button_finish_create table">-->
+        <!--            <button class="btn btn-outline-success btn-block btn" data-dismiss="modal"><strong>Anlegen</strong>-->
+        <!--            </button>-->
+        <!--        </div>-->
+        <div class="col-6" id="button_finish_create table">
+            {{ form.submit(class='btn btn-outline-success btn-block btn', value='Anlegen') }}
+        </div>
+        <div class="col-6" id="button_finish_create_table">
+            <button class="btn btn-outline-primary btn-block btn" data-dismiss="modal"><strong>Zurück</strong>
+            </button>
+        </div>
+</form>

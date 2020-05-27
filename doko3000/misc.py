@@ -12,7 +12,13 @@ ACCEPTED_JSON_MIMETYPES = ['*/*', 'text/javascript', 'application/json']
 class Login(FlaskForm):
     player_id = StringField('Username', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()])
-    submit = SubmitField('Log in')
+    submit = SubmitField('Login')
+
+
+class CreateTable(FlaskForm):
+    new_table_id = StringField('Table', validators=[DataRequired()])
+    submit = SubmitField('Anlegen')
+
 
 
 # request.is_xhr()-replacement

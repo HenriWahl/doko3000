@@ -181,16 +181,22 @@ class Player(UserMixin, Document):
     def get_cards(self):
         """
         give complete card objects to player to be displayed in browser
+        if player is idle just remove remaining cards from previous session
         """
         cards = []
-        try:
-            for card_id in self.cards:
-                cards.append(Deck.cards[card_id])
-        except KeyError:
-            # cards might have been here from debugging or an earlier game - just reset them
-            cards = []
-            self.cards = cards
-            self.save()
+        if self.table in self.game.tables:
+            if self.id not in self.game.tables[self.table].idle_players:
+                try:
+                    for card_id in self.cards:
+                        cards.append(Deck.cards[card_id])
+                except KeyError:
+                    # cards might have been here from debugging or an earlier game - just reset them
+                    cards = []
+                    self.cards = cards
+                    self.save()
+            else:
+                self.cards = cards
+                self.save()
         return cards
 
     def remove_card(self, card_id):

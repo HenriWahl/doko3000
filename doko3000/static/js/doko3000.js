@@ -243,22 +243,35 @@ $(document).ready(function () {
         // ask server via json if player is allowed to enter or not
         return $.getJSON('/table/enter/' + $(this).data('table_id') + '/' + player_id,
             function (data, status) {
-                if (status == 'success') {
-                    if (data.allowed) {
-                        return data.allowed
-                    }
-                    return false
+                if (status == 'success' && data.allowed) {
+                    return data.allowed
                 }
                 // dummy return just in case
                 return false
             })
     })
 
+    // create new table
+    $(document).on('click', '#button_create_table', function () {
+        console.log('create table')
+        // parameter 'json' makes it equivalent to .getJSON
+        // because there is no .postJSON but .post(..., 'json') so it will be the same for GET and POST here
+        $.get('/create/table', function (data, status) {
+            console.log(status)
+            if (status == 'success') {
+                $("#modal_body").html(data.html)
+                $('#modal_dialog').modal('show')
+            }
+        }, 'json')
+        console.log('done')
+        return false
+    })
+
     // draggable list of players in setup table dialog
     $(document).on('click', '.button-setup-table', function () {
         $.getJSON('/table/setup/' + $(this).data('table_id'), function (data, status) {
             console.log(data)
-            if (data.allowed) {
+            if (status == 'success' && data.allowed) {
                 $("#modal_body").html(data.html)
                 $('#modal_dialog').modal('show')
                 let dragging_players = dragula([document.querySelector('#setup_table_players'),
@@ -356,11 +369,11 @@ $(document).ready(function () {
     // reload page after setup
     $(document).on('click', '#button_finish_table_setup', function () {
         // location.reload()
-        $.get('/get/html/tables',
+        $.getJSON('/get/tables',
             function (data, status) {
                 console.log(data, status)
                 if (status == 'success') {
-                    $('#list_tables').html(data)
+                    $('#list_tables').html(data.html)
                 }
             })
     })
