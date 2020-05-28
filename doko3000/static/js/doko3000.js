@@ -393,6 +393,9 @@ $(document).ready(function () {
             player_id: player_id,
             table_id: $(this).data('table_id')
         })
+        if (window.location.pathname.startsWith('/table/')) {
+            location.reload()
+        }
     })
 
     // reload page after setup
