@@ -342,7 +342,7 @@ class Round(Document):
                 self.game.tricks[f'{self.id}-{trick_number}'] = Trick(trick_id=f'{self.id}-{trick_number}',
                                                                       game=self.game)
             # access tricks per trick_count number, not as index starting from 0
-            self.tricks[trick_number] = trick
+            self.tricks[trick_number] = self.game.tricks[f'{self.id}-{trick_number}']
 
     @property
     def id(self):
@@ -407,8 +407,7 @@ class Round(Document):
         """
         enable access to current trick
         """
-        # return an empty trick if none yet existing
-        return self.tricks.get(self.trick_count, Trick())
+        return self.tricks.get(self.trick_count)
 
     @property
     def previous_trick(self):
