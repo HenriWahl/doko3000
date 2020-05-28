@@ -407,7 +407,8 @@ class Round(Document):
         """
         enable access to current trick
         """
-        return self.tricks[self.trick_count]
+        # return an empty trick if none yet existing
+        return self.tricks.get(self.trick_count, Trick())
 
     @property
     def previous_trick(self):
