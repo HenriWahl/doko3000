@@ -64,7 +64,7 @@ def who_am_i():
         table_id = game.players[player_id].table
         round_finished = False
         # if player already sits on a table inform client
-        if table_id:
+        if table_id and table_id in game.tables:
             current_player_id = game.tables[table_id].round.current_player
             round_finished = game.tables[table_id].round.is_finished()
             join_room(table_id)
@@ -573,7 +573,6 @@ def create_table():
     create table via button
     """
     if is_xhr(request):
-        # form = CreateTable()
         if request.method == 'GET':
             return jsonify({'html': render_template('index/create_table.html')})
         elif request.method == 'POST':
