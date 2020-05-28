@@ -20,8 +20,7 @@ from .config import Config
 from .database import DB
 from .game import Deck, \
     Game
-from .misc import CreateTable, \
-    is_xhr, \
+from .misc import is_xhr, \
     Login
 
 # initialize app
@@ -76,18 +75,6 @@ def who_am_i():
                        'table_id': table_id,
                        'current_player_id': current_player_id,
                        'round_finished': round_finished})
-
-
-@socketio.on('new-table')
-def new_table(msg):
-    game.add_table('test2')
-    game.tables['test2'].add_player(current_user.id)
-    socketio.emit('new-table-available',
-                  {'tables': game.get_tables_names(),
-                   'player_id': current_user.id,
-                   'html': render_template('index/list_tables.html',
-                                           tables=game.get_tables())},
-                  broadcast=True)
 
 
 @socketio.on('played-card')

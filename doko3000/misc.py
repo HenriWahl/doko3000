@@ -13,11 +13,11 @@ class Login(FlaskForm):
     player_id = StringField('Username', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()])
     submit = SubmitField('Login')
-
-
-class CreateTable(FlaskForm):
-    new_table_id = StringField('Table', validators=[DataRequired()])
-    # submit = SubmitField('Anlegen')
+#
+#
+# class CreateTable(FlaskForm):
+#     new_table_id = StringField('Table', validators=[DataRequired()])
+#     # submit = SubmitField('Anlegen')
 
 
 

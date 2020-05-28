@@ -8,7 +8,7 @@ let current_player_id = ''
 let cards_locked = false
 
 // show alert messages
-function show_message (place, message) {
+function show_message(place, message) {
     $(place).after('<div class="mx-3 mt-3 mb-1 alert alert-danger alert-dismissible dialog-message">' +
         '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
         message +
@@ -17,7 +17,6 @@ function show_message (place, message) {
 
 $(document).ready(function () {
     const socket = io()
-
     // initialize drag&drop
     let dragging_cards = dragula([document.querySelector('#hand'),
         document.querySelector('#table'), {
@@ -25,7 +24,6 @@ $(document).ready(function () {
             direction: 'horizontal'
         }
     ]);
-
     dragging_cards.on('drop', function (card, target, source) {
         // do not drag your gained tricks around
         console.log(card, source, target, cards_locked)
@@ -207,7 +205,6 @@ $(document).ready(function () {
             $('#button_deal_cards').addClass('d-none')
             $('#button_close_info').removeClass('d-none')
         }
-
         $("#modal_dialog").modal('show')
     })
 
@@ -238,10 +235,6 @@ $(document).ready(function () {
         $('#modal_dialog').modal('show')
     })
 
-    $(document).on('click', '#new_table', function () {
-        socket.emit('new-table', {button: 'new_table'})
-    })
-
     $(document).on('click', '.button-enter-table', function () {
         console.log($(this).data('table_players'), $(this).data('table_locked'))
         socket.emit('enter-table', {
@@ -262,31 +255,42 @@ $(document).ready(function () {
     // create new table
     $(document).on('click', '#button_create_table', function () {
         console.log('create table')
-        // parameter 'json' makes it equivalent to .getJSON
-        // because there is no .postJSON but .post(..., 'json') so it will be the same for GET and POST here
-        $.get('/create/table', function (data, status) {
+        $.getJSON('/create/table', function (data, status) {
             console.log(status)
             if (status == 'success') {
                 $("#modal_body").html(data.html)
                 $('#modal_dialog').modal('show')
             }
-        }, 'json')
+        })
         console.log('done')
         return false
+    })
+
+    // set focus onto new_table_id form field
+    $('#modal_dialog').on('shown.bs.modal', function () {
+        $('#new_table_id').focus()
     })
 
     // parameter 'json' makes it equivalent to non-existing .postJSON
     $(document).on('click', '#button_finish_create_table', function () {
         console.log('create table pressed button')
+        // parameter 'json' makes it equivalent to .getJSON
+        // because there is no .postJSON but .post(..., 'json') so it will be the same for GET and POST here
         $.post('/create/table', $('#form_create_table').serialize(), function (data, status) {
             console.log(data)
             if (status == 'success') {
-                            if (data.status == 'error') {
-                                // $('#message_boxes').removeClass('d-none')
-                                // $('#message_boxes').html(data.message)
-                                show_message('#message_boxes', data.message)
+                if (data.status == 'error') {
+                    show_message('#message_boxes', data.message)
+                } else if (data.status == 'ok') {
+                    $('#modal_dialog').modal('hide')
+                    $.getJSON('/get/tables',
+                        function (data, status) {
+                            console.log(data, status)
+                            if (status == 'success') {
+                                $('#list_tables').html(data.html)
                             }
-
+                        })
+                }
             }
         }, 'json')
         return false
