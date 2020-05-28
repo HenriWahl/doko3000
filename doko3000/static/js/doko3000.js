@@ -95,10 +95,15 @@ $(document).ready(function () {
         // if (!msg.is_last_turn) {
         //     $('#hud_player_' + msg.current_player_id).addClass('hud-player-active')
         // }
-        if (player_id != msg.player_id) {
-            $('#table').append(msg.html.card)
-            $('#card_' + msg.card_id).attr('title', msg.player_id)
-        }
+        // if (player_id != msg.player_id) {
+        //     // $('#table').append(msg.html.card)
+        //     $('#table').html(msg.html.table)
+        //     $('#card_' + msg.card_id).attr('title', msg.player_id)
+        // }
+
+        $('#table').html(msg.html.table)
+        $('#card_' + msg.card_id).attr('title', msg.player_id)
+
         if (msg.is_last_turn) {
             cards_locked = true
             $('#turn_indicator').addClass('d-none')

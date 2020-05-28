@@ -93,9 +93,12 @@ def played_card(msg):
                 table.round.increase_turn_count()
                 card = Deck.cards[card_id]
                 player.remove_card(card.id)
-                is_last_turn = table.round.current_trick.is_last_turn()
+                is_last_turn = table.round.current_trick.current_trick.is_last_turn()
                 current_player_id = table.round.get_current_player()
                 idle_players = table.idle_players
+                cards_table = table.round.current_trick.get_cards()
+
+                # hier muss wohl der komplette Tisch neu übertragen werden
                 socketio.emit('played-card-by-user',
                               {'player_id': player.id,
                                'card_id': card.id,
@@ -103,9 +106,9 @@ def played_card(msg):
                                'is_last_turn': is_last_turn,
                                'current_player_id': current_player_id,
                                'idle_players': idle_players,
-                               'html': {'card': render_template('cards/card.html',
-                                                                card=Deck.cards[card_id],
-                                                                table=table),
+                               'html': {'table': render_template('cards/table.html',
+                                                                 cards_table=cards_table,
+                                                                 table=table),
                                         'hud_players': render_template('top/hud_players.html',
                                                                        table=table,
                                                                        player=player,
@@ -306,8 +309,8 @@ def send_final_result(msg):
         if player_id == current_user.id and \
                 player_id in game.players and \
                 table_id in game.tables:
-            player = game.players[player_id]
-            if table_id == player.table:
+            player = game.players.get(player_id)
+            if player and table_id == player.table:
                 table = game.tables[msg['table_id']]
                 score = table.round.get_score()
                 # tell single player stats and wait for everybody confirming next round
@@ -444,11 +447,11 @@ def login():
             flash('Spieler nicht bekannt :-(')
             return redirect(url_for('login'))
         else:
-            player = game.players[form.player_id.data]
-            if not player.check_password(form.password.data):
+            player_id = game.players[form.player_id.data]
+            if not player_id.check_password(form.password.data):
                 flash('Falsches Passwort :-(')
                 return redirect(url_for('login'))
-            login_user(player)
+            login_user(player_id)
             return redirect(url_for('index'))
     return render_template('login.html',
                            title=f"{app.config['TITLE']} Login",

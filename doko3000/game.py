@@ -196,7 +196,9 @@ class Player(UserMixin, Document):
                     self.save()
             else:
                 self.cards = cards
-                self.save()
+                # if not playing right now there is no need to save the cards
+                # sometimes provokes a 409 error from cloudant
+                #self.save()
         return cards
 
     def remove_card(self, card_id):
