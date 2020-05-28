@@ -60,7 +60,7 @@ def load_user(id):
 @socketio.on('who-am-i')
 def who_am_i():
     if not current_user.is_anonymous:
-        player_id = current_user.id
+        player_id = current_user.get_id()
         table_id = game.players[player_id].table
         round_finished = False
         # if player already sits on a table inform client
@@ -88,12 +88,12 @@ def played_card(msg):
         player = game.players[player_id]
         if player.table == table_id:
             table = game.tables[table_id]
-            if current_user.id == player.id == table.round.current_player:
+            if current_user.get_id() == player.id == table.round.current_player:
                 table.round.current_trick.add_turn(player.id, card_id)
                 table.round.increase_turn_count()
                 card = Deck.cards[card_id]
                 player.remove_card(card.id)
-                is_last_turn = table.round.current_trick.current_trick.is_last_turn()
+                is_last_turn = table.round.current_trick.is_last_turn()
                 current_player_id = table.round.get_current_player()
                 idle_players = table.idle_players
                 cards_table = table.round.current_trick.get_cards()
@@ -199,7 +199,7 @@ def deal_cards_to_player(msg):
         if player.table == table_id and \
                 table_id in game.tables:
             table = game.tables[table_id]
-            if player.id == current_user.id and table.id in game.tables:
+            if player.id == current_user.get_id() and table.id in game.tables:
                 if player.id in table.players:
                     dealer = table.dealer
                     # just in case
@@ -243,7 +243,7 @@ def sorted_cards(msg):
     player_id = msg.get('player_id')
     table_id = msg.get('table_id')
     if player_id and table_id:
-        if player_id == current_user.id and \
+        if player_id == current_user.get_id() and \
                 player_id in game.players and \
                 table_id in game.tables:
             player = game.players[player_id]
@@ -257,7 +257,7 @@ def sorted_cards(msg):
 @socketio.on('claim-trick')
 def claimed_trick(msg):
     player = game.players[msg['player_id']]
-    if player.id == current_user.id and \
+    if player.id == current_user.get_id() and \
             msg['table_id'] in game.tables:
         table = game.tables[msg['table_id']]
         if player.id in table.round.players:
@@ -306,7 +306,7 @@ def send_final_result(msg):
     player_id = msg.get('player_id')
     table_id = msg.get('table_id')
     if player_id and table_id:
-        if player_id == current_user.id and \
+        if player_id == current_user.get_id() and \
                 player_id in game.players and \
                 table_id in game.tables:
             player = game.players.get(player_id)
@@ -327,7 +327,7 @@ def send_final_result(msg):
 def ready_for_next_round(msg):
     player_id = msg.get('player_id')
     table_id = msg.get('table_id')
-    if player_id == current_user.id and \
+    if player_id == current_user.get_id() and \
             table_id in game.tables:
         table = game.tables[table_id]
         table.add_ready_player(player_id)
@@ -380,7 +380,7 @@ def request_round_finish(msg):
 def round_reset(msg):
     player_id = msg['player_id']
     table_id = msg['table_id']
-    if player_id == current_user.id and \
+    if player_id == current_user.get_id() and \
             table_id in game.tables:
         table = game.tables[table_id]
         table.add_ready_player(player_id)
@@ -394,7 +394,7 @@ def round_reset(msg):
 def round_finish(msg):
     player_id = msg['player_id']
     table_id = msg['table_id']
-    if player_id == current_user.id and \
+    if player_id == current_user.get_id() and \
             table_id in game.tables:
         table = game.tables[table_id]
         table.add_ready_player(player_id)
@@ -419,7 +419,7 @@ def round_finish(msg):
 def round_restart(msg):
     player_id = msg['player_id']
     table_id = msg['table_id']
-    if player_id == current_user.id and \
+    if player_id == current_user.get_id() and \
             table_id in game.tables:
         table = game.tables[table_id]
         table.add_ready_player(player_id)
@@ -479,8 +479,8 @@ def index():
 @login_required
 def table(table_id=''):
     if table_id in game.tables and \
-            current_user.id in game.tables[table_id].players:
-        player = game.players[current_user.id]
+            current_user.get_id() in game.tables[table_id].players:
+        player = game.players.get(current_user.get_id())
         table = game.tables[table_id]
         dealer = table.dealer
         # if no card is played already the dealer might deal
@@ -520,8 +520,8 @@ def setup_table(table_id):
     if is_xhr(request) and table_id:
         if table_id in game.tables:
             table = game.tables[table_id]
-            if current_user.id in game.players and \
-                    (current_user.id in table.players or
+            if current_user.get_id() in game.players and \
+                    (current_user.get_id() in table.players or
                      not table.locked):
                 return jsonify({'allowed': True,
                                 'html': render_template('setup_table.html',
