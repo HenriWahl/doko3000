@@ -397,14 +397,17 @@ $(document).ready(function () {
 
     // reload page after setup
     $(document).on('click', '#button_finish_table_setup', function () {
-        // location.reload()
-        $.getJSON('/get/tables',
-            function (data, status) {
-                console.log(data, status)
-                if (status == 'success') {
-                    $('#list_tables').html(data.html)
-                }
-            })
+        if (window.location.pathname.startsWith('/table/')) {
+            location.reload()
+        } else {
+            $.getJSON('/get/tables',
+                function (data, status) {
+                    console.log(data, status)
+                    if (status == 'success') {
+                        $('#list_tables').html(data.html)
+                    }
+                })
+        }
     })
 
     $(document).on('click', '#button_deal_cards_again', function () {
