@@ -1,6 +1,7 @@
 html, body {
     height: 100%;
     user-select: none;
+    overflow-x: hidden;
 }
 
 .background {
@@ -9,6 +10,7 @@ html, body {
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
+    background-attachment: fixed;
 }
 
 #main_content {
@@ -25,15 +27,15 @@ html, body {
     bottom: 0%;
 }
 
-#table {
-    /*margin-right: 0; !important;*/
-    /*padding-right: 0; !important;*/
-}
+/*#table {*/
+/*    !*margin-right: 0; !important;*!*/
+/*    !*padding-right: 0; !important;*!*/
+/*}*/
 
-#hand {
-    /*margin-right: 0; !important;*/
-    /*padding-right: 0; !important;*/
-}
+/*#hand {*/
+/*    !*margin-right: 0; !important;*!*/
+/*    !*padding-right: 0; !important;*!*/
+/*}*/
 
 #index_menu {
     position: fixed;
@@ -43,6 +45,12 @@ html, body {
     left: 0;
     /*z-index: 100;*/
     /*background-color: rgba(0, 0, 0, 0.5);*/
+}
+
+#list_tables {
+    overflow-y: scroll;
+    overvlow-x: hidden;
+    height: 65%;
 }
 
 #hud_players {

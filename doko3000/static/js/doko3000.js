@@ -9,10 +9,14 @@ let cards_locked = false
 
 // show alert messages
 function show_message(place, message) {
-    $(place).after('<div class="mx-3 mt-3 mb-1 alert alert-danger alert-dismissible dialog-message">' +
+    $(place).html('<div class="mx-3 mt-3 mb-1 alert alert-danger alert-dismissible dialog-message">' +
         '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
         message +
         '</div>')
+}
+
+function clear_message(place) {
+    $(place).html('')
 }
 
 $(document).ready(function () {
@@ -263,7 +267,8 @@ $(document).ready(function () {
         $.getJSON('/create/table', function (data, status) {
             console.log(status)
             if (status == 'success') {
-                $("#modal_body").html(data.html)
+                $('#modal_body').html(data.html)
+                clear_message('#modal_message')
                 $('#modal_dialog').modal('show')
             }
         })
@@ -285,7 +290,7 @@ $(document).ready(function () {
             console.log(data)
             if (status == 'success') {
                 if (data.status == 'error') {
-                    show_message('#message_boxes', data.message)
+                    show_message('#modal_message', data.message)
                 } else if (data.status == 'ok') {
                     $('#modal_dialog').modal('hide')
                     $.getJSON('/get/tables',
