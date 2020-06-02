@@ -76,7 +76,8 @@ html, body {
     top: 0;
     z-index: 100;
     /*background-color: rgba(0, 0, 0, 0.5);*/
-    background: linear-gradient(to top, #cccccc00 0%, #111111cc 100%);
+    /*background: linear-gradient(to top, #cccccc00 0%, #111111cc 100%);*/
+    background: linear-gradient(to top, #ffffff00 0%, #111111ff 100%);
 }
 
 .topbar-button {

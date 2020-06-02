@@ -594,3 +594,29 @@ def create_table():
             return redirect(url_for('index'))
     else:
         return redirect(url_for('index'))
+
+@app.route('/create/player', methods=['GET', 'POST'])
+@login_required
+def create_player():
+    """
+    create table via button
+    """
+    if is_xhr(request) and current_user.is_admin:
+        if request.method == 'GET':
+            return jsonify({'html': render_template('index/create_player.html')})
+        elif request.method == 'POST':
+            new_player_id = request.values.get('new_player_id')
+            if new_player_id:
+                if new_player_id in game.players:
+                    return jsonify({'status': 'error',
+                                    'message': 'Diesen Spieler gibt es schon :-('})
+                else:
+                    game.add_player(new_player_id)
+                    return jsonify({'status': 'ok'})
+            else:
+                return jsonify({'status': 'error',
+                                'message': 'Der Spieler braucht einen Namen'})
+        else:
+            return redirect(url_for('index'))
+    else:
+        return redirect(url_for('index'))

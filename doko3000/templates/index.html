@@ -14,8 +14,8 @@
         {% if current_user.is_admin %}
         <div class="col-lg-7 col-xs-12 p-4">
             {% else %}
-            <div class="col-lg-1"></div>
-            <div class="col-lg-10 col-xs-12 p-4">
+            <div class="col-lg-2 col-md-2"></div>
+            <div class="col-lg-8 col-md-10 col-xs-12 p-4">
                 {% endif %}
                 <h3>
                     Tische
@@ -34,7 +34,9 @@
             <div class="col-lg-5 col-xs-12 p-4">
                 <h3>
                     Spieler
-                    <button class="btn btn-success btn-sm float-right disabled"><span class="oi oi-plus mr-1"></span>
+                    <button id="button_create_player"
+                            class="btn btn-success btn-sm float-right">
+                        <span class="oi oi-plus mr-1"></span>
                         Neu
                     </button>
                 </h3>

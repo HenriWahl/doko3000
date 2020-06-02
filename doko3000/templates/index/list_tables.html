@@ -1,9 +1,9 @@
-<table class="table">
+<ul class="list-group">
     {% for table in tables %}
-    <tr
+    <li class="list-group-item"
             id="{{ table.id }}"
             data-table_id="{{ table.id }}">
-        <td class="row">
+        <div class="row">
             <div class="col-md-7 col-sm-12">
                 <strong>
                     {{ table.id }}
@@ -35,7 +35,7 @@
                     <span class="oi oi-wrench"></span>
                 </button>
             </div>
-        </td>
-    </tr>
+        </div>
+    </li>
     {% endfor %}
-</table>
+</ul>

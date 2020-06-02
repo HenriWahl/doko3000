@@ -1,9 +1,11 @@
+<ul class="list-group">
 {% for player in players %}
-<a href="" class="list-group-item list-group-item-action list-item-table"
+<li class="list-group-item list-group-item-action list-item-table"
    id="{{ player.name }}"
    data-player="{{ player.name }}">
     <strong>
         {{ player.name }}
     </strong>
-</a>
+</li>
 {% endfor %}
+</ul>

@@ -261,6 +261,11 @@ $(document).ready(function () {
             })
     })
 
+    // set focus onto defined form field
+    $('#modal_dialog').on('shown.bs.modal', function () {
+        $('.form-focus').focus()
+    })
+
     // create new table
     $(document).on('click', '#button_create_table', function () {
         console.log('create table')
@@ -274,11 +279,6 @@ $(document).ready(function () {
         })
         console.log('done')
         return false
-    })
-
-    // set focus onto new_table_id form field
-    $('#modal_dialog').on('shown.bs.modal', function () {
-        $('#new_table_id').focus()
     })
 
     // parameter 'json' makes it equivalent to non-existing .postJSON
@@ -388,6 +388,22 @@ $(document).ready(function () {
             $('.table_' + $(this).data('table_id') + '_player_' + $(this).data('player_id')).remove()
         }
     })
+
+    // create new user
+    $(document).on('click', '#button_create_player', function () {
+        console.log('create player')
+        $.getJSON('/create/player', function (data, status) {
+            console.log(status)
+            if (status == 'success') {
+                $('#modal_body').html(data.html)
+                clear_message('#modal_message')
+                $('#modal_dialog').modal('show')
+            }
+        })
+        console.log('done')
+        return false
+    })
+
 
     $(document).on('click', '#button_deal_cards', function () {
         console.log('button_deal_cards')
