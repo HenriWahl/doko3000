@@ -38,19 +38,13 @@ html, body {
 /*}*/
 
 #index_menu {
-    position: fixed;
+    /*position: fixed;*/
     top: 10%;
     height: 90%;
     width: 100%;
     left: 0;
     /*z-index: 100;*/
     /*background-color: rgba(0, 0, 0, 0.5);*/
-}
-
-#list_tables {
-    overflow-y: scroll;
-    overvlow-x: hidden;
-    height: 65%;
 }
 
 #hud_players {

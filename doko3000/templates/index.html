@@ -12,22 +12,10 @@
 <div id="index_menu">
     <div class="row">
         {% if current_user.is_admin %}
-        <div class="col-md-6 col-sm-12 p-4">
-            <h3>
-                Spieler
-                <!--                <button class="btn btn-success btn-sm float-right disabled"><span class="oi oi-plus mr-1"></span>Hinzufügen-->
-                <button class="btn btn-success btn-sm float-right disabled"><span class="oi oi-plus mr-1"></span>
-                    Neu
-                </button>
-            </h3>
-            <div class="list-group" id="list_players">
-                {% include 'index/list_players.html' %}
-            </div>
-        </div>
-        <div class="col-md-6 col-sm-12 p-4">
+        <div class="col-lg-7 col-xs-12 p-4">
             {% else %}
-            <div class="col-md-1"></div>
-            <div class="col-md-10 col-sm-12 p-4">
+            <div class="col-lg-1"></div>
+            <div class="col-lg-10 col-xs-12 p-4">
                 {% endif %}
                 <h3>
                     Tische
@@ -42,7 +30,19 @@
                     {% include 'index/list_tables.html' %}
                 </div>
             </div>
+            {% if current_user.is_admin %}
+            <div class="col-lg-5 col-xs-12 p-4">
+                <h3>
+                    Spieler
+                    <button class="btn btn-success btn-sm float-right disabled"><span class="oi oi-plus mr-1"></span>
+                        Neu
+                    </button>
+                </h3>
+                <div class="list-group" id="list_players">
+                    {% include 'index/list_players.html' %}
+                </div>
+            </div>
+            {% endif %}
         </div>
     </div>
-</div>
-{% endblock main_content %}
+    {% endblock main_content %}
