@@ -416,6 +416,31 @@ $(document).ready(function () {
         return false
     })
 
+    // parameter 'json' makes it equivalent to non-existing .postJSON
+    $(document).on('click', '#button_finish_create_player', function () {
+        console.log('create table pressed button')
+        // parameter 'json' makes it equivalent to .getJSON
+        // because there is no .postJSON but .post(..., 'json') so it will be the same for GET and POST here
+        $.post('/create/player', $('#form_create_player').serialize(), function (data, status) {
+            console.log(data)
+            if (status == 'success') {
+                if (data.status == 'error') {
+                    show_message('#modal_message', data.message)
+                } else if (data.status == 'ok') {
+                    $('#modal_dialog').modal('hide')
+                    $.getJSON('/get/players',
+                        function (data, status) {
+                            console.log(data, status)
+                            if (status == 'success') {
+                                $('#list_players').html(data.html)
+                            }
+                        })
+                }
+            }
+        }, 'json')
+        return false
+    })
+
     $(document).on('click', '#button_deal_cards', function () {
         console.log('button_deal_cards')
         socket.emit('deal-cards', {
