@@ -92,6 +92,7 @@ def played_card(msg):
                 table.round.current_trick.add_turn(player.id, card_id)
                 table.round.increase_turn_count()
                 card = Deck.cards[card_id]
+                card.played_by = player.id
                 player.remove_card(card.id)
                 is_last_turn = table.round.current_trick.is_last_turn()
                 current_player_id = table.round.get_current_player()

@@ -102,7 +102,7 @@ $(document).ready(function () {
         // }
 
         $('#table').html(msg.html.table)
-        $('#card_' + msg.card_id).attr('title', msg.player_id)
+        // $('#card_' + msg.card_id).attr('title', msg.player_id)
 
         if (msg.is_last_turn) {
             cards_locked = true
