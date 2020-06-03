@@ -570,6 +570,19 @@ def get_html_tables():
         return redirect(url_for('index'))
 
 
+@app.route('/get/players')
+@login_required
+def get_html_players():
+    """
+    get HTML list of players to refresh index.html players list after changes
+    """
+    if is_xhr(request):
+        players = game.get_players()
+        return jsonify({'html': render_template('index/list_players.html',
+                                                players=players)})
+    else:
+        return redirect(url_for('index'))
+
 @app.route('/create/table', methods=['GET', 'POST'])
 @login_required
 def create_table():
@@ -607,13 +620,19 @@ def create_player():
             return jsonify({'html': render_template('index/create_player.html')})
         elif request.method == 'POST':
             new_player_id = request.values.get('new_player_id')
+            new_player_password = request.values.get('new_player_password')
             if new_player_id:
                 if new_player_id in game.players:
                     return jsonify({'status': 'error',
                                     'message': 'Diesen Spieler gibt es schon :-('})
                 else:
-                    game.add_player(new_player_id)
-                    return jsonify({'status': 'ok'})
+                    if new_player_password:
+                        player = game.add_player(new_player_id)
+                        player.set_password(new_player_password)
+                        return jsonify({'status': 'ok'})
+                    else:
+                        return jsonify({'status': 'error',
+                                        'message': 'Der Spieler braucht eine Passwort'})
             else:
                 return jsonify({'status': 'error',
                                 'message': 'Der Spieler braucht einen Namen'})
