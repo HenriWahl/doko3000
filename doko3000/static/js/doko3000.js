@@ -404,6 +404,11 @@ $(document).ready(function () {
         return false
     })
 
+    $(document).on('click', '#button_password_from_player', function () {
+        $('#new_player_password').val($('#new_player_id').val())
+        return false
+    })
+
 
     $(document).on('click', '#button_deal_cards', function () {
         console.log('button_deal_cards')
