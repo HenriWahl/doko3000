@@ -404,11 +404,17 @@ $(document).ready(function () {
         return false
     })
 
+    // take player id as password
     $(document).on('click', '#button_password_from_player', function () {
         $('#new_player_password').val($('#new_player_id').val())
         return false
     })
 
+    // create random password
+    $(document).on('click', '#button_password_from_random', function () {
+        $('#new_player_password').val(btoa(Math.random()).substr(5, 8))
+        return false
+    })
 
     $(document).on('click', '#button_deal_cards', function () {
         console.log('button_deal_cards')
