@@ -381,7 +381,7 @@ $(document).ready(function () {
         if (player_id != $(this).data('player_id')) {
             // used too if player leaves table via menu
             socket.emit('setup-table-change', {
-                action: 'delete_player',
+                action: 'remove_player',
                 player_id: $(this).data('player_id'),
                 table_id: $(this).data('table_id')
             })

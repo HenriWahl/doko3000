@@ -139,7 +139,7 @@ def enter_table(msg):
     if table_id in game.tables:
         table = game.tables[table_id]
         if player_id in table.players:
-            if action == 'delete_player':
+            if action == 'remove_player':
                 table.remove_player(player_id)
                 leave_room(table_id)
             elif action == 'lock_table':
@@ -659,10 +659,9 @@ def delete_player(player_id):
                                                     player_id=player_id)})
         elif request.method == 'POST':
             player = game.players[player_id]
-            if new_player_id:
-                if new_player_id in game.players:
-                    return jsonify({'status': 'error',
-                                    'message': 'Diesen Spieler gibt es schon :-('})
+            if not player.is_playing():
+                if game.delete_player(player_id):
+                    return jsonify({'status': 'ok'})
                 else:
                     if new_player_password:
                         player = game.add_player(new_player_id)

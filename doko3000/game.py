@@ -152,6 +152,17 @@ class Player(UserMixin, Document):
         self['table'] = value
         self.save()
 
+    def is_playing(self):
+        """
+        double-check if player sits at some table - make sure it can be deleted
+        """
+        for table in self.game.tables:
+            if self.id in table.players:
+                # just in case the table was not stored yet
+                self.table = table.id
+                return True
+        return False
+
     # @property
     # def left(self):
     #     return self['left']
@@ -719,12 +730,14 @@ class Table(Document):
             self.round.trick_order.pop(self.round.trick_order.index(player_id))
         if self.round.current_player == player_id:
             self.round.current_player == ''
+        self.game.players[player_id].table = ''
         if player_id not in self.players and \
                 player_id not in self.order and \
                 player_id not in self.round.players and\
                 player_id not in self.round.trick_order:
             self.round.save()
             self.save()
+            self.game.players[player_id].save()
 
     def add_round(self):
         """
@@ -834,8 +847,18 @@ class Game:
     def get_tables(self):
         return self.tables.values()
 
-    def get_tables_names(self):
-        return list(self.tables.keys())
-
     def get_players(self):
         return self.players.values()
+
+    def delete_player(self, player_id):
+        for table in self.tables:
+            if player_id in table.players:
+                table.players.pop(table.players.index(player_id))
+                table.save()
+        for round in self.rounds:
+            if player_id in round.players:
+                round.players.pop(round.players.index(player_id))
+                round.save()
+        self.players.pop(player_id)
+        self.db.
+        return True
