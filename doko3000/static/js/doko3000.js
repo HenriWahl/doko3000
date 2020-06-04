@@ -441,6 +441,39 @@ $(document).ready(function () {
         return false
     })
 
+    // delete a player in the draggable players order
+    $(document).on('click', '.button-delete-player', function () {
+        console.log('remove player really',  encodeURIComponent($(this).data('player_id')))
+        if (player_id != $(this).data('player_id')) {
+            $.getJSON('/delete/player/' + encodeURIComponent($(this).data('player_id')),
+                function (data, status) {
+                    console.log(data, status)
+                    if (status == 'success') {
+                        $('#modal_body').html(data.html)
+                        clear_message('#modal_message')
+                        $('#modal_dialog').modal('show')
+                    }
+                })
+        }
+    })
+
+    // really delete player after safety dialog
+    $(document).on('click', '#button_really_delete_player', function () {
+        console.log('remove player really really really',  encodeURIComponent($(this).data('player_id')))
+        if (player_id != $(this).data('player_id')) {
+            // once again the .post + 'json' move
+            $.post('/delete/player/' + encodeURIComponent($(this).data('player_id')),
+                function (data, status) {
+                    console.log(data, status)
+                    if (status == 'success') {
+                        $('#modal_body').html(data.html)
+                        clear_message('#modal_message')
+                        $('#modal_dialog').modal('show')
+                    }
+                }, 'json')
+        }
+    })
+
     $(document).on('click', '#button_deal_cards', function () {
         console.log('button_deal_cards')
         socket.emit('deal-cards', {

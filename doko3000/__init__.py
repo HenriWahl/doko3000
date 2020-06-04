@@ -583,6 +583,7 @@ def get_html_players():
     else:
         return redirect(url_for('index'))
 
+
 @app.route('/create/table', methods=['GET', 'POST'])
 @login_required
 def create_table():
@@ -609,6 +610,7 @@ def create_table():
     else:
         return redirect(url_for('index'))
 
+
 @app.route('/create/player', methods=['GET', 'POST'])
 @login_required
 def create_player():
@@ -621,6 +623,42 @@ def create_player():
         elif request.method == 'POST':
             new_player_id = request.values.get('new_player_id')
             new_player_password = request.values.get('new_player_password')
+            if new_player_id:
+                if new_player_id in game.players:
+                    return jsonify({'status': 'error',
+                                    'message': 'Diesen Spieler gibt es schon :-('})
+                else:
+                    if new_player_password:
+                        player = game.add_player(new_player_id)
+                        player.set_password(new_player_password)
+                        return jsonify({'status': 'ok'})
+                    else:
+                        return jsonify({'status': 'error',
+                                        'message': 'Der Spieler braucht eine Passwort'})
+            else:
+                return jsonify({'status': 'error',
+                                'message': 'Der Spieler braucht einen Namen'})
+        else:
+            return redirect(url_for('index'))
+    else:
+        return redirect(url_for('index'))
+
+
+@app.route('/delete/player/<player_id>', methods=['GET', 'POST'])
+@login_required
+def delete_player(player_id):
+    """
+    delete player from players list on index page and thus from game at all
+    """
+    if is_xhr(request) and \
+            current_user.is_admin and \
+            player_id in game.players:
+        if request.method == 'GET':
+            return jsonify({'status': 'ok',
+                            'html': render_template('index/delete_player.html',
+                                                    player_id=player_id)})
+        elif request.method == 'POST':
+            player = game.players[player_id]
             if new_player_id:
                 if new_player_id in game.players:
                     return jsonify({'status': 'error',
