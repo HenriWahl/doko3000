@@ -496,6 +496,9 @@ class Round(Document):
         """
         shuffle cards
         """
+        # clear cards' played_by property
+        for card in self.cards:
+            card.played_by = ''
         # very important for game - some randomness
         seed()
         shuffle(self.cards)
