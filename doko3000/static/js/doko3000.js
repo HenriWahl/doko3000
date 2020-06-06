@@ -466,9 +466,7 @@ $(document).ready(function () {
                 function (data, status) {
                     console.log(data, status)
                     if (status == 'success') {
-                        $('#modal_body').html(data.html)
-                        clear_message('#modal_message')
-                        $('#modal_dialog').modal('show')
+                        $('#list_players').html(data.html)
                     }
                 }, 'json')
         }

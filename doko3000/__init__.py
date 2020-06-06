@@ -468,8 +468,8 @@ def logout():
 @app.route('/', methods=['GET', 'POST'])
 @login_required
 def index():
-    players = game.get_players()
-    tables = game.get_tables()
+    players = game.players.values()
+    tables = game.tables.values()
     return render_template('index.html',
                            tables=tables,
                            players=players,
@@ -505,7 +505,7 @@ def table(table_id=''):
                                cards_hand=cards_hand,
                                cards_table=cards_table,
                                score=score)
-    tables = game.get_tables()
+    tables = game.tables.values()
     return render_template('index.html',
                            tables=tables,
                            title=f"{app.config['TITLE']}")
@@ -563,7 +563,7 @@ def get_html_tables():
     get HTML list of tables to refresh index.html tables list after changes
     """
     if is_xhr(request):
-        tables = game.get_tables()
+        tables = game.tables.values()
         return jsonify({'html': render_template('index/list_tables.html',
                                                 tables=tables)})
     else:
@@ -577,7 +577,7 @@ def get_html_players():
     get HTML list of players to refresh index.html players list after changes
     """
     if is_xhr(request):
-        players = game.get_players()
+        players = game.players.values()
         return jsonify({'html': render_template('index/list_players.html',
                                                 players=players)})
     else:
@@ -629,8 +629,8 @@ def create_player():
                                     'message': 'Diesen Spieler gibt es schon :-('})
                 else:
                     if new_player_password:
-                        player = game.add_player(new_player_id)
-                        player.set_password(new_player_password)
+                        player = game.add_player(player_id=new_player_id, password=new_player_password)
+                        # player.set_password(new_player_password)
                         return jsonify({'status': 'ok'})
                     else:
                         return jsonify({'status': 'error',
@@ -661,7 +661,10 @@ def delete_player(player_id):
             player = game.players[player_id]
             if not player.is_playing():
                 if game.delete_player(player_id):
-                    return jsonify({'status': 'ok'})
+                    players = game.players.values()
+                    return jsonify({'status': 'ok',
+                                    'html': render_template('index/list_players.html',
+                                                players=players)})
                 else:
                     if new_player_password:
                         player = game.add_player(new_player_id)
