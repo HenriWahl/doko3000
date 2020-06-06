@@ -45,20 +45,27 @@ $(document).ready(function () {
                 table_id: $(card).data('table_id')
             })
         } else if (source.id == 'hand' && target.id == 'hand') {
-            // get cards order to end it to server for storing it
-            // let cards_hand = $('#hand').children('.game-card-hand')
-            let cards_hand_ids = []
-            for (let card_hand of $('#hand').children('.game-card-hand')) {
-                cards_hand_ids.push($(card_hand).data('id'))
+            // check if card and hand have the same timestamp - otherwise someone dealed new cards
+            // and the dragged card does not belong to the current cards
+            console.log($(card).data('timestamp'), $('#cards_hand_timestamp').data('timestamp'))
+            if ($(card).data('timestamp') == $('#cards_hand_timestamp').data('timestamp')) {
+                // get cards order to end it to server for storing it
+                let cards_hand_ids = []
+                for (let card_hand of $('#hand').children('.game-card-hand')) {
+                    cards_hand_ids.push($(card_hand).data('id'))
+                }
+                socket.emit('sorted-cards', {
+                    player_id: player_id,
+                    table_id: $(card).data('table_id'),
+                    cards_hand_ids: cards_hand_ids
+                })
+                // to avoid later mess (cards stack inside the cards at hand) move stack to end
+                $('#cards_stack').appendTo('#hand')
+                return true
+            } else {
+                // card does not belong to hand because the dealer dealed again while the card was dragged around
+                $(card).remove()
             }
-            socket.emit('sorted-cards', {
-                player_id: player_id,
-                table_id: $(card).data('table_id'),
-                cards_hand_ids: cards_hand_ids
-            })
-            // to avoid later mess (cards stack inside the cards at hand) move stack to end
-            $('#cards_stack').appendTo('#hand')
-            return true
         } else if (source.id == 'table' || cards_locked || player_id != current_player_id) {
             dragging_cards.cancel(true)
         }
@@ -443,7 +450,7 @@ $(document).ready(function () {
 
     // delete a player in the draggable players order
     $(document).on('click', '.button-delete-player', function () {
-        console.log('remove player really',  encodeURIComponent($(this).data('player_id')))
+        console.log('remove player really', encodeURIComponent($(this).data('player_id')))
         if (player_id != $(this).data('player_id')) {
             $.getJSON('/delete/player/' + encodeURIComponent($(this).data('player_id')),
                 function (data, status) {
@@ -459,7 +466,7 @@ $(document).ready(function () {
 
     // really delete player after safety dialog
     $(document).on('click', '#button_really_delete_player', function () {
-        console.log('remove player really really really',  encodeURIComponent($(this).data('player_id')))
+        console.log('remove player really really really', encodeURIComponent($(this).data('player_id')))
         if (player_id != $(this).data('player_id')) {
             // once again the .post + 'json' move
             $.post('/delete/player/' + encodeURIComponent($(this).data('player_id')),

@@ -208,6 +208,7 @@ def deal_cards_to_player(msg):
                     current_player_id = table.round.current_player
                     if player.id in table.round.players:
                         cards_hand = player.get_cards()
+                        timestamp = int(time()*100000)
                         socketio.emit('your-cards-please',
                                       {'player_id': player.id,
                                        'turn_count': table.round.turn_count,
@@ -217,7 +218,8 @@ def deal_cards_to_player(msg):
                                        'html': {'cards_hand': render_template('cards/hand.html',
                                                                               cards_hand=cards_hand,
                                                                               table=table,
-                                                                              player=player),
+                                                                              player=player,
+                                                                              timestamp=timestamp),
                                                 'hud_players': render_template('top/hud_players.html',
                                                                                table=table,
                                                                                player=player,
@@ -493,6 +495,7 @@ def table(table_id=''):
         current_player_id = table.round.current_player
         cards_hand = player.get_cards()
         cards_table = table.round.current_trick.get_cards()
+        timestamp = int(time() * 100000)
         score = table.round.get_score()
         return render_template('table.html',
                                title=f"{app.config['TITLE']} {table_id}",
@@ -504,6 +507,7 @@ def table(table_id=''):
                                current_player_id=current_player_id,
                                cards_hand=cards_hand,
                                cards_table=cards_table,
+                               timestamp=timestamp,
                                score=score)
     tables = game.tables.values()
     return render_template('index.html',
