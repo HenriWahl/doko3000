@@ -1,0 +1,53 @@
+<form id="form_create_player">
+    <div class="row">
+    </div>
+    <div class="row">
+        <div class="col-12 input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text"><i class="oi oi-person"></i></span>
+            </div>
+            <input type="text"
+                   class="form-control form-focus"
+                   id="new_player_id"
+                   placeholder="Neuer Spieler"
+                   name="new_player_id">
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text mt-3"><i class="oi oi-key"></i></span>
+            </div>
+            <input type="text"
+                   class="form-control mt-3"
+                   id="new_player_password"
+                   placeholder="Passwort"
+                   name="new_player_password">
+            <div class="input-group-append">
+                <button class="btn btn-outline-primary mt-3 text-nowrap"
+                        id="button_password_from_player"
+                        name="button_password_from_player">
+                    <span class="oi oi-person"></span>
+                    <span class="oi oi-arrow-right"></span>
+                    <span class="oi oi-key"></span>
+                </button>
+                <button class="btn btn-outline-primary mt-3 text-nowrap"
+                        id="button_password_from_random"
+                        name="button_password_from_random">
+                    <span class="oi oi-question-mark"></span>
+                    <span class="oi oi-arrow-right"></span>
+                    <span class="oi oi-key"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-3">
+        <div class="col-6" id="button_finish_create_player">
+            <button class="btn btn-outline-success btn-block btn"><strong>Anlegen</strong>
+            </button>
+        </div>
+        <div class="col-6">
+            <button class="btn btn-outline-primary btn-block btn" data-dismiss="modal"><strong>Zurück</strong>
+            </button>
+        </div>
+</form>

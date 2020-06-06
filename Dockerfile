@@ -1,4 +1,4 @@
-FROM python:3.7
+FROM python:3.8
 LABEL maintainer=h.wahl@ifw-dresden.de
 
 RUN apt -y update &&\

@@ -25,10 +25,10 @@ def run():
 def add_player(player_id, password, is_admin):
     if password == None:
         password = player_id
-    game.add_player(player_id)
-    game.players[player_id].set_password(password)
-    if is_admin:
-        game.players[player_id].is_admin = True
+    game.add_player(player_id, password, is_admin)
+    # game.players[player_id].set_password(password)
+    # if is_admin:
+    #     game.players[player_id].is_admin = True
 
 @run.command(help='Add table <table_id>')
 @click.argument('table_id', default=False)

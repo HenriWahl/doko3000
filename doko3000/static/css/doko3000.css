@@ -1,6 +1,7 @@
 html, body {
     height: 100%;
     user-select: none;
+    overflow-x: hidden;
 }
 
 .background {
@@ -9,6 +10,7 @@ html, body {
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
+    background-attachment: fixed;
 }
 
 #main_content {
@@ -25,18 +27,18 @@ html, body {
     bottom: 0%;
 }
 
-#table {
-    /*margin-right: 0; !important;*/
-    /*padding-right: 0; !important;*/
-}
+/*#table {*/
+/*    !*margin-right: 0; !important;*!*/
+/*    !*padding-right: 0; !important;*!*/
+/*}*/
 
-#hand {
-    /*margin-right: 0; !important;*/
-    /*padding-right: 0; !important;*/
-}
+/*#hand {*/
+/*    !*margin-right: 0; !important;*!*/
+/*    !*padding-right: 0; !important;*!*/
+/*}*/
 
 #index_menu {
-    position: fixed;
+    /*position: fixed;*/
     top: 10%;
     height: 90%;
     width: 100%;
@@ -74,7 +76,8 @@ html, body {
     top: 0;
     z-index: 100;
     /*background-color: rgba(0, 0, 0, 0.5);*/
-    background: linear-gradient(to top, #cccccc00 0%, #111111cc 100%);
+    /*background: linear-gradient(to top, #cccccc00 0%, #111111cc 100%);*/
+    background: linear-gradient(to top, #ffffff00 0%, #111111ff 100%);
 }
 
 .topbar-button {
@@ -123,6 +126,6 @@ html, body {
 !important;
 }
 
-.button-remove-player-from-table {
-    border-style: none;
-}
+/*.button-remove-player-from-table {*/
+/*    border-style: none;*/
+/*}*/

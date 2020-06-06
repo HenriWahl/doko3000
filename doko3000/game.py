@@ -152,6 +152,17 @@ class Player(UserMixin, Document):
         self['table'] = value
         self.save()
 
+    def is_playing(self):
+        """
+        double-check if player sits at some table - make sure it can be deleted
+        """
+        for table in self.game.tables.values():
+            if self.id in table.players:
+                # just in case the table was not stored yet
+                self.table = table.id
+                return True
+        return False
+
     # @property
     # def left(self):
     #     return self['left']
@@ -485,6 +496,9 @@ class Round(Document):
         """
         shuffle cards
         """
+        # clear cards' played_by property
+        #for card in self.cards:
+        #    card.played_by = ''
         # very important for game - some randomness
         seed()
         shuffle(self.cards)
@@ -719,12 +733,14 @@ class Table(Document):
             self.round.trick_order.pop(self.round.trick_order.index(player_id))
         if self.round.current_player == player_id:
             self.round.current_player == ''
+        self.game.players[player_id].table = ''
         if player_id not in self.players and \
                 player_id not in self.order and \
                 player_id not in self.round.players and\
                 player_id not in self.round.trick_order:
             self.round.save()
             self.save()
+            self.game.players[player_id].save()
 
     def add_round(self):
         """
@@ -794,6 +810,12 @@ class Game:
         for player_id, document in self.db.filter_by_type('player').items():
             self.players[player_id] = Player(document_id=document['_id'], game=self)
 
+        # if no player exists create a dummy admin account
+        if len(self.players) == 0:
+            self.add_player(player_id='admin',
+                            password='admin',
+                            is_admin=True)
+
         # all tricks belonging to certain rounds shall stay in CouchDB too
         self.tricks = {}
         for trick_id, document in self.db.filter_by_type('trick').items():
@@ -809,12 +831,16 @@ class Game:
         for table_id, document in self.db.filter_by_type('table').items():
             self.tables[table_id] = Table(document_id=document['_id'], game=self)
 
-    def add_player(self, player_id=''):
+    def add_player(self, player_id='', password='', is_admin=False):
         """
         adds a new player
         """
         if player_id and player_id not in self.players:
             self.players[player_id] = Player(player_id=player_id, game=self)
+            if password:
+                self.players[player_id].set_password(password)
+            if is_admin:
+                self.players[player_id].is_admin = True
         return self.players.get(player_id)
 
     def add_table(self, table_id=''):
@@ -825,17 +851,20 @@ class Game:
             self.tables[table_id] = Table(table_id=table_id, game=self)
         return self.tables.get(table_id)
 
-    def has_tables(self):
-        if len(self.tables) == 0:
-            return False
-        else:
+    def delete_player(self, player_id):
+        """
+        remove all traces of a player which is going to be deleted
+        """
+        for table in self.tables.values():
+            if player_id in table.players:
+                table.players.pop(table.players.index(player_id))
+                table.save()
+        for round in self.rounds.values():
+            if player_id in round.players:
+                round.players.pop(round.players.index(player_id))
+                round.save()
+        if player_id in self.players:
+            self.players[player_id].delete()
+            self.players.pop(player_id)
             return True
-
-    def get_tables(self):
-        return self.tables.values()
-
-    def get_tables_names(self):
-        return list(self.tables.keys())
-
-    def get_players(self):
-        return self.players.values()
+        return False

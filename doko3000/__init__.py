@@ -139,7 +139,7 @@ def enter_table(msg):
     if table_id in game.tables:
         table = game.tables[table_id]
         if player_id in table.players:
-            if action == 'delete_player':
+            if action == 'remove_player':
                 table.remove_player(player_id)
                 leave_room(table_id)
             elif action == 'lock_table':
@@ -468,8 +468,8 @@ def logout():
 @app.route('/', methods=['GET', 'POST'])
 @login_required
 def index():
-    players = game.get_players()
-    tables = game.get_tables()
+    players = game.players.values()
+    tables = game.tables.values()
     return render_template('index.html',
                            tables=tables,
                            players=players,
@@ -505,7 +505,7 @@ def table(table_id=''):
                                cards_hand=cards_hand,
                                cards_table=cards_table,
                                score=score)
-    tables = game.get_tables()
+    tables = game.tables.values()
     return render_template('index.html',
                            tables=tables,
                            title=f"{app.config['TITLE']}")
@@ -563,9 +563,23 @@ def get_html_tables():
     get HTML list of tables to refresh index.html tables list after changes
     """
     if is_xhr(request):
-        tables = game.get_tables()
+        tables = game.tables.values()
         return jsonify({'html': render_template('index/list_tables.html',
                                                 tables=tables)})
+    else:
+        return redirect(url_for('index'))
+
+
+@app.route('/get/players')
+@login_required
+def get_html_players():
+    """
+    get HTML list of players to refresh index.html players list after changes
+    """
+    if is_xhr(request):
+        players = game.players.values()
+        return jsonify({'html': render_template('index/list_players.html',
+                                                players=players)})
     else:
         return redirect(url_for('index'))
 
@@ -591,6 +605,77 @@ def create_table():
             else:
                 return jsonify({'status': 'error',
                                 'message': 'Der Tisch braucht einen Namen'})
+        else:
+            return redirect(url_for('index'))
+    else:
+        return redirect(url_for('index'))
+
+
+@app.route('/create/player', methods=['GET', 'POST'])
+@login_required
+def create_player():
+    """
+    create table via button
+    """
+    if is_xhr(request) and current_user.is_admin:
+        if request.method == 'GET':
+            return jsonify({'html': render_template('index/create_player.html')})
+        elif request.method == 'POST':
+            new_player_id = request.values.get('new_player_id')
+            new_player_password = request.values.get('new_player_password')
+            if new_player_id:
+                if new_player_id in game.players:
+                    return jsonify({'status': 'error',
+                                    'message': 'Diesen Spieler gibt es schon :-('})
+                else:
+                    if new_player_password:
+                        player = game.add_player(player_id=new_player_id, password=new_player_password)
+                        # player.set_password(new_player_password)
+                        return jsonify({'status': 'ok'})
+                    else:
+                        return jsonify({'status': 'error',
+                                        'message': 'Der Spieler braucht eine Passwort'})
+            else:
+                return jsonify({'status': 'error',
+                                'message': 'Der Spieler braucht einen Namen'})
+        else:
+            return redirect(url_for('index'))
+    else:
+        return redirect(url_for('index'))
+
+
+@app.route('/delete/player/<player_id>', methods=['GET', 'POST'])
+@login_required
+def delete_player(player_id):
+    """
+    delete player from players list on index page and thus from game at all
+    """
+    if is_xhr(request) and \
+            current_user.is_admin and \
+            player_id in game.players:
+        if request.method == 'GET':
+            return jsonify({'status': 'ok',
+                            'html': render_template('index/delete_player.html',
+                                                    player_id=player_id)})
+        elif request.method == 'POST':
+            player = game.players[player_id]
+            if not player.is_playing():
+                if game.delete_player(player_id):
+                    players = game.players.values()
+                    return jsonify({'status': 'ok',
+                                    'html': render_template('index/list_players.html',
+                                                players=players)})
+                else:
+                    if new_player_password:
+                        player = game.add_player(new_player_id)
+                        player.set_password(new_player_password)
+                        return jsonify({'status': 'ok'})
+                    else:
+                        return jsonify({'status': 'error',
+                                        'message': 'Der Spieler braucht eine Passwort'})
+            else:
+                return jsonify({'status': 'error',
+                                'message': 'Der Spieler braucht einen Namen'})
         else:
             return redirect(url_for('index'))
     else:

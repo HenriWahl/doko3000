@@ -1,0 +1,12 @@
+<form id="form_delete_player">
+    <div class="mb-3 text-center"><strong>Soll {{ player_id }} tatsächlich gelöscht werden?</strong></div>
+    <div class="row">
+        <div class="col-6" id="button_really_delete_player" data-player_id="{{ player_id }}">
+            <button class="btn btn-outline-danger btn-block" data-dismiss="modal"><strong>Ja</strong></button>
+        </div>
+        <div class="col-6">
+            <button class="btn btn-outline-success btn-block" data-dismiss="modal"><strong>Nein</strong></button>
+        </div>
+    </div>
+    <input type="hidden" id="player_id" name="player_id" value="{{ player_id }}">
+</form>

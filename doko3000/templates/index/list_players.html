@@ -1,9 +1,17 @@
-{% for player in players %}
-<a href="" class="list-group-item list-group-item-action list-item-table"
-   id="{{ player.name }}"
-   data-player="{{ player.name }}">
-    <strong>
-        {{ player.name }}
-    </strong>
-</a>
-{% endfor %}
+<ul class="list-group">
+    {% for player in players %}
+    <li class="list-group-item list-group-item-action list-item-table"
+        id="{{ player.id }}"
+        data-player="{{ player.id }}">
+        <strong>
+            {{ player.name }}
+        </strong>
+        <button class="oi oi-trash float-right btn btn-outline-danger button-delete-player"
+                data-player_id="{{ player.id }}">
+        </button>
+        <button class="oi oi-cog float-right btn btn-outline-info button-player-set-password mr-2"
+                data-player_id="{{ player.id }}">
+        </button>
+    </li>
+    {% endfor %}
+</ul>

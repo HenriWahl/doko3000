@@ -9,10 +9,14 @@ let cards_locked = false
 
 // show alert messages
 function show_message(place, message) {
-    $(place).after('<div class="mx-3 mt-3 mb-1 alert alert-danger alert-dismissible dialog-message">' +
+    $(place).html('<div class="mx-3 mt-3 mb-1 alert alert-danger alert-dismissible dialog-message">' +
         '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
         message +
         '</div>')
+}
+
+function clear_message(place) {
+    $(place).html('')
 }
 
 $(document).ready(function () {
@@ -257,23 +261,24 @@ $(document).ready(function () {
             })
     })
 
+    // set focus onto defined form field
+    $('#modal_dialog').on('shown.bs.modal', function () {
+        $('.form-focus').focus()
+    })
+
     // create new table
     $(document).on('click', '#button_create_table', function () {
         console.log('create table')
         $.getJSON('/create/table', function (data, status) {
             console.log(status)
             if (status == 'success') {
-                $("#modal_body").html(data.html)
+                $('#modal_body').html(data.html)
+                clear_message('#modal_message')
                 $('#modal_dialog').modal('show')
             }
         })
         console.log('done')
         return false
-    })
-
-    // set focus onto new_table_id form field
-    $('#modal_dialog').on('shown.bs.modal', function () {
-        $('#new_table_id').focus()
     })
 
     // parameter 'json' makes it equivalent to non-existing .postJSON
@@ -285,7 +290,7 @@ $(document).ready(function () {
             console.log(data)
             if (status == 'success') {
                 if (data.status == 'error') {
-                    show_message('#message_boxes', data.message)
+                    show_message('#modal_message', data.message)
                 } else if (data.status == 'ok') {
                     $('#modal_dialog').modal('hide')
                     $.getJSON('/get/tables',
@@ -376,11 +381,94 @@ $(document).ready(function () {
         if (player_id != $(this).data('player_id')) {
             // used too if player leaves table via menu
             socket.emit('setup-table-change', {
-                action: 'delete_player',
+                action: 'remove_player',
                 player_id: $(this).data('player_id'),
                 table_id: $(this).data('table_id')
             })
             $('.table_' + $(this).data('table_id') + '_player_' + $(this).data('player_id')).remove()
+        }
+    })
+
+    // create new user
+    $(document).on('click', '#button_create_player', function () {
+        console.log('create player')
+        $.getJSON('/create/player', function (data, status) {
+            console.log(status)
+            if (status == 'success') {
+                $('#modal_body').html(data.html)
+                clear_message('#modal_message')
+                $('#modal_dialog').modal('show')
+            }
+        })
+        console.log('done')
+        return false
+    })
+
+    // take player id as password
+    $(document).on('click', '#button_password_from_player', function () {
+        $('#new_player_password').val($('#new_player_id').val())
+        return false
+    })
+
+    // create random password
+    $(document).on('click', '#button_password_from_random', function () {
+        $('#new_player_password').val(btoa(Math.random()).substr(5, 8))
+        return false
+    })
+
+    // parameter 'json' makes it equivalent to non-existing .postJSON
+    $(document).on('click', '#button_finish_create_player', function () {
+        console.log('create table pressed button')
+        // parameter 'json' makes it equivalent to .getJSON
+        // because there is no .postJSON but .post(..., 'json') so it will be the same for GET and POST here
+        $.post('/create/player', $('#form_create_player').serialize(), function (data, status) {
+            console.log(data)
+            if (status == 'success') {
+                if (data.status == 'error') {
+                    show_message('#modal_message', data.message)
+                } else if (data.status == 'ok') {
+                    $('#modal_dialog').modal('hide')
+                    $.getJSON('/get/players',
+                        function (data, status) {
+                            console.log(data, status)
+                            if (status == 'success') {
+                                $('#list_players').html(data.html)
+                            }
+                        })
+                }
+            }
+        }, 'json')
+        return false
+    })
+
+    // delete a player in the draggable players order
+    $(document).on('click', '.button-delete-player', function () {
+        console.log('remove player really',  encodeURIComponent($(this).data('player_id')))
+        if (player_id != $(this).data('player_id')) {
+            $.getJSON('/delete/player/' + encodeURIComponent($(this).data('player_id')),
+                function (data, status) {
+                    console.log(data, status)
+                    if (status == 'success') {
+                        $('#modal_body').html(data.html)
+                        clear_message('#modal_message')
+                        $('#modal_dialog').modal('show')
+                    }
+                })
+        }
+    })
+
+    // really delete player after safety dialog
+    $(document).on('click', '#button_really_delete_player', function () {
+        console.log('remove player really really really',  encodeURIComponent($(this).data('player_id')))
+        if (player_id != $(this).data('player_id')) {
+            // once again the .post + 'json' move
+            $.post('/delete/player/' + encodeURIComponent($(this).data('player_id')),
+                function (data, status) {
+                    console.log(data, status)
+                    if (status == 'success') {
+                        $('#list_players').html(data.html)
+                    }
+                }, 'json')
         }
     })
 
