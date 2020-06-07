@@ -35,15 +35,20 @@ $(document).ready(function () {
             dragging_cards.cancel(true)
         } else if (source.id == 'hand' && target.id == 'table' && player_id == current_player_id && !cards_locked) {
             console.log(card.id == 'cards_stack')
-            $('#table').append(card)
-            // add tooltip
-            $(card).attr('title', player_id)
-            socket.emit('played-card', {
-                player_id: player_id,
-                card_id: $(card).data('id'),
-                card_name: $(card).data('name'),
-                table_id: $(card).data('table_id')
-            })
+            if ($(card).data('timestamp') == $('#cards_table_timestamp').data('timestamp')) {
+                $('#table').append(card)
+                // add tooltip
+                $(card).attr('title', player_id)
+                socket.emit('played-card', {
+                    player_id: player_id,
+                    card_id: $(card).data('id'),
+                    card_name: $(card).data('name'),
+                    table_id: $(card).data('table_id')
+                })
+            } else {
+                // card does not belong to hand because the dealer dealed again while the card was dragged around
+                $(card).remove()
+            }
         } else if (source.id == 'hand' && target.id == 'hand') {
             // check if card and hand have the same timestamp - otherwise someone dealed new cards
             // and the dragged card does not belong to the current cards

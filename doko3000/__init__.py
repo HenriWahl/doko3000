@@ -207,7 +207,7 @@ def deal_cards_to_player(msg):
                     current_player_id = table.round.current_player
                     if player.id in table.round.players:
                         cards_hand = player.get_cards()
-                        timestamp = int(time()*100000)
+                        timestamp = table.round.timestamp
                         socketio.emit('your-cards-please',
                                       {'player_id': player.id,
                                        'turn_count': table.round.turn_count,
@@ -494,7 +494,7 @@ def table(table_id=''):
         current_player_id = table.round.current_player
         cards_hand = player.get_cards()
         cards_table = table.round.current_trick.get_cards()
-        timestamp = int(time() * 100000)
+        timestamp = table.round.timestamp
         score = table.round.get_score()
         return render_template('table.html',
                                title=f"{app.config['TITLE']} {table_id}",

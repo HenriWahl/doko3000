@@ -3,6 +3,7 @@
 from json import dumps
 from random import seed, \
     shuffle
+from time import time
 
 from cloudant.document import Document
 from flask_login import UserMixin
@@ -312,6 +313,8 @@ class Round(Document):
     """
     eternal round, part of a table
     """
+    # store moment of shuffling for comparing cards when being sorted and freshly dealed at one time
+    timestamp = 0
 
     def __init__(self, players=[], game=None, round_id='', document_id=''):
         """
@@ -488,6 +491,7 @@ class Round(Document):
         # very important for game - some randomness
         seed()
         shuffle(self.cards)
+        self.timestamp = int(time() * 100000)
 
     def deal(self):
         """
