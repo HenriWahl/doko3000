@@ -186,7 +186,7 @@ $(document).ready(function () {
         current_player_id = msg.current_player_id
         console.log(msg)
         cards_locked = false
-        $('#table').html('')
+        $('#table').html(msg.html.cards_table)
         // $('.hud_player').removeClass('hud-player-active')
         if (player_id == current_player_id) {
             $('#turn_indicator').removeClass('d-none')

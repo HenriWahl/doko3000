@@ -283,8 +283,9 @@ def claimed_trick(msg):
                     # apparently the ownership of the previous trick is not clear - change it
                     table.round.previous_trick.owner = player.id
                     table.round.current_player = player.id
-                dealer = table.dealer
                 score = table.round.get_score()
+                timestamp = table.round.timestamp
+                cards_table = []
                 table.round.calculate_trick_order()
                 socketio.emit('next-trick',
                               {'current_player_id': player.id,
@@ -292,8 +293,12 @@ def claimed_trick(msg):
                                'html': {'hud_players': render_template('top/hud_players.html',
                                                                        table=table,
                                                                        player=player,
-                                                                       dealer=dealer,
-                                                                       current_player_id=player.id)}},
+                                                                       current_player_id=player.id),
+                                        'cards_table': render_template('cards/table.html',
+                                                                       cards_table=cards_table,
+                                                                       table=table,
+                                                                       timestamp=timestamp)
+                                        }},
                               room=table.id)
             else:
                 table.round.current_trick.owner = player.id
