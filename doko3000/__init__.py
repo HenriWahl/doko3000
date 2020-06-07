@@ -97,8 +97,7 @@ def played_card(msg):
                 current_player_id = table.round.get_current_player()
                 idle_players = table.idle_players
                 cards_table = table.round.current_trick.get_cards()
-
-                # hier muss wohl der komplette Tisch neu übertragen werden
+                timestamp = table.round.timestamp
                 socketio.emit('played-card-by-user',
                               {'player_id': player.id,
                                'card_id': card.id,
@@ -106,9 +105,10 @@ def played_card(msg):
                                'is_last_turn': is_last_turn,
                                'current_player_id': current_player_id,
                                'idle_players': idle_players,
-                               'html': {'table': render_template('cards/table.html',
-                                                                 cards_table=cards_table,
-                                                                 table=table),
+                               'html': {'cards_table': render_template('cards/table.html',
+                                                                       cards_table=cards_table,
+                                                                       table=table,
+                                                                       timestamp=timestamp),
                                         'hud_players': render_template('top/hud_players.html',
                                                                        table=table,
                                                                        player=player,
@@ -207,6 +207,7 @@ def deal_cards_to_player(msg):
                     current_player_id = table.round.current_player
                     if player.id in table.round.players:
                         cards_hand = player.get_cards()
+                        cards_table = []
                         timestamp = table.round.timestamp
                         socketio.emit('your-cards-please',
                                       {'player_id': player.id,
@@ -223,7 +224,12 @@ def deal_cards_to_player(msg):
                                                                                table=table,
                                                                                player=player,
                                                                                dealer=dealer,
-                                                                               current_player_id=current_player_id)}},
+                                                                               current_player_id=current_player_id),
+                                                'cards_table': render_template('cards/table.html',
+                                                                               cards_table=cards_table,
+                                                                               table=table,
+                                                                               timestamp=timestamp)}
+                                       },
                                       room=request.sid)
                     else:
                         # one day becoming spectator mode
@@ -667,7 +673,7 @@ def delete_player(player_id):
                     players = game.players.values()
                     return jsonify({'status': 'ok',
                                     'html': render_template('index/list_players.html',
-                                                players=players)})
+                                                            players=players)})
                 else:
                     if new_player_password:
                         player = game.add_player(new_player_id)

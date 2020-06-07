@@ -113,11 +113,11 @@ $(document).ready(function () {
         // }
         // if (player_id != msg.player_id) {
         //     // $('#table').append(msg.html.card)
-        //     $('#table').html(msg.html.table)
+        //     $('#table').html(msg.html.cards_table)
         //     $('#card_' + msg.card_id).attr('title', msg.player_id)
         // }
 
-        $('#table').html(msg.html.table)
+        $('#table').html(msg.html.cards_table)
         // $('#card_' + msg.card_id).attr('title', msg.player_id)
 
         if (msg.is_last_turn) {
@@ -151,7 +151,7 @@ $(document).ready(function () {
         current_player_id = msg.current_player_id
         cards_locked = false
         console.log('your-cards-please')
-        $('#table').html('')
+        $('#table').html(msg.html.cards_table)
         $('#hud_players').html(msg.html.hud_players)
         $('#hand').html(msg.html.cards_hand)
         $('#button_claim_trick').addClass('d-none')
