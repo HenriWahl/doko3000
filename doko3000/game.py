@@ -313,9 +313,6 @@ class Round(Document):
     """
     eternal round, part of a table
     """
-    # store moment of shuffling for comparing cards when being sorted and freshly dealed at one time
-    timestamp = 0
-
     def __init__(self, players=[], game=None, round_id='', document_id=''):
         """
         either initialize new round or load it from CouchDB
@@ -419,6 +416,21 @@ class Round(Document):
         self.save()
 
     @property
+    def timestamp(self):
+        timestamp = self.get('timestamp')
+        # backward compatibility
+        if not timestamp:
+            self.calculate_timestamp()
+            self.save()
+        return timestamp
+
+    def calculate_timestamp(self):
+        """
+        store moment of shuffling for comparing cards when being sorted and freshly dealed at one time
+        """
+        self['timestamp'] = int(time() * 100000)
+
+    @property
     def current_trick(self):
         """
         enable access to current trick
@@ -491,7 +503,7 @@ class Round(Document):
         # very important for game - some randomness
         seed()
         shuffle(self.cards)
-        self.timestamp = int(time() * 100000)
+        self.calculate_timestamp()
 
     def deal(self):
         """
