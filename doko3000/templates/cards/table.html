@@ -2,6 +2,5 @@
 <!--generate tooltip played_by info from current trick order-->
   {% with played_by=table.round.trick_order[loop.index-1] %}
     {% include 'cards/card.html' %}
-{{ loop.index }}
   {% endwith %}
 {% endfor %}
