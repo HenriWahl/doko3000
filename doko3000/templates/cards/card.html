@@ -3,6 +3,10 @@
      data-name="{{ card.name }}"
      data-id="{{ card.id }}"
      data-table_id="{{ table.id }}"
-     data-timestamp="{{ timestamp }}">
+     data-timestamp="{{ timestamp }}"
+{% if played_by %}
+     title="{{ played_by }}"
+     {% endif %}}
+>
 <img class="img-fluid p-1" src="/static/img/cards/{{ card.name }}.png">
 </div>

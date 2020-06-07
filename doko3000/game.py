@@ -15,9 +15,6 @@ class Card:
     one single card
     """
 
-    # just needed for tooltip of player who played it
-    __played_by = ''
-
     def __init__(self, symbol, rank_item, card_id):
         """
         symbol, rank and value come from deck
@@ -29,14 +26,6 @@ class Card:
         self.name = f'{self.symbol}-{self.rank}'
         # id comes from deck
         self.id = card_id
-
-    @property
-    def played_by(self):
-        return self.__played_by
-
-    @played_by.setter
-    def played_by(self, value):
-        self.__played_by = value
 
 
 class Deck:
@@ -496,9 +485,6 @@ class Round(Document):
         """
         shuffle cards
         """
-        # clear cards' played_by property
-        #for card in self.cards:
-        #    card.played_by = ''
         # very important for game - some randomness
         seed()
         shuffle(self.cards)
