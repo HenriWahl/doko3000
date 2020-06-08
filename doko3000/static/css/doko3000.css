@@ -71,7 +71,7 @@ html, body {
 #topbar {
     position: fixed;
     width: 100%;
-    height: 10%;
+    height: 5%;
     left: 0;
     top: 0;
     z-index: 100;
@@ -82,6 +82,10 @@ html, body {
 
 .topbar-button {
     border-style: none;
+    z-index: 600;
+}
+
+.topbar-menu {
     z-index: 600;
 }
 
@@ -113,7 +117,7 @@ html, body {
     bottom: 85%;
     left: 30%;
     right: 30%;
-    z-index: 500;
+    /*z-index: 500;*/
     background-color: rgba(0, 0, 0, 0.5);
 }
 
@@ -126,6 +130,3 @@ html, body {
 !important;
 }
 
-/*.button-remove-player-from-table {*/
-/*    border-style: none;*/
-/*}*/
