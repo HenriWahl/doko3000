@@ -117,7 +117,7 @@ html, body {
     bottom: 85%;
     left: 30%;
     right: 30%;
-    /*z-index: 500;*/
+    z-index: 500;
     background-color: rgba(0, 0, 0, 0.5);
 }
 
