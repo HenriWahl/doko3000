@@ -27,7 +27,7 @@
 <!--    <div clas="mt-2 mb-4"><strong>Spieler:</strong></div>-->
 <div class="container d-flex flex-column" id="setup_table_players" data-table_id="{{ table.id }}">
     {% for player_id in table.players %}
-    <div class="p-2 m-1 border table_{{ table.id }}_player_{{ player_id }} player"
+    <div class="p-2 m-1 border table_player_{{ player_id }} player"
          data-player_id="{{ player_id }}">
         <span class="oi oi-person"></span>
         {{ player_id }}

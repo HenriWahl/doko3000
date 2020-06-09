@@ -13,7 +13,6 @@ from flask_login import current_user, \
     login_user, \
     logout_user
 from flask_socketio import join_room, \
-    leave_room, \
     SocketIO
 
 from .config import Config
@@ -140,7 +139,6 @@ def enter_table(msg):
         if player_id in table.players:
             if action == 'remove_player':
                 table.remove_player(player_id)
-                leave_room(table_id)
             elif action == 'lock_table':
                 table.locked = True
             elif action == 'unlock_table':
@@ -594,6 +592,18 @@ def get_html_players():
         players = game.players.values()
         return jsonify({'html': render_template('index/list_players.html',
                                                 players=players)})
+    else:
+        return redirect(url_for('index'))
+
+
+@app.route('/get/wait')
+@login_required
+def get_wait():
+    """
+    get HTML snippet asking for patience
+    """
+    if is_xhr(request):
+        return jsonify({'html': render_template('round/wait.html')})
     else:
         return redirect(url_for('index'))
 

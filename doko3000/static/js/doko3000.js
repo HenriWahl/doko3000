@@ -30,11 +30,9 @@ $(document).ready(function () {
     ]);
     dragging_cards.on('drop', function (card, target, source) {
         // do not drag your gained tricks around
-        console.log(card, source, target, cards_locked)
         if (card.id == 'cards_stack') {
             dragging_cards.cancel(true)
         } else if (source.id == 'hand' && target.id == 'table' && player_id == current_player_id && !cards_locked) {
-            console.log(card.id == 'cards_stack')
             if ($(card).data('timestamp') == $('#cards_table_timestamp').data('timestamp')) {
                 $('#table').append(card)
                 // add tooltip
@@ -52,7 +50,6 @@ $(document).ready(function () {
         } else if (source.id == 'hand' && target.id == 'hand') {
             // check if card and hand have the same timestamp - otherwise someone dealed new cards
             // and the dragged card does not belong to the current cards
-            console.log($(card).data('timestamp'), $('#cards_hand_timestamp').data('timestamp'))
             if ($(card).data('timestamp') == $('#cards_hand_timestamp').data('timestamp')) {
                 // get cards order to end it to server for storing it
                 let cards_hand_ids = []
@@ -102,7 +99,6 @@ $(document).ready(function () {
 
     socket.on('played-card-by-user', function (msg) {
         current_player_id = msg.current_player_id
-        console.log(msg)
         //$('#hud_players').html('')
         $('#hud_players').html(msg.html.hud_players)
         $('.overlay-button').addClass('d-none')
@@ -123,7 +119,6 @@ $(document).ready(function () {
         if (msg.is_last_turn) {
             cards_locked = true
             $('#turn_indicator').addClass('d-none')
-            console.log(msg.idle_players.includes(player_id))
             if (!msg.idle_players.includes(player_id)) {
                 $('#button_claim_trick').removeClass('d-none')
             }
@@ -150,14 +145,11 @@ $(document).ready(function () {
     socket.on('your-cards-please', function (msg) {
         current_player_id = msg.current_player_id
         cards_locked = false
-        console.log('your-cards-please')
         $('#table').html(msg.html.cards_table)
         $('#hud_players').html(msg.html.hud_players)
         $('#hand').html(msg.html.cards_hand)
         $('#button_claim_trick').addClass('d-none')
         $('#modal_dialog').modal('hide')
-        console.log(msg)
-        console.log(player_id, current_player_id)
         if (player_id == current_player_id) {
             $('#turn_indicator').removeClass('d-none')
         } else {
@@ -184,7 +176,6 @@ $(document).ready(function () {
 
     socket.on('next-trick', function (msg) {
         current_player_id = msg.current_player_id
-        console.log(msg)
         cards_locked = false
         $('#table').html(msg.html.cards_table)
         // $('.hud_player').removeClass('hud-player-active')
@@ -195,10 +186,7 @@ $(document).ready(function () {
             // $('#hud_player_' + current_player_id).addClass('hud-player-active')
         }
         $('#hud_players').html(msg.html.hud_players)
-        console.log(msg.score)
-        console.log(player_id in msg.score)
         if (player_id in msg.score) {
-            console.log(msg.score[player_id])
             $('#cards_stack').attr('title', msg.score[player_id])
             $('#cards_stack').removeClass('d-none')
         } else {
@@ -207,7 +195,6 @@ $(document).ready(function () {
     })
 
     socket.on('round-finished', function (msg) {
-        console.log('round-finished', msg)
         $('#button_claim_trick').addClass('d-none')
         // cleanup content of dialog
         $('#modal_body').html(msg.html)
@@ -215,10 +202,10 @@ $(document).ready(function () {
     })
 
     socket.on('start-next-round', function (msg) {
-        console.log('start-next-round', msg)
         $('.overlay-button').addClass('d-none')
         $('.overlay-notification').addClass('d-none')
         $('#modal_body').html(msg.html)
+        console.log(msg)
         if (player_id == msg.dealer) {
             $('#button_deal_cards').removeClass('d-none')
             $('#button_close_info').addClass('d-none')
@@ -239,7 +226,6 @@ $(document).ready(function () {
     })
 
     socket.on('round-finish-requested', function (msg) {
-        console.log('round-finish-requested', msg)
         $('.overlay-button').addClass('d-none')
         $('.overlay-notification').addClass('d-none')
         // cleanup content of dialog
@@ -248,7 +234,6 @@ $(document).ready(function () {
     })
 
     socket.on('round-restart-options', function (msg) {
-        console.log('round-restart-requested', msg)
         $('.overlay-button').addClass('d-none')
         $('.overlay-notification').addClass('d-none')
         // cleanup content of dialog
@@ -257,7 +242,6 @@ $(document).ready(function () {
     })
 
     $(document).on('click', '.button-enter-table', function () {
-        console.log($(this).data('table_players'), $(this).data('table_locked'))
         socket.emit('enter-table', {
             player_id: player_id,
             table_id: $(this).data('table_id')
@@ -280,26 +264,21 @@ $(document).ready(function () {
 
     // create new table
     $(document).on('click', '#button_create_table', function () {
-        console.log('create table')
         $.getJSON('/create/table', function (data, status) {
-            console.log(status)
             if (status == 'success') {
                 $('#modal_body').html(data.html)
                 clear_message('#modal_message')
                 $('#modal_dialog').modal('show')
             }
         })
-        console.log('done')
         return false
     })
 
     // parameter 'json' makes it equivalent to non-existing .postJSON
     $(document).on('click', '#button_finish_create_table', function () {
-        console.log('create table pressed button')
         // parameter 'json' makes it equivalent to .getJSON
         // because there is no .postJSON but .post(..., 'json') so it will be the same for GET and POST here
         $.post('/create/table', $('#form_create_table').serialize(), function (data, status) {
-            console.log(data)
             if (status == 'success') {
                 if (data.status == 'error') {
                     show_message('#modal_message', data.message)
@@ -307,7 +286,6 @@ $(document).ready(function () {
                     $('#modal_dialog').modal('hide')
                     $.getJSON('/get/tables',
                         function (data, status) {
-                            console.log(data, status)
                             if (status == 'success') {
                                 $('#list_tables').html(data.html)
                             }
@@ -321,7 +299,6 @@ $(document).ready(function () {
     // draggable list of players in setup table dialog
     $(document).on('click', '.button-setup-table', function () {
         $.getJSON('/table/setup/' + $(this).data('table_id'), function (data, status) {
-            console.log(data)
             if (status == 'success' && data.allowed) {
                 $("#modal_body").html(data.html)
                 $('#modal_dialog').modal('show')
@@ -389,7 +366,6 @@ $(document).ready(function () {
 
     // delete a player in the draggable players order
     $(document).on('click', '.button-remove-player-from-table', function () {
-        console.log('remove player', $(this).data('player_id'))
         if (player_id != $(this).data('player_id')) {
             // used too if player leaves table via menu
             socket.emit('setup-table-change', {
@@ -397,22 +373,19 @@ $(document).ready(function () {
                 player_id: $(this).data('player_id'),
                 table_id: $(this).data('table_id')
             })
-            $('.table_' + $(this).data('table_id') + '_player_' + $(this).data('player_id')).remove()
+            $('.table_player_' + $(this).data('player_id')).remove()
         }
     })
 
     // create new user
     $(document).on('click', '#button_create_player', function () {
-        console.log('create player')
         $.getJSON('/create/player', function (data, status) {
-            console.log(status)
             if (status == 'success') {
                 $('#modal_body').html(data.html)
                 clear_message('#modal_message')
                 $('#modal_dialog').modal('show')
             }
         })
-        console.log('done')
         return false
     })
 
@@ -430,11 +403,9 @@ $(document).ready(function () {
 
     // parameter 'json' makes it equivalent to non-existing .postJSON
     $(document).on('click', '#button_finish_create_player', function () {
-        console.log('create table pressed button')
         // parameter 'json' makes it equivalent to .getJSON
         // because there is no .postJSON but .post(..., 'json') so it will be the same for GET and POST here
         $.post('/create/player', $('#form_create_player').serialize(), function (data, status) {
-            console.log(data)
             if (status == 'success') {
                 if (data.status == 'error') {
                     show_message('#modal_message', data.message)
@@ -442,7 +413,6 @@ $(document).ready(function () {
                     $('#modal_dialog').modal('hide')
                     $.getJSON('/get/players',
                         function (data, status) {
-                            console.log(data, status)
                             if (status == 'success') {
                                 $('#list_players').html(data.html)
                             }
@@ -455,11 +425,9 @@ $(document).ready(function () {
 
     // delete a player in the draggable players order
     $(document).on('click', '.button-delete-player', function () {
-        console.log('remove player really', encodeURIComponent($(this).data('player_id')))
         if (player_id != $(this).data('player_id')) {
             $.getJSON('/delete/player/' + encodeURIComponent($(this).data('player_id')),
                 function (data, status) {
-                    console.log(data, status)
                     if (status == 'success') {
                         $('#modal_body').html(data.html)
                         clear_message('#modal_message')
@@ -471,12 +439,10 @@ $(document).ready(function () {
 
     // really delete player after safety dialog
     $(document).on('click', '#button_really_delete_player', function () {
-        console.log('remove player really really really', encodeURIComponent($(this).data('player_id')))
         if (player_id != $(this).data('player_id')) {
             // once again the .post + 'json' move
             $.post('/delete/player/' + encodeURIComponent($(this).data('player_id')),
                 function (data, status) {
-                    console.log(data, status)
                     if (status == 'success') {
                         $('#list_players').html(data.html)
                     }
@@ -485,7 +451,6 @@ $(document).ready(function () {
     })
 
     $(document).on('click', '#button_deal_cards', function () {
-        console.log('button_deal_cards')
         socket.emit('deal-cards', {
             player_id: player_id,
             table_id: $(this).data('table_id')
@@ -510,7 +475,6 @@ $(document).ready(function () {
         } else {
             $.getJSON('/get/tables',
                 function (data, status) {
-                    console.log(data, status)
                     if (status == 'success') {
                         $('#list_tables').html(data.html)
                     }
@@ -519,7 +483,6 @@ $(document).ready(function () {
     })
 
     $(document).on('click', '#button_deal_cards_again', function () {
-        console.log('button_deal_cards_again')
         socket.emit('deal-cards-again', {
             player_id: player_id,
             table_id: $(this).data('table_id')
@@ -527,7 +490,6 @@ $(document).ready(function () {
     })
 
     $(document).on('click', '#button_claim_trick', function () {
-        console.log('claim trick')
         socket.emit('claim-trick', {
             player_id: player_id,
             table_id: $(this).data('table_id')
@@ -564,15 +526,21 @@ $(document).ready(function () {
     })
 
     $(document).on('click', '#button_round_finish_yes', function () {
-        console.log('button ready finish reset')
-        socket.emit('ready-for-round-finish', {
-            player_id: player_id,
-            table_id: $(this).data('table_id')
+        let table_id = $(this).data('table_id')
+        $.getJSON('/get/wait', function (data, status) {
+            if (status == 'success') {
+                $('#modal_body').html(data.html)
+                socket.emit('ready-for-round-finish', {
+                    player_id: player_id,
+                    table_id: table_id
+                })
+            }
         })
+        // dummy return just in case
+        return false
     })
 
     $(document).on('click', '#button_round_restart_yes', function () {
-        console.log('button ready restart')
         socket.emit('ready-for-round-restart', {
             player_id: player_id,
             table_id: $(this).data('table_id')
