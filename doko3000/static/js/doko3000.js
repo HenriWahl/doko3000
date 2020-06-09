@@ -511,12 +511,28 @@ $(document).ready(function () {
         })
     })
 
+    // $(document).on('click', '#button_round_reset_yes', function () {
+    //     socket.emit('ready-for-round-reset', {
+    //         player_id: player_id,
+    //         table_id: $(this).data('table_id')
+    //     })
+    // })
+
     $(document).on('click', '#button_round_reset_yes', function () {
-        socket.emit('ready-for-round-reset', {
-            player_id: player_id,
-            table_id: $(this).data('table_id')
+        let table_id = $(this).data('table_id')
+        $.getJSON('/get/wait', function (data, status) {
+            if (status == 'success') {
+                $('#modal_body').html(data.html)
+                socket.emit('ready-for-round-reset', {
+                    player_id: player_id,
+                    table_id: table_id
+                })
+            }
         })
+        // dummy return just in case
+        return false
     })
+
 
     $(document).on('click', '#menu_request_round_finish', function () {
         socket.emit('request-round-finish', {
@@ -540,10 +556,18 @@ $(document).ready(function () {
         return false
     })
 
-    $(document).on('click', '#button_round_restart_yes', function () {
-        socket.emit('ready-for-round-restart', {
-            player_id: player_id,
-            table_id: $(this).data('table_id')
-        })
-    })
+    // $(document).on('click', '#button_round_restart_yes', function () {
+    //     let table_id = $(this).data('table_id')
+    //     $.getJSON('/get/wait', function (data, status) {
+    //         if (status == 'success') {
+    //             $('#modal_body').html(data.html)
+    //             socket.emit('ready-for-round-restart', {
+    //                 player_id: player_id,
+    //                 table_id: table_id
+    //             })
+    //         }
+    //     })
+    //     // dummy return just in case
+    //     return false
+    // })
 })

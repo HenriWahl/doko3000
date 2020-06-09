@@ -363,18 +363,6 @@ def ready_for_next_round(msg):
                       room=request.sid)
 
 
-@socketio.on('request-round-reset')
-def request_round_reset(msg):
-    table = game.tables[msg['table_id']]
-    # just tell everybody to get personal cards
-    socketio.emit('round-reset-requested',
-                  {'table_id': table.id,
-                   'html': render_template('round/request_reset.html',
-                                           table=table)
-                   },
-                  room=table.id)
-
-
 @socketio.on('request-round-finish')
 def request_round_finish(msg):
     table = game.tables[msg['table_id']]
@@ -385,20 +373,6 @@ def request_round_finish(msg):
                                            table=table)
                    },
                   room=table.id)
-
-
-@socketio.on('ready-for-round-reset')
-def round_reset(msg):
-    player_id = msg['player_id']
-    table_id = msg['table_id']
-    if player_id == current_user.get_id() and \
-            table_id in game.tables:
-        table = game.tables[table_id]
-        table.add_ready_player(player_id)
-        if set(table.players_ready) >= set(table.round.players):
-            table.reset_round()
-            socketio.emit('grab-your-cards',
-                          {'table_id': table.id})
 
 
 @socketio.on('ready-for-round-finish')
@@ -424,6 +398,32 @@ def round_finish(msg):
                                                    next_players=next_players,
                                                    number_of_rows=number_of_rows)}
                           )
+
+
+@socketio.on('request-round-reset')
+def request_round_reset(msg):
+    table = game.tables[msg['table_id']]
+    # just tell everybody to get personal cards
+    socketio.emit('round-reset-requested',
+                  {'table_id': table.id,
+                   'html': render_template('round/request_reset.html',
+                                           table=table)
+                   },
+                  room=table.id)
+
+
+@socketio.on('ready-for-round-reset')
+def round_reset(msg):
+    player_id = msg['player_id']
+    table_id = msg['table_id']
+    if player_id == current_user.get_id() and \
+            table_id in game.tables:
+        table = game.tables[table_id]
+        table.add_ready_player(player_id)
+        if set(table.players_ready) >= set(table.round.players):
+            table.reset_round()
+            socketio.emit('grab-your-cards',
+                          {'table_id': table.id})
 
 
 @socketio.on('ready-for-round-restart')
