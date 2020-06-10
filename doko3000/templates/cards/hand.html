@@ -4,7 +4,7 @@
 {% include 'cards/card.html' %}
 {% endfor %}
 <div id="cards_stack" class="game-card ml-2
-{% if score[player.id] == 0 %}
+{% if not player.id in score or score[player.id] == 0 %}
 d-none
 {% endif %}
 ">
