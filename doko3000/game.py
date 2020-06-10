@@ -142,6 +142,14 @@ class Player(UserMixin, Document):
         self['table'] = value
         self.save()
 
+    @property
+    def eichel_ober_count(self):
+        return self.get('eichel_ober_count', 0)
+
+    @eichel_ober_count.setter
+    def eichel_ober_count(self, value):
+        self['eichel_ober_count'] = value
+
     def is_playing(self):
         """
         double-check if player sits at some table - make sure it can be deleted
@@ -513,13 +521,18 @@ class Round(Document):
         player_count = 0
         # self.cards_per_player = len(self.cards) // 4
         for player_id in self.players:
-            #self.game.players[player_id].remove_all_cards()
-            for card in range(self.cards_per_player):
-                # cards are given to players so the can be .pop()ed
-                # self.game.players[player_id].cards.append(self.cards.pop())
+            # reset counter for Eichel Ober cards
+            self.game.players[player_id].eichel_ober_count = 0
+            for card_id in range(self.cards_per_player):
+                # cards are given to players, segmented by range
                 self.game.players[player_id].cards = self.cards[player_count * self.cards_per_player:\
                                                                 player_count * self.cards_per_player +\
                                                                 self.cards_per_player]
+            # raiser counter for Eichel Ober cards if player has one or two
+            for card_id in self.game.players[player_id].cards:
+                if Deck.cards[card_id].name == 'Eichel-Ober':
+                    self.game.players[player_id].eichel_ober_count += 1
+
             player_count += 1
             # self.game.players[player_id].save()
         # not needed, is saved by .reset()
@@ -557,6 +570,8 @@ class Round(Document):
 
     def get_score(self):
         score = {}
+        for player_id in self.players:
+            score[player_id] = 0
         for trick in self.tricks.values():
             if trick and trick.owner:
                 if trick.owner not in score:

@@ -178,7 +178,6 @@ $(document).ready(function () {
         current_player_id = msg.current_player_id
         cards_locked = false
         $('#table').html(msg.html.cards_table)
-        // $('.hud_player').removeClass('hud-player-active')
         if (player_id == current_player_id) {
             $('#turn_indicator').removeClass('d-none')
         } else {
@@ -186,7 +185,7 @@ $(document).ready(function () {
             // $('#hud_player_' + current_player_id).addClass('hud-player-active')
         }
         $('#hud_players').html(msg.html.hud_players)
-        if (player_id in msg.score) {
+        if (msg.score[player_id] > 0) {
             $('#cards_stack').attr('title', msg.score[player_id])
             $('#cards_stack').removeClass('d-none')
         } else {

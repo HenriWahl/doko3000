@@ -6,10 +6,17 @@
     </tr>
     </thead>
     <tbody>
-    {% for player in score %}
+    {% for player_id in score %}
     <tr>
-        <td>{{ player }}</td>
-        <td>{{ score[player] }}</td>
+        <td>
+            {{ players[player_id].name }}
+            {% if players[player_id].eichel_ober_count > 0 %}
+                {% for eichel_ober in range(players[player_id].eichel_ober_count) %}
+            <span class="oi oi-sun"></span>
+                {% endfor %}
+            {% endif %}
+        </td>
+        <td>{{ score[player_id] }}</td>
     </tr>
     {% endfor %}
     </tbody>

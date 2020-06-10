@@ -206,6 +206,8 @@ def deal_cards_to_player(msg):
                     if player.id in table.round.players:
                         cards_hand = player.get_cards()
                         cards_table = []
+                        # no score yet but needed for full set of cards for hand - to decide if back-card is shown too
+                        score = table.round.get_score()
                         timestamp = table.round.timestamp
                         socketio.emit('your-cards-please',
                                       {'player_id': player.id,
@@ -217,6 +219,7 @@ def deal_cards_to_player(msg):
                                                                               cards_hand=cards_hand,
                                                                               table=table,
                                                                               player=player,
+                                                                              score=score,
                                                                               timestamp=timestamp),
                                                 'hud_players': render_template('top/hud_players.html',
                                                                                table=table,
@@ -300,6 +303,7 @@ def claimed_trick(msg):
                               room=table.id)
             else:
                 table.round.current_trick.owner = player.id
+                players = game.players
                 score = table.round.get_score()
                 table.shift_players()
                 # tell everybody stats and wait for everybody confirming next round
@@ -307,6 +311,7 @@ def claimed_trick(msg):
                               {'table_id': table.id,
                                'html': render_template('round/score.html',
                                                        table=table,
+                                                       players=players,
                                                        score=score)
                                },
                               room=table.id)
@@ -323,12 +328,14 @@ def send_final_result(msg):
             player = game.players.get(player_id)
             if player and table_id == player.table:
                 table = game.tables[msg['table_id']]
+                players = game.players
                 score = table.round.get_score()
                 # tell single player stats and wait for everybody confirming next round
                 socketio.emit('round-finished',
                               {'table_id': table.id,
                                'html': render_template('round/score.html',
                                                        table=table,
+                                                       players=players,
                                                        score=score)
                                },
                               room=request.sid)
