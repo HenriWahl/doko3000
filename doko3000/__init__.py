@@ -564,7 +564,7 @@ def setup_player(player_id):
     if is_xhr(request) and player_id:
         if player_id in game.players:
             player = game.players[player_id]
-            return jsonify({'html': render_template('setup/table.html',
+            return jsonify({'html': render_template('setup/player.html',
                                                     player=player)})
         else:
             return redirect(url_for('index'))

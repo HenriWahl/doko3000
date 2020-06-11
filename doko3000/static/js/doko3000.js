@@ -449,6 +449,16 @@ $(document).ready(function () {
         }
     })
 
+    $(document).on('click', '.button-setup-player', function () {
+        $.getJSON('/setup/player/' + $(this).data('player_id'), function (data, status) {
+            if (status == 'success') {
+                $("#modal_body").html(data.html)
+                $('#modal_dialog').modal('show')
+            }
+        })
+    })
+
+
     $(document).on('click', '#button_deal_cards', function () {
         socket.emit('deal-cards', {
             player_id: player_id,
