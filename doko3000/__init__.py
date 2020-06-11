@@ -530,7 +530,7 @@ def table(table_id=''):
                            title=f"{app.config['TITLE']}")
 
 
-@app.route('/table/setup/<table_id>')
+@app.route('/setup/table/<table_id>')
 @login_required
 def setup_table(table_id):
     """
@@ -544,7 +544,7 @@ def setup_table(table_id):
                     (current_user.get_id() in table.players or
                      not table.locked):
                 return jsonify({'allowed': True,
-                                'html': render_template('setup_table.html',
+                                'html': render_template('setup/table.html',
                                                         table=table)})
             else:
                 return jsonify({'allowed': False})
@@ -555,7 +555,24 @@ def setup_table(table_id):
         return redirect(url_for('index'))
 
 
-@app.route('/table/enter/<table_id>/<player_id>')
+@app.route('/setup/player/<player_id>')
+@login_required
+def setup_player(player_id):
+    """
+    Setup for player - at first only password, quite probably
+    """
+    if is_xhr(request) and player_id:
+        if player_id in game.players:
+            player = game.players[player_id]
+            return jsonify({'html': render_template('setup/table.html',
+                                                    player=player)})
+        else:
+            return redirect(url_for('index'))
+    else:
+        return redirect(url_for('index'))
+
+
+@app.route('/enter/table/<table_id>/<player_id>')
 @login_required
 def enter_table_json(table_id='', player_id=''):
     """

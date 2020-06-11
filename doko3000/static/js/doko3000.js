@@ -246,7 +246,7 @@ $(document).ready(function () {
             table_id: $(this).data('table_id')
         })
         // ask server via json if player is allowed to enter or not
-        return $.getJSON('/table/enter/' + $(this).data('table_id') + '/' + player_id,
+        return $.getJSON('/enter/table/' + $(this).data('table_id') + '/' + player_id,
             function (data, status) {
                 if (status == 'success' && data.allowed) {
                     return data.allowed
@@ -297,7 +297,7 @@ $(document).ready(function () {
 
     // draggable list of players in setup table dialog
     $(document).on('click', '.button-setup-table', function () {
-        $.getJSON('/table/setup/' + $(this).data('table_id'), function (data, status) {
+        $.getJSON('/setup/table/' + $(this).data('table_id'), function (data, status) {
             if (status == 'success' && data.allowed) {
                 $("#modal_body").html(data.html)
                 $('#modal_dialog').modal('show')
