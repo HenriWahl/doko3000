@@ -4,15 +4,6 @@
     </div>
 </div>
 <div class="row mt-3 px-3">
-    <!--    <div class="col-6" data-player_id="{{ player.id }}">-->
-    <!--        <button class="btn btn-outline-success btn-block"-->
-    <!--           id="button_apply_player_setup"-->
-    <!--           data-player_id="{{ player.id }}">-->
-    <!--            <strong>-->
-    <!--                OK-->
-    <!--            </strong>-->
-    <!--        </button>-->
-    <!--    </div>-->
     <div class="col-12 input-group">
         <div class="input-group-prepend">
             <span class="input-group-text"><i class="oi oi-key"></i></span>
@@ -23,23 +14,13 @@
                placeholder="Neues Passwort"
                name="new_player_password"
         >
-
         <div class="input-group-append">
-                    {% if current_user.is_admin %}
-            <button class="btn btn-outline-primary text-nowrap"
-                    id="button_password_from_random"
-                    name="button_password_from_random">
-                <span class="oi oi-question-mark"></span>
-                <span class="oi oi-arrow-right"></span>
-                <span class="oi oi-key"></span>
-            </button>
-            {% endif %}
-                        <button class="btn btn-outline-success text-nowrap"
+            <button class="btn btn-outline-success text-nowrap"
                     id="button_change_password"
                     name="button_change_password"
-                        data-player_id="{{ player.id }}">
+                    data-player_id="{{ player.id }}">
                 <span class="oi oi-check"></span>
-                            Ändern
+                Ändern
             </button>
         </div>
     </div>
