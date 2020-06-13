@@ -163,10 +163,14 @@ def setup_player(msg):
     action = msg.get('action')
     player = game.players.get(player_id)
     if player:
-        if action == 'player_is_admin':
+        if action == 'is_admin':
             player.is_admin = True
-        elif action == 'player_is_no_admin':
+        elif action == 'is_no_admin':
             player.is_admin = False
+        elif action == 'new_password':
+            password = msg.get('password')
+            if password:
+                player.set_password(password)
 
 @socketio.on('deal-cards')
 def deal_cards(msg):

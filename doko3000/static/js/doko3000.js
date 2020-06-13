@@ -491,22 +491,30 @@ $(document).ready(function () {
         })
     })
 
-    // enable playing with card '9'
+    // make player an admin
     $(document).on('click', '#switch_player_is_admin', function () {
         if (this.checked) {
             socket.emit('setup-player-change', {
-                action: 'player_is_admin',
+                action: 'is_admin',
                 player_id: $(this).data('player_id')
             })
         } else {
             socket.emit('setup-player-change', {
-                action: 'player_is_no_admin',
+                action: 'is_no_admin',
                 player_id: $(this).data('player_id')
             })
         }
     })
 
-
+    // change password
+    $(document).on('click', '#button_change_password', function () {
+        console.log('password change')
+        socket.emit('setup-player-change', {
+                action: 'new_password',
+                player_id: $(this).data('player_id'),
+                password: $('#new_player_password').val()
+            })
+    })
 
     $(document).on('click', '#button_deal_cards_again', function () {
         socket.emit('deal-cards-again', {
