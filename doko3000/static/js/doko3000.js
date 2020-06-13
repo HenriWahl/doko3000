@@ -296,7 +296,7 @@ $(document).ready(function () {
     })
 
     // draggable list of players in setup table dialog
-    $(document).on('click', '.button-setup-table', function () {
+    $(document).on('click', '.setup-table', function () {
         $.getJSON('/setup/table/' + $(this).data('table_id'), function (data, status) {
             if (status == 'success' && data.allowed) {
                 $("#modal_body").html(data.html)
@@ -449,16 +449,6 @@ $(document).ready(function () {
         }
     })
 
-    $(document).on('click', '.button-setup-player', function () {
-        $.getJSON('/setup/player/' + $(this).data('player_id'), function (data, status) {
-            if (status == 'success') {
-                $("#modal_body").html(data.html)
-                $('#modal_dialog').modal('show')
-            }
-        })
-    })
-
-
     $(document).on('click', '#button_deal_cards', function () {
         socket.emit('deal-cards', {
             player_id: player_id,
@@ -490,6 +480,33 @@ $(document).ready(function () {
                 })
         }
     })
+
+    // player setup
+    $(document).on('click', '.setup-player', function () {
+        $.getJSON('/setup/player/' + $(this).data('player_id'), function (data, status) {
+            if (status == 'success') {
+                $("#modal_body").html(data.html)
+                $('#modal_dialog').modal('show')
+            }
+        })
+    })
+
+    // enable playing with card '9'
+    $(document).on('click', '#switch_player_is_admin', function () {
+        if (this.checked) {
+            socket.emit('setup-player-change', {
+                action: 'player_is_admin',
+                player_id: $(this).data('player_id')
+            })
+        } else {
+            socket.emit('setup-player-change', {
+                action: 'player_is_no_admin',
+                player_id: $(this).data('player_id')
+            })
+        }
+    })
+
+
 
     $(document).on('click', '#button_deal_cards_again', function () {
         socket.emit('deal-cards-again', {

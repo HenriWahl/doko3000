@@ -130,34 +130,43 @@ def enter_table_socket(msg):
 
 
 @socketio.on('setup-table-change')
-def enter_table(msg):
+def setup_table(msg):
     table_id = msg.get('table_id')
     player_id = msg.get('player_id')
     action = msg.get('action')
-    if table_id in game.tables:
-        table = game.tables[table_id]
-        if player_id in table.players:
-            if action == 'remove_player':
-                table.remove_player(player_id)
-            elif action == 'lock_table':
-                table.locked = True
-            elif action == 'unlock_table':
-                table.locked = False
-            elif action == 'play_with_9':
-                table.round.with_9 = True
-            elif action == 'play_without_9':
-                table.round.with_9 = False
-            elif action == 'changed_order':
-                order = msg.get('order')
-                if set(order) == set(table.order):
-                    table.players = order
-            elif action == 'start_table':
-                table.start()
-                # just tell everybody to get personal cards
-                socketio.emit('grab-your-cards',
-                              {'table_id': table.id},
-                              room=table.id)
+    table = game.tables.get(table_id)
+    if table and player_id in table.players:
+        if action == 'remove_player':
+            table.remove_player(player_id)
+        elif action == 'lock_table':
+            table.locked = True
+        elif action == 'unlock_table':
+            table.locked = False
+        elif action == 'play_with_9':
+            table.round.with_9 = True
+        elif action == 'play_without_9':
+            table.round.with_9 = False
+        elif action == 'changed_order':
+            order = msg.get('order')
+            if set(order) == set(table.order):
+                table.players = order
+        elif action == 'start_table':
+            table.start()
+            # just tell everybody to get personal cards
+            socketio.emit('grab-your-cards',
+                          {'table_id': table.id},
+                          room=table.id)
 
+@socketio.on('setup-player-change')
+def setup_player(msg):
+    player_id = msg.get('player_id')
+    action = msg.get('action')
+    player = game.players.get(player_id)
+    if player:
+        if action == 'player_is_admin':
+            player.is_admin = True
+        elif action == 'player_is_no_admin':
+            player.is_admin = False
 
 @socketio.on('deal-cards')
 def deal_cards(msg):
@@ -487,10 +496,15 @@ def logout():
 def index():
     players = game.players.values()
     tables = game.tables.values()
-    return render_template('index.html',
-                           tables=tables,
-                           players=players,
-                           title=f"{app.config['TITLE']}")
+    player = game.players.get(current_user.id)
+    if player:
+        return render_template('index.html',
+                               tables=tables,
+                               players=players,
+                               player=player,
+                               title=f"{app.config['TITLE']}")
+    else:
+        return redirect(url_for('login'))
 
 
 @app.route('/table/<table_id>')

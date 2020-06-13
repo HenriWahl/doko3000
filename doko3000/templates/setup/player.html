@@ -3,3 +3,60 @@
         <h4>{{ player.id }}</h4>
     </div>
 </div>
+<div class="row mt-3 px-3">
+    <!--    <div class="col-6" data-player_id="{{ player.id }}">-->
+    <!--        <button class="btn btn-outline-success btn-block"-->
+    <!--           id="button_apply_player_setup"-->
+    <!--           data-player_id="{{ player.id }}">-->
+    <!--            <strong>-->
+    <!--                OK-->
+    <!--            </strong>-->
+    <!--        </button>-->
+    <!--    </div>-->
+    <div class="col-12 input-group">
+        <div class="input-group-prepend">
+            <span class="input-group-text"><i class="oi oi-key"></i></span>
+        </div>
+        <input type="text"
+               class="form-control"
+               id="new_player_password"
+               placeholder="Neues Passwort"
+               name="new_player_password"
+        >{{ player.password }}
+        <div class="input-group-append">
+            <button class="btn btn-outline-primary text-nowrap"
+                    id="button_password_from_random"
+                    name="button_password_from_random">
+                <span class="oi oi-question-mark"></span>
+                <span class="oi oi-arrow-right"></span>
+                <span class="oi oi-key"></span>
+            </button>
+        </div>
+    </div>
+</div>
+{% if current_user.is_admin %}
+<div class="row mt-2">
+    <div class="col-12">
+        <!--            <strong>Optionen:</strong>-->
+        <div class="custom-control custom-switch my-2 mx-3">
+            <input type="checkbox"
+                   class="custom-control-input"
+                   id="switch_player_is_admin"
+                   data-player_id="{{ player.id }}"
+                   {% if player.is_admin %}
+                   checked=""
+                   {% endif %}
+            >
+            <label class="custom-control-label" for="switch_player_is_admin">Administrator</label>
+        </div>
+    </div>
+</div>
+{% endif %}
+<div class="row mt-3">
+    <div class="col-6">
+    </div>
+    <div class="col-6" id="button_finish_player_setup" data-player_id="{{ player.id }}">
+        <button class="btn btn-outline-primary btn-block btn" data-dismiss="modal"><strong>Zurück</strong>
+        </button>
+    </div>
+</div>
