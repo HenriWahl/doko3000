@@ -171,6 +171,13 @@ def setup_player(msg):
             password = msg.get('password')
             if password:
                 player.set_password(password)
+                socketio.emit('change-password-successful',
+                              {'player_id': player.id},
+                              room=request.sid)
+            else:
+                socketio.emit('change-password-failed',
+                              {'player_id': player.id},
+                              room=request.sid)
 
 @socketio.on('deal-cards')
 def deal_cards(msg):

@@ -9,18 +9,19 @@
             <span class="input-group-text"><i class="oi oi-key"></i></span>
         </div>
         <input type="text"
-               class="form-control"
+               class="form-control form-focus"
                id="new_player_password"
                placeholder="Neues Passwort"
                name="new_player_password"
         >
         <div class="input-group-append">
-            <button class="btn btn-outline-success text-nowrap"
+            <button class="btn btn-outline-primary text-nowrap"
                     id="button_change_password"
                     name="button_change_password"
                     data-player_id="{{ player.id }}">
-                <span class="oi oi-check"></span>
                 Ändern
+                <span class="oi oi-check d-none" id="indicate_change_password_successful"></span>
+                <span class="oi oi-ban d-none" id="indicate_change_password_failed"></span>
             </button>
         </div>
     </div>

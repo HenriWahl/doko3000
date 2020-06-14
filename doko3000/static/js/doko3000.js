@@ -236,8 +236,25 @@ $(document).ready(function () {
         $('.overlay-button').addClass('d-none')
         $('.overlay-notification').addClass('d-none')
         // cleanup content of dialog
-        $('#modal_body').html(msg.html)
+        $('#modal_body').ht
+        ml(msg.html)
         $('#modal_dialog').modal('show')
+    })
+
+    socket.on('change-password-successful', function (msg) {
+        $('#button_change_password').removeClass('btn-outline-primary')
+        $('#button_change_password').removeClass('btn-outline-danger')
+        $('#button_change_password').addClass('btn-outline-success')
+        $('#indicate_change_password_successful').removeClass('d-none')
+        $('#indicate_change_password_failed').addClass('d-none')
+    })
+
+    socket.on('change-password-failed', function (msg) {
+        $('#button_change_password').removeClass('btn-outline-primary')
+        $('#button_change_password').removeClass('btn-outline-success')
+        $('#button_change_password').addClass('btn-outline-danger')
+        $('#indicate_change_password_successful').addClass('d-none')
+        $('#indicate_change_password_failed').removeClass('d-none')
     })
 
     $(document).on('click', '.button-enter-table', function () {
@@ -510,10 +527,10 @@ $(document).ready(function () {
     $(document).on('click', '#button_change_password', function () {
         console.log('password change')
         socket.emit('setup-player-change', {
-                action: 'new_password',
-                player_id: $(this).data('player_id'),
-                password: $('#new_player_password').val()
-            })
+            action: 'new_password',
+            player_id: $(this).data('player_id'),
+            password: $('#new_player_password').val()
+        })
     })
 
     $(document).on('click', '#button_deal_cards_again', function () {
