@@ -459,12 +459,17 @@ $(document).ready(function () {
             // once again the .post + 'json' move
             $.post('/delete/player/' + encodeURIComponent($(this).data('player_id')),
                 function (data, status) {
-                console.log(data)
+                    console.log(data, status)
                     if (status == 'success') {
-                        $('#list_players').html(data.html)
-                    } else {
-                        console.log(data.message)
-                    show_message('#modal_message', data.message)
+                        if (data.status == 'ok') {
+                            $('#list_players').html(data.html)
+                            $('#modal_dialog').modal('hide')
+                        } else {
+                            console.log(status)
+                            $('#modal_body').html(data.html)
+                            clear_message('#modal_message')
+                            $('#modal_dialog').modal('show')
+                        }
                     }
                 }, 'json')
         }
@@ -473,14 +478,14 @@ $(document).ready(function () {
 
     // delete a player in the players list
     $(document).on('click', '.button-delete-table', function () {
-            $.getJSON('/delete/table/' + encodeURIComponent($(this).data('table_id')),
-                function (data, status) {
-                    if (status == 'success') {
-                        $('#modal_body').html(data.html)
-                        clear_message('#modal_message')
-                        $('#modal_dialog').modal('show')
-                    }
-                })
+        $.getJSON('/delete/table/' + encodeURIComponent($(this).data('table_id')),
+            function (data, status) {
+                if (status == 'success') {
+                    $('#modal_body').html(data.html)
+                    clear_message('#modal_message')
+                    $('#modal_dialog').modal('show')
+                }
+            })
     })
 
     $(document).on('click', '#button_deal_cards', function () {

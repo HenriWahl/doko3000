@@ -747,7 +747,8 @@ def delete_player(player_id):
 
             else:
                 return jsonify({'status': 'error',
-                                'message': 'Der Spieler spielt an einem Tisch.'})
+                                'html': render_template('index/delete_player_impossible.html',
+                                                            player=player)})
         else:
             return redirect(url_for('index'))
     else:
