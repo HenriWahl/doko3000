@@ -885,3 +885,11 @@ class Game:
             self.players.pop(player_id)
             return True
         return False
+
+    def check_tables(self):
+        """
+        check if any formerly locked table is now emtpy and should be unlocked
+        """
+        for table in self.tables.values():
+            if table.locked and len(table.players) == 0:
+                table.locked = False

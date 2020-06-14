@@ -120,13 +120,15 @@ def played_card(msg):
 def enter_table_socket(msg):
     table_id = msg.get('table_id')
     player_id = msg.get('player_id')
-    if table_id in game.tables and \
-            player_id in game.players:
-        table = game.tables[table_id]
+    table = game.tables.get(table_id)
+    if table and \
+       player_id in game.players:
         if (table.locked and player_id in table.players) or \
                 not table.locked:
             game.tables[table_id].add_player(player_id)
             join_room(table_id)
+            # check if any formerly locked table is now emtpy and should be unlocked
+            game.check_tables()
 
 
 @socketio.on('setup-table-change')
@@ -157,6 +159,7 @@ def setup_table(msg):
                           {'table_id': table.id},
                           room=table.id)
 
+
 @socketio.on('setup-player-change')
 def setup_player(msg):
     player_id = msg.get('player_id')
@@ -178,6 +181,7 @@ def setup_player(msg):
                 socketio.emit('change-password-failed',
                               {'player_id': player.id},
                               room=request.sid)
+
 
 @socketio.on('deal-cards')
 def deal_cards(msg):
@@ -521,10 +525,11 @@ def index():
 @app.route('/table/<table_id>')
 @login_required
 def table(table_id=''):
-    if table_id in game.tables and \
-            current_user.get_id() in game.tables[table_id].players:
-        player = game.players.get(current_user.get_id())
-        table = game.tables[table_id]
+    player = game.players.get(current_user.get_id())
+    table = game.tables.get(table_id)
+    if player and \
+       table and \
+       player.id in game.tables[table_id].players:
         dealer = table.dealer
         # if no card is played already the dealer might deal
         dealing_needed = table.round.turn_count == 0
@@ -552,6 +557,7 @@ def table(table_id=''):
     tables = game.tables.values()
     return render_template('index.html',
                            tables=tables,
+                           player=player,
                            title=f"{app.config['TITLE']}")
 
 
