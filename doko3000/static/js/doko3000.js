@@ -439,7 +439,7 @@ $(document).ready(function () {
         return false
     })
 
-    // delete a player in the draggable players order
+    // delete a player in the players list
     $(document).on('click', '.button-delete-player', function () {
         if (player_id != $(this).data('player_id')) {
             $.getJSON('/delete/player/' + encodeURIComponent($(this).data('player_id')),
@@ -459,11 +459,28 @@ $(document).ready(function () {
             // once again the .post + 'json' move
             $.post('/delete/player/' + encodeURIComponent($(this).data('player_id')),
                 function (data, status) {
+                console.log(data)
                     if (status == 'success') {
                         $('#list_players').html(data.html)
+                    } else {
+                        console.log(data.message)
+                    show_message('#modal_message', data.message)
                     }
                 }, 'json')
         }
+        return false
+    })
+
+    // delete a player in the players list
+    $(document).on('click', '.button-delete-table', function () {
+            $.getJSON('/delete/table/' + encodeURIComponent($(this).data('table_id')),
+                function (data, status) {
+                    if (status == 'success') {
+                        $('#modal_body').html(data.html)
+                        clear_message('#modal_message')
+                        $('#modal_dialog').modal('show')
+                    }
+                })
     })
 
     $(document).on('click', '#button_deal_cards', function () {

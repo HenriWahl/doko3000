@@ -848,6 +848,9 @@ class Game:
         for table_id, document in self.db.filter_by_type('table').items():
             self.tables[table_id] = Table(document_id=document['_id'], game=self)
 
+        # check for locked tables
+        self.check_tables()
+
     def add_player(self, player_id='', password='', is_admin=False):
         """
         adds a new player

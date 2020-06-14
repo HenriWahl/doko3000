@@ -1,8 +1,8 @@
 <ul class="list-group">
     {% for table in tables %}
     <li class="list-group-item"
-            id="{{ table.id }}"
-            data-table_id="{{ table.id }}">
+        id="{{ table.id }}"
+        data-table_id="{{ table.id }}">
         <div class="row">
             <div class="col-md-7 col-sm-12">
                 <strong>
@@ -30,9 +30,13 @@
                     <span class="oi oi-account-login mr-1"></span>
                     Beitreten
                 </a>
-                <a href="#" class="btn btn-outline-info setup-table ml-2 {{ disabled }}"
-                        data-table_id="{{ table.id }}">
+                <a href="#" class="btn btn-outline-info setup-table text-nowrap ml-2 {{ disabled }}"
+                   data-table_id="{{ table.id }}">
                     <span class="oi oi-cog"></span>
+                </a>
+                <a href="#" class="btn btn-outline-danger text-nowrap ml-2 button-delete-table {{ disabled }}"
+                   data-table_id="{{ table.id }}">
+                    <span class=" oi oi-trash"></span>
                 </a>
             </div>
         </div>

@@ -744,17 +744,10 @@ def delete_player(player_id):
                     return jsonify({'status': 'ok',
                                     'html': render_template('index/list_players.html',
                                                             players=players)})
-                else:
-                    if new_player_password:
-                        player = game.add_player(new_player_id)
-                        player.set_password(new_player_password)
-                        return jsonify({'status': 'ok'})
-                    else:
-                        return jsonify({'status': 'error',
-                                        'message': 'Der Spieler braucht eine Passwort'})
+
             else:
                 return jsonify({'status': 'error',
-                                'message': 'Der Spieler braucht einen Namen'})
+                                'message': 'Der Spieler spielt an einem Tisch.'})
         else:
             return redirect(url_for('index'))
     else:
