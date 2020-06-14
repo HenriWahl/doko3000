@@ -533,6 +533,15 @@ $(document).ready(function () {
         })
     })
 
+    // reset password change button when password gets changed
+    $(document).on('keyup', '#new_player_password', function () {
+        $('#button_change_password').addClass('btn-outline-primary')
+        $('#button_change_password').removeClass('btn-outline-success')
+        $('#button_change_password').removeClass('btn-outline-danger')
+        $('#indicate_change_password_successful').addClass('d-none')
+        $('#indicate_change_password_failed').addClass('d-none')
+    })
+
     $(document).on('click', '#button_deal_cards_again', function () {
         socket.emit('deal-cards-again', {
             player_id: player_id,
