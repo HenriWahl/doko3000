@@ -729,26 +729,59 @@ def delete_player(player_id):
     """
     delete player from players list on index page and thus from game at all
     """
+    player = game.players.get(player_id)
     if is_xhr(request) and \
             current_user.is_admin and \
-            player_id in game.players:
+            player:
         if request.method == 'GET':
-            return jsonify({'status': 'ok',
-                            'html': render_template('index/delete_player.html',
-                                                    player_id=player_id)})
-        elif request.method == 'POST':
-            player = game.players[player_id]
             if not player.is_playing():
-                if game.delete_player(player_id):
-                    players = game.players.values()
-                    return jsonify({'status': 'ok',
-                                    'html': render_template('index/list_players.html',
-                                                            players=players)})
-
+                return jsonify({'status': 'ok',
+                                'html': render_template('index/delete_player.html',
+                                                        player=player)})
             else:
                 return jsonify({'status': 'error',
                                 'html': render_template('error.html',
                                                          message=f"{player.id} sitzt noch am Tisch {player.table}.")})
+        elif request.method == 'POST':
+            if game.delete_player(player.id):
+                players = game.players.values()
+                return jsonify({'status': 'ok',
+                                'html': render_template('index/list_players.html',
+                                                        players=players)})
+            else:
+                return redirect(url_for('index'))
+        else:
+            return redirect(url_for('index'))
+    else:
+        return redirect(url_for('index'))
+
+
+@app.route('/delete/table/<table_id>', methods=['GET', 'POST'])
+@login_required
+def delete_table(table_id):
+    """
+    delete table from players list on index page and thus from game at all
+    """
+    table = game.tables.get(table_id)
+    if is_xhr(request) and \
+            table:
+        if request.method == 'GET':
+            if len(table.players) == 0:
+                return jsonify({'status': 'ok',
+                                'html': render_template('index/delete_table.html',
+                                                        table=table)})
+            else:
+                return jsonify({'status': 'error',
+                                'html': render_template('error.html',
+                                                         message=f"Es sitzen noch Spieler am Tisch {table.id}.")})
+        elif request.method == 'POST':
+            if game.delete_table(table.id):
+                tables = game.tables.values()
+                return jsonify({'status': 'ok',
+                                'html': render_template('index/list_tables.html',
+                                                        tables=tables)})
+            else:
+                return redirect(url_for('index'))
         else:
             return redirect(url_for('index'))
     else:

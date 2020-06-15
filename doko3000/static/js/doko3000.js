@@ -490,6 +490,28 @@ $(document).ready(function () {
             })
     })
 
+    // really delete table after safety dialog
+    $(document).on('click', '#button_really_delete_table', function () {
+            // once again the .post + 'json' move
+            $.post('/delete/table/' + encodeURIComponent($(this).data('table_id')),
+                function (data, status) {
+                    console.log(data, status)
+                    if (status == 'success') {
+                        if (data.status == 'ok') {
+                            $('#list_tables').html(data.html)
+                            $('#modal_dialog').modal('hide')
+                        } else {
+                            console.log(status)
+                            $('#modal_body').html(data.html)
+                            clear_message('#modal_message')
+                            $('#modal_dialog').modal('show')
+                        }
+                    }
+                }, 'json')
+
+        return false
+    })
+
     $(document).on('click', '#button_deal_cards', function () {
         socket.emit('deal-cards', {
             player_id: player_id,

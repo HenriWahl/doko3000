@@ -37,7 +37,7 @@ class Deck:
                'Herz',
                'Grün',
                'Eichel')
-    RANKS = {'Neun':0,
+    RANKS = {'Neun': 0,
              'Zehn': 10,
              'Unter': 2,
              'Ober': 3,
@@ -218,7 +218,7 @@ class Player(UserMixin, Document):
                 self.cards = cards
                 # if not playing right now there is no need to save the cards
                 # sometimes provokes a 409 error from cloudant
-                #self.save()
+                # self.save()
         return cards
 
     def remove_card(self, card_id):
@@ -321,6 +321,7 @@ class Round(Document):
     """
     eternal round, part of a table
     """
+
     def __init__(self, players=[], game=None, round_id='', document_id=''):
         """
         either initialize new round or load it from CouchDB
@@ -481,7 +482,7 @@ class Round(Document):
             self.current_player = None
 
         # needed for player HUD
-        #self.calculate_opponents()
+        # self.calculate_opponents()
         self.calculate_trick_order()
 
         # a new card deck for every round
@@ -525,8 +526,8 @@ class Round(Document):
             self.game.players[player_id].eichel_ober_count = 0
             for card_id in range(self.cards_per_player):
                 # cards are given to players, segmented by range
-                self.game.players[player_id].cards = self.cards[player_count * self.cards_per_player:\
-                                                                player_count * self.cards_per_player +\
+                self.game.players[player_id].cards = self.cards[player_count * self.cards_per_player: \
+                                                                player_count * self.cards_per_player + \
                                                                 self.cards_per_player]
             # raiser counter for Eichel Ober cards if player has one or two
             for card_id in self.game.players[player_id].cards:
@@ -753,7 +754,7 @@ class Table(Document):
         self.game.players[player_id].table = ''
         if player_id not in self.players and \
                 player_id not in self.order and \
-                player_id not in self.round.players and\
+                player_id not in self.round.players and \
                 player_id not in self.round.trick_order:
             self.round.save()
             self.save()
@@ -888,6 +889,26 @@ class Game:
             self.players.pop(player_id)
             return True
         return False
+
+    def delete_table(self, table_id):
+        """
+        remove all traces of a table and its round
+        """
+        table = self.tables.get(table_id)
+        if table and \
+           len(table.players) == 0:
+            for player in self.players.values():
+                if player.table == table_id:
+                    player.table = ''
+            if table_id in self.rounds:
+                self.rounds[table_id].delete()
+                self.rounds.pop(table_id)
+            if table_id in self.tables:
+                self.tables[table_id].delete()
+                self.tables.pop(table_id)
+            return True
+        else:
+            return False
 
     def check_tables(self):
         """
