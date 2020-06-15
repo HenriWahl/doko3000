@@ -901,6 +901,11 @@ class Game:
                 if player.table == table_id:
                     player.table = ''
             if table_id in self.rounds:
+                for trick_number in self.rounds[table_id].tricks:
+                    trick_id =  f'{table_id}-{trick_number}'
+                    if trick_id in self.tricks:
+                        self.tricks[trick_id].delete()
+                        self.tricks.pop(trick_id)
                 self.rounds[table_id].delete()
                 self.rounds.pop(table_id)
             if table_id in self.tables:
