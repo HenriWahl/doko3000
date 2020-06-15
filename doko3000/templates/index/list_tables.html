@@ -30,14 +30,23 @@
                     <span class="oi oi-account-login mr-1"></span>
                     Beitreten
                 </a>
-                <a href="#" class="btn btn-outline-info setup-table text-nowrap ml-2 {{ disabled }}"
-                   data-table_id="{{ table.id }}">
-                    <span class="oi oi-cog"></span>
-                </a>
-                <a href="#" class="btn btn-outline-danger text-nowrap ml-2 button-delete-table {{ disabled }}"
-                   data-table_id="{{ table.id }}">
-                    <span class=" oi oi-trash"></span>
-                </a>
+                <div class="dropdown {{ disabled }}">
+                    <a href="#" class="btn btn-outline-primary border-0 ml-2" data-toggle="dropdown">
+                        <span class="oi oi-menu"></span>
+                    </a>
+                    <div class="dropdown-menu">
+                        <a href="#" class="dropdown-item setup-table text-nowrap {{ disabled }}"
+                           data-table_id="{{ table.id }}">
+                            <span class="oi oi-cog mr-2"></span>
+                            Einstellungen
+                        </a>
+                        <a href="#" class="dropdown-item text-danger text-nowrap button-delete-table {{ disabled }}"
+                           data-table_id="{{ table.id }}">
+                            <span class=" oi oi-trash mr-2"></span>
+                            Löschen
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
     </li>
