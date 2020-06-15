@@ -247,14 +247,16 @@ $(document).ready(function () {
         $('#button_change_password').addClass('btn-outline-success')
         $('#indicate_change_password_successful').removeClass('d-none')
         $('#indicate_change_password_failed').addClass('d-none')
+        $('#submit_change_password').addClass('d-none')
     })
 
     socket.on('change-password-failed', function (msg) {
         $('#button_change_password').removeClass('btn-outline-primary')
         $('#button_change_password').removeClass('btn-outline-success')
         $('#button_change_password').addClass('btn-outline-danger')
-        $('#indicate_change_password_successful').addClass('d-none')
         $('#indicate_change_password_failed').removeClass('d-none')
+        $('#indicate_change_password_successful').addClass('d-none')
+        $('#submit_change_password').addClass('d-none')
     })
 
     $(document).on('click', '.button-enter-table', function () {
@@ -560,6 +562,7 @@ $(document).ready(function () {
         $('#button_change_password').addClass('btn-outline-primary')
         $('#button_change_password').removeClass('btn-outline-success')
         $('#button_change_password').removeClass('btn-outline-danger')
+        $('#submit_change_password').removeClass('d-none')
         $('#indicate_change_password_successful').addClass('d-none')
         $('#indicate_change_password_failed').addClass('d-none')
     })

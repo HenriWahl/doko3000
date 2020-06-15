@@ -4,7 +4,7 @@
         id="{{ table.id }}"
         data-table_id="{{ table.id }}">
         <div class="row">
-            <div class="col-md-7 col-sm-12">
+            <div class="col-md-6 col-sm-12">
                 <strong>
                     {{ table.id }}
                     {% if table.locked %}
@@ -18,7 +18,7 @@
     {% endfor %}
                 </span>
             </div>
-            <div class="col-md-5 col-sm-12 d-flex align-items-center">
+            <div class="col-md-6 col-sm-12 d-flex align-items-center">
                 {% if current_user.id in table.players or not table.locked %}
                 {% set disabled = '' %}
                 {% else %}
