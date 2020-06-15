@@ -445,10 +445,10 @@ def request_round_reset(msg):
 
 @socketio.on('ready-for-round-reset')
 def round_reset(msg):
-    player_id = msg['player_id']
-    table_id = msg['table_id']
+    player_id = msg.get('player_id')
+    table_id = msg.get('table_id')
     if player_id == current_user.get_id() and \
-            table_id in game.tables:
+       table_id in game.tables:
         table = game.tables[table_id]
         table.add_ready_player(player_id)
         if set(table.players_ready) >= set(table.round.players):

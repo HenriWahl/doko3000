@@ -204,7 +204,6 @@ $(document).ready(function () {
         $('.overlay-button').addClass('d-none')
         $('.overlay-notification').addClass('d-none')
         $('#modal_body').html(msg.html)
-        console.log(msg)
         if (player_id == msg.dealer) {
             $('#button_deal_cards').removeClass('d-none')
             $('#button_close_info').addClass('d-none')
@@ -216,7 +215,7 @@ $(document).ready(function () {
     })
 
     socket.on('round-reset-requested', function (msg) {
-        console.log('round-reset-requested', msg)
+
         $('.overlay-button').addClass('d-none')
         $('.overlay-notification').addClass('d-none')
         // cleanup content of dialog
@@ -461,13 +460,11 @@ $(document).ready(function () {
             // once again the .post + 'json' move
             $.post('/delete/player/' + encodeURIComponent($(this).data('player_id')),
                 function (data, status) {
-                    console.log(data, status)
                     if (status == 'success') {
                         if (data.status == 'ok') {
                             $('#list_players').html(data.html)
                             $('#modal_dialog').modal('hide')
                         } else {
-                            console.log(status)
                             $('#modal_body').html(data.html)
                             clear_message('#modal_message')
                             $('#modal_dialog').modal('show')
@@ -495,13 +492,11 @@ $(document).ready(function () {
             // once again the .post + 'json' move
             $.post('/delete/table/' + encodeURIComponent($(this).data('table_id')),
                 function (data, status) {
-                    console.log(data, status)
                     if (status == 'success') {
                         if (data.status == 'ok') {
                             $('#list_tables').html(data.html)
                             $('#modal_dialog').modal('hide')
                         } else {
-                            console.log(status)
                             $('#modal_body').html(data.html)
                             clear_message('#modal_message')
                             $('#modal_dialog').modal('show')
@@ -571,7 +566,6 @@ $(document).ready(function () {
 
     // change password
     $(document).on('click', '#button_change_password', function () {
-        console.log('password change')
         socket.emit('setup-player-change', {
             action: 'new_password',
             player_id: $(this).data('player_id'),
@@ -611,7 +605,6 @@ $(document).ready(function () {
     })
 
     $(document).on('click', '#menu_request_round_reset', function () {
-        console.log('request_round_reset')
         socket.emit('request-round-reset', {
             player_id: player_id,
             table_id: $(this).data('table_id')
@@ -662,19 +655,4 @@ $(document).ready(function () {
         // dummy return just in case
         return false
     })
-
-    // $(document).on('click', '#button_round_restart_yes', function () {
-    //     let table_id = $(this).data('table_id')
-    //     $.getJSON('/get/wait', function (data, status) {
-    //         if (status == 'success') {
-    //             $('#modal_body').html(data.html)
-    //             socket.emit('ready-for-round-restart', {
-    //                 player_id: player_id,
-    //                 table_id: table_id
-    //             })
-    //         }
-    //     })
-    //     // dummy return just in case
-    //     return false
-    // })
 })
