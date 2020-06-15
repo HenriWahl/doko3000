@@ -555,8 +555,10 @@ def table(table_id=''):
                                timestamp=timestamp,
                                score=score)
     tables = game.tables.values()
+    players = game.players.values()
     return render_template('index.html',
                            tables=tables,
+                           players=players,
                            player=player,
                            title=f"{app.config['TITLE']}")
 
