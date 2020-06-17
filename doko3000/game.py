@@ -433,12 +433,6 @@ class Round(Document):
             self.save()
         return timestamp
 
-    def calculate_timestamp(self):
-        """
-        store moment of shuffling for comparing cards when being sorted and freshly dealed at one time
-        """
-        self['timestamp'] = int(time() * 100000)
-
     @property
     def current_trick(self):
         """
@@ -504,6 +498,12 @@ class Round(Document):
             self.game.players[player_id].save()
 
         self.save()
+
+    def calculate_timestamp(self):
+        """
+        store moment of shuffling for comparing cards when being sorted and freshly dealed at one time
+        """
+        self['timestamp'] = int(time() * 100000)
 
     def shuffle(self):
         """
@@ -581,20 +581,6 @@ class Round(Document):
                     score[trick.owner] += Deck.cards[card_id].value
         return score
 
-    # def calculate_opponents(self):
-    #     """
-    #     give players info about whom they are playing against - interesting for HUD display
-    #     """
-    #     if len(self.players) == 4:
-    #         for player_id in self.players:
-    #             player_index = self.players.index(player_id)
-    #             player_order_view = copy(self.players)
-    #             for i in range(player_index):
-    #                 player_order_view.append(player_order_view.pop(0))
-    #             self.game.players[player_id].left = player_order_view[1]
-    #             self.game.players[player_id].opposite = player_order_view[2]
-    #             self.game.players[player_id].right = player_order_view[3]
-
     def calculate_trick_order(self):
         """
         get order by arranging players list starting from current player who is first in this trick
@@ -611,6 +597,14 @@ class Round(Document):
         self.trick_count += 1
         self.save()
 
+    def get_players_cards(self):
+        """
+        retrieve all cards of all players for spectator mode
+        """
+        players_cards = []
+        for player_id in self.players:
+            players_cards.append(self.game.players[player_id].get_cards())
+        return players_cards
 
 class Table(Document):
     """

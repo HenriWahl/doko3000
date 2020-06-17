@@ -227,12 +227,12 @@ def deal_cards_to_player(msg):
                     # just in case
                     join_room(table.id)
                     current_player_id = table.round.current_player
+                    timestamp = table.round.timestamp
                     if player.id in table.round.players:
                         cards_hand = player.get_cards()
                         cards_table = []
                         # no score yet but needed for full set of cards for hand - to decide if back-card is shown too
                         score = table.round.get_score()
-                        timestamp = table.round.timestamp
                         socketio.emit('your-cards-please',
                                       {'player_id': player.id,
                                        'turn_count': table.round.turn_count,
@@ -258,12 +258,19 @@ def deal_cards_to_player(msg):
                                       room=request.sid)
                     else:
                         # one day becoming spectator mode
+                        players_cards = table.round.get_players_cards()
+                        print(players_cards)
                         socketio.emit('sorry-no-cards-for-you',
                                       {'html': {'hud_players': render_template('top/hud_players.html',
                                                                                table=table,
                                                                                player=player,
                                                                                dealer=dealer,
-                                                                               current_player_id=current_player_id)}},
+                                                                               current_player_id=current_player_id),
+                                                'cards_spectator': render_template('cards/spectator.html',
+                                                                              table=table,
+                                                                              players_cards=players_cards,
+                                                                              timestamp=timestamp,
+                                                                              spectator_mode=True)}},
                                       room=request.sid)
 
 

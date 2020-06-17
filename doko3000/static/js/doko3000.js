@@ -164,7 +164,7 @@ $(document).ready(function () {
 
     socket.on('sorry-no-cards-for-you', function (msg) {
         $('#table').html('')
-        $('#hand').html('')
+        $('#hand').html(msg.html.cards_spectator)
         $('#hud_players').html(msg.html.hud_players)
     })
 
