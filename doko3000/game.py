@@ -601,7 +601,7 @@ class Round(Document):
         """
         retrieve all cards of all players for spectator mode
         """
-        players_cards = []
+        players_cards = {}
         for player_id in self.players:
             players_cards.append(self.game.players[player_id].get_cards())
         return players_cards

@@ -114,7 +114,7 @@ $(document).ready(function () {
         // }
 
         $('#table').html(msg.html.cards_table)
-        // $('#card_' + msg.card_id).attr('title', msg.player_id)
+        $('#table_spectator').html(msg.html.cards_table)
 
         if (msg.is_last_turn) {
             cards_locked = true

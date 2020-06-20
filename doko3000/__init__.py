@@ -563,10 +563,14 @@ def table(table_id=''):
                                    timestamp=timestamp,
                                    score=score)
         else:
+            players = table.round.players
+            players_cards = table.round.get_players_cards()
             return render_template('spectator.html',
                                    title=f"{app.config['TITLE']} {table_id}",
                                    table=table,
-                                   player=player)
+                                   player=player,
+                                   players=players,
+                                   players_cards=players_cards)
     tables = game.tables.values()
     players = game.players.values()
     return render_template('index.html',
