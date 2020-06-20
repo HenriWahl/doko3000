@@ -536,31 +536,37 @@ def table(table_id=''):
     table = game.tables.get(table_id)
     if player and \
        table and \
-       player.id in game.tables[table_id].players:
-        dealer = table.dealer
-        # if no card is played already the dealer might deal
-        dealing_needed = table.round.turn_count == 0
-        # if one trick right now was finished the claim-trick-button should be displayed again
-        trick_claiming_needed = table.round.turn_count % 4 == 0 and \
-                                table.round.turn_count > 0 and \
-                                not table.round.is_finished()
-        current_player_id = table.round.current_player
-        cards_hand = player.get_cards()
-        cards_table = table.round.current_trick.get_cards()
-        timestamp = table.round.timestamp
-        score = table.round.get_score()
-        return render_template('table.html',
-                               title=f"{app.config['TITLE']} {table_id}",
-                               table=table,
-                               dealer=dealer,
-                               dealing_needed=dealing_needed,
-                               trick_claiming_needed=trick_claiming_needed,
-                               player=player,
-                               current_player_id=current_player_id,
-                               cards_hand=cards_hand,
-                               cards_table=cards_table,
-                               timestamp=timestamp,
-                               score=score)
+       player.id in table.players:
+        if player.id in table.round.players:
+            dealer = table.dealer
+            # if no card is played already the dealer might deal
+            dealing_needed = table.round.turn_count == 0
+            # if one trick right now was finished the claim-trick-button should be displayed again
+            trick_claiming_needed = table.round.turn_count % 4 == 0 and \
+                                    table.round.turn_count > 0 and \
+                                    not table.round.is_finished()
+            current_player_id = table.round.current_player
+            cards_hand = player.get_cards()
+            cards_table = table.round.current_trick.get_cards()
+            timestamp = table.round.timestamp
+            score = table.round.get_score()
+            return render_template('table.html',
+                                   title=f"{app.config['TITLE']} {table_id}",
+                                   table=table,
+                                   dealer=dealer,
+                                   dealing_needed=dealing_needed,
+                                   trick_claiming_needed=trick_claiming_needed,
+                                   player=player,
+                                   current_player_id=current_player_id,
+                                   cards_hand=cards_hand,
+                                   cards_table=cards_table,
+                                   timestamp=timestamp,
+                                   score=score)
+        else:
+            return render_template('spectator.html',
+                                   title=f"{app.config['TITLE']} {table_id}",
+                                   table=table,
+                                   player=player)
     tables = game.tables.values()
     players = game.players.values()
     return render_template('index.html',

@@ -1,7 +1,7 @@
 // globally used player_id
 let player_id = ''
 // for staying in sync with the game this is global
-let turn_count = 0
+//let turn_count = 0
 // keep an eye on next player to know if turns are allowed or not
 let current_player_id = ''
 // lock dragging of cards while waiting for trick being claimed

@@ -2,30 +2,6 @@
 
 {% block main_content %}
 
-<div id="button_deal_cards_again" class="overlay-button justify-content-center
-    {% if current_user.id != dealer or not dealing_needed %}
-    d-none
-    {% endif %}"
-     data-table_id="{{ table.id }}">
-    <button class="btn btn-warning btn-block btn-lg p-4"><strong>Karten noch einmal geben</strong></button>
-</div>
-
-<div id="button_claim_trick" class="overlay-button justify-content-center
-     {% if player.id in table.idle_players or not trick_claiming_needed %}
-     d-none
-     {% endif %}
-     "
-     data-table_id="{{ table.id }}">
-    <button class="btn btn-success btn-block btn-lg p-4"><strong>Stich nehmen</strong></button>
-</div>
-
-<button id="turn_indicator" class="overlay-notification btn btn-block btn-lg text-white
-{% if current_player_id != current_user.id %}
-d-none
-{% endif %}
-">Du bist am Zug
-</button>
-
 <div class="container-fluid row p-0 m-0" id="topbar">
     <div class="col-3 p-0">
         {% include "top/menu.html" %}
@@ -41,16 +17,17 @@ d-none
 <div id="table_hand">
     <div class="row align-items-center w-100 h-50 m-0 p-0">
         <div class="container-fluid w-100 h-100 m-0 p-0 d-flex justify-content-center align-items-center"
-             id="table">
+             id="table_spectator">
             {% include 'cards/table.html' %}
         </div>
     </div>
 
     <div class="row align-items-center w-100 h-50 m-0 p-0">
         <div class="container-fluid w-100 h-100 m-0 p-0 container-fluid d-inline-flex justify-content-center align-items-center"
-             id="hand">
+             id="hand_spectator">
             {% include 'cards/hand.html' %}
         </div>
     </div>
 </div>
+
 {% endblock main_content %}
