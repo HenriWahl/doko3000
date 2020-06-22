@@ -259,7 +259,6 @@ def deal_cards_to_player(msg):
                     else:
                         # one day becoming spectator mode
                         players_cards = table.round.get_players_cards()
-                        print(players_cards)
                         socketio.emit('sorry-no-cards-for-you',
                                       {'html': {'hud_players': render_template('top/hud_players.html',
                                                                                table=table,

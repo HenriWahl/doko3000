@@ -2,67 +2,101 @@
 
 {% block main_content %}
 
-<div class="container-fluid row p-0 m-0" id="topbar">
-    <div class="col-3 p-0">
-        {% include "top/menu.html" %}
+    <div class="container-fluid row p-0 m-0" id="topbar">
+        <div class="col-3 p-0">
+            {% include "top/menu.html" %}
+        </div>
+        <div class="col-6 p-0 mt-2">
+            {% include 'top/hud_players.html' %}
+        </div>
+        <div class="col-3 p-0">
+            {% include "top/player.html" %}
+        </div>
     </div>
-    <div class="col-6 p-0 mt-2">
-        {% include 'top/hud_players.html' %}
-    </div>
-    <div class="col-3 p-0">
-        {% include "top/player.html" %}
-    </div>
-</div>
 
-<div id="table_hand">
-    <div class="row align-items-center w-100 h-25 m-0 p-0">
-        <!--        <div class="container-fluid w-100 h-100 m-0 p-0 container-fluid d-inline-flex justify-content-center align-items-center"-->
-        <div class="w-100 h-100 m-0 p-0"
-             id="hand_spectator_upper">
-            <div class="row">
-                <!-- player 1 -->
-                <div class="col-6 container-fluid d-inline-flex justify-content-center align-items-center">
-                    {% for card in players_cards[0] %}
-                    {% include 'cards/card.html' %}
-                    {% endfor %}
+    <div id="table_hand">
+        <div class="row align-items-center w-100 h-25 m-0 p-0">
+            <!--        <div class="container-fluid w-100 h-100 m-0 p-0 container-fluid d-inline-flex justify-content-center align-items-center"-->
+            <div class="w-100 h-100 m-0 p-0"
+                 id="hand_spectator_upper">
+                <div class="row">
+                    <!-- player 1 -->
+                    <div class="col-6">
+                        <div class="row">
+                            <div class="col-12">
+                                <span class="mx-2">
+                                {{ players[0] }}
+                                </span>
+                            </div>
+                            <div class="col-12 container-fluid d-inline-flex align-items-center">
+                                {% for card in players_cards[0] %}
+                                    {% include 'cards/card.html' %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    <!-- player 2 -->
+                    <div class="col-6">
+                        <div class="row">
+                            <div class="col-12">
+                                <span class="float-right mx-2">
+                                {{ players[1] }}
+                                </span>
+                            </div>
+                            <div class="col-12 container-fluid d-inline-flex align-items-center justify-content-end">
+                                {% for card in players_cards[1] %}
+                                    {% include 'cards/card.html' %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <!-- player 2 -->
-                <div class="col-6 container-fluid d-inline-flex justify-content-center align-items-center">
-                    {% for card in players_cards[1] %}
-                    {% include 'cards/card.html' %}
-                    {% endfor %}
+            </div>
+        </div>
+        <div class="row align-items-center w-100 h-50 m-0 p-0">
+            <div class="container-fluid w-100 h-100 m-0 p-0 d-flex justify-content-center align-items-center"
+                 id="table_spectator">
+                {% include 'cards/table.html' %}
+            </div>
+        </div>
+        <div class="row align-items-center w-100 h-25 m-0 p-0">
+            <!--        <div class="container-fluid w-100 h-100 m-0 p-0 container-fluid d-inline-flex justify-content-center align-items-center"-->
+            <div class="w-100 h-100 m-0 p-0"
+                 id="hand_spectator_lower">
+                <div class="row">
+                    <!-- player 1 -->
+                    <div class="col-6">
+                        <div class="row">
+                            <div class="col-12">
+                                <span class="mx-2">
+                                {{ players[2] }}
+                                </span>
+                            </div>
+                            <div class="col-12 container-fluid d-inline-flex align-items-center">
+                                {% for card in players_cards[2] %}
+                                    {% include 'cards/card.html' %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    <!-- player 2 -->
+                    <div class="col-6">
+                        <div class="row">
+                            <div class="col-12">
+                                <span class="float-right mx-2">
+                                {{ players[3] }}
+                                </span>
+                            </div>
+                            <div class="col-12 container-fluid d-inline-flex align-items-center justify-content-end">
+                                {% for card in players_cards[3] %}
+                                    {% include 'cards/card.html' %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="row align-items-center w-100 h-50 m-0 p-0">
-        <div class="container-fluid w-100 h-100 m-0 p-0 d-flex justify-content-center align-items-center"
-             id="table_spectator">
-            {% include 'cards/table.html' %}
-        </div>
-    </div>
-    <div class="row align-items-center w-100 h-25 m-0 p-0">
-        <!--        <div class="container-fluid w-100 h-100 m-0 p-0 container-fluid d-inline-flex justify-content-center align-items-center"-->
-        <div class="w-100 h-100 m-0 p-0"
-             id="hand_spectator_lower">
-            <div class="row">
-                <!-- player 3 -->
-
-                <div class="col-6 container-fluid d-inline-flex justify-content-center align-items-center">
-                    {% for card in players_cards[2] %}
-                    {% include 'cards/card.html' %}
-                    {% endfor %}
-                </div>
-                <!-- player 4 -->
-                <div class="col-6 container-fluid d-inline-flex justify-content-center align-items-center">
-                    {% for card in players_cards[3] %}
-                    {% include 'cards/card.html' %}
-                    {% endfor %}
-                </div>
-            </div>
-
-        </div>
-    </div>
-</div>
 
 {% endblock main_content %}
