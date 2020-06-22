@@ -258,18 +258,12 @@ def deal_cards_to_player(msg):
                                       room=request.sid)
                     else:
                         # one day becoming spectator mode
-                        players_cards = table.round.get_players_cards()
                         socketio.emit('sorry-no-cards-for-you',
                                       {'html': {'hud_players': render_template('top/hud_players.html',
                                                                                table=table,
                                                                                player=player,
                                                                                dealer=dealer,
-                                                                               current_player_id=current_player_id),
-                                                'cards_spectator': render_template('cards/spectator.html',
-                                                                              table=table,
-                                                                              players_cards=players_cards,
-                                                                              timestamp=timestamp,
-                                                                              spectator_mode=True)}},
+                                                                               current_player_id=current_player_id)}},
                                       room=request.sid)
 
 
@@ -564,9 +558,11 @@ def table(table_id=''):
         else:
             players = table.round.players
             players_cards = table.round.get_players_cards()
+            cards_table = table.round.current_trick.get_cards()
             return render_template('spectator.html',
                                    title=f"{app.config['TITLE']} {table_id}",
                                    table=table,
+                                   cards_table=cards_table,
                                    player=player,
                                    players=players,
                                    players_cards=players_cards)
