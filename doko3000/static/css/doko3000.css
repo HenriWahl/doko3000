@@ -130,10 +130,9 @@ html, body {
 !important;
 }
 
-/*.spectator-hand .img-fluid {*/
-/*    height: 50%;*/
-/*    max-height: 50%;*/
-/*}*/
+.spectator-hand .img-fluid {
+    max-height: 150px;
+}
 
 #table_spectator {
     position: absolute;
