@@ -4,9 +4,11 @@
      data-id="{{ card.id }}"
      data-table_id="{{ table.id }}"
      data-timestamp="{{ timestamp }}"
-{% if played_by %}
+        {% if played_by %}
      title="{{ played_by }}"
-     {% endif %}}
+        {% endif %}}
 >
-<img class="img-fluid p-1" src="/static/img/cards/{{ card.name }}.png">
+    <picture>
+        <img class="img-fluid p-1" src="/static/img/cards/{{ card.name }}.png">
+    </picture>
 </div>

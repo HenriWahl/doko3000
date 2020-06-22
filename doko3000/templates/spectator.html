@@ -15,7 +15,7 @@
     </div>
 
     <div id="table_hand">
-        <div class="row align-items-center w-100 h-25 m-0 p-0">
+        <div class="row w-100 h-50 m-0 p-0">
             <!--        <div class="container-fluid w-100 h-100 m-0 p-0 container-fluid d-inline-flex justify-content-center align-items-center"-->
             <div class="w-100 h-100 m-0 p-0"
                  id="hand_spectator_upper">
@@ -53,26 +53,30 @@
                 </div>
             </div>
         </div>
-        <div class="row align-items-center w-100 h-50 m-0 p-0">
-            <div class="container-fluid w-100 h-100 m-0 p-0 d-flex justify-content-center align-items-center"
+        <div class="row align-items-center m-0 p-0">
+            <div class="container-fluid m-0 p-0 d-flex justify-content-center align-items-center"
                  id="table_spectator">
                 {% include 'cards/table.html' %}
             </div>
         </div>
-        <div class="row align-items-center w-100 h-25 m-0 p-0">
+        <div class="row w-100 h-50 m-0 p-0">
             <!--        <div class="container-fluid w-100 h-100 m-0 p-0 container-fluid d-inline-flex justify-content-center align-items-center"-->
             <div class="w-100 h-100 m-0 p-0"
                  id="hand_spectator_lower">
-                <div class="row">
+                <div class="row spectator-hand">
                     <!-- player 1 -->
                     <div class="col-6">
                         <div class="row">
+                        <div class="row">
+                            <div class="col-12 mt-auto">
+                            </div>
+                        </div>
                             <div class="col-12">
                                 <span class="mx-2">
                                 {{ players[2] }}
                                 </span>
                             </div>
-                            <div class="col-12 container-fluid d-inline-flex align-items-center">
+                            <div class="col-12 container-fluid d-inline-flex">
                                 {% for card in players_cards[2] %}
                                     {% include 'cards/card.html' %}
                                 {% endfor %}
