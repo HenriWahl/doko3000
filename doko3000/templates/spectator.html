@@ -64,7 +64,7 @@
             <!-- player 3 -->
             <div class="col-6">
                 <div class="row h-100">
-                    <div class="col-12 mt-auto m-0 p-0">
+                    <div class="col-12 mt-auto ml-0 pl-0">
                        <span class="mx-2">
                         {{ players[2] }}
                        </span>
@@ -79,15 +79,15 @@
             <!-- player 4 -->
             <div class="col-6">
                 <div class="row h-100">
-                    <div class="col-12">
-                                <span class="float-right mx-2">
-                                {{ players[3] }}
-                                </span>
-                    </div>
-                    <div class="col-12 container-fluid d-inline-flex align-items-center justify-content-end">
-                        {% for card in players_cards[3] %}
-                            {% include 'cards/card.html' %}
-                        {% endfor %}
+                    <div class="col-12 mt-auto mr-0 pr-0">
+                       <span class="mx-2 float-right">
+                        {{ players[3] }}
+                       </span>
+                        <div class="container-fluid d-inline-flex m-0 p-0 justify-content-end">
+                            {% for card in players_cards[2] %}
+                                {% include 'cards/card.html' %}
+                            {% endfor %}
+                        </div>
                     </div>
                 </div>
             </div>
