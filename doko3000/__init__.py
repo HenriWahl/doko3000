@@ -41,9 +41,6 @@ game = Game(db)
 game.load_from_db()
 
 
-# game.test_game()
-
-
 @login.user_loader
 def load_user(id):
     """
@@ -233,6 +230,7 @@ def deal_cards_to_player(msg):
                         cards_table = []
                         # no score yet but needed for full set of cards for hand - to decide if back-card is shown too
                         score = table.round.get_score()
+                        mode = 'player'
                         socketio.emit('your-cards-please',
                                       {'player_id': player.id,
                                        'turn_count': table.round.turn_count,
@@ -253,17 +251,36 @@ def deal_cards_to_player(msg):
                                                 'cards_table': render_template('cards/table.html',
                                                                                cards_table=cards_table,
                                                                                table=table,
-                                                                               timestamp=timestamp)}
+                                                                               timestamp=timestamp,
+                                                                               mode=mode)}
                                        },
                                       room=request.sid)
                     else:
                         # one day becoming spectator mode
+                        players = table.round.players
+                        players_cards = table.round.get_players_cards()
+                        cards_table = table.round.current_trick.get_cards()
+                        mode = 'spectator'
                         socketio.emit('sorry-no-cards-for-you',
                                       {'html': {'hud_players': render_template('top/hud_players.html',
                                                                                table=table,
                                                                                player=player,
                                                                                dealer=dealer,
-                                                                               current_player_id=current_player_id)}},
+                                                                               current_player_id=current_player_id),
+                                                'cards_table': render_template('cards/table.html',
+                                                                               cards_table=cards_table,
+                                                                               table=table,
+                                                                               timestamp=timestamp,
+                                                                               mode=mode),
+                                                'cards_hand_spectator_upper': render_template('cards/hand_spectator_upper.html',
+                                                                                             table=table,
+                                                                                             players=players,
+                                                                                             players_cards=players_cards),
+                                                'cards_hand_spectator_lower': render_template('cards/hand_spectator_lower.html',
+                                                    table=table,
+                                                    players=players,
+                                                    players_cards=players_cards)
+                                                }},
                                       room=request.sid)
 
 
@@ -427,8 +444,8 @@ def round_finish(msg):
                            'html': render_template('round/info.html',
                                                    table=table,
                                                    next_players=next_players,
-                                                   number_of_rows=number_of_rows)}
-                          )
+                                                   number_of_rows=number_of_rows)},
+                          room=table.id)
 
 
 @socketio.on('request-round-reset')
@@ -454,7 +471,8 @@ def round_reset(msg):
         if set(table.players_ready) >= set(table.round.players):
             table.reset_round()
             socketio.emit('grab-your-cards',
-                          {'table_id': table.id})
+                          {'table_id': table.id},
+                          room=table.id)
 
 
 @socketio.on('ready-for-round-restart')
@@ -478,7 +496,8 @@ def round_restart(msg):
                            'html': render_template('round/info.html',
                                                    table=table,
                                                    next_players=next_players,
-                                                   number_of_rows=number_of_rows)})
+                                                   number_of_rows=number_of_rows)},
+                          room=table.id)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -543,6 +562,7 @@ def table(table_id=''):
             cards_table = table.round.current_trick.get_cards()
             timestamp = table.round.timestamp
             score = table.round.get_score()
+            mode = 'player'
             return render_template('table.html',
                                    title=f"{app.config['TITLE']} {table_id}",
                                    table=table,
@@ -555,11 +575,12 @@ def table(table_id=''):
                                    cards_table=cards_table,
                                    timestamp=timestamp,
                                    score=score,
-                                   mode='player')
+                                   mode=mode)
         else:
             players = table.round.players
             players_cards = table.round.get_players_cards()
             cards_table = table.round.current_trick.get_cards()
+            mode = 'spectator'
             return render_template('table.html',
                                    title=f"{app.config['TITLE']} {table_id}",
                                    table=table,
@@ -567,7 +588,7 @@ def table(table_id=''):
                                    player=player,
                                    players=players,
                                    players_cards=players_cards,
-                                   mode='spectator')
+                                   mode=mode)
     tables = game.tables.values()
     players = game.players.values()
     return render_template('index.html',

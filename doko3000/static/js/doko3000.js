@@ -113,8 +113,11 @@ $(document).ready(function () {
         //     $('#card_' + msg.card_id).attr('title', msg.player_id)
         // }
 
+        // either #table_spectator or #table are visible and may show the cards on table
+        if ($('#table_spectator').hasClass('d-none')) {
         $('#table').html(msg.html.cards_table)
-        $('#table_spectator').html(msg.html.cards_table)
+            } else {
+        $('#table_spectator').html(msg.html.cards_table) }
 
         if (msg.is_last_turn) {
             cards_locked = true
@@ -165,14 +168,14 @@ $(document).ready(function () {
     })
 
     socket.on('sorry-no-cards-for-you', function (msg) {
-        $('.mode-spectator').addClass('d-none')
-        $('.mode-player').removeClass('d-none')
+        $('.mode-spectator').removeClass('d-none')
+        $('.mode-player').addClass('d-none')
         $('#hud_players').html(msg.html.hud_players)
         $('#table').html('')
+        $('#table_spectator').html(msg.html.cards_table)
         console.log(msg)
-        $('#hand').html(msg.html.cards_spectator)
-        // just get new spectator table
-        //window.location.reload(false)
+        $('#hand_spectator_upper').html(msg.html.cards_hand_spectator_upper)
+        $('#hand_spectator_lower').html(msg.html.cards_hand_spectator_lower)
     })
 
     socket.on('really-deal-again', function (msg) {
