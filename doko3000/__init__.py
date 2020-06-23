@@ -554,18 +554,20 @@ def table(table_id=''):
                                    cards_hand=cards_hand,
                                    cards_table=cards_table,
                                    timestamp=timestamp,
-                                   score=score)
+                                   score=score,
+                                   mode='player')
         else:
             players = table.round.players
             players_cards = table.round.get_players_cards()
             cards_table = table.round.current_trick.get_cards()
-            return render_template('spectator.html',
+            return render_template('table.html',
                                    title=f"{app.config['TITLE']} {table_id}",
                                    table=table,
                                    cards_table=cards_table,
                                    player=player,
                                    players=players,
-                                   players_cards=players_cards)
+                                   players_cards=players_cards,
+                                   mode='spectator')
     tables = game.tables.values()
     players = game.players.values()
     return render_template('index.html',

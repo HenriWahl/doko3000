@@ -1,0 +1,33 @@
+<div class="row">
+    <!-- player 1 -->
+    <div class="col-6">
+        <div class="row">
+            <div class="col-12">
+                <span class="mx-2 text-white">
+                <strong>{{ players[0] }}</strong>
+                </span>
+            </div>
+            <div class="col-12 container-fluid d-inline-flex">
+                {% for card in players_cards[0] %}
+                    {% include 'cards/card.html' %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <!-- player 2 -->
+    <div class="col-6">
+        <div class="row">
+            <div class="col-12">
+                <span class="mx-2 float-right text-white">
+                    <strong>{{ players[1] }}</strong>
+                </span>
+            </div>
+            <div class="col-12 container-fluid d-inline-flex justify-content-end">
+                {% for card in players_cards[1] %}
+                    {% include 'cards/card.html' %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+

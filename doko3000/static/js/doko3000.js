@@ -145,31 +145,34 @@ $(document).ready(function () {
     socket.on('your-cards-please', function (msg) {
         current_player_id = msg.current_player_id
         cards_locked = false
-        // $('#table').html(msg.html.cards_table)
-        // $('#hud_players').html(msg.html.hud_players)
-        // $('#hand').html(msg.html.cards_hand)
-        // $('#button_claim_trick').addClass('d-none')
-        // $('#modal_dialog').modal('hide')
-        // if (player_id == current_player_id) {
-        //     $('#turn_indicator').removeClass('d-none')
-        // } else {
-        //     $('#turn_indicator').addClass('d-none')
-        // }
-        // if (player_id == msg.dealer) {
-        //     $('#button_deal_cards_again').removeClass('d-none')
-        // } else {
-        //     $('#button_deal_cards_again').addClass('d-none')
-        // }
-        window.location.reload(false)
-k    })
+        $('.mode-spectator').addClass('d-none')
+        $('.mode-player').removeClass('d-none')
+        $('#hud_players').html(msg.html.hud_players)
+        $('#table').html(msg.html.cards_table)
+        $('#hand').html(msg.html.cards_hand)
+        $('#button_claim_trick').addClass('d-none')
+        $('#modal_dialog').modal('hide')
+        if (player_id == current_player_id) {
+            $('#turn_indicator').removeClass('d-none')
+        } else {
+            $('#turn_indicator').addClass('d-none')
+        }
+        if (player_id == msg.dealer) {
+            $('#button_deal_cards_again').removeClass('d-none')
+        } else {
+            $('#button_deal_cards_again').addClass('d-none')
+        }
+    })
 
     socket.on('sorry-no-cards-for-you', function (msg) {
-        // $('#table').html('')
-        // console.log(msg)
-        // $('#hand').html(msg.html.cards_spectator)
-        // $('#hud_players').html(msg.html.hud_players)
+        $('.mode-spectator').addClass('d-none')
+        $('.mode-player').removeClass('d-none')
+        $('#hud_players').html(msg.html.hud_players)
+        $('#table').html('')
+        console.log(msg)
+        $('#hand').html(msg.html.cards_spectator)
         // just get new spectator table
-        window.location.reload(false)
+        //window.location.reload(false)
     })
 
     socket.on('really-deal-again', function (msg) {
