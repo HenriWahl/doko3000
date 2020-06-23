@@ -117,7 +117,10 @@ $(document).ready(function () {
         if ($('#table_spectator').hasClass('d-none')) {
         $('#table').html(msg.html.cards_table)
             } else {
-        $('#table_spectator').html(msg.html.cards_table) }
+        $('#table_spectator').html(msg.html.cards_table)
+            // strange move to take away card but not possible by id because it would vanish on table too
+            $('.' + msg.card_id).remove()
+        }
 
         if (msg.is_last_turn) {
             cards_locked = true

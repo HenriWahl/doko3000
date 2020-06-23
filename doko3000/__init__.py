@@ -256,7 +256,7 @@ def deal_cards_to_player(msg):
                                        },
                                       room=request.sid)
                     else:
-                        # one day becoming spectator mode
+                        # spectator mode
                         players = table.round.players
                         players_cards = table.round.get_players_cards()
                         cards_table = table.round.current_trick.get_cards()

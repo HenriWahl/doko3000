@@ -1,5 +1,10 @@
 <div id="card_{{ card.id }}"
-     class="game-card game-card-hand"
+     {% if hand_spectator %}
+         {% set card_as_class = card.id %}
+     {% else %}
+         {% set card_as_class = '' %}
+     {% endif %}
+     class="game-card game-card-hand {{ card_as_class }}"
      data-name="{{ card.name }}"
      data-id="{{ card.id }}"
      data-table_id="{{ table.id }}"
