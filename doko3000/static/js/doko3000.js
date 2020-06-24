@@ -100,27 +100,20 @@ $(document).ready(function () {
 
     socket.on('played-card-by-user', function (msg) {
         current_player_id = msg.current_player_id
-        //$('#hud_players').html('')
         $('#hud_players').html(msg.html.hud_players)
         $('.overlay-button').addClass('d-none')
 
-        // $('.hud_player').removeClass('hud-player-active')
-        // if (!msg.is_last_turn) {
-        //     $('#hud_player_' + msg.current_player_id).addClass('hud-player-active')
-        // }
-        // if (player_id != msg.player_id) {
-        //     // $('#table').append(msg.html.card)
-        //     $('#table').html(msg.html.cards_table)
-        //     $('#card_' + msg.card_id).attr('title', msg.player_id)
-        // }
-
         // either #table_spectator or #table are visible and may show the cards on table
         if ($('#table_spectator').hasClass('d-none')) {
-        $('#table').html(msg.html.cards_table)
-            } else {
-        $('#table_spectator').html(msg.html.cards_table)
-            // strange move to take away card but not possible by id because it would vanish on table too
-            $('.' + msg.card_id).remove()
+            $('#table').html(msg.html.cards_table)
+        } else {
+            $('#table_spectator').html(msg.html.cards_table)
+            // strange move to take away card by class but not possible by id because it would vanish on table too
+            // make sure that even after some lost communication all cards are updated
+            // just take away already played cards
+            for (let card_id of msg.played_cards) {
+                $('.card_' + card_id).remove()
+            }
         }
 
         if (msg.is_last_turn) {
@@ -503,20 +496,20 @@ $(document).ready(function () {
 
     // really delete table after safety dialog
     $(document).on('click', '#button_really_delete_table', function () {
-            // once again the .post + 'json' move
-            $.post('/delete/table/' + encodeURIComponent($(this).data('table_id')),
-                function (data, status) {
-                    if (status == 'success') {
-                        if (data.status == 'ok') {
-                            $('#list_tables').html(data.html)
-                            $('#modal_dialog').modal('hide')
-                        } else {
-                            $('#modal_body').html(data.html)
-                            clear_message('#modal_message')
-                            $('#modal_dialog').modal('show')
-                        }
+        // once again the .post + 'json' move
+        $.post('/delete/table/' + encodeURIComponent($(this).data('table_id')),
+            function (data, status) {
+                if (status == 'success') {
+                    if (data.status == 'ok') {
+                        $('#list_tables').html(data.html)
+                        $('#modal_dialog').modal('hide')
+                    } else {
+                        $('#modal_body').html(data.html)
+                        clear_message('#modal_message')
+                        $('#modal_dialog').modal('show')
                     }
-                }, 'json')
+                }
+            }, 'json')
 
         return false
     })

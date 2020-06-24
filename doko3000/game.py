@@ -623,6 +623,17 @@ class Round(Document):
                 players_cards.append([])
         return players_cards
 
+    def get_played_cards(self):
+        """
+        return list of all cards played in this round
+        """
+        played_cards = []
+        for trick in self.tricks.values():
+            for card in trick.cards:
+                played_cards.append(card)
+        return played_cards
+
+
 class Table(Document):
     """
     Definition of a table used by group of players

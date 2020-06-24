@@ -93,6 +93,7 @@ def played_card(msg):
                 current_player_id = table.round.get_current_player()
                 idle_players = table.idle_players
                 cards_table = table.round.current_trick.get_cards()
+                played_cards = table.round.get_played_cards()
                 timestamp = table.round.timestamp
                 socketio.emit('played-card-by-user',
                               {'player_id': player.id,
@@ -101,6 +102,7 @@ def played_card(msg):
                                'is_last_turn': is_last_turn,
                                'current_player_id': current_player_id,
                                'idle_players': idle_players,
+                               'played_cards': played_cards,
                                'html': {'cards_table': render_template('cards/table.html',
                                                                        cards_table=cards_table,
                                                                        table=table,

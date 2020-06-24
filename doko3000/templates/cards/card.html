@@ -1,6 +1,6 @@
 <div id="card_{{ card.id }}"
      {% if hand_spectator %}
-         {% set card_as_class = card.id %}
+         {% set card_as_class = 'card_' + card.id|string %}
      {% else %}
          {% set card_as_class = '' %}
      {% endif %}
