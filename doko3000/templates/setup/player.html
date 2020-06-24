@@ -29,7 +29,6 @@
 {% if current_user.is_admin and current_user.id != player.id %}
 <div class="row mt-2">
     <div class="col-12">
-        <!--            <strong>Optionen:</strong>-->
         <div class="custom-control custom-switch my-2 mx-3">
             <input type="checkbox"
                    class="custom-control-input"
@@ -44,6 +43,21 @@
     </div>
 </div>
 {% endif %}
+<div class="row mt-2">
+    <div class="col-12">
+        <div class="custom-control custom-switch my-2 mx-3">
+            <input type="checkbox"
+                   class="custom-control-input"
+                   id="switch_player_allows_spectators"
+                   data-player_id="{{ player.id }}"
+                   {% if player.allows_spectators %}
+                   checked=""
+                   {% endif %}
+            >
+            <label class="custom-control-label" for="switch_player_allows_spectators">Erlaube Zuschauer</label>
+        </div>
+    </div>
+</div>
 <div class="row mt-3">
     <div class="col-6">
     </div>

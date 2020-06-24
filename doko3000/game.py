@@ -34,14 +34,14 @@ class Deck:
     full deck of cards - enough to be static
     """
     SYMBOLS = ('Schell',
-               'Herz',
-               'Grün',
+               # 'Herz',
+               # 'Grün',
                'Eichel')
     RANKS = {'Neun': 0,
-             'Zehn': 10,
-             'Unter': 2,
-             'Ober': 3,
-             'König': 4,
+             # 'Zehn': 10,
+             # 'Unter': 2,
+             # 'Ober': 3,
+             # 'König': 4,
              'Ass': 11}
     NUMBER = 2  # Doppelkopf :-)!
     # NUMBER = 1 # Debugging
@@ -89,6 +89,8 @@ class Player(UserMixin, Document):
             self['table'] = ''
             # has admin rights
             self['is_admin'] = False
+            # let idle players see player's cards
+            self['allows_spectators'] = True
             # # other players to the left, opposite and right of table
             # self['left'] = self['opposite'] = self['right'] = None
             self.save()
@@ -131,6 +133,17 @@ class Player(UserMixin, Document):
     @is_admin.setter
     def is_admin(self, value):
         self['is_admin'] = value
+        self.save()
+
+    @property
+    def allows_spectators(self):
+        # better via .get() in case the player is not updated yet
+        # defaults to True
+        return self.get('allows_spectators', True)
+
+    @allows_spectators.setter
+    def allows_spectators(self, value):
+        self['allows_spectators'] = value
         self.save()
 
     @property
@@ -603,7 +616,11 @@ class Round(Document):
         """
         players_cards = []
         for player_id in self.players:
-            players_cards.append(self.game.players[player_id].get_cards())
+            # only if player allows it
+            if self.game.players[player_id].allows_spectators:
+                players_cards.append(self.game.players[player_id].get_cards())
+            else:
+                players_cards.append([])
         return players_cards
 
 class Table(Document):

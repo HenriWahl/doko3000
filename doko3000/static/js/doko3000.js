@@ -541,9 +541,7 @@ $(document).ready(function () {
 
     // reload page after setup
     $(document).on('click', '#button_finish_table_setup', function () {
-        if (window.location.pathname.startsWith('/table/')) {
-            location.reload()
-        } else {
+        if (!window.location.pathname.startsWith('/table/')) {
             $.getJSON('/get/tables',
                 function (data, status) {
                     if (status == 'success') {
@@ -563,21 +561,6 @@ $(document).ready(function () {
         })
     })
 
-    // make player an admin
-    $(document).on('click', '#switch_player_is_admin', function () {
-        if (this.checked) {
-            socket.emit('setup-player-change', {
-                action: 'is_admin',
-                player_id: $(this).data('player_id')
-            })
-        } else {
-            socket.emit('setup-player-change', {
-                action: 'is_no_admin',
-                player_id: $(this).data('player_id')
-            })
-        }
-    })
-
     // change password
     $(document).on('click', '#button_change_password', function () {
         socket.emit('setup-player-change', {
@@ -595,6 +578,36 @@ $(document).ready(function () {
         $('#submit_change_password').removeClass('d-none')
         $('#indicate_change_password_successful').addClass('d-none')
         $('#indicate_change_password_failed').addClass('d-none')
+    })
+
+    // make player an admin
+    $(document).on('click', '#switch_player_is_admin', function () {
+        if (this.checked) {
+            socket.emit('setup-player-change', {
+                action: 'is_admin',
+                player_id: $(this).data('player_id')
+            })
+        } else {
+            socket.emit('setup-player-change', {
+                action: 'is_no_admin',
+                player_id: $(this).data('player_id')
+            })
+        }
+    })
+
+    // let player allow spectators
+    $(document).on('click', '#switch_player_allows_spectators', function () {
+        if (this.checked) {
+            socket.emit('setup-player-change', {
+                action: 'allows_spectators',
+                player_id: $(this).data('player_id')
+            })
+        } else {
+            socket.emit('setup-player-change', {
+                action: 'denies_spectators',
+                player_id: $(this).data('player_id')
+            })
+        }
     })
 
     $(document).on('click', '#button_deal_cards_again', function () {

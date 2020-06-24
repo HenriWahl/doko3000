@@ -167,6 +167,10 @@ def setup_player(msg):
             player.is_admin = True
         elif action == 'is_no_admin':
             player.is_admin = False
+        elif action == 'allows_spectators':
+            player.allows_spectators = True
+        elif action == 'denies_spectators':
+            player.allows_spectators = False
         elif action == 'new_password':
             password = msg.get('password')
             if password:
@@ -236,7 +240,6 @@ def deal_cards_to_player(msg):
                                        'turn_count': table.round.turn_count,
                                        'current_player_id': current_player_id,
                                        'dealer': dealer,
-                                       # 'order_names': table.round.order_names,
                                        'html': {'cards_hand': render_template('cards/hand.html',
                                                                               cards_hand=cards_hand,
                                                                               table=table,
