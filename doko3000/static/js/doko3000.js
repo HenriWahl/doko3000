@@ -30,11 +30,9 @@ $(document).ready(function () {
     ]);
     dragging_cards.on('drop', function (card, target, source) {
         // do not drag your gained tricks around
-        console.log(card, target, source, player_id, current_player_id, cards_locked)
         if (card.id == 'cards_stack') {
             dragging_cards.cancel(true)
         } else if (source.id == 'hand' && target.id == 'table' && player_id == current_player_id && !cards_locked) {
-            console.log($(card).data('timestamp'), $('#cards_table_timestamp').data('timestamp'))
             if ($(card).data('timestamp') == $('#cards_table_timestamp').data('timestamp')) {
                 $('#table').append(card)
                 // add tooltip
@@ -158,6 +156,7 @@ $(document).ready(function () {
         $('.mode-player').removeClass('d-none')
         $('#hud_players').html(msg.html.hud_players)
         $('#table').html(msg.html.cards_table)
+        $('#table_spectator').html('')
         $('#hand').html(msg.html.cards_hand)
         $('#button_claim_trick').addClass('d-none')
         $('#modal_dialog').modal('hide')
