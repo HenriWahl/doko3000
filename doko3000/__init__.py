@@ -828,3 +828,23 @@ def delete_table(table_id):
             return redirect(url_for('index'))
     else:
         return redirect(url_for('index'))
+
+@app.route('/start/table/<table_id>')
+@login_required
+def start_table(table_id):
+    """
+    start table after setting it up - ask first
+    """
+    table = game.tables.get(table_id)
+    if is_xhr(request) and \
+            table:
+        if len(table.players) >= 4:
+            return jsonify({'status': 'ok',
+                            'html': render_template('index/start_table.html',
+                                                    table=table)})
+        else:
+            return jsonify({'status': 'error',
+                            'html': render_template('error.html',
+                                                     message=f"Es sitzen nicht genug Spieler am Tisch {table.id}.")})
+    else:
+        return redirect(url_for('index'))
