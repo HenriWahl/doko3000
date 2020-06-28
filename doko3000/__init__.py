@@ -41,9 +41,6 @@ game = Game(db)
 game.load_from_db()
 
 
-# game.test_game()
-
-
 @login.user_loader
 def load_user(id):
     """
@@ -96,6 +93,7 @@ def played_card(msg):
                 current_player_id = table.round.get_current_player()
                 idle_players = table.idle_players
                 cards_table = table.round.current_trick.get_cards()
+                played_cards = table.round.get_played_cards()
                 timestamp = table.round.timestamp
                 socketio.emit('played-card-by-user',
                               {'player_id': player.id,
@@ -104,6 +102,7 @@ def played_card(msg):
                                'is_last_turn': is_last_turn,
                                'current_player_id': current_player_id,
                                'idle_players': idle_players,
+                               'played_cards': played_cards,
                                'html': {'cards_table': render_template('cards/table.html',
                                                                        cards_table=cards_table,
                                                                        table=table,
@@ -170,6 +169,10 @@ def setup_player(msg):
             player.is_admin = True
         elif action == 'is_no_admin':
             player.is_admin = False
+        elif action == 'allows_spectators':
+            player.allows_spectators = True
+        elif action == 'denies_spectators':
+            player.allows_spectators = False
         elif action == 'new_password':
             password = msg.get('password')
             if password:
@@ -227,18 +230,18 @@ def deal_cards_to_player(msg):
                     # just in case
                     join_room(table.id)
                     current_player_id = table.round.current_player
+                    timestamp = table.round.timestamp
                     if player.id in table.round.players:
                         cards_hand = player.get_cards()
                         cards_table = []
                         # no score yet but needed for full set of cards for hand - to decide if back-card is shown too
                         score = table.round.get_score()
-                        timestamp = table.round.timestamp
+                        mode = 'player'
                         socketio.emit('your-cards-please',
                                       {'player_id': player.id,
                                        'turn_count': table.round.turn_count,
                                        'current_player_id': current_player_id,
                                        'dealer': dealer,
-                                       # 'order_names': table.round.order_names,
                                        'html': {'cards_hand': render_template('cards/hand.html',
                                                                               cards_hand=cards_hand,
                                                                               table=table,
@@ -253,17 +256,36 @@ def deal_cards_to_player(msg):
                                                 'cards_table': render_template('cards/table.html',
                                                                                cards_table=cards_table,
                                                                                table=table,
-                                                                               timestamp=timestamp)}
+                                                                               timestamp=timestamp,
+                                                                               mode=mode)}
                                        },
                                       room=request.sid)
                     else:
-                        # one day becoming spectator mode
+                        # spectator mode
+                        players = table.round.players
+                        players_cards = table.round.get_players_cards()
+                        cards_table = table.round.current_trick.get_cards()
+                        mode = 'spectator'
                         socketio.emit('sorry-no-cards-for-you',
                                       {'html': {'hud_players': render_template('top/hud_players.html',
                                                                                table=table,
                                                                                player=player,
                                                                                dealer=dealer,
-                                                                               current_player_id=current_player_id)}},
+                                                                               current_player_id=current_player_id),
+                                                'cards_table': render_template('cards/table.html',
+                                                                               cards_table=cards_table,
+                                                                               table=table,
+                                                                               timestamp=timestamp,
+                                                                               mode=mode),
+                                                'cards_hand_spectator_upper': render_template('cards/hand_spectator_upper.html',
+                                                                                             table=table,
+                                                                                             players=players,
+                                                                                             players_cards=players_cards),
+                                                'cards_hand_spectator_lower': render_template('cards/hand_spectator_lower.html',
+                                                    table=table,
+                                                    players=players,
+                                                    players_cards=players_cards)
+                                                }},
                                       room=request.sid)
 
 
@@ -427,8 +449,8 @@ def round_finish(msg):
                            'html': render_template('round/info.html',
                                                    table=table,
                                                    next_players=next_players,
-                                                   number_of_rows=number_of_rows)}
-                          )
+                                                   number_of_rows=number_of_rows)},
+                          room=table.id)
 
 
 @socketio.on('request-round-reset')
@@ -454,7 +476,8 @@ def round_reset(msg):
         if set(table.players_ready) >= set(table.round.players):
             table.reset_round()
             socketio.emit('grab-your-cards',
-                          {'table_id': table.id})
+                          {'table_id': table.id},
+                          room=table.id)
 
 
 @socketio.on('ready-for-round-restart')
@@ -478,7 +501,8 @@ def round_restart(msg):
                            'html': render_template('round/info.html',
                                                    table=table,
                                                    next_players=next_players,
-                                                   number_of_rows=number_of_rows)})
+                                                   number_of_rows=number_of_rows)},
+                          room=table.id)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -529,31 +553,47 @@ def table(table_id=''):
     table = game.tables.get(table_id)
     if player and \
        table and \
-       player.id in game.tables[table_id].players:
-        dealer = table.dealer
-        # if no card is played already the dealer might deal
-        dealing_needed = table.round.turn_count == 0
-        # if one trick right now was finished the claim-trick-button should be displayed again
-        trick_claiming_needed = table.round.turn_count % 4 == 0 and \
-                                table.round.turn_count > 0 and \
-                                not table.round.is_finished()
-        current_player_id = table.round.current_player
-        cards_hand = player.get_cards()
-        cards_table = table.round.current_trick.get_cards()
-        timestamp = table.round.timestamp
-        score = table.round.get_score()
-        return render_template('table.html',
-                               title=f"{app.config['TITLE']} {table_id}",
-                               table=table,
-                               dealer=dealer,
-                               dealing_needed=dealing_needed,
-                               trick_claiming_needed=trick_claiming_needed,
-                               player=player,
-                               current_player_id=current_player_id,
-                               cards_hand=cards_hand,
-                               cards_table=cards_table,
-                               timestamp=timestamp,
-                               score=score)
+       player.id in table.players:
+        if player.id in table.round.players:
+            dealer = table.dealer
+            # if no card is played already the dealer might deal
+            dealing_needed = table.round.turn_count == 0
+            # if one trick right now was finished the claim-trick-button should be displayed again
+            trick_claiming_needed = table.round.turn_count % 4 == 0 and \
+                                    table.round.turn_count > 0 and \
+                                    not table.round.is_finished()
+            current_player_id = table.round.current_player
+            cards_hand = player.get_cards()
+            cards_table = table.round.current_trick.get_cards()
+            timestamp = table.round.timestamp
+            score = table.round.get_score()
+            mode = 'player'
+            return render_template('table.html',
+                                   title=f"{app.config['TITLE']} {table_id}",
+                                   table=table,
+                                   dealer=dealer,
+                                   dealing_needed=dealing_needed,
+                                   trick_claiming_needed=trick_claiming_needed,
+                                   player=player,
+                                   current_player_id=current_player_id,
+                                   cards_hand=cards_hand,
+                                   cards_table=cards_table,
+                                   timestamp=timestamp,
+                                   score=score,
+                                   mode=mode)
+        else:
+            players = table.round.players
+            players_cards = table.round.get_players_cards()
+            cards_table = table.round.current_trick.get_cards()
+            mode = 'spectator'
+            return render_template('table.html',
+                                   title=f"{app.config['TITLE']} {table_id}",
+                                   table=table,
+                                   cards_table=cards_table,
+                                   player=player,
+                                   players=players,
+                                   players_cards=players_cards,
+                                   mode=mode)
     tables = game.tables.values()
     players = game.players.values()
     return render_template('index.html',

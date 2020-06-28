@@ -1,59 +1,85 @@
 {% extends "base.html" %}
 
 {% block main_content %}
-<!--<div id="overlay_hud">-->
-<!--&lt;!&ndash;    <div id="hud_players">&ndash;&gt;-->
-<!--&lt;!&ndash;    </div>&ndash;&gt;-->
-<!--</div>-->
 
-<div id="button_deal_cards_again" class="overlay-button justify-content-center
+    <div id="button_deal_cards_again" class="overlay-button justify-content-center
     {% if current_user.id != dealer or not dealing_needed %}
     d-none
     {% endif %}"
-     data-table_id="{{ table.id }}">
-    <button class="btn btn-warning btn-block btn-lg p-4"><strong>Karten noch einmal geben</strong></button>
-</div>
+         data-table_id="{{ table.id }}">
+        <button class="btn btn-warning btn-block btn-lg p-4"><strong>Karten noch einmal geben</strong></button>
+    </div>
 
-<div id="button_claim_trick" class="overlay-button justify-content-center
+    <div id="button_claim_trick" class="overlay-button justify-content-center
      {% if player.id in table.idle_players or not trick_claiming_needed %}
      d-none
      {% endif %}
      "
-     data-table_id="{{ table.id }}">
-    <button class="btn btn-success btn-block btn-lg p-4"><strong>Stich nehmen</strong></button>
-</div>
-
-<button id="turn_indicator" class="overlay-notification btn btn-block btn-lg text-white
-{% if current_player_id != current_user.id %}
-d-none
-{% endif %}
-">Du bist am Zug
-</button>
-
-<div class="container-fluid row p-0 m-0" id="topbar">
-    <div class="col-3 p-0">
-        {% include "top/menu.html" %}
+         data-table_id="{{ table.id }}">
+        <button class="btn btn-success btn-block btn-lg p-4"><strong>Stich nehmen</strong></button>
     </div>
-    <div class="col-6 p-0 mt-2">
-        {% include 'top/hud_players.html' %}
-    </div>
-    <div class="col-3 p-0">
-        {% include "top/player.html" %}
-    </div>
-</div>
 
-<div id="table_hand">
-    <div class="row align-items-center w-100 h-50 m-0 p-0">
-        <div class="container-fluid w-100 h-100 m-0 p-0 d-flex justify-content-center align-items-center" id="table">
-            {% include 'cards/table.html' %}
+    <button id="turn_indicator" class="overlay-notification btn btn-block btn-lg text-white
+    {% if current_player_id != current_user.id %}
+    d-none
+    {% endif %}
+    ">Du bist am Zug
+    </button>
+
+    <div class="container-fluid row p-0 m-0" id="topbar">
+        <div class="col-3 p-0">
+            {% include "top/menu.html" %}
+        </div>
+        <div class="col-6 p-0 mt-2">
+            {% include 'top/hud_players.html' %}
+        </div>
+        <div class="col-3 p-0">
+            {% include "top/player.html" %}
         </div>
     </div>
 
-    <div class="row align-items-center w-100 h-50 m-0 p-0">
-        <div class="container-fluid w-100 h-100 m-0 p-0 container-fluid d-inline-flex justify-content-center align-items-center"
-             id="hand">
-            {% include 'cards/hand.html' %}
+    {% if mode == 'spectator' %}
+        {% set mode_spectator_visible = '' %}
+        {% set mode_player_visible = 'd-none' %}
+    {% else %}
+        {% set mode_spectator_visible = 'd-none' %}
+        {% set mode_player_visible = '' %}
+    {% endif %}
+
+    <div id="table_hand">
+                <div class="container-fluid m-0 p-0 d-flex justify-content-center align-items-center mode-spectator {{ mode_spectator_visible }}"
+                 id="table_spectator">
+                {% if mode == 'spectator' %}
+                    {% include 'cards/table.html' %}
+                {% endif %}
+            </div>
+        <div class="row align-items-center w-100 h-50 m-0 p-0">
+            <div class="w-100 h-100 m-0 p-0 spectator-hand mode-spectator {{ mode_spectator_visible }}"
+                 id="hand_spectator_upper">
+                {% if mode == 'spectator' %}
+                    {% include 'cards/hand_spectator_upper.html' %}
+                {% endif %}
+            </div>
+            <div class="container-fluid w-100 h-100 m-0 p-0 d-flex justify-content-center align-items-center mode-player {{ mode_player_visible }}"
+                 id="table">
+                {% if mode == 'player' %}
+                    {% include 'cards/table.html' %}
+                {% endif %}
+            </div>
+        </div>
+        <div class="row align-items-center w-100 h-50 m-0 p-0">
+            <div class="row w-100 h-100 m-0 p-0 spectator-hand mode-spectator {{ mode_spectator_visible }}"
+                 id="hand_spectator_lower">
+                {% if mode == 'spectator' %}
+                    {% include 'cards/hand_spectator_lower.html' %}
+                {% endif %}
+            </div>
+            <div class="container-fluid w-100 h-100 m-0 p-0 container-fluid d-inline-flex justify-content-center align-items-center mode-player {{ mode_player_visible }}"
+                 id="hand">
+                {% if mode == 'player' %}
+                    {% include 'cards/hand.html' %}
+                {% endif %}
+            </div>
         </div>
     </div>
-</div>
 {% endblock main_content %}

@@ -89,6 +89,8 @@ class Player(UserMixin, Document):
             self['table'] = ''
             # has admin rights
             self['is_admin'] = False
+            # let idle players see player's cards
+            self['allows_spectators'] = True
             # # other players to the left, opposite and right of table
             # self['left'] = self['opposite'] = self['right'] = None
             self.save()
@@ -131,6 +133,17 @@ class Player(UserMixin, Document):
     @is_admin.setter
     def is_admin(self, value):
         self['is_admin'] = value
+        self.save()
+
+    @property
+    def allows_spectators(self):
+        # better via .get() in case the player is not updated yet
+        # defaults to True
+        return self.get('allows_spectators', True)
+
+    @allows_spectators.setter
+    def allows_spectators(self, value):
+        self['allows_spectators'] = value
         self.save()
 
     @property
@@ -433,12 +446,6 @@ class Round(Document):
             self.save()
         return timestamp
 
-    def calculate_timestamp(self):
-        """
-        store moment of shuffling for comparing cards when being sorted and freshly dealed at one time
-        """
-        self['timestamp'] = int(time() * 100000)
-
     @property
     def current_trick(self):
         """
@@ -504,6 +511,12 @@ class Round(Document):
             self.game.players[player_id].save()
 
         self.save()
+
+    def calculate_timestamp(self):
+        """
+        store moment of shuffling for comparing cards when being sorted and freshly dealed at one time
+        """
+        self['timestamp'] = int(time() * 100000)
 
     def shuffle(self):
         """
@@ -581,20 +594,6 @@ class Round(Document):
                     score[trick.owner] += Deck.cards[card_id].value
         return score
 
-    # def calculate_opponents(self):
-    #     """
-    #     give players info about whom they are playing against - interesting for HUD display
-    #     """
-    #     if len(self.players) == 4:
-    #         for player_id in self.players:
-    #             player_index = self.players.index(player_id)
-    #             player_order_view = copy(self.players)
-    #             for i in range(player_index):
-    #                 player_order_view.append(player_order_view.pop(0))
-    #             self.game.players[player_id].left = player_order_view[1]
-    #             self.game.players[player_id].opposite = player_order_view[2]
-    #             self.game.players[player_id].right = player_order_view[3]
-
     def calculate_trick_order(self):
         """
         get order by arranging players list starting from current player who is first in this trick
@@ -610,6 +609,29 @@ class Round(Document):
     def increase_trick_count(self):
         self.trick_count += 1
         self.save()
+
+    def get_players_cards(self):
+        """
+        retrieve all cards of all players for spectator mode
+        """
+        players_cards = []
+        for player_id in self.players:
+            # only if player allows it
+            if self.game.players[player_id].allows_spectators:
+                players_cards.append(self.game.players[player_id].get_cards())
+            else:
+                players_cards.append([])
+        return players_cards
+
+    def get_played_cards(self):
+        """
+        return list of all cards played in this round
+        """
+        played_cards = []
+        for trick in self.tricks.values():
+            for card in trick.cards:
+                played_cards.append(card)
+        return played_cards
 
 
 class Table(Document):

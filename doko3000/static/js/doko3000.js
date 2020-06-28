@@ -1,7 +1,7 @@
 // globally used player_id
 let player_id = ''
 // for staying in sync with the game this is global
-let turn_count = 0
+//let turn_count = 0
 // keep an eye on next player to know if turns are allowed or not
 let current_player_id = ''
 // lock dragging of cards while waiting for trick being claimed
@@ -44,6 +44,7 @@ $(document).ready(function () {
                     table_id: $(card).data('table_id')
                 })
             } else {
+                console.log('remove')
                 // card does not belong to hand because the dealer dealed again while the card was dragged around
                 $(card).remove()
             }
@@ -99,22 +100,21 @@ $(document).ready(function () {
 
     socket.on('played-card-by-user', function (msg) {
         current_player_id = msg.current_player_id
-        //$('#hud_players').html('')
         $('#hud_players').html(msg.html.hud_players)
         $('.overlay-button').addClass('d-none')
 
-        // $('.hud_player').removeClass('hud-player-active')
-        // if (!msg.is_last_turn) {
-        //     $('#hud_player_' + msg.current_player_id).addClass('hud-player-active')
-        // }
-        // if (player_id != msg.player_id) {
-        //     // $('#table').append(msg.html.card)
-        //     $('#table').html(msg.html.cards_table)
-        //     $('#card_' + msg.card_id).attr('title', msg.player_id)
-        // }
-
-        $('#table').html(msg.html.cards_table)
-        // $('#card_' + msg.card_id).attr('title', msg.player_id)
+        // either #table_spectator or #table are visible and may show the cards on table
+        if ($('#table_spectator').hasClass('d-none')) {
+            $('#table').html(msg.html.cards_table)
+        } else {
+            $('#table_spectator').html(msg.html.cards_table)
+            // strange move to take away card by class but not possible by id because it would vanish on table too
+            // make sure that even after some lost communication all cards are updated
+            // just take away already played cards
+            for (let card_id of msg.played_cards) {
+                $('.card_' + card_id).remove()
+            }
+        }
 
         if (msg.is_last_turn) {
             cards_locked = true
@@ -145,8 +145,11 @@ $(document).ready(function () {
     socket.on('your-cards-please', function (msg) {
         current_player_id = msg.current_player_id
         cards_locked = false
-        $('#table').html(msg.html.cards_table)
+        $('.mode-spectator').addClass('d-none')
+        $('.mode-player').removeClass('d-none')
         $('#hud_players').html(msg.html.hud_players)
+        $('#table').html(msg.html.cards_table)
+        $('#table_spectator').html('')
         $('#hand').html(msg.html.cards_hand)
         $('#button_claim_trick').addClass('d-none')
         $('#modal_dialog').modal('hide')
@@ -163,9 +166,13 @@ $(document).ready(function () {
     })
 
     socket.on('sorry-no-cards-for-you', function (msg) {
-        $('#table').html('')
-        $('#hand').html('')
+        $('.mode-spectator').removeClass('d-none')
+        $('.mode-player').addClass('d-none')
         $('#hud_players').html(msg.html.hud_players)
+        $('#table').html('')
+        $('#table_spectator').html(msg.html.cards_table)
+        $('#hand_spectator_upper').html(msg.html.cards_hand_spectator_upper)
+        $('#hand_spectator_lower').html(msg.html.cards_hand_spectator_lower)
     })
 
     socket.on('really-deal-again', function (msg) {
@@ -489,20 +496,20 @@ $(document).ready(function () {
 
     // really delete table after safety dialog
     $(document).on('click', '#button_really_delete_table', function () {
-            // once again the .post + 'json' move
-            $.post('/delete/table/' + encodeURIComponent($(this).data('table_id')),
-                function (data, status) {
-                    if (status == 'success') {
-                        if (data.status == 'ok') {
-                            $('#list_tables').html(data.html)
-                            $('#modal_dialog').modal('hide')
-                        } else {
-                            $('#modal_body').html(data.html)
-                            clear_message('#modal_message')
-                            $('#modal_dialog').modal('show')
-                        }
+        // once again the .post + 'json' move
+        $.post('/delete/table/' + encodeURIComponent($(this).data('table_id')),
+            function (data, status) {
+                if (status == 'success') {
+                    if (data.status == 'ok') {
+                        $('#list_tables').html(data.html)
+                        $('#modal_dialog').modal('hide')
+                    } else {
+                        $('#modal_body').html(data.html)
+                        clear_message('#modal_message')
+                        $('#modal_dialog').modal('show')
                     }
-                }, 'json')
+                }
+            }, 'json')
 
         return false
     })
@@ -527,9 +534,7 @@ $(document).ready(function () {
 
     // reload page after setup
     $(document).on('click', '#button_finish_table_setup', function () {
-        if (window.location.pathname.startsWith('/table/')) {
-            location.reload()
-        } else {
+        if (!window.location.pathname.startsWith('/table/')) {
             $.getJSON('/get/tables',
                 function (data, status) {
                     if (status == 'success') {
@@ -549,21 +554,6 @@ $(document).ready(function () {
         })
     })
 
-    // make player an admin
-    $(document).on('click', '#switch_player_is_admin', function () {
-        if (this.checked) {
-            socket.emit('setup-player-change', {
-                action: 'is_admin',
-                player_id: $(this).data('player_id')
-            })
-        } else {
-            socket.emit('setup-player-change', {
-                action: 'is_no_admin',
-                player_id: $(this).data('player_id')
-            })
-        }
-    })
-
     // change password
     $(document).on('click', '#button_change_password', function () {
         socket.emit('setup-player-change', {
@@ -581,6 +571,36 @@ $(document).ready(function () {
         $('#submit_change_password').removeClass('d-none')
         $('#indicate_change_password_successful').addClass('d-none')
         $('#indicate_change_password_failed').addClass('d-none')
+    })
+
+    // make player an admin
+    $(document).on('click', '#switch_player_is_admin', function () {
+        if (this.checked) {
+            socket.emit('setup-player-change', {
+                action: 'is_admin',
+                player_id: $(this).data('player_id')
+            })
+        } else {
+            socket.emit('setup-player-change', {
+                action: 'is_no_admin',
+                player_id: $(this).data('player_id')
+            })
+        }
+    })
+
+    // let player allow spectators
+    $(document).on('click', '#switch_player_allows_spectators', function () {
+        if (this.checked) {
+            socket.emit('setup-player-change', {
+                action: 'allows_spectators',
+                player_id: $(this).data('player_id')
+            })
+        } else {
+            socket.emit('setup-player-change', {
+                action: 'denies_spectators',
+                player_id: $(this).data('player_id')
+            })
+        }
     })
 
     $(document).on('click', '#button_deal_cards_again', function () {
