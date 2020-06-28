@@ -388,6 +388,25 @@ $(document).ready(function () {
         }
     })
 
+    // allow undoing a trick when wrong card was played
+    $(document).on('click', '#switch_allow_undo', function () {
+        if (this.checked) {
+            $('#menu_request_undo').removeClass('d-none')
+            socket.emit('setup-table-change', {
+                action: 'allow_undo',
+                player_id: player_id,
+                table_id: $(this).data('table_id')
+            })
+        } else {
+            $('#menu_request_undo').addClass('d-none')
+            socket.emit('setup-table-change', {
+                action: 'prohibit_undo',
+                player_id: player_id,
+                table_id: $(this).data('table_id')
+            })
+        }
+    })
+
     // delete a player in the draggable players order
     $(document).on('click', '.button-remove-player-from-table', function () {
         if (player_id != $(this).data('player_id')) {

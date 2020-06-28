@@ -40,7 +40,6 @@
 </div>
 <div class="row mt-2">
     <div class="col-12">
-        <!--            <strong>Optionen:</strong>-->
         <div class="custom-control custom-switch my-2 mx-3">
             <input type="checkbox"
                    class="custom-control-input"
@@ -51,6 +50,21 @@
                    {% endif %}
             >
             <label class="custom-control-label" for="switch_card_9">Mit 9er Karten</label>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12">
+        <div class="custom-control custom-switch my-2 mx-3">
+            <input type="checkbox"
+                   class="custom-control-input"
+                   id="switch_allow_undo"
+                   data-table_id="{{ table.id }}"
+                   {% if table.round.allow_undo %}
+                   checked=""
+                   {% endif %}
+            >
+            <label class="custom-control-label" for="switch_allow_undo">Erlaube rückgängig machen</label>
         </div>
     </div>
 </div>

@@ -147,6 +147,10 @@ def setup_table(msg):
             table.round.with_9 = True
         elif action == 'play_without_9':
             table.round.with_9 = False
+        elif action == 'allow_undo':
+            table.round.allow_undo = True
+        elif action == 'prohibit_undo':
+            table.round.allow_undo = False
         elif action == 'changed_order':
             order = msg.get('order')
             if set(order) == set(table.order):

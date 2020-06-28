@@ -1,15 +1,33 @@
 <div class="dropdown">
-    <div class="btn btn-outline-light oi oi-menu float-left m-2 topbar-button" data-toggle="dropdown"
-         id="hamburger_menu"></div>
+    <div class="btn btn-outline-light oi oi-menu float-left m-2 topbar-button"
+         data-toggle="dropdown"
+         id="hamburger_menu">
+    </div>
     <div class="dropdown-menu topbar-menu shadow">
-        <a class="dropdown-item py-2" href="#" id="menu_request_round_finish" data-table_id="{{ table.id }}">
+        <a class="dropdown-item py-2"
+           href="#"
+           id="menu_request_round_finish"
+           data-table_id="{{ table.id }}">
             <span class="oi oi-media-skip-forward mr-1"></span>
-            Spiel beenden</a>
-        <a class="dropdown-item py-2" href="#" id="menu_request_round_reset" data-table_id="{{ table.id }}">
+            Spiel beenden
+        </a>
+        <a class="dropdown-item py-2"
+           href="#"
+           id="menu_request_round_reset"
+           data-table_id="{{ table.id }}">
             <span class="oi oi-media-skip-backward mr-1"></span>
-            Spiel neu starten</a>
+            Spiel neu starten
+        </a>
+        <a class="dropdown-item {% if not table.round.allow_undo %}d-none{% endif %} py-2"
+           href="#"
+           id="menu_request_undo"
+           data-table_id="{{ table.id }}">
+            <span class="oi oi-action-undo mr-1"></span>
+            Zug rückgängig machen
+        </a>
         <a class="dropdown-item py-2 setup-table" href="#" data-table_id="{{ table.id }}">
             <span class="oi oi-cog mr-1"></span>
-            Einstellungen</a>
+            Einstellungen
+        </a>
     </div>
 </div>

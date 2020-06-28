@@ -351,7 +351,12 @@ class Round(Document):
             # what table?
             self['id'] = round_id
             # as default play without '9'-cards
+            # should be a property of table but rounds are initialized before tables and this leads to a logical
+            # problem some lines later when cards are initialized and there are no tables yet which can be asked
+            # for a .with_9 property
             self['with_9'] = False
+            # even if not logical too just keep the undo setting here too to keep the table/round-settings together
+            self['allow_undo'] = True
             # initialize
             self.reset(players=players)
         elif document_id:
@@ -435,6 +440,19 @@ class Round(Document):
             self['with_9'] = value
         else:
             self['with_9'] = False
+        self.save()
+
+    @property
+    def allow_undo(self):
+        # better via .get() in case the table is not updated yet
+        return self.get('allow_undo', True)
+
+    @allow_undo.setter
+    def allow_undo(self, value):
+        if type(value) == bool:
+            self['allow_undo'] = value
+        else:
+            self['allow_undo'] = False
         self.save()
 
     @property
