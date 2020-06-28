@@ -238,6 +238,14 @@ $(document).ready(function () {
         $('#modal_dialog').modal('show')
     })
 
+    socket.on('undo-requested', function (msg) {
+        $('.overlay-button').addClass('d-none')
+        $('.overlay-notification').addClass('d-none')
+        // cleanup content of dialog
+        $('#modal_body').html(msg.html)
+        $('#modal_dialog').modal('show')
+    })
+
     socket.on('round-restart-options', function (msg) {
         $('.overlay-button').addClass('d-none')
         $('.overlay-notification').addClass('d-none')
@@ -693,6 +701,28 @@ $(document).ready(function () {
             if (status == 'success') {
                 $('#modal_body').html(data.html)
                 socket.emit('ready-for-round-finish', {
+                    player_id: player_id,
+                    table_id: table_id
+                })
+            }
+        })
+        // dummy return just in case
+        return false
+    })
+
+    $(document).on('click', '#menu_request_undo', function () {
+        socket.emit('request-undo', {
+            player_id: player_id,
+            table_id: $(this).data('table_id')
+        })
+    })
+
+    $(document).on('click', '#button_undo_yes', function () {
+        let table_id = $(this).data('table_id')
+        $.getJSON('/get/wait', function (data, status) {
+            if (status == 'success') {
+                $('#modal_body').html(data.html)
+                socket.emit('ready-for-undo', {
                     player_id: player_id,
                     table_id: table_id
                 })
