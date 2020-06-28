@@ -522,6 +522,19 @@ $(document).ready(function () {
     })
 
     $(document).on('click', '#button_start_table', function () {
+        console.log('start')
+        $.getJSON('/start/table/' + encodeURIComponent($(this).data('table_id')),
+            function (data, status) {
+                if (status == 'success') {
+                    $('#modal_body').html(data.html)
+                    clear_message('#modal_message')
+                    $('#modal_dialog').modal('show')
+                }
+            })
+        return false
+    })
+
+    $(document).on('click', '#button_really_start_table', function () {
         socket.emit('setup-table-change', {
             action: 'start_table',
             player_id: player_id,
@@ -530,6 +543,7 @@ $(document).ready(function () {
         if (window.location.pathname.startsWith('/table/')) {
             location.reload()
         }
+        return false
     })
 
     // reload page after setup
@@ -630,13 +644,6 @@ $(document).ready(function () {
             table_id: $(this).data('table_id')
         })
     })
-
-    // $(document).on('click', '#button_round_reset_yes', function () {
-    //     socket.emit('ready-for-round-reset', {
-    //         player_id: player_id,
-    //         table_id: $(this).data('table_id')
-    //     })
-    // })
 
     $(document).on('click', '#button_round_reset_yes', function () {
         let table_id = $(this).data('table_id')
