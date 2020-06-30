@@ -171,6 +171,8 @@ $(document).ready(function () {
     })
 
     socket.on('sorry-no-cards-for-you', function (msg) {
+        $('#modal_body').html('')
+        $("#modal_dialog").modal('hide')
         $('.mode-spectator').removeClass('d-none')
         $('.mode-player').addClass('d-none')
         $('#hud_players').html(msg.html.hud_players)
