@@ -242,12 +242,17 @@ def deal_cards_to_player(msg):
                         score = table.round.get_score()
                         mode = 'player'
                         dealing_needed = table.round.turn_count == 0
+                        # if one trick right now was finished the claim-trick-button should be displayed again
+                        trick_claiming_needed = table.round.turn_count % 4 == 0 and \
+                                                table.round.turn_count > 0 and \
+                                                not table.round.is_finished()
                         socketio.emit('your-cards-please',
                                       {'player_id': player.id,
                                        'turn_count': table.round.turn_count,
                                        'current_player_id': current_player_id,
                                        'dealer': dealer,
                                        'dealing_needed': dealing_needed,
+                                       'trick_claiming_needed': trick_claiming_needed,
                                        'html': {'cards_hand': render_template('cards/hand.html',
                                                                               cards_hand=cards_hand,
                                                                               table=table,

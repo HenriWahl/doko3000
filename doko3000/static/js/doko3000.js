@@ -163,6 +163,11 @@ $(document).ready(function () {
         } else {
             $('#button_deal_cards_again').addClass('d-none')
         }
+        if (msg.trick_claiming_needed) {
+            $('#button_claim_trick').removeClass('d-none')
+        } else {
+            $('#button_claim_trick').addClass('d-none')
+        }
     })
 
     socket.on('sorry-no-cards-for-you', function (msg) {
@@ -189,7 +194,6 @@ $(document).ready(function () {
             $('#turn_indicator').removeClass('d-none')
         } else {
             $('#turn_indicator').addClass('d-none')
-            // $('#hud_player_' + current_player_id).addClass('hud-player-active')
         }
         $('#hud_players').html(msg.html.hud_players)
         if (msg.score[player_id] > 0) {
