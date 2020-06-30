@@ -197,7 +197,7 @@ $(document).ready(function () {
         }
         $('#hud_players').html(msg.html.hud_players)
         if (msg.score[player_id] > 0) {
-            $('#cards_stack').attr('title', msg.score[player_id])
+            $('#cards_stack_img').attr('title', msg.score[player_id])
             $('#cards_stack').removeClass('d-none')
         } else {
             $('#cards_stack').addClass('d-none')

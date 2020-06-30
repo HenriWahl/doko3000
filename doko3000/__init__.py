@@ -336,7 +336,6 @@ def claimed_trick(msg):
                     # table.round.current_trick.owner = table.round.players[player_id]
                     table.round.current_trick.owner = player.id
                     # new trick for next turns
-                    # table.round.add_trick(table.players[player_id])
                     table.round.add_trick(player.id)
                 else:
                     # apparently the ownership of the previous trick is not clear - change it
