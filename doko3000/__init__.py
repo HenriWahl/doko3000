@@ -469,8 +469,9 @@ def round_finish(msg):
 
 @socketio.on('request-round-reset')
 def request_round_reset(msg):
+    player_id = msg.get('player_id')
     table = game.tables.get(msg.get('table_id'))
-    if table:
+    if table and player_id in table.players:
         # clear list of ready players for next poll
         table.reset_ready_players()
         # just tell everybody to get personal cards
@@ -485,10 +486,10 @@ def request_round_reset(msg):
 @socketio.on('ready-for-round-reset')
 def round_reset(msg):
     player_id = msg.get('player_id')
-    table_id = msg.get('table_id')
-    if player_id == current_user.get_id() and \
-       table_id in game.tables:
-        table = game.tables[table_id]
+    table = game.tables.get(msg.get('table_id'))
+    if table and \
+       player_id in table.players and \
+       player_id == current_user.get_id():
         table.add_ready_player(player_id)
         if set(table.players_ready) >= set(table.round.players):
             table.reset_round()
@@ -499,17 +500,20 @@ def round_reset(msg):
 
 @socketio.on('request-undo')
 def request_undo(msg):
+    player_id = msg.get('player_id')
     table = game.tables.get(msg.get('table_id'))
-    if table:
-        # clear list of ready players for next poll
-        table.reset_ready_players()
-        # just tell everybody that an undo was requested
-        socketio.emit('undo-requested',
-                      {'table_id': table.id,
-                       'html': render_template('round/request_undo.html',
-                                               table=table)
-                       },
-                      room=table.id)
+    if table and player_id in table.players:
+        # makes only sense if there was any card played yet
+        if table.round.turn_count > 0:
+            # clear list of ready players for next poll
+            table.reset_ready_players()
+            # just tell everybody that an undo was requested
+            socketio.emit('undo-requested',
+                          {'table_id': table.id,
+                           'html': render_template('round/request_undo.html',
+                                                   table=table)
+                           },
+                          room=table.id)
 
 
 @socketio.on('ready-for-undo')
