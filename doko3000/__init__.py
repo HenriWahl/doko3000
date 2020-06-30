@@ -322,10 +322,11 @@ def sorted_cards(msg):
 
 @socketio.on('claim-trick')
 def claimed_trick(msg):
-    player = game.players[msg['player_id']]
-    if player.id == current_user.get_id() and \
-            msg['table_id'] in game.tables:
-        table = game.tables[msg['table_id']]
+    player = game.players.get(msg.get('player_id'))
+    table = game.tables.get(msg.get('table_id'))
+    if player and \
+       player.id == current_user.get_id() and \
+       table:
         if player.id in table.round.players:
             if not table.round.is_finished():
                 # when ownership changes it does at previous trick because normally there is a new one created
