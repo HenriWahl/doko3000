@@ -241,11 +241,13 @@ def deal_cards_to_player(msg):
                         # no score yet but needed for full set of cards for hand - to decide if back-card is shown too
                         score = table.round.get_score()
                         mode = 'player'
+                        dealing_needed = table.round.turn_count == 0
                         socketio.emit('your-cards-please',
                                       {'player_id': player.id,
                                        'turn_count': table.round.turn_count,
                                        'current_player_id': current_player_id,
                                        'dealer': dealer,
+                                       'dealing_needed': dealing_needed,
                                        'html': {'cards_hand': render_template('cards/hand.html',
                                                                               cards_hand=cards_hand,
                                                                               table=table,
@@ -424,6 +426,8 @@ def ready_for_next_round(msg):
 def request_round_finish(msg):
     table = game.tables.get(msg.get('table_id'))
     if table:
+        # clear list of ready players for next poll
+        table.reset_ready_players()
         # just tell everybody to get personal cards
         socketio.emit('round-finish-requested',
                       {'table_id': table.id,
@@ -458,23 +462,12 @@ def round_finish(msg):
                           room=table.id)
 
 
-@socketio.on('request-undo')
-def request_undo(msg):
-    table = game.tables.get(msg.get('table_id'))
-    if table:
-        # just tell everybody that an undo was requested
-        socketio.emit('undo-requested',
-                      {'table_id': table.id,
-                       'html': render_template('round/request_undo.html',
-                                               table=table)
-                       },
-                      room=table.id)
-
-
 @socketio.on('request-round-reset')
 def request_round_reset(msg):
     table = game.tables.get(msg.get('table_id'))
     if table:
+        # clear list of ready players for next poll
+        table.reset_ready_players()
         # just tell everybody to get personal cards
         socketio.emit('round-reset-requested',
                       {'table_id': table.id,
@@ -499,29 +492,56 @@ def round_reset(msg):
                           room=table.id)
 
 
-@socketio.on('ready-for-round-restart')
-def round_restart(msg):
+@socketio.on('request-undo')
+def request_undo(msg):
+    table = game.tables.get(msg.get('table_id'))
+    if table:
+        # clear list of ready players for next poll
+        table.reset_ready_players()
+        # just tell everybody that an undo was requested
+        socketio.emit('undo-requested',
+                      {'table_id': table.id,
+                       'html': render_template('round/request_undo.html',
+                                               table=table)
+                       },
+                      room=table.id)
+
+
+@socketio.on('ready-for-undo')
+def round_reset(msg):
     player_id = msg.get('player_id')
-    table_id = msg.get('table_id')
-    if player_id == current_user.get_id() and \
-            table_id in game.tables:
-        table = game.tables[table_id]
+    table = game.tables.get(msg.get('table_id'))
+    if player_id == current_user.get_id() and table:
         table.add_ready_player(player_id)
-        if len(table.players_ready) >= 4:
-            table.reset_round()
-            dealer = table.dealer
-            table.reset_ready_players()
-            next_players = table.order[:4]
-            number_of_rows = max(len(next_players), len(table.idle_players))
-            # just tell everybody to get personal cards
-            socketio.emit('start-next-round',
-                          {'table_id': table.id,
-                           'dealer': dealer,
-                           'html': render_template('round/info.html',
-                                                   table=table,
-                                                   next_players=next_players,
-                                                   number_of_rows=number_of_rows)},
+        if set(table.players_ready) >= set(table.round.players):
+            table.round.undo()
+            socketio.emit('grab-your-cards',
+                          {'table_id': table.id},
                           room=table.id)
+
+# @socketio.on('ready-for-round-restart')
+# def round_restart(msg):
+#     player_id = msg.get('player_id')
+#     table_id = msg.get('table_id')
+#     if player_id == current_user.get_id() and \
+#             table_id in game.tables:
+#         table = game.tables[table_id]
+#         table.add_ready_player(player_id)
+#         if len(table.players_ready) >= 4:
+#             table.reset_round()
+#             dealer = table.dealer
+#             table.reset_ready_players()
+#             next_players = table.order[:4]
+#             number_of_rows = max(len(next_players), len(table.idle_players))
+#             # just tell everybody to get personal cards
+#             socketio.emit('start-next-round',
+#                           {'table_id': table.id,
+#                            'dealer': dealer,
+#                            'html': render_template('round/info.html',
+#                                                    table=table,
+#                                                    next_players=next_players,
+#                                                    number_of_rows=number_of_rows)},
+#                           room=table.id)
 
 
 @app.route('/login', methods=['GET', 'POST'])

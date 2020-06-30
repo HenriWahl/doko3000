@@ -547,7 +547,7 @@ class Round(Document):
 
     def deal(self):
         """
-        deal cards
+        deal cards, will be saved by .reset()
         """
         # simple counter to deal cards to all players
         player_count = 0
@@ -566,15 +566,11 @@ class Round(Document):
                     self.game.players[player_id].eichel_ober_count += 1
 
             player_count += 1
-            # self.game.players[player_id].save()
-        # not needed, is saved by .reset()
-        # self.save()
 
     def add_trick(self, player_id):
         """
         set player as owner of current trick
         """
-        # self['tricks'].append(Trick(game=self.game))
         self.game.tricks[f'{self.id}-{self.trick_count}'].owner = player_id
         self.increase_trick_count()
         self.current_player = player_id
@@ -650,6 +646,20 @@ class Round(Document):
             for card in trick.cards:
                 played_cards.append(card)
         return played_cards
+
+    def undo(self):
+        """
+        undo last trick by request
+        """
+        for player_id, card_id in zip(self.current_trick.players, self.current_trick.cards):
+            self.game.players[player_id].cards.append(card_id)
+            # decrease turn_count here to avoid extra self.save() like in increase_turn_count()
+            self.turn_count -= 1
+        # store last current trick starting player
+        self.current_player = self.current_trick.players[0]
+        self.current_trick.reset()
+        # self.trick_count -= 1
+        self.save()
 
 
 class Table(Document):

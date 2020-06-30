@@ -158,7 +158,7 @@ $(document).ready(function () {
         } else {
             $('#turn_indicator').addClass('d-none')
         }
-        if (player_id == msg.dealer) {
+        if (player_id == msg.dealer && msg.dealing_needed) {
             $('#button_deal_cards_again').removeClass('d-none')
         } else {
             $('#button_deal_cards_again').addClass('d-none')
