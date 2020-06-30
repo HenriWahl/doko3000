@@ -120,7 +120,7 @@ $(document).ready(function () {
             cards_locked = true
             $('#turn_indicator').addClass('d-none')
             if (!msg.idle_players.includes(player_id)) {
-                $('#button_claim_trick').removeClass('d-none')
+                $('#button_claim_trick').removeClass('d-none').fadeOut(1).delay(1500).fadeIn(1)
             }
         } else {
             cards_locked = false
@@ -164,7 +164,7 @@ $(document).ready(function () {
             $('#button_deal_cards_again').addClass('d-none')
         }
         if (msg.trick_claiming_needed) {
-            $('#button_claim_trick').removeClass('d-none')
+            $('#button_claim_trick').removeClass('d-none').fadeOut(1).delay(1500).fadeIn(1)
         } else {
             $('#button_claim_trick').addClass('d-none')
         }
