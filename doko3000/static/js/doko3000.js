@@ -228,7 +228,6 @@ $(document).ready(function () {
     })
 
     socket.on('round-reset-requested', function (msg) {
-
         $('.overlay-button').addClass('d-none')
         $('.overlay-notification').addClass('d-none')
         // cleanup content of dialog
@@ -245,14 +244,6 @@ $(document).ready(function () {
     })
 
     socket.on('undo-requested', function (msg) {
-        $('.overlay-button').addClass('d-none')
-        $('.overlay-notification').addClass('d-none')
-        // cleanup content of dialog
-        $('#modal_body').html(msg.html)
-        $('#modal_dialog').modal('show')
-    })
-
-    socket.on('round-restart-options', function (msg) {
         $('.overlay-button').addClass('d-none')
         $('.overlay-notification').addClass('d-none')
         // cleanup content of dialog

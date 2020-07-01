@@ -528,31 +528,6 @@ def round_reset(msg):
                           {'table_id': table.id},
                           room=table.id)
 
-# @socketio.on('ready-for-round-restart')
-# def round_restart(msg):
-#     player_id = msg.get('player_id')
-#     table_id = msg.get('table_id')
-#     if player_id == current_user.get_id() and \
-#             table_id in game.tables:
-#         table = game.tables[table_id]
-#         table.add_ready_player(player_id)
-#         if len(table.players_ready) >= 4:
-#             table.reset_round()
-#             dealer = table.dealer
-#             table.reset_ready_players()
-#             next_players = table.order[:4]
-#             number_of_rows = max(len(next_players), len(table.idle_players))
-#             # just tell everybody to get personal cards
-#             socketio.emit('start-next-round',
-#                           {'table_id': table.id,
-#                            'dealer': dealer,
-#                            'html': render_template('round/info.html',
-#                                                    table=table,
-#                                                    next_players=next_players,
-#                                                    number_of_rows=number_of_rows)},
-#                           room=table.id)
-
-
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = Login()
