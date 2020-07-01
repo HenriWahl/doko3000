@@ -256,8 +256,7 @@ $(document).ready(function () {
         $('.overlay-button').addClass('d-none')
         $('.overlay-notification').addClass('d-none')
         // cleanup content of dialog
-        $('#modal_body').ht
-        ml(msg.html)
+        $('#modal_body').html(msg.html)
         $('#modal_dialog').modal('show')
     })
 
