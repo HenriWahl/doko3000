@@ -58,18 +58,18 @@ def who_am_i():
     if not current_user.is_anonymous:
         player = game.players.get(current_user.get_id())
         if player:
-            table_id = player.table
+            table = game.tables.get(player.table)
             round_finished = False
             # if player already sits on a table inform client
-            if table_id and table_id in game.tables:
-                current_player_id = game.tables[table_id].round.current_player
-                round_finished = game.tables[table_id].round.is_finished()
-                join_room(table_id)
+            if table:
+                current_player_id = table.round.current_player
+                round_finished = table.round.is_finished()
+                join_room(table.id)
             else:
                 current_player_id = ''
             socketio.emit('you-are-what-you-is',
                           {'player_id': player.id,
-                           'table_id': table_id,
+                           'table_id': table.id,
                            'current_player_id': current_player_id,
                            'round_finished': round_finished})
 
@@ -77,8 +77,6 @@ def who_am_i():
 @socketio.on('played-card')
 def played_card(msg):
     card_id = msg.get('card_id')
-    #player_id = msg.get('player_id')
-    #table_id = msg.get('table_id')
     player = game.players.get(msg.get('player_id'))
     table = game.tables.get(msg.get('table_id'))
     if card_id in Deck.cards and \
@@ -118,9 +116,6 @@ def played_card(msg):
 
 @socketio.on('enter-table')
 def enter_table_socket(msg):
-    #table_id = msg.get('table_id')
-    #player_id = msg.get('player_id')
-    #table = game.tables.get(table_id)
     player = game.players.get(msg.get('player_id'))
     table = game.tables.get(msg.get('table_id'))
     if player and table:
@@ -134,12 +129,9 @@ def enter_table_socket(msg):
 
 @socketio.on('setup-table-change')
 def setup_table(msg):
-    #table_id = msg.get('table_id')
-    #player_id = msg.get('player_id')
     player = game.players.get(msg.get('player_id'))
     table = game.tables.get(msg.get('table_id'))
     action = msg.get('action')
-    #table = game.tables.get(table_id)
     if player and table:
         if action == 'remove_player':
             table.remove_player(player.id)
@@ -169,7 +161,6 @@ def setup_table(msg):
 
 @socketio.on('setup-player-change')
 def setup_player(msg):
-    #player_id = msg.get('player_id')
     action = msg.get('action')
     player = game.players.get(msg.get('player_id'))
     if player:
@@ -196,7 +187,6 @@ def setup_player(msg):
 
 @socketio.on('deal-cards')
 def deal_cards(msg):
-    #table_id = msg.get('table_id')
     table = game.tables.get(msg.get('table_id'))
     if table:
         table.reset_round()
@@ -208,7 +198,6 @@ def deal_cards(msg):
 
 @socketio.on('deal-cards-again')
 def deal_cards_again(msg):
-    #table_id = msg.get('table_id')
     table = game.tables.get(msg.get('table_id'))
     if table:
         # ask dealer if really should be re-dealt
@@ -224,8 +213,6 @@ def deal_cards_to_player(msg):
     """
     give player cards after requesting them
     """
-    #player_id = msg.get('player_id')
-    #table_id = msg.get('table_id')
     player = game.players.get(msg.get('player_id'))
     table = game.tables.get(msg.get('table_id'))
     if player and \
@@ -309,8 +296,6 @@ def sorted_cards(msg):
     while player sorts cards every card placed somewhere causes transmission of current card sort order
     which gets saved here
     """
-    #player_id = msg.get('player_id')
-    #table_id = msg.get('table_id')
     player = game.players.get(msg.get('player_id'))
     table = game.tables.get(msg.get('table_id'))
     if player and table:
@@ -379,8 +364,6 @@ def claimed_trick(msg):
 
 @socketio.on('need-final-result')
 def send_final_result(msg):
-    # player_id = msg.get('player_id')
-    # table_id = msg.get('table_id')
     player = game.players.get(msg.get('player_id'))
     table = game.tables.get(msg.get('table_id'))
     if player and \
@@ -402,8 +385,6 @@ def send_final_result(msg):
 
 @socketio.on('ready-for-next-round')
 def ready_for_next_round(msg):
-    #player_id = msg.get('player_id')
-    #table_id = msg.get('table_id')
     player = game.players.get(msg.get('player_id'))
     table = game.tables.get(msg.get('table_id'))
     if player and \
@@ -448,8 +429,6 @@ def request_round_finish(msg):
 
 @socketio.on('ready-for-round-finish')
 def round_finish(msg):
-    #player_id = msg.get('player_id')
-    #table_id = msg.get('table_id')
     player = game.players.get(msg.get('player_id'))
     table = game.tables.get(msg.get('table_id'))
     if player and \
@@ -475,7 +454,6 @@ def round_finish(msg):
 
 @socketio.on('request-round-reset')
 def request_round_reset(msg):
-    #player_id = msg.get('player_id')
     player = game.players.get(msg.get('player_id'))
     table = game.tables.get(msg.get('table_id'))
     if player and \
@@ -494,7 +472,6 @@ def request_round_reset(msg):
 
 @socketio.on('ready-for-round-reset')
 def round_reset(msg):
-    #player_id = msg.get('player_id')
     player = game.players.get(msg.get('player_id'))
     table = game.tables.get(msg.get('table_id'))
     if player and \
@@ -510,7 +487,6 @@ def round_reset(msg):
 
 @socketio.on('request-undo')
 def request_undo(msg):
-    #player_id = msg.get('player_id')
     player = game.players.get(msg.get('player_id'))
     table = game.tables.get(msg.get('table_id'))
     if player and \
@@ -531,7 +507,6 @@ def request_undo(msg):
 
 @socketio.on('ready-for-undo')
 def round_reset(msg):
-    #player_id = msg.get('player_id')
     player = game.players.get(msg.get('player_id'))
     table = game.tables.get(msg.get('table_id'))
     if player and \
@@ -650,19 +625,16 @@ def setup_table(table_id):
     well, formular check seems to be unnecessary for now, but anyway it is an easy way to deliver it
     """
     if is_xhr(request) and table_id:
-        if table_id in game.tables:
-            table = game.tables[table_id]
-            if current_user.get_id() in game.players and \
-                    (current_user.get_id() in table.players or
-                     not table.locked):
-                return jsonify({'allowed': True,
+        table = game.tables.get(table_id)
+        if table and \
+           current_user.get_id() in game.players and \
+           (current_user.get_id() in table.players or
+           not table.locked):
+            return jsonify({'allowed': True,
                                 'html': render_template('setup/table.html',
                                                         table=table)})
-            else:
-                return jsonify({'allowed': False})
-
         else:
-            return redirect(url_for('index'))
+            return jsonify({'allowed': False})
     else:
         return redirect(url_for('index'))
 
@@ -674,8 +646,8 @@ def setup_player(player_id):
     Setup for player - at first only password, quite probably
     """
     if is_xhr(request) and player_id:
-        if player_id in game.players:
-            player = game.players[player_id]
+        player = game.players.get(player_id)
+        if player:
             return jsonify({'html': render_template('setup/player.html',
                                                     player=player)})
         else:
@@ -693,12 +665,13 @@ def enter_table_json(table_id='', player_id=''):
     """
     if is_xhr(request) and table_id:
         allowed = False
-        if table_id in game.tables and \
-                player_id in game.players:
-            table = game.tables[table_id]
-            if (table.locked and player_id in table.players) or \
-                    not table.locked:
-                allowed = True
+        player = game.players.get(player_id)
+        table = game.tables.get(table_id)
+        if player and \
+           table and \
+           ((table.locked and player_id in table.players) or
+           not table.locked):
+            allowed = True
         return jsonify({'allowed': allowed})
     else:
         return redirect(url_for('index'))
@@ -812,8 +785,8 @@ def delete_player(player_id):
     """
     player = game.players.get(player_id)
     if is_xhr(request) and \
-            current_user.is_admin and \
-            player:
+            player and \
+            current_user.is_admin:
         if request.method == 'GET':
             if not player.is_playing():
                 return jsonify({'status': 'ok',
