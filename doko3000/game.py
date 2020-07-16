@@ -4,6 +4,7 @@ from json import dumps
 from random import seed, \
     shuffle
 from time import time
+from urllib.parse import quote
 
 from cloudant.document import Document
 from flask_login import UserMixin
@@ -72,11 +73,12 @@ class Player(UserMixin, Document):
     def __init__(self, player_id='', document_id='', game=None):
         self.game = game
         if player_id:
-            # ID still name, going to be number - for CouchDB
-            self['_id'] = f'player-{player_id}'
+            # ID for CouchDB - quoted and without '/'
+            player_id_quoted = quote(player_id, safe='')
+            self['_id'] = f"player-{player_id_quoted}"
             Document.__init__(self, self.game.db.database)
             # ID for flask-login
-            self['id'] = player_id
+            self['id'] = player_id_quoted
             # type is for CouchDB
             self['type'] = 'player'
             # name of player - to become somewhat more natural

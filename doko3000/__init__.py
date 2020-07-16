@@ -802,12 +802,8 @@ def delete_player(player_id):
                 return jsonify({'status': 'ok',
                                 'html': render_template('index/list_players.html',
                                                         players=players)})
-            else:
-                return redirect(url_for('index'))
-        else:
-            return redirect(url_for('index'))
-    else:
-        return redirect(url_for('index'))
+    # default return if nothing applies
+    return redirect(url_for('index'))
 
 
 @app.route('/delete/table/<table_id>', methods=['GET', 'POST'])
@@ -834,12 +830,8 @@ def delete_table(table_id):
                 return jsonify({'status': 'ok',
                                 'html': render_template('index/list_tables.html',
                                                         tables=tables)})
-            else:
-                return redirect(url_for('index'))
-        else:
-            return redirect(url_for('index'))
-    else:
-        return redirect(url_for('index'))
+    # default return if nothing applies
+    return redirect(url_for('index'))
 
 @app.route('/start/table/<table_id>')
 @login_required
