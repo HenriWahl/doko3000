@@ -30,7 +30,7 @@
     <div class="p-2 m-1 border table_player_{{ player_id }} player"
          data-player_id="{{ player_id }}">
         <span class="oi oi-person"></span>
-        {{ player_id }}
+        {{ game.players[player_id ].name}}
         <span class="oi oi-x float-right text-danger btn btn-outline-light border-0 btn-sm button-remove-player-from-table"
               data-player_id="{{ player_id }}"
               data-table_id="{{ table.id }}"

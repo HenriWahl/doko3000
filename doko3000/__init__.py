@@ -112,6 +112,7 @@ def played_card(msg):
                                 'hud_players': render_template('top/hud_players.html',
                                                                table=table,
                                                                player=player,
+                                                               game=game,
                                                                current_player_id=current_player_id)
                                 }},
                       room=table.id)
@@ -255,6 +256,7 @@ def deal_cards_to_player(msg):
                                     'hud_players': render_template('top/hud_players.html',
                                                                    table=table,
                                                                    player=player,
+                                                                   game=game,
                                                                    dealer=dealer,
                                                                    current_player_id=current_player_id),
                                     'cards_table': render_template('cards/table.html',
@@ -274,6 +276,7 @@ def deal_cards_to_player(msg):
                           {'html': {'hud_players': render_template('top/hud_players.html',
                                                                    table=table,
                                                                    player=player,
+                                                                   game=game,
                                                                    dealer=dealer,
                                                                    current_player_id=current_player_id),
                                     'cards_table': render_template('cards/table.html',
@@ -342,6 +345,7 @@ def claimed_trick(msg):
                                'html': {'hud_players': render_template('top/hud_players.html',
                                                                        table=table,
                                                                        player=player,
+                                                                       game=game,
                                                                        current_player_id=player.id),
                                         'cards_table': render_template('cards/table.html',
                                                                        cards_table=cards_table,
@@ -599,6 +603,7 @@ def table(table_id=''):
                                    cards_table=cards_table,
                                    timestamp=timestamp,
                                    score=score,
+                                   game=game,
                                    mode=mode)
         else:
             players = table.round.players
@@ -612,6 +617,7 @@ def table(table_id=''):
                                    player=player,
                                    players=players,
                                    players_cards=players_cards,
+                                   game=game,
                                    mode=mode)
     # tables = game.tables.values()
     # players = game.players.values()
@@ -634,7 +640,8 @@ def setup_table(table_id):
            not table.locked):
             return jsonify({'allowed': True,
                                 'html': render_template('setup/table.html',
-                                                        table=table)})
+                                                        table=table,
+                                                        game=game)})
         else:
             return jsonify({'allowed': False})
     else:
@@ -663,7 +670,7 @@ def setup_player(player_id):
 def enter_table_json(table_id='', player_id=''):
     """
     give #buttom_enter_table permission or not, depending on player membership or table lockedness
-    support for socket.io request, just telling #button_enter_table if its link can be followed or not
+    support for socket.io request, just telling .button-enter-table if its link can be followed or not
     """
     if is_xhr(request) and table_id:
         allowed = False
@@ -780,7 +787,7 @@ def create_player():
         return redirect(url_for('index'))
 
 
-@app.route('/delete/player/<path:player_id>', methods=['GET', 'POST'])
+@app.route('/delete/player/<player_id>', methods=['GET', 'POST'])
 @login_required
 def delete_player(player_id):
     """
@@ -809,7 +816,7 @@ def delete_player(player_id):
     return redirect(url_for('index'))
 
 
-@app.route('/delete/table/<path:table_id>', methods=['GET', 'POST'])
+@app.route('/delete/table/<table_id>', methods=['GET', 'POST'])
 @login_required
 def delete_table(table_id):
     """

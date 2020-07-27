@@ -4,7 +4,7 @@
         {% if hud_player_id == current_player_id %}
         hud-player-active
         {% endif %}
-    ">{{ hud_player_id }}</span>
+    ">{{ game.players[hud_player_id].name }}</span>
     {% endfor %}
 
     {% for idle_player in table.idle_players %}
