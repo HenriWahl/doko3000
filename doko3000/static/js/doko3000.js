@@ -275,7 +275,7 @@ $(document).ready(function () {
             table_id: $(this).data('table_id')
         })
         // ask server via json if player is allowed to enter or not
-        return $.getJSON('/enter/table/' + $(this).data('table_id') + '/' + player_id,
+        return $.getJSON('/enter/table/' + encodeURIComponent($(this).data('table_id')) + '/' + player_id,
             function (data, status) {
                 if (status == 'success' && data.allowed) {
                     return data.allowed
@@ -473,8 +473,9 @@ $(document).ready(function () {
     // delete a player in the players list
     $(document).on('click', '.button-delete-player', function () {
         if (player_id != $(this).data('player_id')) {
-            // $.getJSON('/delete/player/' + encodeURIComponent($(this).data('player_id')),
-            $.getJSON('/delete/player/' + $(this).data('player_id'),
+            console.log($(this).data('player_id'))
+            $.getJSON('/delete/player/' + encodeURIComponent($(this).data('player_id')),
+                // $.getJSON('/delete/player/' + $(this).data('player_id'),
                 function (data, status) {
                     if (status == 'success') {
                         $('#modal_body').html(data.html)
@@ -490,6 +491,7 @@ $(document).ready(function () {
         if (player_id != $(this).data('player_id')) {
             // once again the .post + 'json' move
             $.post('/delete/player/' + encodeURIComponent($(this).data('player_id')),
+            // $.post('/delete/player/' + $(this).data('player_id'),
                 function (data, status) {
                     if (status == 'success') {
                         if (data.status == 'ok') {
@@ -509,6 +511,7 @@ $(document).ready(function () {
     // delete a player in the players list
     $(document).on('click', '.button-delete-table', function () {
         $.getJSON('/delete/table/' + encodeURIComponent($(this).data('table_id')),
+        // $.getJSON('/delete/table/' + $(this).data('table_id'),
             function (data, status) {
                 if (status == 'success') {
                     $('#modal_body').html(data.html)
@@ -522,6 +525,7 @@ $(document).ready(function () {
     $(document).on('click', '#button_really_delete_table', function () {
         // once again the .post + 'json' move
         $.post('/delete/table/' + encodeURIComponent($(this).data('table_id')),
+        // $.post('/delete/table/' + $(this).data('table_id'),
             function (data, status) {
                 if (status == 'success') {
                     if (data.status == 'ok') {
@@ -584,7 +588,7 @@ $(document).ready(function () {
 
     // player setup
     $(document).on('click', '.setup-player', function () {
-        $.getJSON('/setup/player/' + $(this).data('player_id'), function (data, status) {
+        $.getJSON('/setup/player/' + encodeURIComponent($(this).data('player_id')), function (data, status) {
             if (status == 'success') {
                 $("#modal_body").html(data.html)
                 $('#modal_dialog').modal('show')

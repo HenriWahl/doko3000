@@ -1,7 +1,7 @@
 <div class="dropdown">
     <div class="btn btn-outline-light float-right m-2 text-nowrap topbar-button" data-toggle="dropdown">
         <span class="oi oi-person mr-1"></span>
-        {{ current_user.id }}
+        {{ current_user.name }}
     </div>
     <div class="dropdown-menu topbar-menu shadow">
         <a href="{{ url_for('index') }}" class="dropdown-item py-2">

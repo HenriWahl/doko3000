@@ -73,7 +73,7 @@ class Player(UserMixin, Document):
     def __init__(self, player_id='', document_id='', game=None):
         self.game = game
         if player_id:
-            # ID for CouchDB - quoted and without '/'
+            # ID for CouchDB - quoted and without '/', to be transported easily througout HTML and JS
             player_id_quoted = quote(player_id, safe='')
             self['_id'] = f"player-{player_id_quoted}"
             Document.__init__(self, self.game.db.database)
@@ -345,7 +345,7 @@ class Round(Document):
         # collection of tricks per round - its number should not exceed cards_per_player
         self.tricks = {}
         if round_id:
-            # ID still name, going to be number - for CouchDB
+            # ID for CouchDB - comes already quoted from table
             self['_id'] = f'round-{round_id}'
             Document.__init__(self, self.game.db.database)
             # type is for CouchDB
@@ -674,13 +674,15 @@ class Table(Document):
     def __init__(self, table_id='', document_id='', game=None):
         self.game = game
         if table_id:
-            # ID still name, going to be number - for CouchDB
-            self['_id'] = f'table-{table_id}'
+            # ID for CouchDB - quoted and without '/'
+            table_id_quoted = quote(table_id, safe='')
+            self['_id'] = f'table-{table_id_quoted}'
             Document.__init__(self, self.game.db.database)
             # type is for CouchDB
             self['type'] = 'table'
             # what table?
-            self['id'] = table_id
+            self['id'] = table_id_quoted
+            self['name'] = table_id
             # default empty
             # quite likely order is about to vanish
             self['order'] = []
@@ -701,6 +703,15 @@ class Table(Document):
         return self['id']
 
     @property
+    def name(self):
+        # legacy move for older tables which do not have names yet
+        name = self.get('name')
+        if not name:
+            return self.id
+        else:
+            return name
+
+    @property
     def order(self):
         return self['order']
 
@@ -708,10 +719,6 @@ class Table(Document):
     def order(self, value):
         self['order'] = value
         self.save()
-
-    @property
-    def id(self):
-        return self['id']
 
     @property
     def round(self):
@@ -910,21 +917,26 @@ class Game:
         """
         adds a new player
         """
-        if player_id and player_id not in self.players:
-            self.players[player_id] = Player(player_id=player_id, game=self)
-            if password:
-                self.players[player_id].set_password(password)
-            if is_admin:
-                self.players[player_id].is_admin = True
-        return self.players.get(player_id)
+        if player_id:
+            # quoted player_id for CouchDB, HTML and JS
+            player_id_quoted = quote(player_id, safe='')
+            if player_id_quoted not in self.players:
+                self.players[player_id_quoted] = Player(player_id=player_id, game=self)
+                if password:
+                    self.players[player_id_quoted].set_password(password)
+                if is_admin:
+                    self.players[player_id_quoted].is_admin = True
+            return self.players.get(player_id_quoted)
 
     def add_table(self, table_id=''):
         """
         adds a new table (to sit and play on, no database table!)
         """
-        if table_id and table_id not in self.tables:
-            self.tables[table_id] = Table(table_id=table_id, game=self)
-        return self.tables.get(table_id)
+        if table_id:
+            table_id_quoted = quote(table_id, safe='')
+            if table_id_quoted not in self.tables:
+                self.tables[table_id_quoted] = Table(table_id=table_id, game=self)
+            return self.tables.get(table_id_quoted)
 
     def delete_player(self, player_id):
         """
@@ -956,7 +968,7 @@ class Game:
                     player.table = ''
             if table_id in self.rounds:
                 for trick_number in self.rounds[table_id].tricks:
-                    trick_id =  f'{table_id}-{trick_number}'
+                    trick_id = f'{table_id}-{trick_number}'
                     if trick_id in self.tricks:
                         self.tricks[trick_id].delete()
                         self.tricks.pop(trick_id)

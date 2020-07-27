@@ -1,4 +1,5 @@
 from time import time
+from urllib.parse import quote
 
 from flask import flash, \
     Flask, \
@@ -65,11 +66,13 @@ def who_am_i():
                 current_player_id = table.round.current_player
                 round_finished = table.round.is_finished()
                 join_room(table.id)
+                table_id = table.id
             else:
                 current_player_id = ''
+                table_id = ''
             socketio.emit('you-are-what-you-is',
                           {'player_id': player.id,
-                           'table_id': table.id,
+                           'table_id': table_id,
                            'current_player_id': current_player_id,
                            'round_finished': round_finished})
 
@@ -523,16 +526,17 @@ def round_reset(msg):
 def login():
     form = Login()
     if form.validate_on_submit():
-        if not form.player_id.data in game.players:
-            flash('Spieler nicht bekannt :-(')
-            return redirect(url_for('login'))
-        else:
-            player_id = game.players[form.player_id.data]
-            if not player_id.check_password(form.password.data):
+        player_id_quoted = quote(form.player_id.data, safe='')
+        player = game.players.get(player_id_quoted)
+        if player:
+            if not player.check_password(form.password.data):
                 flash('Falsches Passwort :-(')
                 return redirect(url_for('login'))
-            login_user(player_id)
+            login_user(player)
             return redirect(url_for('index'))
+        else:
+            flash('Spieler nicht bekannt :-(')
+            return redirect(url_for('login'))
     return render_template('login.html',
                            title=f"{app.config['TITLE']} Login",
                            form=form)
@@ -555,6 +559,7 @@ def index():
                                tables=tables,
                                players=players,
                                player=player,
+                               game=game,
                                title=f"{app.config['TITLE']}")
     else:
         return redirect(url_for('login'))
@@ -608,13 +613,10 @@ def table(table_id=''):
                                    players=players,
                                    players_cards=players_cards,
                                    mode=mode)
-    tables = game.tables.values()
-    players = game.players.values()
-    return render_template('index.html',
-                           tables=tables,
-                           players=players,
-                           player=player,
-                           title=f"{app.config['TITLE']}")
+    # tables = game.tables.values()
+    # players = game.players.values()
+    return redirect(url_for('index'))
+
 
 
 @app.route('/setup/table/<table_id>')
@@ -686,7 +688,8 @@ def get_html_tables():
     if is_xhr(request):
         tables = game.tables.values()
         return jsonify({'html': render_template('index/list_tables.html',
-                                                tables=tables)})
+                                                tables=tables,
+                                                game=game)})
     else:
         return redirect(url_for('index'))
 
@@ -777,7 +780,7 @@ def create_player():
         return redirect(url_for('index'))
 
 
-@app.route('/delete/player/<player_id>', methods=['GET', 'POST'])
+@app.route('/delete/player/<path:player_id>', methods=['GET', 'POST'])
 @login_required
 def delete_player(player_id):
     """
@@ -806,7 +809,7 @@ def delete_player(player_id):
     return redirect(url_for('index'))
 
 
-@app.route('/delete/table/<table_id>', methods=['GET', 'POST'])
+@app.route('/delete/table/<path:table_id>', methods=['GET', 'POST'])
 @login_required
 def delete_table(table_id):
     """
@@ -829,7 +832,8 @@ def delete_table(table_id):
                 tables = game.tables.values()
                 return jsonify({'status': 'ok',
                                 'html': render_template('index/list_tables.html',
-                                                        tables=tables)})
+                                                        tables=tables,
+                                                        game=game)})
     # default return if nothing applies
     return redirect(url_for('index'))
 

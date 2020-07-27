@@ -6,7 +6,7 @@
         <div class="row">
             <div class="col-md-6 col-sm-12">
                 <strong>
-                    {{ table.id }}
+                    {{ table.name}}
                     {% if table.locked %}
                     <span class="oi oi-lock-locked"></span>
                     {% endif %}
@@ -14,7 +14,7 @@
 
                 <span class="text-secondary">
     {% for player_id in table.players %}
-                        <span class="table_{{ table.id }}_player_{{ player_id }}">{{ player_id }}&nbsp;</span>
+                        <span class="table_{{ table.id }}_player_{{ player_id }}">{{ game.players[player_id].name }}&nbsp;</span>
     {% endfor %}
                 </span>
             </div>
