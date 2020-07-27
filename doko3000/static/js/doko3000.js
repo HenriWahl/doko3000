@@ -327,7 +327,7 @@ $(document).ready(function () {
 
     // draggable list of players in setup table dialog
     $(document).on('click', '.setup-table', function () {
-        $.getJSON('/setup/table/' + $(this).data('table_id'), function (data, status) {
+        $.getJSON('/setup/table/' + encodeURIComponent($(this).data('table_id')), function (data, status) {
             if (status == 'success' && data.allowed) {
                 $("#modal_body").html(data.html)
                 $('#modal_dialog').modal('show')

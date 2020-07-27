@@ -833,7 +833,7 @@ def delete_table(table_id):
             else:
                 return jsonify({'status': 'error',
                                 'html': render_template('error.html',
-                                                         message=f"Es sitzen noch Spieler am Tisch {table.id}.")})
+                                                         message=f"Es sitzen noch Spieler am Tisch {table.name}.")})
         elif request.method == 'POST':
             if game.delete_table(table.id):
                 tables = game.tables.values()
@@ -860,6 +860,6 @@ def start_table(table_id):
         else:
             return jsonify({'status': 'error',
                             'html': render_template('error.html',
-                                                     message=f"Es sitzen nicht genug Spieler am Tisch {table.id}.")})
+                                                     message=f"Es sitzen nicht genug Spieler am Tisch {table.name}.")})
     else:
         return redirect(url_for('index'))
