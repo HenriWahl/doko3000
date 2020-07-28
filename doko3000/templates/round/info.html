@@ -11,13 +11,13 @@
     {% for row in range(number_of_rows) %}
     <tr>
         {% if row < 4 %}
-        <td>{{ next_players[row] }}</td>
+        <td>{{ game.players(next_players[row]).name }}</td>
         {% else %}
         <td></td>
         {% endif %}
              {% if table.idle_players %}
                 {% if row < table.idle_players|length %}
-        <td>{{ table.idle_players[row] }}</td>
+        <td>{{ game.players[table.idle_players[row]].name }}</td>
              {% else %}
         <td></td>
              {% endif %}

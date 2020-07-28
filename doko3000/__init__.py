@@ -414,6 +414,7 @@ def ready_for_next_round(msg):
                                                table=table,
                                                dealer=dealer,
                                                next_players=next_players,
+                                               game=game,
                                                number_of_rows=number_of_rows)
                        },
                       room=request.sid)
@@ -455,6 +456,7 @@ def round_finish(msg):
                            'html': render_template('round/info.html',
                                                    table=table,
                                                    next_players=next_players,
+                                                   game=game,
                                                    number_of_rows=number_of_rows)},
                           room=table.id)
 
