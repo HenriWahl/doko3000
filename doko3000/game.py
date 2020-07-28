@@ -778,6 +778,35 @@ class Table(Document):
         """
         return self.order[4:]
 
+    @property
+    def sync_count(self):
+        """
+        help to stabilize client synchronization
+        """
+        if not self.get('sync_count'):
+            return 0
+        else:
+            return self['sync_count']
+
+    @sync_count.setter
+    def sync_count(self, value):
+        self['sync_count'] = value
+
+    def increase_sync_count(self):
+        """
+        to be called after various actions
+        """
+        self.sync_count += 1
+        self.save()
+        return self.sync_count
+
+    def reset_sync_count(self):
+        """
+        new round needs a reset of sync count
+        """
+        self.sync_count = 0
+        self.save()
+
     def add_player(self, player_id):
         """
         adding just one player to the party
@@ -849,7 +878,10 @@ class Table(Document):
         """
         # beginning order is the same like players
         self.order = self.players[:]
+        # new round of 4 players
         self.reset_round()
+        # new sync count
+        self.reset_sync_count()
 
     def shift_players(self):
         """

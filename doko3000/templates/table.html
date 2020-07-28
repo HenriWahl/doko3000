@@ -2,6 +2,8 @@
 
 {% block main_content %}
 
+    <span id="sync_count" data-sync_count="{{ table.sync_count }}"></span>
+
     <div id="button_deal_cards_again" class="overlay-button justify-content-center
     {% if current_user.id != dealer or not dealing_needed %}
     d-none
