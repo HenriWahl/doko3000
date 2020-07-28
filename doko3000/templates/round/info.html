@@ -11,7 +11,7 @@
     {% for row in range(number_of_rows) %}
     <tr>
         {% if row < 4 %}
-        <td>{{ game.players(next_players[row]).name }}</td>
+        <td>{{ game.players[next_players[row]].name }}</td>
         {% else %}
         <td></td>
         {% endif %}

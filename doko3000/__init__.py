@@ -626,7 +626,6 @@ def table(table_id=''):
     return redirect(url_for('index'))
 
 
-
 @app.route('/setup/table/<table_id>')
 @login_required
 def setup_table(table_id):

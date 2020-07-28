@@ -7,9 +7,9 @@
     ">{{ game.players[hud_player_id].name }}</span>
     {% endfor %}
 
-    {% for idle_player in table.idle_players %}
+    {% for idle_player_id in table.idle_players %}
         <span class="text-muted">
-            {{ idle_player }}
+            {{ game.players[idle_player_id].name }}
         </span>
     {% endfor %}
 </div>
