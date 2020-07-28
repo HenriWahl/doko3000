@@ -287,11 +287,13 @@ def deal_cards_to_player(msg):
                                     'cards_hand_spectator_upper': render_template('cards/hand_spectator_upper.html',
                                                                                  table=table,
                                                                                  players=players,
-                                                                                 players_cards=players_cards),
+                                                                                 players_cards=players_cards,
+                                                                                 game=game),
                                     'cards_hand_spectator_lower': render_template('cards/hand_spectator_lower.html',
-                                        table=table,
-                                        players=players,
-                                        players_cards=players_cards)
+                                                                                  table=table,
+                                                                                  players=players,
+                                                                                  players_cards=players_cards,
+                                                                                  game=game)
                                     }},
                           room=request.sid)
 
