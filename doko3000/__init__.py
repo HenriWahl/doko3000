@@ -99,7 +99,7 @@ def played_card(msg):
         idle_players = table.idle_players
         cards_table = table.round.current_trick.get_cards()
         played_cards = table.round.get_played_cards()
-        timestamp = table.round.timestamp
+        cards_timestamp = table.round.cards_timestamp
         sync_count = table.increase_sync_count()
         socketio.emit('played-card-by-user',
                       {'player_id': player.id,
@@ -113,7 +113,7 @@ def played_card(msg):
                        'html': {'cards_table': render_template('cards/table.html',
                                                                cards_table=cards_table,
                                                                table=table,
-                                                               timestamp=timestamp),
+                                                               cards_timestamp=cards_timestamp),
                                 'hud_players': render_template('top/hud_players.html',
                                                                table=table,
                                                                player=player,
@@ -239,7 +239,7 @@ def deal_cards_to_player(msg):
         # just in case
         join_room(table.id)
         current_player_id = table.round.current_player
-        timestamp = table.round.timestamp
+        cards_timestamp = table.round.cards_timestamp
         if player.id in table.round.players:
             cards_hand = player.get_cards()
             cards_table = []
@@ -263,7 +263,7 @@ def deal_cards_to_player(msg):
                                                                   table=table,
                                                                   player=player,
                                                                   score=score,
-                                                                  timestamp=timestamp),
+                                                                  cards_timestamp=cards_timestamp),
                                     'hud_players': render_template('top/hud_players.html',
                                                                    table=table,
                                                                    player=player,
@@ -273,7 +273,7 @@ def deal_cards_to_player(msg):
                                     'cards_table': render_template('cards/table.html',
                                                                    cards_table=cards_table,
                                                                    table=table,
-                                                                   timestamp=timestamp,
+                                                                   cards_timestamp=cards_timestamp,
                                                                    mode=mode)}
                            },
                           room=request.sid)
@@ -293,7 +293,7 @@ def deal_cards_to_player(msg):
                                     'cards_table': render_template('cards/table.html',
                                                                    cards_table=cards_table,
                                                                    table=table,
-                                                                   timestamp=timestamp,
+                                                                   cards_timestamp=cards_timestamp,
                                                                    mode=mode),
                                     'cards_hand_spectator_upper': render_template('cards/hand_spectator_upper.html',
                                                                                  table=table,
@@ -350,7 +350,7 @@ def claimed_trick(msg):
                     table.round.previous_trick.owner = player.id
                     table.round.current_player = player.id
                 score = table.round.get_score()
-                timestamp = table.round.timestamp
+                cards_timestamp = table.round.cards_timestamp
                 cards_table = []
                 table.round.calculate_trick_order()
                 socketio.emit('next-trick',
@@ -365,7 +365,7 @@ def claimed_trick(msg):
                                         'cards_table': render_template('cards/table.html',
                                                                        cards_table=cards_table,
                                                                        table=table,
-                                                                       timestamp=timestamp)
+                                                                       cards_timestamp=cards_timestamp)
                                         }},
                               room=table.id)
             else:
@@ -605,7 +605,7 @@ def table(table_id=''):
             current_player_id = table.round.current_player
             cards_hand = player.get_cards()
             cards_table = table.round.current_trick.get_cards()
-            timestamp = table.round.timestamp
+            cards_timestamp = table.round.cards_timestamp
             score = table.round.get_score()
             mode = 'player'
             return render_template('table.html',
@@ -618,7 +618,7 @@ def table(table_id=''):
                                    current_player_id=current_player_id,
                                    cards_hand=cards_hand,
                                    cards_table=cards_table,
-                                   timestamp=timestamp,
+                                   cards_timestamp=cards_timestamp,
                                    score=score,
                                    game=game,
                                    mode=mode)

@@ -33,7 +33,7 @@ $(document).ready(function () {
         if (card.id == 'cards_stack') {
             dragging_cards.cancel(true)
         } else if (source.id == 'hand' && target.id == 'table' && player_id == current_player_id && !cards_locked) {
-            if ($(card).data('timestamp') == $('#cards_table_timestamp').data('timestamp')) {
+            if ($(card).data('cards_timestamp') == $('#cards_table_timestamp').data('cards_timestamp')) {
                 $('#table').append(card)
                 // add tooltip
                 $(card).attr('title', player_id)
@@ -51,7 +51,7 @@ $(document).ready(function () {
         } else if (source.id == 'hand' && target.id == 'hand') {
             // check if card and hand have the same timestamp - otherwise someone dealed new cards
             // and the dragged card does not belong to the current cards
-            if ($(card).data('timestamp') == $('#cards_hand_timestamp').data('timestamp')) {
+            if ($(card).data('cards_timestamp') == $('#cards_hand_timestamp').data('cards_timestamp')) {
                 // get cards order to end it to server for storing it
                 let cards_hand_ids = []
                 for (let card_hand of $('#hand').children('.game-card-hand')) {

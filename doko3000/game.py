@@ -458,13 +458,12 @@ class Round(Document):
         self.save()
 
     @property
-    def timestamp(self):
-        timestamp = self.get('timestamp')
+    def cards_timestamp(self):
         # backward compatibility
-        if not timestamp:
-            self.calculate_timestamp()
+        if not self.get('cards_timestamp'):
+            self.calculate_cards_timestamp()
             self.save()
-        return timestamp
+        return self['cards_timestamp']
 
     @property
     def current_trick(self):
@@ -532,11 +531,11 @@ class Round(Document):
 
         self.save()
 
-    def calculate_timestamp(self):
+    def calculate_cards_timestamp(self):
         """
         store moment of shuffling for comparing cards when being sorted and freshly dealed at one time
         """
-        self['timestamp'] = int(time() * 100000)
+        self['cards_timestamp'] = int(time() * 100000)
 
     def shuffle(self):
         """
@@ -545,7 +544,7 @@ class Round(Document):
         # very important for game - some randomness
         seed()
         shuffle(self.cards)
-        self.calculate_timestamp()
+        self.calculate_cards_timestamp()
 
     def deal(self):
         """
