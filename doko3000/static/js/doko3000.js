@@ -1,7 +1,7 @@
 // globally used player_id
 let player_id = ''
 // for staying in sync with the game this is global
-let sync_count = 0
+let sync_timestamp = 0
 // keep an eye on next player to know if turns are allowed or not
 let current_player_id = ''
 // lock dragging of cards while waiting for trick being claimed
@@ -81,7 +81,8 @@ $(document).ready(function () {
 
     socket.on('you-are-what-you-is', function (msg) {
 
-        console.log(msg.sync_count)
+        sync_timestamp = msg.sync_timestamp
+        console.log('sync_timestamp:', sync_timestamp)
 
         if (player_id == '') {
             player_id = msg.player_id
@@ -102,7 +103,8 @@ $(document).ready(function () {
     })
 
     socket.on('played-card-by-user', function (msg) {
-        console.log(msg.sync_count)
+        sync_timestamp = msg.sync_timestamp
+        console.log('sync_timestamp:', sync_timestamp)
         current_player_id = msg.current_player_id
         $('#hud_players').html(msg.html.hud_players)
         $('.overlay-button').addClass('d-none')
@@ -140,7 +142,8 @@ $(document).ready(function () {
     })
 
     socket.on('grab-your-cards', function (msg) {
-        console.log(msg.sync_count)
+        sync_timestamp = msg.sync_timestamp
+        console.log('sync_timestamp:', sync_timestamp)
         socket.emit('my-cards-please', {
             player_id: player_id,
             table_id: msg.table_id
@@ -188,14 +191,16 @@ $(document).ready(function () {
     })
 
     socket.on('really-deal-again', function (msg) {
-        console.log(msg.sync_count)
+        sync_timestamp = msg.sync_timestamp
+        console.log('sync_timestamp:', sync_timestamp)
         $('.overlay-notification').addClass('d-none')
         $('#modal_body').html(msg.html)
         $("#modal_dialog").modal('show')
     })
 
     socket.on('next-trick', function (msg) {
-        console.log(msg.sync_count)
+        sync_timestamp = msg.sync_timestamp
+        console.log('sync_timestamp:', sync_timestamp)
         current_player_id = msg.current_player_id
         cards_locked = false
         $('#table').html(msg.html.cards_table)
@@ -214,7 +219,8 @@ $(document).ready(function () {
     })
 
     socket.on('round-finished', function (msg) {
-        console.log(msg.sync_count)
+        sync_timestamp = msg.sync_timestamp
+        console.log('sync_timestamp:', sync_timestamp)
         $('#button_claim_trick').addClass('d-none')
         // cleanup content of dialog
         $('#modal_body').html(msg.html)

@@ -778,33 +778,27 @@ class Table(Document):
         return self.order[4:]
 
     @property
-    def sync_count(self):
+    def sync_timestamp(self):
         """
         help to stabilize client synchronization
         """
-        if not self.get('sync_count'):
-            return 0
-        else:
-            return self['sync_count']
+        # backward compatibility
+        if not self.get('sync_timestamp'):
+            return self.increase_sync_timestamp()
+        return self['sync_timestamp']
 
-    @sync_count.setter
-    def sync_count(self, value):
-        self['sync_count'] = value
+    @sync_timestamp.setter
+    def sync_timestamp(self, value):
+        self['sync_timestamp'] = value
 
-    def increase_sync_count(self):
+    def increase_sync_timestamp(self):
         """
         to be called after various actions
         """
-        self.sync_count += 1
+        self['sync_timestamp'] = int(time() * 100000)
         self.save()
-        return self.sync_count
-
-    def reset_sync_count(self):
-        """
-        new round needs a reset of sync count
-        """
-        self.sync_count = 0
-        self.save()
+        # just return new timestamp to have it ready for use
+        return self['sync_timestamp']
 
     def add_player(self, player_id):
         """
@@ -880,7 +874,7 @@ class Table(Document):
         # new round of 4 players
         self.reset_round()
         # new sync count
-        self.reset_sync_count()
+        self.increase_sync_timestamp()
 
     def shift_players(self):
         """
