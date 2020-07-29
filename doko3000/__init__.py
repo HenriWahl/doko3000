@@ -67,15 +67,15 @@ def who_am_i():
                 round_finished = table.round.is_finished()
                 join_room(table.id)
                 table_id = table.id
-                sync_timestamp = table.sync_timestamp
+                sync_count = table.sync_count
             else:
                 current_player_id = ''
                 table_id = ''
-                sync_timestamp = 0
+                sync_count = 0
             socketio.emit('you-are-what-you-is',
                           {'player_id': player.id,
                            'table_id': table_id,
-                           'sync_timestamp': sync_timestamp,
+                           'sync_count': sync_count,
                            'current_player_id': current_player_id,
                            'round_finished': round_finished})
 
@@ -100,7 +100,7 @@ def played_card(msg):
         cards_table = table.round.current_trick.get_cards()
         played_cards = table.round.get_played_cards()
         cards_timestamp = table.round.cards_timestamp
-        sync_timestamp = table.increase_sync_timestamp()
+        sync_count = table.increase_sync_count()
         socketio.emit('played-card-by-user',
                       {'player_id': player.id,
                        'table_id': table.id,
@@ -110,7 +110,7 @@ def played_card(msg):
                        'current_player_id': current_player_id,
                        'idle_players': idle_players,
                        'played_cards': played_cards,
-                       'sync_timestamp': sync_timestamp,
+                       'sync_count': sync_count,
                        'html': {'cards_table': render_template('cards/table.html',
                                                                cards_table=cards_table,
                                                                table=table,
@@ -163,11 +163,11 @@ def setup_table(msg):
                 table.players = order
         elif action == 'start_table':
             table.start()
-            sync_timestamp = table.sync_timestamp
+            sync_count = table.sync_count
             # just tell everybody to get personal cards
             socketio.emit('grab-your-cards',
                           {'table_id': table.id,
-                           'sync_timestamp': sync_timestamp},
+                           'sync_count': sync_count},
                           room=table.id)
 
 
@@ -202,11 +202,11 @@ def deal_cards(msg):
     table = game.tables.get(msg.get('table_id'))
     if table:
         table.reset_round()
-        sync_timestamp = table.increase_sync_timestamp()
+        sync_count = table.increase_sync_count()
         # just tell everybody to get personal cards
         socketio.emit('grab-your-cards',
                       {'table_id': table.id,
-                       'sync_timestamp': sync_timestamp},
+                       'sync_count': sync_count},
                       room=table.id)
 
 
@@ -214,11 +214,11 @@ def deal_cards(msg):
 def deal_cards_again(msg):
     table = game.tables.get(msg.get('table_id'))
     if table:
-        sync_timestamp = table.increase_sync_timestamp()
+        sync_count = table.increase_sync_count()
         # ask dealer if really should be re-dealt
         socketio.emit('really-deal-again',
                       {'table_id': table.id,
-                       'sync_timestamp': sync_timestamp,
+                       'sync_count': sync_count,
                        'html': render_template('round/request_deal_again.html',
                                                table=table)},
                       room=request.sid)
@@ -336,7 +336,7 @@ def claimed_trick(msg):
        table and \
        player.id == current_user.get_id():
         if player.id in table.round.players:
-            sync_timestamp = table.increase_sync_timestamp()
+            sync_count = table.increase_sync_count()
             if not table.round.is_finished():
                 # when ownership changes it does at previous trick because normally there is a new one created
                 # so the new one becomes the current one and the reclaimed is the previous
@@ -358,7 +358,7 @@ def claimed_trick(msg):
                               {'current_player_id': player.id,
                                'score': score,
                                'table_id': table.id,
-                               'sync_timestamp': sync_timestamp,
+                               'sync_count': sync_count,
                                'html': {'hud_players': render_template('top/hud_players.html',
                                                                        table=table,
                                                                        player=player,
@@ -378,7 +378,7 @@ def claimed_trick(msg):
                 # tell everybody stats and wait for everybody confirming next round
                 socketio.emit('round-finished',
                               {'table_id': table.id,
-                               'sync_timestamp': sync_timestamp,
+                               'sync_count': sync_count,
                                'html': render_template('round/score.html',
                                                        table=table,
                                                        players=players,

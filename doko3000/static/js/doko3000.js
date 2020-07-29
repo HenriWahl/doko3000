@@ -1,8 +1,7 @@
 // globally used player_id
 let player_id = ''
 // for staying in sync with the game this is global
-window.sync_timestamp = 0
-let sync_timestamp = 0
+let sync_count = 0
 // keep an eye on next player to know if turns are allowed or not
 let current_player_id = ''
 // lock dragging of cards while waiting for trick being claimed
@@ -20,37 +19,32 @@ function clear_message(place) {
     $(place).html('')
 }
 
-function check_sync_window(msg) {
-    if (window.sync_timestamp==msg.sync_timestamp) {
-        console.log('sync_timestamp:', msg.sync_timestamp)
+function check_sync(msg) {
+    if ((sync_count + 1 == msg.sync_count) || (sync_count == msg.sync_count)) {
+        sync_count = msg.sync_count
+        console.log('sync_count:', msg.sync_count)
         return true
     } else {
-        console.log('not passed', window.sync_timestamp, msg.sync_timestamp)
-        window.sync_timestamp = msg.sync_timestamp
-        $.get('/table/' + encodeURIComponent(msg.table_id), function (data, status) {
-            console.log(data)
+        console.log('not passed', sync_count, msg.sync_count)
+        sync_count = msg.sync_count
+        if (window.location.pathname.startsWith('/table/')) {
+            location.reload()
+        }
+        // $.get('/table/' + encodeURIComponent(msg.table_id), function (data, status) {
+        //     console.log(data)
         return false
-        })
     }
 }
 
-function check_sync(msg) {
-    if (sync_timestamp==msg.sync_timestamp) {
-        console.log('sync_timestamp:', msg.sync_timestamp)
-        return true
-    } else {
-        console.log('not passed', sync_timestamp, msg.sync_timestamp)
-        sync_timestamp = msg.sync_timestamp
-        $.get('/table/' + encodeURIComponent(msg.table_id), function (data, status) {
-            console.log(data)
-        return false
-        })
-    }
-}
 
 
 $(document).ready(function () {
+    // get initial timestamp from table
+    sync_count = $('#sync_count').data('sync_count')
+
+    // initialize SocketIO
     const socket = io()
+
     // initialize drag&drop
     let dragging_cards = dragula([document.querySelector('#hand'),
         document.querySelector('#table'), {
@@ -134,6 +128,7 @@ $(document).ready(function () {
 
     socket.on('played-card-by-user', function (msg) {
         if (check_sync(msg)) {
+            console.log('card-played-by-user', msg)
             current_player_id = msg.current_player_id
             $('#hud_players').html(msg.html.hud_players)
             $('.overlay-button').addClass('d-none')
