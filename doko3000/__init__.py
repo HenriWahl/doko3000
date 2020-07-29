@@ -103,6 +103,7 @@ def played_card(msg):
         sync_timestamp = table.increase_sync_timestamp()
         socketio.emit('played-card-by-user',
                       {'player_id': player.id,
+                       'table_id': table.id,
                        'card_id': card.id,
                        'card_name': card.name,
                        'is_last_turn': is_last_turn,
@@ -356,6 +357,7 @@ def claimed_trick(msg):
                 socketio.emit('next-trick',
                               {'current_player_id': player.id,
                                'score': score,
+                               'table_id': table.id,
                                'sync_timestamp': sync_timestamp,
                                'html': {'hud_players': render_template('top/hud_players.html',
                                                                        table=table,

@@ -1,6 +1,7 @@
 // globally used player_id
 let player_id = ''
 // for staying in sync with the game this is global
+window.sync_timestamp = 0
 let sync_timestamp = 0
 // keep an eye on next player to know if turns are allowed or not
 let current_player_id = ''
@@ -18,6 +19,35 @@ function show_message(place, message) {
 function clear_message(place) {
     $(place).html('')
 }
+
+function check_sync_window(msg) {
+    if (window.sync_timestamp==msg.sync_timestamp) {
+        console.log('sync_timestamp:', msg.sync_timestamp)
+        return true
+    } else {
+        console.log('not passed', window.sync_timestamp, msg.sync_timestamp)
+        window.sync_timestamp = msg.sync_timestamp
+        $.get('/table/' + encodeURIComponent(msg.table_id), function (data, status) {
+            console.log(data)
+        return false
+        })
+    }
+}
+
+function check_sync(msg) {
+    if (sync_timestamp==msg.sync_timestamp) {
+        console.log('sync_timestamp:', msg.sync_timestamp)
+        return true
+    } else {
+        console.log('not passed', sync_timestamp, msg.sync_timestamp)
+        sync_timestamp = msg.sync_timestamp
+        $.get('/table/' + encodeURIComponent(msg.table_id), function (data, status) {
+            console.log(data)
+        return false
+        })
+    }
+}
+
 
 $(document).ready(function () {
     const socket = io()
@@ -81,20 +111,20 @@ $(document).ready(function () {
 
     socket.on('you-are-what-you-is', function (msg) {
 
-        sync_timestamp = msg.sync_timestamp
-        console.log('sync_timestamp:', sync_timestamp)
+        if (check_sync(msg)) {
 
-        if (player_id == '') {
-            player_id = msg.player_id
-        }
-        if (current_player_id == '') {
-            current_player_id = msg.current_player_id
-        }
-        if (msg.round_finished) {
-            socket.emit('need-final-result', {
-                player_id: player_id,
-                table_id: msg.table_id
-            })
+            if (player_id == '') {
+                player_id = msg.player_id
+            }
+            if (current_player_id == '') {
+                current_player_id = msg.current_player_id
+            }
+            if (msg.round_finished) {
+                socket.emit('need-final-result', {
+                    player_id: player_id,
+                    table_id: msg.table_id
+                })
+            }
         }
     })
 
@@ -103,22 +133,22 @@ $(document).ready(function () {
     })
 
     socket.on('played-card-by-user', function (msg) {
-        sync_timestamp = msg.sync_timestamp
-        console.log('sync_timestamp:', sync_timestamp)
-        current_player_id = msg.current_player_id
-        $('#hud_players').html(msg.html.hud_players)
-        $('.overlay-button').addClass('d-none')
+        if (check_sync(msg)) {
+            current_player_id = msg.current_player_id
+            $('#hud_players').html(msg.html.hud_players)
+            $('.overlay-button').addClass('d-none')
 
-        // either #table_spectator or #table are visible and may show the cards on table
-        if ($('#table_spectator').hasClass('d-none')) {
-            $('#table').html(msg.html.cards_table)
-        } else {
-            $('#table_spectator').html(msg.html.cards_table)
-            // strange move to take away card by class but not possible by id because it would vanish on table too
-            // make sure that even after some lost communication all cards are updated
-            // just take away already played cards
-            for (let card_id of msg.played_cards) {
-                $('.card_' + card_id).remove()
+            // either #table_spectator or #table are visible and may show the cards on table
+            if ($('#table_spectator').hasClass('d-none')) {
+                $('#table').html(msg.html.cards_table)
+            } else {
+                $('#table_spectator').html(msg.html.cards_table)
+                // strange move to take away card by class but not possible by id because it would vanish on table too
+                // make sure that even after some lost communication all cards are updated
+                // just take away already played cards
+                for (let card_id of msg.played_cards) {
+                    $('.card_' + card_id).remove()
+                }
             }
         }
 
@@ -142,12 +172,12 @@ $(document).ready(function () {
     })
 
     socket.on('grab-your-cards', function (msg) {
-        sync_timestamp = msg.sync_timestamp
-        console.log('sync_timestamp:', sync_timestamp)
-        socket.emit('my-cards-please', {
-            player_id: player_id,
-            table_id: msg.table_id
-        })
+        if (check_sync(msg)) {
+            socket.emit('my-cards-please', {
+                player_id: player_id,
+                table_id: msg.table_id
+            })
+        }
     })
 
     socket.on('your-cards-please', function (msg) {
@@ -191,40 +221,40 @@ $(document).ready(function () {
     })
 
     socket.on('really-deal-again', function (msg) {
-        sync_timestamp = msg.sync_timestamp
-        console.log('sync_timestamp:', sync_timestamp)
-        $('.overlay-notification').addClass('d-none')
-        $('#modal_body').html(msg.html)
-        $("#modal_dialog").modal('show')
+        if (check_sync(msg)) {
+            $('.overlay-notification').addClass('d-none')
+            $('#modal_body').html(msg.html)
+            $("#modal_dialog").modal('show')
+        }
     })
 
     socket.on('next-trick', function (msg) {
-        sync_timestamp = msg.sync_timestamp
-        console.log('sync_timestamp:', sync_timestamp)
-        current_player_id = msg.current_player_id
-        cards_locked = false
-        $('#table').html(msg.html.cards_table)
-        if (player_id == current_player_id) {
-            $('#turn_indicator').removeClass('d-none')
-        } else {
-            $('#turn_indicator').addClass('d-none')
-        }
-        $('#hud_players').html(msg.html.hud_players)
-        if (msg.score[player_id] > 0) {
-            $('#cards_stack_img').attr('title', msg.score[player_id])
-            $('#cards_stack').removeClass('d-none')
-        } else {
-            $('#cards_stack').addClass('d-none')
+        if (check_sync(msg)) {
+            current_player_id = msg.current_player_id
+            cards_locked = false
+            $('#table').html(msg.html.cards_table)
+            if (player_id == current_player_id) {
+                $('#turn_indicator').removeClass('d-none')
+            } else {
+                $('#turn_indicator').addClass('d-none')
+            }
+            $('#hud_players').html(msg.html.hud_players)
+            if (msg.score[player_id] > 0) {
+                $('#cards_stack_img').attr('title', msg.score[player_id])
+                $('#cards_stack').removeClass('d-none')
+            } else {
+                $('#cards_stack').addClass('d-none')
+            }
         }
     })
 
     socket.on('round-finished', function (msg) {
-        sync_timestamp = msg.sync_timestamp
-        console.log('sync_timestamp:', sync_timestamp)
-        $('#button_claim_trick').addClass('d-none')
-        // cleanup content of dialog
-        $('#modal_body').html(msg.html)
-        $("#modal_dialog").modal('show')
+        if (check_sync(msg)) {
+            $('#button_claim_trick').addClass('d-none')
+            // cleanup content of dialog
+            $('#modal_body').html(msg.html)
+            $("#modal_dialog").modal('show')
+        }
     })
 
     socket.on('start-next-round', function (msg) {
