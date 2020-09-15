@@ -33,10 +33,14 @@ db = DB(app)
 # login
 login = LoginManager(app)
 login.login_view = 'login'
-# empty message avoids useless errorflash-messae-by-default
+# empty message avoids useless errorflash-message-by-default
 login.login_message = ''
 # extend by socket.io
-socketio = SocketIO(app, manage_session=False)
+# shorter ping interval for better sync
+socketio = SocketIO(app,
+                    manage_session=False,
+                    ping_timeout=15,
+                    ping_interval=1)
 
 game = Game(db)
 game.load_from_db()
@@ -630,7 +634,7 @@ def table(table_id=''):
             cards_table = table.round.current_trick.get_cards()
             mode = 'spectator'
             return render_template('table.html',
-                                   title=f"{app.config['TITLE']} {table_id}",
+                                   title=f"{app.config['TITLE']} {table.name}",
                                    table=table,
                                    cards_table=cards_table,
                                    player=player,
