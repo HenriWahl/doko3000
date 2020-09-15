@@ -39,7 +39,7 @@ login.login_message = ''
 # shorter ping interval for better sync
 socketio = SocketIO(app,
                     manage_session=False,
-                    ping_timeout=15,
+                    ping_timeout=120,
                     ping_interval=1)
 
 game = Game(db)
@@ -401,9 +401,11 @@ def send_final_result(msg):
        player.table == table.id:
         players = game.players
         score = table.round.get_score()
+        sync_count = table.sync_count
         # tell single player stats and wait for everybody confirming next round
         socketio.emit('round-finished',
                       {'table_id': table.id,
+                       'sync_count': sync_count,
                        'html': render_template('round/score.html',
                                                table=table,
                                                players=players,

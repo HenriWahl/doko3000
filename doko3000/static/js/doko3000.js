@@ -1,7 +1,7 @@
 // globally used player_id
 let player_id = ''
 // for staying in sync with the game this is global
-let sync_count = false
+let sync_count = 0
 // keep an eye on next player to know if turns are allowed or not
 let current_player_id = ''
 // lock dragging of cards while waiting for trick being claimed
@@ -21,7 +21,7 @@ function clear_message(place) {
 
 function check_sync(msg) {
     // check if message is in sync
-    if (!sync_count) {
+    if (sync_count == 0) {
         sync_count = $('#sync_count').data('sync_count')
     }
     if ((sync_count + 1 == msg.sync_count) || (sync_count == msg.sync_count)) {
@@ -30,7 +30,7 @@ function check_sync(msg) {
     } else {
         sync_count = msg.sync_count
         if (location.pathname.startsWith('/table/')) {
-            location.reload()
+             location.reload()
         }
         return false
     }
