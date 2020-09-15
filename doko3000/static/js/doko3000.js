@@ -109,7 +109,9 @@ $(document).ready(function () {
             current_player_id = msg.current_player_id
         }
         // check if being still in sync
-        // check_sync(msg)
+        check_sync(msg)
+
+        // show results if finished
         if (msg.round_finished) {
             socket.emit('need-final-result', {
                 player_id: player_id,

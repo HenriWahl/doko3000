@@ -611,7 +611,7 @@ def table(table_id=''):
             score = table.round.get_score()
             mode = 'player'
             return render_template('table.html',
-                                   title=f"{app.config['TITLE']} {table_id}",
+                                   title=f"{app.config['TITLE']} {table.name}",
                                    table=table,
                                    dealer=dealer,
                                    dealing_needed=dealing_needed,
