@@ -20,29 +20,21 @@ function clear_message(place) {
 }
 
 function check_sync(msg) {
-    console.log(msg)
-    console.log(sync_count)
-    console.log($('#sync_count').data('sync_count'))
-    if (! sync_count) {
+    // check if message is in sync
+    if (!sync_count) {
         sync_count = $('#sync_count').data('sync_count')
     }
-
     if ((sync_count + 1 == msg.sync_count) || (sync_count == msg.sync_count)) {
         sync_count = msg.sync_count
-        console.log('sync_count:', msg.sync_count)
         return true
     } else {
-        console.log('not passed', sync_count, msg.sync_count)
         sync_count = msg.sync_count
-        if (window.location.pathname.startsWith('/table/')) {
-            // location.reload()
+        if (location.pathname.startsWith('/table/')) {
+            location.reload()
         }
-        // $.get('/table/' + encodeURIComponent(msg.table_id), function (data, status) {
-        //     console.log(data)
         return false
     }
 }
-
 
 
 $(document).ready(function () {
@@ -75,7 +67,6 @@ $(document).ready(function () {
                     table_id: $(card).data('table_id')
                 })
             } else {
-                console.log('remove')
                 // card does not belong to hand because the dealer dealed again while the card was dragged around
                 $(card).remove()
             }
@@ -111,19 +102,20 @@ $(document).ready(function () {
     })
 
     socket.on('you-are-what-you-is', function (msg) {
-        console.log('you-are-what-you-is', sync_count)
-            if (player_id == '') {
-                player_id = msg.player_id
-            }
-            if (current_player_id == '') {
-                current_player_id = msg.current_player_id
-            }
-            if (msg.round_finished) {
-                socket.emit('need-final-result', {
-                    player_id: player_id,
-                    table_id: msg.table_id
-                })
-            }
+        if (player_id == '') {
+            player_id = msg.player_id
+        }
+        if (current_player_id == '') {
+            current_player_id = msg.current_player_id
+        }
+        // check if being still in sync
+        // check_sync(msg)
+        if (msg.round_finished) {
+            socket.emit('need-final-result', {
+                player_id: player_id,
+                table_id: msg.table_id
+            })
+        }
     })
 
     socket.on('new-table-available', function (msg) {
@@ -132,7 +124,6 @@ $(document).ready(function () {
 
     socket.on('played-card-by-user', function (msg) {
         if (check_sync(msg)) {
-            console.log('card-played-by-user', msg)
             current_player_id = msg.current_player_id
             $('#hud_players').html(msg.html.hud_players)
             $('.overlay-button').addClass('d-none')
@@ -313,17 +304,20 @@ $(document).ready(function () {
     })
 
     $(document).on('click', '.button-enter-table', function () {
-        console.log(player_id)
+        let table_id = $(this).data('table_id')
         socket.emit('enter-table', {
             player_id: player_id,
-            table_id: $(this).data('table_id')
+            table_id: table_id
         })
         // ask server via json if player is allowed to enter or not
         return $.getJSON('/enter/table/' + encodeURIComponent($(this).data('table_id')) + '/' + encodeURIComponent(player_id),
             function (data, status) {
                 if (status == 'success' && data.allowed) {
-                    console.log(data)
-                    return data.allowed
+                    // return data.allowed
+                    if (data.allowed) {
+                        // use location.assign to avoid browsers decoding the id
+                        location.assign('/table/' + encodeURIComponent(table_id))
+                    }
                 }
                 // dummy return just in case
                 return false
@@ -607,7 +601,7 @@ $(document).ready(function () {
             player_id: player_id,
             table_id: $(this).data('table_id')
         })
-        if (window.location.pathname.startsWith('/table/')) {
+        if (location.pathname.startsWith('/table/')) {
             location.reload()
         }
         return false
@@ -615,7 +609,7 @@ $(document).ready(function () {
 
     // reload page after setup
     $(document).on('click', '#button_finish_table_setup', function () {
-        if (!window.location.pathname.startsWith('/table/')) {
+        if (!location.pathname.startsWith('/table/')) {
             $.getJSON('/get/tables',
                 function (data, status) {
                     if (status == 'success') {

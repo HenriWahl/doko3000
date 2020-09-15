@@ -24,12 +24,12 @@
                 {% else %}
                 {% set disabled = 'disabled' %}
                 {% endif %}
-                <a href="/table/{{ table.id }}"
+                <span href="/table/{{ table.id }}"
                    class="btn btn-outline-success ml-auto text-nowrap button-enter-table {{ disabled }}"
                    data-table_id="{{ table.id }}">
                     <span class="oi oi-account-login mr-1"></span>
                     Beitreten
-                </a>
+                </span>
                 <div class="dropdown">
                     <a href="#" class="btn btn-outline-primary border-0 ml-2 {{ disabled }}" data-toggle="dropdown">
                         <span class="oi oi-menu"></span>
