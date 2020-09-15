@@ -28,7 +28,8 @@ function check_sync(msg) {
         sync_count = msg.sync_count
         return true
     } else {
-        sync_count = msg.sync_count
+        // sync_count won't be persistent anyway because page will be reloaded to make refresh safely work
+        // sync_count = msg.sync_count
         if (location.pathname.startsWith('/table/')) {
              location.reload()
         }
