@@ -1,7 +1,7 @@
 // globally used player_id
 let player_id = ''
 // for staying in sync with the game this is global
-let sync_count = 0
+let sync_count = false
 // keep an eye on next player to know if turns are allowed or not
 let current_player_id = ''
 // lock dragging of cards while waiting for trick being claimed
@@ -20,6 +20,13 @@ function clear_message(place) {
 }
 
 function check_sync(msg) {
+    console.log(msg)
+    console.log(sync_count)
+    console.log($('#sync_count').data('sync_count'))
+    if (! sync_count) {
+        sync_count = $('#sync_count').data('sync_count')
+    }
+
     if ((sync_count + 1 == msg.sync_count) || (sync_count == msg.sync_count)) {
         sync_count = msg.sync_count
         console.log('sync_count:', msg.sync_count)
@@ -28,7 +35,7 @@ function check_sync(msg) {
         console.log('not passed', sync_count, msg.sync_count)
         sync_count = msg.sync_count
         if (window.location.pathname.startsWith('/table/')) {
-            location.reload()
+            // location.reload()
         }
         // $.get('/table/' + encodeURIComponent(msg.table_id), function (data, status) {
         //     console.log(data)
@@ -40,7 +47,7 @@ function check_sync(msg) {
 
 $(document).ready(function () {
     // get initial timestamp from table
-    sync_count = $('#sync_count').data('sync_count')
+    // sync_count = $('#sync_count').data('sync_count')
 
     // initialize SocketIO
     const socket = io()
@@ -104,9 +111,7 @@ $(document).ready(function () {
     })
 
     socket.on('you-are-what-you-is', function (msg) {
-
-        if (check_sync(msg)) {
-
+        console.log('you-are-what-you-is', sync_count)
             if (player_id == '') {
                 player_id = msg.player_id
             }
@@ -119,7 +124,6 @@ $(document).ready(function () {
                     table_id: msg.table_id
                 })
             }
-        }
     })
 
     socket.on('new-table-available', function (msg) {
@@ -309,6 +313,7 @@ $(document).ready(function () {
     })
 
     $(document).on('click', '.button-enter-table', function () {
+        console.log(player_id)
         socket.emit('enter-table', {
             player_id: player_id,
             table_id: $(this).data('table_id')

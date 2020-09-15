@@ -14,3 +14,4 @@ gunicorn --user doko3000\
          --log-level DEBUG\
          --bind :8000\
          main:app
+
