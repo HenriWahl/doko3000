@@ -39,7 +39,7 @@ login.login_message = ''
 # shorter ping interval for better sync
 socketio = SocketIO(app,
                     manage_session=False,
-                    ping_timeout=120,
+                    ping_timeout=2,
                     ping_interval=1)
 
 game = Game(db)
@@ -89,6 +89,9 @@ def played_card(msg):
     card_id = msg.get('card_id')
     player = game.players.get(msg.get('player_id'))
     table = game.tables.get(msg.get('table_id'))
+
+    print(player.id, table.id)
+
     if card_id in Deck.cards and \
        player and \
        table and \

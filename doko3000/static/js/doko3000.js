@@ -20,6 +20,9 @@ function clear_message(place) {
 }
 
 function check_sync(msg) {
+
+    console.log(sync_count, msg.sync_count, $('#sync_count').data('sync_count'))
+
     // check if message is in sync
     if (sync_count == 0) {
         sync_count = $('#sync_count').data('sync_count')
@@ -126,6 +129,9 @@ $(document).ready(function () {
     })
 
     socket.on('played-card-by-user', function (msg) {
+
+        console.log(msg)
+
         if (check_sync(msg)) {
             current_player_id = msg.current_player_id
             $('#hud_players').html(msg.html.hud_players)
@@ -144,6 +150,8 @@ $(document).ready(function () {
                 }
             }
         }
+
+        console.log('msg.is_last_turn:', msg.is_last_turn, 'player_id:', player_id, 'current_player_id:', current_player_id)
 
         if (msg.is_last_turn) {
             cards_locked = true
@@ -689,6 +697,7 @@ $(document).ready(function () {
     })
 
     $(document).on('click', '#button_claim_trick', function () {
+        console.log('claim_trick', player_id, $(this).data('table_id'))
         socket.emit('claim-trick', {
             player_id: player_id,
             table_id: $(this).data('table_id')
