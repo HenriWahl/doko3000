@@ -39,7 +39,9 @@ login.login_message = ''
 # shorter ping interval for better sync
 socketio = SocketIO(app,
                     manage_session=False,
-                    ping_timeout=2,
+                    # ping_timeout=2,
+                    # seems to be better somewhat higher for clients not getting nervous when waiting for reset
+                    ping_timeout=120,
                     ping_interval=1,
                     logger=True)
 
@@ -516,6 +518,7 @@ def round_reset(msg):
         if set(table.players_ready) >= set(table.round.players):
             table.reset_round()
             sync_count = table.sync_count
+            print('grab-your-cards', table.id, sync_count)
             socketio.emit('grab-your-cards',
                           {'table_id': table.id,
                            'sync_count': sync_count},

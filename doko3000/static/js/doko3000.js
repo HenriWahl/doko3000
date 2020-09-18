@@ -175,12 +175,13 @@ $(document).ready(function () {
     })
 
     socket.on('grab-your-cards', function (msg) {
-        if (check_sync(msg)) {
+        // if (check_sync(msg)) {
+            console.log('grab-your-cards', msg)
             socket.emit('my-cards-please', {
                 player_id: player_id,
                 table_id: msg.table_id
             })
-        }
+        // }
     })
 
     socket.on('your-cards-please', function (msg) {
