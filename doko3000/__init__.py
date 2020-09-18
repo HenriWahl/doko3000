@@ -40,7 +40,8 @@ login.login_message = ''
 socketio = SocketIO(app,
                     manage_session=False,
                     ping_timeout=2,
-                    ping_interval=1)
+                    ping_interval=1,
+                    logger=True)
 
 game = Game(db)
 game.load_from_db()
@@ -81,7 +82,8 @@ def who_am_i():
                            'table_id': table_id,
                            'sync_count': sync_count,
                            'current_player_id': current_player_id,
-                           'round_finished': round_finished})
+                           'round_finished': round_finished},
+                          room=request.sid)
 
 
 @socketio.on('played-card')
@@ -89,9 +91,6 @@ def played_card(msg):
     card_id = msg.get('card_id')
     player = game.players.get(msg.get('player_id'))
     table = game.tables.get(msg.get('table_id'))
-
-    print(player.id, table.id)
-
     if card_id in Deck.cards and \
        player and \
        table and \
@@ -221,7 +220,8 @@ def deal_cards(msg):
 def deal_cards_again(msg):
     table = game.tables.get(msg.get('table_id'))
     if table:
-        sync_count = table.increase_sync_count()
+        # sync_count = table.increase_sync_count()
+        sync_count = table.sync_count
         # ask dealer if really should be re-dealt
         socketio.emit('really-deal-again',
                       {'table_id': table.id,
@@ -515,8 +515,10 @@ def round_reset(msg):
         table.add_ready_player(player.id)
         if set(table.players_ready) >= set(table.round.players):
             table.reset_round()
+            sync_count = table.sync_count
             socketio.emit('grab-your-cards',
-                          {'table_id': table.id},
+                          {'table_id': table.id,
+                           'sync_count': sync_count},
                           room=table.id)
 
 

@@ -565,7 +565,7 @@ class Round(Document):
             for card_id in self.game.players[player_id].cards:
                 if Deck.cards[card_id].name == 'Eichel-Ober':
                     self.game.players[player_id].eichel_ober_count += 1
-
+            # next player
             player_count += 1
 
     def add_trick(self, player_id):

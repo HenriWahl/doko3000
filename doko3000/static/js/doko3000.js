@@ -24,6 +24,8 @@ function check_sync(msg) {
     console.log(sync_count, msg.sync_count, $('#sync_count').data('sync_count'))
 
     // check if message is in sync
+
+    // if not set yet take sync_count from freshly loaded HTML id
     if (sync_count == 0) {
         sync_count = $('#sync_count').data('sync_count')
     }
