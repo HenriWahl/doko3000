@@ -522,8 +522,13 @@ class Round(Document):
 
         # first shuffling...
         self.shuffle()
-        # ...then dealing
-        self.deal()
+        # ...then dealing - there might be some race condition which leads to one player not getting cards
+        # - this while-loop-workaround might fix it hopefully
+        while (len(self.game.players[self.players[0]].cards) + \
+               len(self.game.players[self.players[1]].cards) + \
+               len(self.game.players[self.players[2]].cards) + \
+               len(self.game.players[self.players[3]].cards)) != len(self.cards):
+            self.deal()
 
         # avoid multiple time-consuming .save(), concentrating them here
         for player_id in self.players:
@@ -552,7 +557,6 @@ class Round(Document):
         """
         # simple counter to deal cards to all players
         player_count = 0
-        # self.cards_per_player = len(self.cards) // 4
         for player_id in self.players:
             # reset counter for Eichel Ober cards
             self.game.players[player_id].eichel_ober_count = 0
