@@ -153,7 +153,7 @@ $(document).ready(function () {
             }
         }
 
-        console.log('msg.is_last_turn:', msg.is_last_turn, 'player_id:', player_id, 'current_player_id:', current_player_id)
+        // console.log('msg.is_last_turn:', msg.is_last_turn, 'player_id:', player_id, 'current_player_id:', current_player_id)
 
         if (msg.is_last_turn) {
             cards_locked = true
@@ -315,6 +315,10 @@ $(document).ready(function () {
         $('#indicate_change_password_failed').removeClass('d-none')
         $('#indicate_change_password_successful').addClass('d-none')
         $('#submit_change_password').addClass('d-none')
+    })
+
+    socket.on('please-hold-the-line', function(msg) {
+        console.log(msg)
     })
 
     $(document).on('click', '.button-enter-table', function () {
@@ -726,6 +730,7 @@ $(document).ready(function () {
         $.getJSON('/get/wait', function (data, status) {
             if (status == 'success') {
                 $('#modal_body').html(data.html)
+                console.log('ready-for-round-reset')
                 socket.emit('ready-for-round-reset', {
                     player_id: player_id,
                     table_id: table_id
