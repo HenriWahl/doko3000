@@ -124,6 +124,13 @@ $(document).ready(function () {
                 table_id: msg.table_id
             })
         }
+        // check if round is freshly reset - if yes get cards
+        if (msg.round_reset) {
+            socket.emit('my-cards-please', {
+                player_id: player_id,
+                table_id: msg.table_id
+            })
+        }
     })
 
     socket.on('new-table-available', function (msg) {
@@ -131,9 +138,6 @@ $(document).ready(function () {
     })
 
     socket.on('played-card-by-user', function (msg) {
-
-        console.log(msg)
-
         if (check_sync(msg)) {
             current_player_id = msg.current_player_id
             $('#hud_players').html(msg.html.hud_players)
@@ -152,9 +156,6 @@ $(document).ready(function () {
                 }
             }
         }
-
-        // console.log('msg.is_last_turn:', msg.is_last_turn, 'player_id:', player_id, 'current_player_id:', current_player_id)
-
         if (msg.is_last_turn) {
             cards_locked = true
             $('#turn_indicator').addClass('d-none')
@@ -176,7 +177,6 @@ $(document).ready(function () {
 
     socket.on('grab-your-cards', function (msg) {
         // if (check_sync(msg)) {
-            console.log('grab-your-cards', msg)
             socket.emit('my-cards-please', {
                 player_id: player_id,
                 table_id: msg.table_id
@@ -317,9 +317,9 @@ $(document).ready(function () {
         $('#submit_change_password').addClass('d-none')
     })
 
-    socket.on('please-hold-the-line', function(msg) {
-        console.log(msg)
-    })
+    // socket.on('please-hold-the-line', function(msg) {
+    //     console.log(msg)
+    // })
 
     $(document).on('click', '.button-enter-table', function () {
         let table_id = $(this).data('table_id')
@@ -704,7 +704,6 @@ $(document).ready(function () {
     })
 
     $(document).on('click', '#button_claim_trick', function () {
-        console.log('claim_trick', player_id, $(this).data('table_id'))
         socket.emit('claim-trick', {
             player_id: player_id,
             table_id: $(this).data('table_id')
@@ -730,7 +729,6 @@ $(document).ready(function () {
         $.getJSON('/get/wait', function (data, status) {
             if (status == 'success') {
                 $('#modal_body').html(data.html)
-                console.log('ready-for-round-reset')
                 socket.emit('ready-for-round-reset', {
                     player_id: player_id,
                     table_id: table_id

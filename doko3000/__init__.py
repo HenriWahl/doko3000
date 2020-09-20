@@ -43,7 +43,6 @@ socketio = SocketIO(app,
                     # # seems to be better somewhat higher for clients not getting nervous when waiting for reset
                     ping_timeout=15,
                     ping_interval=2,
-                    # monitor_clients=False,
                     logger=True)
 
 game = Game(db)
@@ -69,10 +68,12 @@ def who_am_i():
         if player:
             table = game.tables.get(player.table)
             round_finished = False
+            round_reset = False
             # if player already sits on a table inform client
             if table:
                 current_player_id = table.round.current_player
                 round_finished = table.round.is_finished()
+                round_reset = table.round.is_reset()
                 join_room(table.id)
                 table_id = table.id
                 sync_count = table.sync_count
@@ -85,7 +86,8 @@ def who_am_i():
                            'table_id': table_id,
                            'sync_count': sync_count,
                            'current_player_id': current_player_id,
-                           'round_finished': round_finished},
+                           'round_finished': round_finished,
+                           'round_reset': round_reset},
                           room=request.sid)
 
 
@@ -519,11 +521,9 @@ def round_reset(msg):
        table and \
        player.id == current_user.get_id():
         table.add_ready_player(player.id)
-        print(set(table.players_ready), set(table.round.players))
         if set(table.players_ready) >= set(table.round.players):
             table.reset_round()
             sync_count = table.sync_count
-            print('grab-your-cards', table.id, sync_count)
             socketio.emit('grab-your-cards',
                           {'table_id': table.id,
                            'sync_count': sync_count},
@@ -532,11 +532,7 @@ def round_reset(msg):
             socketio.emit('please-hold-the-line',
                           {'table_id': table.id},
                           room=request.sid)
-            # sync_count = table.sync_count
-            # socketio.emit('grab-your-cards',
-            #               {'table_id': table.id,
-            #                'sync_count': sync_count},
-            #               room=table.id)
+
 
 @socketio.on('request-undo')
 def request_undo(msg):

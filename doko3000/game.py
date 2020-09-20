@@ -597,6 +597,12 @@ class Round(Document):
         """
         return len(self.cards) == self.turn_count
 
+    def is_reset(self):
+        """
+        check if round has been freshly reset
+        """
+        return self.turn_count == 0
+
     def get_score(self):
         score = {}
         for player_id in self.players:
