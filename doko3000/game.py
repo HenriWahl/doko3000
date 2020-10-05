@@ -35,14 +35,14 @@ class Deck:
     full deck of cards - enough to be static
     """
     SYMBOLS = ('Schell',
-               'Herz',
-               'Grün',
+               #'Herz',
+               #'Grün',
                'Eichel')
     RANKS = {'Neun': 0,
-             'Zehn': 10,
-             'Unter': 2,
-             'Ober': 3,
-             'König': 4,
+             #'Zehn': 10,
+             #'Unter': 2,
+             #'Ober': 3,
+             #'König': 4,
              'Ass': 11}
     NUMBER = 2  # Doppelkopf :-)!
     # NUMBER = 1 # Debugging
@@ -56,11 +56,6 @@ class Deck:
             for rank in RANKS.items():
                 cards[card_id] = Card(symbol, rank, card_id)
                 card_id += 1
-
-    # for symbol in SYMBOLS[0:2]:
-    #     for rank in RANKS.items():
-    #         cards[card_id] = Card(symbol, rank, card_id)
-    #         card_id += 1
 
 
 class Player(UserMixin, Document):
@@ -508,7 +503,6 @@ class Round(Document):
             self.current_player = None
 
         # needed for player HUD
-        # self.calculate_opponents()
         self.calculate_trick_order()
 
         # a new card deck for every round
@@ -522,13 +516,8 @@ class Round(Document):
 
         # first shuffling...
         self.shuffle()
-        # ...then dealing - there might be some race condition which leads to one player not getting cards
-        # - this while-loop-workaround might fix it hopefully
-        while (len(self.game.players[self.players[0]].cards) + \
-               len(self.game.players[self.players[1]].cards) + \
-               len(self.game.players[self.players[2]].cards) + \
-               len(self.game.players[self.players[3]].cards)) != len(self.cards):
-            self.deal()
+        # ...then dealing
+        self.deal()
 
         # avoid multiple time-consuming .save(), concentrating them here
         for player_id in self.players:
@@ -877,7 +866,9 @@ class Table(Document):
             players = []
         self.round.reset(players=players)
         self.reset_ready_players()
-        self.save()
+        #self.save()
+        # saving is done by increasing sync count
+        self.increase_sync_count()
 
     def start(self):
         """

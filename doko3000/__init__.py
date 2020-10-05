@@ -213,7 +213,8 @@ def deal_cards(msg):
     table = game.tables.get(msg.get('table_id'))
     if table:
         table.reset_round()
-        sync_count = table.increase_sync_count()
+        # table increases its sync_count when resetting round
+        sync_count = table.sync_count
         # just tell everybody to get personal cards
         socketio.emit('grab-your-cards',
                       {'table_id': table.id,
@@ -225,7 +226,6 @@ def deal_cards(msg):
 def deal_cards_again(msg):
     table = game.tables.get(msg.get('table_id'))
     if table:
-        # sync_count = table.increase_sync_count()
         sync_count = table.sync_count
         # ask dealer if really should be re-dealt
         socketio.emit('really-deal-again',
@@ -264,6 +264,7 @@ def deal_cards_to_player(msg):
             trick_claiming_needed = table.round.turn_count % 4 == 0 and \
                                     table.round.turn_count > 0 and \
                                     not table.round.is_finished()
+            sync_count = table.sync_count
             socketio.emit('your-cards-please',
                           {'player_id': player.id,
                            'turn_count': table.round.turn_count,
@@ -271,6 +272,7 @@ def deal_cards_to_player(msg):
                            'dealer': dealer,
                            'dealing_needed': dealing_needed,
                            'trick_claiming_needed': trick_claiming_needed,
+                           'sync_count': sync_count,
                            'html': {'cards_hand': render_template('cards/hand.html',
                                                                   cards_hand=cards_hand,
                                                                   table=table,

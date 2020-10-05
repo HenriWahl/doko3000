@@ -36,7 +36,7 @@ function check_sync(msg) {
         // sync_count won't be persistent anyway because page will be reloaded to make refresh safely work
         // sync_count = msg.sync_count
         if (location.pathname.startsWith('/table/')) {
-             location.reload()
+            location.reload()
         }
         return false
     }
@@ -177,38 +177,40 @@ $(document).ready(function () {
 
     socket.on('grab-your-cards', function (msg) {
         // if (check_sync(msg)) {
-            socket.emit('my-cards-please', {
-                player_id: player_id,
-                table_id: msg.table_id
-            })
+        socket.emit('my-cards-please', {
+            player_id: player_id,
+            table_id: msg.table_id
+        })
         // }
     })
 
     socket.on('your-cards-please', function (msg) {
         current_player_id = msg.current_player_id
-        cards_locked = false
-        $('.mode-spectator').addClass('d-none')
-        $('.mode-player').removeClass('d-none')
-        $('#hud_players').html(msg.html.hud_players)
-        $('#table').html(msg.html.cards_table)
-        $('#table_spectator').html('')
-        $('#hand').html(msg.html.cards_hand)
-        $('#button_claim_trick').addClass('d-none')
-        $('#modal_dialog').modal('hide')
-        if (player_id == current_player_id) {
-            $('#turn_indicator').removeClass('d-none')
-        } else {
-            $('#turn_indicator').addClass('d-none')
-        }
-        if (player_id == msg.dealer && msg.dealing_needed) {
-            $('#button_deal_cards_again').removeClass('d-none')
-        } else {
-            $('#button_deal_cards_again').addClass('d-none')
-        }
-        if (msg.trick_claiming_needed) {
-            $('#button_claim_trick').removeClass('d-none').fadeOut(1).delay(1500).fadeIn(1)
-        } else {
+        if (check_sync(msg)) {
+            cards_locked = false
+            $('.mode-spectator').addClass('d-none')
+            $('.mode-player').removeClass('d-none')
+            $('#hud_players').html(msg.html.hud_players)
+            $('#table').html(msg.html.cards_table)
+            $('#table_spectator').html('')
+            $('#hand').html(msg.html.cards_hand)
             $('#button_claim_trick').addClass('d-none')
+            $('#modal_dialog').modal('hide')
+            if (player_id == current_player_id) {
+                $('#turn_indicator').removeClass('d-none')
+            } else {
+                $('#turn_indicator').addClass('d-none')
+            }
+            if (player_id == msg.dealer && msg.dealing_needed) {
+                $('#button_deal_cards_again').removeClass('d-none')
+            } else {
+                $('#button_deal_cards_again').addClass('d-none')
+            }
+            if (msg.trick_claiming_needed) {
+                $('#button_claim_trick').removeClass('d-none').fadeOut(1).delay(1500).fadeIn(1)
+            } else {
+                $('#button_claim_trick').addClass('d-none')
+            }
         }
     })
 
