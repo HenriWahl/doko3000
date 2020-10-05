@@ -81,14 +81,20 @@ def who_am_i():
                 current_player_id = ''
                 table_id = ''
                 sync_count = 0
-            socketio.emit('you-are-what-you-is',
-                          {'player_id': player.id,
+            # putting into variables makes debugging easier
+            event = 'you-are-what-you-is'
+            payload = {'player_id': player.id,
                            'table_id': table_id,
                            'sync_count': sync_count,
                            'current_player_id': current_player_id,
                            'round_finished': round_finished,
-                           'round_reset': round_reset},
-                          room=request.sid)
+                           'round_reset': round_reset}
+            room = request.sid
+            # debugging...
+            if table.is_debugging:
+                table.log(event, payload, room)
+            # ...and action
+            socketio.emit(event, payload, room=room)
 
 
 @socketio.on('played-card')
@@ -112,8 +118,8 @@ def played_card(msg):
         played_cards = table.round.get_played_cards()
         cards_timestamp = table.round.cards_timestamp
         sync_count = table.increase_sync_count()
-        socketio.emit('played-card-by-user',
-                      {'player_id': player.id,
+        event = 'played-card-by-user',
+        payload = {'player_id': player.id,
                        'table_id': table.id,
                        'card_id': card.id,
                        'card_name': card.name,
@@ -131,9 +137,13 @@ def played_card(msg):
                                                                player=player,
                                                                game=game,
                                                                current_player_id=current_player_id)
-                                }},
-                      room=table.id)
-
+                                }}
+        room=table.id
+        # debugging...
+        if table.is_debugging:
+            table.log(event, payload, room)
+        # ...and action
+        socketio.emit(event, payload, room=room)
 
 @socketio.on('enter-table')
 def enter_table_socket(msg):
@@ -168,6 +178,10 @@ def setup_table(msg):
             table.round.allow_undo = True
         elif action == 'prohibit_undo':
             table.round.allow_undo = False
+        elif action == 'enable_debugging':
+            table.is_debugging = True
+        elif action == 'disable_debugging':
+            table.is_debugging = False
         elif action == 'changed_order':
             order = msg.get('order')
             if set(order) == set(table.order):
@@ -216,11 +230,15 @@ def deal_cards(msg):
         # table increases its sync_count when resetting round
         sync_count = table.sync_count
         # just tell everybody to get personal cards
-        socketio.emit('grab-your-cards',
-                      {'table_id': table.id,
-                       'sync_count': sync_count},
-                      room=table.id)
-
+        event = 'grab-your-cards',
+        payload = {'table_id': table.id,
+                       'sync_count': sync_count}
+        room = table.id
+        # debugging...
+        if table.is_debugging:
+            table.log(event, payload, room)
+        # ...and action
+        socketio.emit(event, payload, room=room)
 
 @socketio.on('deal-cards-again')
 def deal_cards_again(msg):
@@ -265,8 +283,9 @@ def deal_cards_to_player(msg):
                                     table.round.turn_count > 0 and \
                                     not table.round.is_finished()
             sync_count = table.sync_count
-            socketio.emit('your-cards-please',
-                          {'player_id': player.id,
+            # putting into variables makes debugging easier
+            event = 'your-cards-please',
+            payload = {'player_id': player.id,
                            'turn_count': table.round.turn_count,
                            'current_player_id': current_player_id,
                            'dealer': dealer,
@@ -290,16 +309,21 @@ def deal_cards_to_player(msg):
                                                                    table=table,
                                                                    cards_timestamp=cards_timestamp,
                                                                    mode=mode)}
-                           },
-                          room=request.sid)
+                           }
+            room=request.sid
+            # debugging...
+            if table.is_debugging:
+                table.log(event, payload, room)
+            # ...and action
+            socketio.emit(event, payload, room=room)
         else:
             # spectator mode
             players = table.round.players
             players_cards = table.round.get_players_cards()
             cards_table = table.round.current_trick.get_cards()
             mode = 'spectator'
-            socketio.emit('sorry-no-cards-for-you',
-                          {'html': {'hud_players': render_template('top/hud_players.html',
+            event = 'sorry-no-cards-for-you',
+            payload = {'html': {'hud_players': render_template('top/hud_players.html',
                                                                    table=table,
                                                                    player=player,
                                                                    game=game,
@@ -320,8 +344,13 @@ def deal_cards_to_player(msg):
                                                                                   players=players,
                                                                                   players_cards=players_cards,
                                                                                   game=game)
-                                    }},
-                          room=request.sid)
+                                    }}
+            room = request.sid
+            # debugging...
+            if table.is_debugging:
+                table.log(event, payload, room)
+            # ...and action
+            socketio.emit(event, payload, room=room)
 
 
 @socketio.on('sorted-cards')
@@ -684,9 +713,11 @@ def setup_table(table_id):
            current_user.get_id() in game.players and \
            (current_user.get_id() in table.players or
            not table.locked):
+            player = game.players[current_user.get_id()]
             return jsonify({'allowed': True,
                                 'html': render_template('setup/table.html',
                                                         table=table,
+                                                        player=player,
                                                         game=game)})
         else:
             return jsonify({'allowed': False})

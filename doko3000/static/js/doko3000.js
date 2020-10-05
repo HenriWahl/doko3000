@@ -470,6 +470,24 @@ $(document).ready(function () {
         }
     })
 
+    // enable debugging if user is admin
+    $(document).on('click', '#switch_enable_debugging', function () {
+        if (this.checked) {
+            socket.emit('setup-table-change', {
+                action: 'enable_debugging',
+                player_id: player_id,
+                table_id: $(this).data('table_id')
+            })
+        } else {
+            socket.emit('setup-table-change', {
+                action: 'disable_debugging',
+                player_id: player_id,
+                table_id: $(this).data('table_id')
+            })
+        }
+    })
+
+
     // delete a player in the draggable players order
     $(document).on('click', '.button-remove-player-from-table', function () {
         if (player_id != $(this).data('player_id')) {

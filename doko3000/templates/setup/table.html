@@ -8,18 +8,17 @@
                class="custom-control-input"
                id="table_lock"
                data-table_id="{{ table.id }}"
-               {% if table.locked %}
+                {% if table.locked %}
                checked=""
-               {% endif %}>
+                {% endif %}>
         <label class="custom-control-label float-right" for="table_lock">
-            <span
-                    class="oi
+            <span class="oi
                 {% if table.locked %}
                 oi-lock-locked
                 {% else %}
                 oi-lock-unlocked
                 {% endif %}"
-                    id="table_lock_icon">
+                  id="table_lock_icon">
             </span>
         </label>
     </div>
@@ -27,15 +26,15 @@
 <!--    <div clas="mt-2 mb-4"><strong>Spieler:</strong></div>-->
 <div class="container d-flex flex-column" id="setup_table_players" data-table_id="{{ table.id }}">
     {% for player_id in table.players %}
-    <div class="p-2 m-1 border table_player_{{ player_id }} player"
-         data-player_id="{{ player_id }}">
-        <span class="oi oi-person"></span>
-        {{ game.players[player_id ].name}}
-        <span class="oi oi-x float-right text-danger btn btn-outline-light border-0 btn-sm button-remove-player-from-table"
-              data-player_id="{{ player_id }}"
-              data-table_id="{{ table.id }}"
-        ></span>
-    </div>
+        <div class="p-2 m-1 border table_player_{{ player_id }} player"
+             data-player_id="{{ player_id }}">
+            <span class="oi oi-person"></span>
+            {{ game.players[player_id].name }}
+            <span class="oi oi-x float-right text-danger btn btn-outline-light border-0 btn-sm button-remove-player-from-table"
+                  data-player_id="{{ player_id }}"
+                  data-table_id="{{ table.id }}"
+            ></span>
+        </div>
     {% endfor %}
 </div>
 <div class="row mt-2">
@@ -45,9 +44,9 @@
                    class="custom-control-input"
                    id="switch_card_9"
                    data-table_id="{{ table.id }}"
-                   {% if table.round.with_9 %}
+                    {% if table.round.with_9 %}
                    checked=""
-                   {% endif %}
+                    {% endif %}
             >
             <label class="custom-control-label" for="switch_card_9">Mit 9er Karten</label>
         </div>
@@ -60,14 +59,31 @@
                    class="custom-control-input"
                    id="switch_allow_undo"
                    data-table_id="{{ table.id }}"
-                   {% if table.round.allow_undo %}
+                    {% if table.round.allow_undo %}
                    checked=""
-                   {% endif %}
+                    {% endif %}
             >
             <label class="custom-control-label" for="switch_allow_undo">Mit Stich rückgängig machen</label>
         </div>
     </div>
 </div>
+{% if player.is_admin %}
+    <div class="row">
+        <div class="col-12">
+            <div class="custom-control custom-switch my-2 mx-3">
+                <input type="checkbox"
+                       class="custom-control-input"
+                       id="switch_enable_debugging"
+                       data-table_id="{{ table.id }}"
+                        {% if table.is_debugging %}
+                       checked=""
+                        {% endif %}
+                >
+                <label class="custom-control-label" for="switch_enable_debugging">Debugmodus</label>
+            </div>
+        </div>
+    </div>
+{% endif %}
 <div class="row mt-3">
     <div class="col-6" data-table_id="{{ table.id }}">
         <a href="/table/{{ table.id }}"

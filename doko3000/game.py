@@ -687,6 +687,7 @@ class Table(Document):
             self['players'] = []
             self['players_ready'] = []
             self['locked'] = False
+            self['is_debugging'] = False
         elif document_id:
             Document.__init__(self, self.game.db.database, document_id=document_id)
             # get document data from CouchDB
@@ -775,6 +776,21 @@ class Table(Document):
         players who have to wait until round is over - all which are more than 4
         """
         return self.order[4:]
+
+    @property
+    def is_debugging(self):
+        """
+        flag showing if debugging is enabled or not
+        """
+        return self.get('is_debugging', False)
+
+    @is_debugging.setter
+    def is_debugging(self, value):
+        if type(value) == bool:
+            self['is_debugging'] = value
+        else:
+            self['is_debugging'] = False
+        self.save()
 
     @property
     def sync_count(self):
@@ -900,6 +916,8 @@ class Table(Document):
         self.players_ready = []
         self.save()
 
+    def log(self, *args):
+        print(args)
 
 class Game:
     """
