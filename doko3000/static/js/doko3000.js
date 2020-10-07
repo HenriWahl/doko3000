@@ -321,10 +321,6 @@ $(document).ready(function () {
         $('#submit_change_password').addClass('d-none')
     })
 
-    // socket.on('please-hold-the-line', function(msg) {
-    //     console.log(msg)
-    // })
-
     $(document).on('click', '.button-enter-table', function () {
         let table_id = $(this).data('table_id')
         socket.emit('enter-table', {
@@ -636,6 +632,7 @@ $(document).ready(function () {
     })
 
     $(document).on('click', '#button_really_start_table', function () {
+        $('#modal_dialog').modal('hide')
         socket.emit('setup-table-change', {
             action: 'start_table',
             player_id: player_id,
