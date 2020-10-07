@@ -215,15 +215,17 @@ $(document).ready(function () {
     })
 
     socket.on('sorry-no-cards-for-you', function (msg) {
-        $('#modal_body').html('')
-        $("#modal_dialog").modal('hide')
-        $('.mode-spectator').removeClass('d-none')
-        $('.mode-player').addClass('d-none')
-        $('#hud_players').html(msg.html.hud_players)
-        $('#table').html('')
-        $('#table_spectator').html(msg.html.cards_table)
-        $('#hand_spectator_upper').html(msg.html.cards_hand_spectator_upper)
-        $('#hand_spectator_lower').html(msg.html.cards_hand_spectator_lower)
+        if (check_sync(msg)) {
+            $('#modal_body').html('')
+            $("#modal_dialog").modal('hide')
+            $('.mode-spectator').removeClass('d-none')
+            $('.mode-player').addClass('d-none')
+            $('#hud_players').html(msg.html.hud_players)
+            $('#table').html('')
+            $('#table_spectator').html(msg.html.cards_table)
+            $('#hand_spectator_upper').html(msg.html.cards_hand_spectator_upper)
+            $('#hand_spectator_lower').html(msg.html.cards_hand_spectator_lower)
+        }
     })
 
     socket.on('really-deal-again', function (msg) {

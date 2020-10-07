@@ -39,7 +39,7 @@ login.login_message = ''
 # shorter ping interval for better sync
 socketio = SocketIO(app,
                     manage_session=False,
-                    #ping_timeout=2,
+                    # ping_timeout=2,
                     # # seems to be better somewhat higher for clients not getting nervous when waiting for reset
                     ping_timeout=15,
                     ping_interval=2,
@@ -84,11 +84,11 @@ def who_am_i():
             # putting into variables makes debugging easier
             event = 'you-are-what-you-is'
             payload = {'player_id': player.id,
-                           'table_id': table_id,
-                           'sync_count': sync_count,
-                           'current_player_id': current_player_id,
-                           'round_finished': round_finished,
-                           'round_reset': round_reset}
+                       'table_id': table_id,
+                       'sync_count': sync_count,
+                       'current_player_id': current_player_id,
+                       'round_finished': round_finished,
+                       'round_reset': round_reset}
             room = request.sid
             # debugging...
             if table.is_debugging:
@@ -103,10 +103,10 @@ def played_card(msg):
     player = game.players.get(msg.get('player_id'))
     table = game.tables.get(msg.get('table_id'))
     if card_id in Deck.cards and \
-       player and \
-       table and \
-       player.table == table.id and \
-       current_user.get_id() == player.id == table.round.current_player:
+            player and \
+            table and \
+            player.table == table.id and \
+            current_user.get_id() == player.id == table.round.current_player:
         table.round.current_trick.add_turn(player.id, card_id)
         table.round.increase_turn_count()
         card = Deck.cards[card_id]
@@ -120,30 +120,31 @@ def played_card(msg):
         sync_count = table.increase_sync_count()
         event = 'played-card-by-user',
         payload = {'player_id': player.id,
-                       'table_id': table.id,
-                       'card_id': card.id,
-                       'card_name': card.name,
-                       'is_last_turn': is_last_turn,
-                       'current_player_id': current_player_id,
-                       'idle_players': idle_players,
-                       'played_cards': played_cards,
-                       'sync_count': sync_count,
-                       'html': {'cards_table': render_template('cards/table.html',
-                                                               cards_table=cards_table,
-                                                               table=table,
-                                                               cards_timestamp=cards_timestamp),
-                                'hud_players': render_template('top/hud_players.html',
-                                                               table=table,
-                                                               player=player,
-                                                               game=game,
-                                                               current_player_id=current_player_id)
-                                }}
-        room=table.id
+                   'table_id': table.id,
+                   'card_id': card.id,
+                   'card_name': card.name,
+                   'is_last_turn': is_last_turn,
+                   'current_player_id': current_player_id,
+                   'idle_players': idle_players,
+                   'played_cards': played_cards,
+                   'sync_count': sync_count,
+                   'html': {'cards_table': render_template('cards/table.html',
+                                                           cards_table=cards_table,
+                                                           table=table,
+                                                           cards_timestamp=cards_timestamp),
+                            'hud_players': render_template('top/hud_players.html',
+                                                           table=table,
+                                                           player=player,
+                                                           game=game,
+                                                           current_player_id=current_player_id)
+                            }}
+        room = table.id
         # debugging...
         if table.is_debugging:
             table.log(event, payload, room)
         # ...and action
         socketio.emit(event, payload, room=room)
+
 
 @socketio.on('enter-table')
 def enter_table_socket(msg):
@@ -232,13 +233,14 @@ def deal_cards(msg):
         # just tell everybody to get personal cards
         event = 'grab-your-cards',
         payload = {'table_id': table.id,
-                       'sync_count': sync_count}
+                   'sync_count': sync_count}
         room = table.id
         # debugging...
         if table.is_debugging:
             table.log(event, payload, room)
         # ...and action
         socketio.emit(event, payload, room=room)
+
 
 @socketio.on('deal-cards-again')
 def deal_cards_again(msg):
@@ -262,15 +264,16 @@ def deal_cards_to_player(msg):
     player = game.players.get(msg.get('player_id'))
     table = game.tables.get(msg.get('table_id'))
     if player and \
-       table and \
-       player.table == table.id and \
-       player.id == current_user.get_id() and \
-       player.id in table.players:
+            table and \
+            player.table == table.id and \
+            player.id == current_user.get_id() and \
+            player.id in table.players:
         dealer = table.dealer
         # just in case
         join_room(table.id)
         current_player_id = table.round.current_player
         cards_timestamp = table.round.cards_timestamp
+        sync_count = table.sync_count
         if player.id in table.round.players:
             cards_hand = player.get_cards()
             cards_table = []
@@ -282,35 +285,34 @@ def deal_cards_to_player(msg):
             trick_claiming_needed = table.round.turn_count % 4 == 0 and \
                                     table.round.turn_count > 0 and \
                                     not table.round.is_finished()
-            sync_count = table.sync_count
             # putting into variables makes debugging easier
             event = 'your-cards-please',
             payload = {'player_id': player.id,
-                           'turn_count': table.round.turn_count,
-                           'current_player_id': current_player_id,
-                           'dealer': dealer,
-                           'dealing_needed': dealing_needed,
-                           'trick_claiming_needed': trick_claiming_needed,
-                           'sync_count': sync_count,
-                           'html': {'cards_hand': render_template('cards/hand.html',
-                                                                  cards_hand=cards_hand,
-                                                                  table=table,
-                                                                  player=player,
-                                                                  score=score,
-                                                                  cards_timestamp=cards_timestamp),
-                                    'hud_players': render_template('top/hud_players.html',
-                                                                   table=table,
-                                                                   player=player,
-                                                                   game=game,
-                                                                   dealer=dealer,
-                                                                   current_player_id=current_player_id),
-                                    'cards_table': render_template('cards/table.html',
-                                                                   cards_table=cards_table,
-                                                                   table=table,
-                                                                   cards_timestamp=cards_timestamp,
-                                                                   mode=mode)}
-                           }
-            room=request.sid
+                       'turn_count': table.round.turn_count,
+                       'current_player_id': current_player_id,
+                       'dealer': dealer,
+                       'dealing_needed': dealing_needed,
+                       'trick_claiming_needed': trick_claiming_needed,
+                       'sync_count': sync_count,
+                       'html': {'cards_hand': render_template('cards/hand.html',
+                                                              cards_hand=cards_hand,
+                                                              table=table,
+                                                              player=player,
+                                                              score=score,
+                                                              cards_timestamp=cards_timestamp),
+                                'hud_players': render_template('top/hud_players.html',
+                                                               table=table,
+                                                               player=player,
+                                                               game=game,
+                                                               dealer=dealer,
+                                                               current_player_id=current_player_id),
+                                'cards_table': render_template('cards/table.html',
+                                                               cards_table=cards_table,
+                                                               table=table,
+                                                               cards_timestamp=cards_timestamp,
+                                                               mode=mode)}
+                       }
+            room = request.sid
             # debugging...
             if table.is_debugging:
                 table.log(event, payload, room)
@@ -323,28 +325,29 @@ def deal_cards_to_player(msg):
             cards_table = table.round.current_trick.get_cards()
             mode = 'spectator'
             event = 'sorry-no-cards-for-you',
-            payload = {'html': {'hud_players': render_template('top/hud_players.html',
-                                                                   table=table,
-                                                                   player=player,
-                                                                   game=game,
-                                                                   dealer=dealer,
-                                                                   current_player_id=current_player_id),
-                                    'cards_table': render_template('cards/table.html',
-                                                                   cards_table=cards_table,
-                                                                   table=table,
-                                                                   cards_timestamp=cards_timestamp,
-                                                                   mode=mode),
-                                    'cards_hand_spectator_upper': render_template('cards/hand_spectator_upper.html',
-                                                                                 table=table,
-                                                                                 players=players,
-                                                                                 players_cards=players_cards,
-                                                                                 game=game),
-                                    'cards_hand_spectator_lower': render_template('cards/hand_spectator_lower.html',
-                                                                                  table=table,
-                                                                                  players=players,
-                                                                                  players_cards=players_cards,
-                                                                                  game=game)
-                                    }}
+            payload = {'sync_count': sync_count,
+                       'html': {'hud_players': render_template('top/hud_players.html',
+                                                               table=table,
+                                                               player=player,
+                                                               game=game,
+                                                               dealer=dealer,
+                                                               current_player_id=current_player_id),
+                                'cards_table': render_template('cards/table.html',
+                                                               cards_table=cards_table,
+                                                               table=table,
+                                                               cards_timestamp=cards_timestamp,
+                                                               mode=mode),
+                                'cards_hand_spectator_upper': render_template('cards/hand_spectator_upper.html',
+                                                                              table=table,
+                                                                              players=players,
+                                                                              players_cards=players_cards,
+                                                                              game=game),
+                                'cards_hand_spectator_lower': render_template('cards/hand_spectator_lower.html',
+                                                                              table=table,
+                                                                              players=players,
+                                                                              players_cards=players_cards,
+                                                                              game=game)
+                                }}
             room = request.sid
             # debugging...
             if table.is_debugging:
@@ -363,12 +366,12 @@ def sorted_cards(msg):
     table = game.tables.get(msg.get('table_id'))
     if player and table:
         if player.id == current_user.get_id() and \
-           player.id in game.players and \
-           player.table == table.id:
-                cards_hand_ids = msg.get('cards_hand_ids')
-                if set(cards_hand_ids) == set(player.cards):
-                    player.cards = cards_hand_ids
-                    player.save()
+                player.id in game.players and \
+                player.table == table.id:
+            cards_hand_ids = msg.get('cards_hand_ids')
+            if set(cards_hand_ids) == set(player.cards):
+                player.cards = cards_hand_ids
+                player.save()
 
 
 @socketio.on('claim-trick')
@@ -376,8 +379,8 @@ def claimed_trick(msg):
     player = game.players.get(msg.get('player_id'))
     table = game.tables.get(msg.get('table_id'))
     if player and \
-       table and \
-       player.id == current_user.get_id():
+            table and \
+            player.id == current_user.get_id():
         if player.id in table.round.players:
             sync_count = table.increase_sync_count()
             if not table.round.is_finished():
@@ -435,9 +438,9 @@ def send_final_result(msg):
     player = game.players.get(msg.get('player_id'))
     table = game.tables.get(msg.get('table_id'))
     if player and \
-       table and \
-       player.id == current_user.get_id() and \
-       player.table == table.id:
+            table and \
+            player.id == current_user.get_id() and \
+            player.table == table.id:
         players = game.players
         score = table.round.get_score()
         sync_count = table.sync_count
@@ -458,8 +461,8 @@ def ready_for_next_round(msg):
     player = game.players.get(msg.get('player_id'))
     table = game.tables.get(msg.get('table_id'))
     if player and \
-       table and \
-       player.id == current_user.get_id():
+            table and \
+            player.id == current_user.get_id():
         table.add_ready_player(player.id)
         game.players[player.id].remove_all_cards()
         dealer = table.dealer
@@ -502,8 +505,8 @@ def round_finish(msg):
     player = game.players.get(msg.get('player_id'))
     table = game.tables.get(msg.get('table_id'))
     if player and \
-       table and \
-       player.id == current_user.get_id():
+            table and \
+            player.id == current_user.get_id():
         table.add_ready_player(player.id)
         if set(table.players_ready) >= set(table.round.players):
             table.shift_players()
@@ -526,13 +529,14 @@ def round_finish(msg):
                           {'table_id': table.id},
                           room=request.sid)
 
+
 @socketio.on('request-round-reset')
 def request_round_reset(msg):
     player = game.players.get(msg.get('player_id'))
     table = game.tables.get(msg.get('table_id'))
     if player and \
-       table and \
-       player.id in table.players:
+            table and \
+            player.id in table.players:
         # clear list of ready players for next poll
         table.reset_ready_players()
         # just tell everybody to get personal cards
@@ -549,8 +553,8 @@ def round_reset(msg):
     player = game.players.get(msg.get('player_id'))
     table = game.tables.get(msg.get('table_id'))
     if player and \
-       table and \
-       player.id == current_user.get_id():
+            table and \
+            player.id == current_user.get_id():
         table.add_ready_player(player.id)
         if set(table.players_ready) >= set(table.round.players):
             table.reset_round()
@@ -560,8 +564,10 @@ def round_reset(msg):
                            'sync_count': sync_count},
                           room=table.id)
         else:
+            sync_count = table.sync_count
             socketio.emit('please-hold-the-line',
-                          {'table_id': table.id},
+                          {'table_id': table.id,
+                           'sync_count': sync_count},
                           room=request.sid)
 
 
@@ -570,8 +576,8 @@ def request_undo(msg):
     player = game.players.get(msg.get('player_id'))
     table = game.tables.get(msg.get('table_id'))
     if player and \
-       table and \
-       player.id in table.players:
+            table and \
+            player.id in table.players:
         # makes only sense if there was any card played yet
         if table.round.turn_count > 0:
             # clear list of ready players for next poll
@@ -590,8 +596,8 @@ def round_reset(msg):
     player = game.players.get(msg.get('player_id'))
     table = game.tables.get(msg.get('table_id'))
     if player and \
-       table and \
-       player.id == current_user.get_id():
+            table and \
+            player.id == current_user.get_id():
         table.add_ready_player(player.id)
         if set(table.players_ready) >= set(table.round.players):
             table.round.undo()
@@ -653,8 +659,8 @@ def table(table_id=''):
     player = game.players.get(current_user.get_id())
     table = game.tables.get(table_id)
     if player and \
-       table and \
-       player.id in table.players:
+            table and \
+            player.id in table.players:
         if player.id in table.round.players:
             dealer = table.dealer
             # if no card is played already the dealer might deal
@@ -710,15 +716,15 @@ def setup_table(table_id):
     if is_xhr(request) and table_id:
         table = game.tables.get(table_id)
         if table and \
-           current_user.get_id() in game.players and \
-           (current_user.get_id() in table.players or
-           not table.locked):
+                current_user.get_id() in game.players and \
+                (current_user.get_id() in table.players or
+                 not table.locked):
             player = game.players[current_user.get_id()]
             return jsonify({'allowed': True,
-                                'html': render_template('setup/table.html',
-                                                        table=table,
-                                                        player=player,
-                                                        game=game)})
+                            'html': render_template('setup/table.html',
+                                                    table=table,
+                                                    player=player,
+                                                    game=game)})
         else:
             return jsonify({'allowed': False})
     else:
@@ -754,9 +760,9 @@ def enter_table_json(table_id='', player_id=''):
         player = game.players.get(player_id)
         table = game.tables.get(table_id)
         if player and \
-           table and \
-           ((table.locked and player_id in table.players) or
-           not table.locked):
+                table and \
+                ((table.locked and player_id in table.players) or
+                 not table.locked):
             allowed = True
         return jsonify({'allowed': allowed})
     else:
@@ -882,7 +888,7 @@ def delete_player(player_id):
             else:
                 return jsonify({'status': 'error',
                                 'html': render_template('error.html',
-                                                         message=f"{player.id} sitzt noch am Tisch {player.table}.")})
+                                                        message=f"{player.id} sitzt noch am Tisch {player.table}.")})
         elif request.method == 'POST':
             if game.delete_player(player.id):
                 players = game.players.values()
@@ -910,7 +916,7 @@ def delete_table(table_id):
             else:
                 return jsonify({'status': 'error',
                                 'html': render_template('error.html',
-                                                         message=f"Es sitzen noch Spieler am Tisch {table.name}.")})
+                                                        message=f"Es sitzen noch Spieler am Tisch {table.name}.")})
         elif request.method == 'POST':
             if game.delete_table(table.id):
                 tables = game.tables.values()
@@ -920,6 +926,7 @@ def delete_table(table_id):
                                                         game=game)})
     # default return if nothing applies
     return redirect(url_for('index'))
+
 
 @app.route('/start/table/<table_id>')
 @login_required
@@ -937,6 +944,6 @@ def start_table(table_id):
         else:
             return jsonify({'status': 'error',
                             'html': render_template('error.html',
-                                                     message=f"Es sitzen nicht genug Spieler am Tisch {table.name}.")})
+                                                    message=f"Es sitzen nicht genug Spieler am Tisch {table.name}.")})
     else:
         return redirect(url_for('index'))
