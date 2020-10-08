@@ -624,7 +624,7 @@ class Round(Document):
         self.trick_count += 1
         self.save()
 
-    def get_players_cards(self):
+    def get_players_shuffled_cards(self):
         """
         retrieve all cards of all players for spectator mode
         """
@@ -632,7 +632,10 @@ class Round(Document):
         for player_id in self.players:
             # only if player allows it
             if self.game.players[player_id].allows_spectators:
-                players_cards.append(self.game.players[player_id].get_cards())
+                # players_cards.append(shuffle(self.game.players[player_id].get_cards()))
+                cards = self.game.players[player_id].get_cards()
+                shuffle(cards)
+                players_cards.append(cards)
             else:
                 players_cards.append([])
         return players_cards

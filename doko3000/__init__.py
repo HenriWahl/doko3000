@@ -321,7 +321,7 @@ def deal_cards_to_player(msg):
         else:
             # spectator mode
             players = table.round.players
-            players_cards = table.round.get_players_cards()
+            players_cards = table.round.get_players_shuffled_cards()
             cards_table = table.round.current_trick.get_cards()
             mode = 'spectator'
             event = 'sorry-no-cards-for-you',
@@ -691,7 +691,7 @@ def table(table_id=''):
                                    mode=mode)
         else:
             players = table.round.players
-            players_cards = table.round.get_players_cards()
+            players_cards = table.round.get_players_shuffled_cards()
             cards_table = table.round.current_trick.get_cards()
             mode = 'spectator'
             return render_template('table.html',
