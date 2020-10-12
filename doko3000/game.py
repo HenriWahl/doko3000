@@ -570,7 +570,7 @@ class Round(Document):
         self.current_player = player_id
         self.save()
 
-    def get_current_player(self):
+    def get_current_player_id(self):
         """
         get player for next turn
         """
@@ -596,17 +596,25 @@ class Round(Document):
         """
         return self.turn_count == 0
 
-    def get_score(self):
+    def get_stats(self):
+        """
+        get score and tricks count of players for display
+        """
         score = {}
+        tricks = {}
         for player_id in self.players:
             score[player_id] = 0
+            tricks[player_id] = 0
         for trick in self.tricks.values():
             if trick and trick.owner:
                 if trick.owner not in score:
                     score[trick.owner] = 0
+                # add score of trick deck cards to owner score
                 for card_id in trick.cards:
                     score[trick.owner] += Deck.cards[card_id].value
-        return score
+                # add number of tricks count to owner
+                tricks[trick.owner] += 1
+        return score, tricks
 
     def calculate_trick_order(self):
         """
@@ -814,7 +822,6 @@ class Table(Document):
         to be called after various actions
         """
         self['sync_count'] += 1
-        self.save()
         # just return new timestamp to have it ready for use
         return self['sync_count']
 
@@ -885,9 +892,8 @@ class Table(Document):
             players = []
         self.round.reset(players=players)
         self.reset_ready_players()
-        #self.save()
-        # saving is done by increasing sync count
         self.increase_sync_count()
+        self.save()
 
     def start(self):
         """
