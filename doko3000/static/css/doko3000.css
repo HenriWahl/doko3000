@@ -62,10 +62,17 @@ html, body {
 
 .hud-player-active {
     color: #212529;
-    padding: 0.25rem;
+    /* no padding on right to keep space for tricks badge */
+    padding-left: 0.25rem;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
     border-radius: 0.25rem;
     border: 1px solid white;
     background-color: white;
+}
+
+.hud-tricks-count {
+    font-size: 0.65rem;
 }
 
 #topbar {

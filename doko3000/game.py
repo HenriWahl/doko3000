@@ -483,10 +483,6 @@ class Round(Document):
                              'tricks': {}}
         return self['stats']
 
-    @stats.setter
-    def stats(self, key, value):
-        print(key, value)
-
     @property
     def current_trick(self):
         """
@@ -531,6 +527,9 @@ class Round(Document):
 
         # needed for player HUD
         self.calculate_trick_order()
+
+        # reset score and tricks
+        self.calculate_stats()
 
         # a new card deck for every round
         # decide if the '9'-cards are needed and do not give them to round if not
@@ -645,7 +644,6 @@ class Round(Document):
                 tricks[trick.owner] += 1
         self.stats['score'] = deepcopy(score)
         self.stats['tricks'] = deepcopy(tricks)
-        print(tricks)
         return self.stats['score'], self.stats['tricks']
 
     def calculate_trick_order(self):

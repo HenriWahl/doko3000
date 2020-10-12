@@ -6,7 +6,7 @@
     </tr>
     </thead>
     <tbody>
-    {% for player_id in score %}
+    {% for player_id in table.round.stats['score'] %}
     <tr>
         <td>
             {{ players[player_id].name }}
@@ -16,7 +16,7 @@
                 {% endfor %}
             {% endif %}
         </td>
-        <td>{{ score[player_id] }}</td>
+        <td>{{ table.round.stats['score'][player_id] }}</td>
     </tr>
     {% endfor %}
     </tbody>

@@ -1,10 +1,20 @@
 <div id="hud_players">
     {% for hud_player_id in table.round.trick_order %}
-    <span id="hud_player_{{ hud_player_id }}" class="hud_player mx-1 text-nowrap
+        <span id="hud_player_{{ hud_player_id }}" class="hud_player mx-1 text-nowrap
         {% if hud_player_id == current_player_id %}
         hud-player-active
         {% endif %}
-    ">{{ game.players[hud_player_id].name }}</span>
+    ">{{ game.players[hud_player_id].name }}
+            {% if table.round.stats['tricks'][hud_player_id] > 0 %}
+                {% if hud_player_id == current_player_id %}
+                    {% set badge_class = 'dark' %}
+                {% else %}
+                    {% set badge_class = 'light' %}
+                {% endif %}
+                <span class="badge badge-{{ badge_class }} rounded-circle align-text-top hud-tricks-count">{{ table.round.stats['tricks'][hud_player_id] }}</span>
+            {% endif %}
+    </span>
+
     {% endfor %}
 
     {% for idle_player_id in table.idle_players %}
