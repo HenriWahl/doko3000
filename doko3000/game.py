@@ -1,5 +1,6 @@
 # game logic part of doko3000
 
+from copy import deepcopy
 from json import dumps
 from random import seed, \
     shuffle
@@ -66,6 +67,7 @@ class Player(UserMixin, Document):
     """
 
     def __init__(self, player_id='', document_id='', game=None):
+        # access to global game
         self.game = game
         if player_id:
             # ID for CouchDB - quoted and without '/', to be transported easily througout HTML and JS
@@ -347,6 +349,14 @@ class Round(Document):
             self['type'] = 'round'
             # what table?
             self['id'] = round_id
+            # list of the 4 players in round
+            self['players'] = []
+            # keep track of turns in round
+            self['turn_count'] = 0
+            # keep track of tricks in round
+            self['trick_count'] = 0
+            # ID of player which has current turn
+            self['current_player'] = ''
             # as default play without '9'-cards
             # should be a property of table but rounds are initialized before tables and this leads to a logical
             # problem some lines later when cards are initialized and there are no tables yet which can be asked
@@ -354,6 +364,12 @@ class Round(Document):
             self['with_9'] = False
             # even if not logical too just keep the undo setting here too to keep the table/round-settings together
             self['allow_undo'] = True
+            # timestamp as checksum to avoid mess on client side if new cards are dealed
+            # every deal gets its own timestamp to make cards belonging together
+            self['cards_timestamp'] = 0
+            # statistics of current round
+            self['stats'] = {'score': {},
+                             'tricks': {}}
             # initialize
             self.reset(players=players)
         elif document_id:
@@ -387,7 +403,7 @@ class Round(Document):
 
     @property
     def players(self):
-        return self['players']
+        return self.get('players', [])
 
     @players.setter
     def players(self, value):
@@ -395,32 +411,11 @@ class Round(Document):
 
     @property
     def turn_count(self):
-        return self['turn_count']
-
-    @turn_count.setter
-    def turn_count(self, value):
-        self['turn_count'] = value
-
-    @property
-    def trick_count(self):
-        return self['trick_count']
-
-    @trick_count.setter
-    def trick_count(self, value):
-        self['trick_count'] = value
-
-    @property
-    def trick_order(self):
-        # backward compatibility, might be changed once if stable
-        return self.get('trick_order', [])
-
-    @trick_order.setter
-    def trick_order(self, value):
-        self['trick_order'] = value
+        return self.get('turn_count', 0)
 
     @property
     def current_player(self):
-        return self['current_player']
+        return self.get('current_player', '')
 
     @current_player.setter
     def current_player(self, value):
@@ -439,6 +434,26 @@ class Round(Document):
             self['with_9'] = False
         self.save()
 
+    @turn_count.setter
+    def turn_count(self, value):
+        self['turn_count'] = value
+
+    @property
+    def trick_count(self):
+        return self.get('trick_count', 0)
+
+    @trick_count.setter
+    def trick_count(self, value):
+        self['trick_count'] = value
+
+    @property
+    def trick_order(self):
+        return self.get('trick_order', [])
+
+    @trick_order.setter
+    def trick_order(self, value):
+        self['trick_order'] = value
+
     @property
     def allow_undo(self):
         # better via .get() in case the table is not updated yet
@@ -454,11 +469,23 @@ class Round(Document):
 
     @property
     def cards_timestamp(self):
-        # backward compatibility
+        # no setter available, will be set by calculate_cards_timestamp()
         if not self.get('cards_timestamp'):
             self.calculate_cards_timestamp()
             self.save()
         return self['cards_timestamp']
+
+    @property
+    def stats(self):
+        if not self.get('stats'):
+            # stats dicts have to be created, not just returned as empty dicts
+            self['stats'] = {'score': {},
+                             'tricks': {}}
+        return self['stats']
+
+    @stats.setter
+    def stats(self, key, value):
+        print(key, value)
 
     @property
     def current_trick(self):
@@ -596,7 +623,7 @@ class Round(Document):
         """
         return self.turn_count == 0
 
-    def get_stats(self):
+    def calculate_stats(self):
         """
         get score and tricks count of players for display
         """
@@ -612,9 +639,14 @@ class Round(Document):
                 # add score of trick deck cards to owner score
                 for card_id in trick.cards:
                     score[trick.owner] += Deck.cards[card_id].value
+                if trick.owner not in tricks:
+                    tricks[trick.owner] = 0
                 # add number of tricks count to owner
                 tricks[trick.owner] += 1
-        return score, tricks
+        self.stats['score'] = deepcopy(score)
+        self.stats['tricks'] = deepcopy(tricks)
+        print(tricks)
+        return self.stats['score'], self.stats['tricks']
 
     def calculate_trick_order(self):
         """
@@ -928,6 +960,7 @@ class Table(Document):
     def log(self, *args):
         print(args)
 
+
 class Game:
     """
     organizes tables
@@ -1019,7 +1052,7 @@ class Game:
         """
         table = self.tables.get(table_id)
         if table and \
-           len(table.players) == 0:
+                len(table.players) == 0:
             for player in self.players.values():
                 if player.table == table_id:
                     player.table = ''

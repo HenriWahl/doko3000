@@ -118,7 +118,6 @@ def played_card(msg):
         played_cards = table.round.get_played_cards()
         cards_timestamp = table.round.cards_timestamp
         sync_count = table.increase_sync_count()
-        score, tricks = table.round.get_stats()
         event = 'played-card-by-user',
         payload = {'player_id': player.id,
                    'table_id': table.id,
@@ -137,7 +136,6 @@ def played_card(msg):
                                                            table=table,
                                                            player=player,
                                                            game=game,
-                                                           tricks=tricks,
                                                            current_player_id=current_player_id)
                             }}
         room = table.id
@@ -276,8 +274,6 @@ def deal_cards_to_player(msg):
         current_player_id = table.round.current_player
         cards_timestamp = table.round.cards_timestamp
         sync_count = table.sync_count
-        # no score yet but needed for full set of cards for hand - to decide if back-card is shown too
-        score, tricks = table.round.get_stats()
         if player.id in table.round.players:
             cards_hand = player.get_cards()
             cards_table = []
@@ -300,13 +296,11 @@ def deal_cards_to_player(msg):
                                                               cards_hand=cards_hand,
                                                               table=table,
                                                               player=player,
-                                                              score=score,
                                                               cards_timestamp=cards_timestamp),
                                 'hud_players': render_template('top/hud_players.html',
                                                                table=table,
                                                                player=player,
                                                                game=game,
-                                                               tricks=tricks,
                                                                dealer=dealer,
                                                                current_player_id=current_player_id),
                                 'cards_table': render_template('cards/table.html',
@@ -333,7 +327,6 @@ def deal_cards_to_player(msg):
                                                                table=table,
                                                                player=player,
                                                                game=game,
-                                                               tricks=tricks,
                                                                dealer=dealer,
                                                                current_player_id=current_player_id),
                                 'cards_table': render_template('cards/table.html',
@@ -399,20 +392,19 @@ def claimed_trick(msg):
                     # apparently the ownership of the previous trick is not clear - change it
                     table.round.previous_trick.owner = player.id
                     table.round.current_player = player.id
-                score, tricks = table.round.get_stats()
                 cards_timestamp = table.round.cards_timestamp
                 cards_table = []
                 table.round.calculate_trick_order()
+                table.round.calculate_stats()
                 socketio.emit('next-trick',
                               {'current_player_id': player.id,
-                               'score': score,
+                               'score': table.round.stats['score'],
                                'table_id': table.id,
                                'sync_count': sync_count,
                                'html': {'hud_players': render_template('top/hud_players.html',
                                                                        table=table,
                                                                        player=player,
                                                                        game=game,
-                                                                       tricks=tricks,
                                                                        current_player_id=player.id),
                                         'cards_table': render_template('cards/table.html',
                                                                        cards_table=cards_table,
@@ -423,7 +415,7 @@ def claimed_trick(msg):
             else:
                 table.round.current_trick.owner = player.id
                 players = game.players
-                score, tricks = table.round.get_stats()
+                table.round.calculate_stats()
                 table.shift_players()
                 # tell everybody stats and wait for everybody confirming next round
                 socketio.emit('round-finished',
@@ -431,8 +423,7 @@ def claimed_trick(msg):
                                'sync_count': sync_count,
                                'html': render_template('round/score.html',
                                                        table=table,
-                                                       players=players,
-                                                       score=score)
+                                                       players=players)
                                },
                               room=table.id)
 
@@ -446,7 +437,6 @@ def send_final_result(msg):
             player.id == current_user.get_id() and \
             player.table == table.id:
         players = game.players
-        score, tricks = table.round.get_stats()
         sync_count = table.sync_count
         # tell single player stats and wait for everybody confirming next round
         socketio.emit('round-finished',
@@ -454,8 +444,7 @@ def send_final_result(msg):
                        'sync_count': sync_count,
                        'html': render_template('round/score.html',
                                                table=table,
-                                               players=players,
-                                               score=score)
+                                               players=players)
                        },
                       room=request.sid)
 
@@ -677,7 +666,6 @@ def table(table_id=''):
             cards_hand = player.get_cards()
             cards_table = table.round.current_trick.get_cards()
             cards_timestamp = table.round.cards_timestamp
-            score, tricks = table.round.get_stats()
             mode = 'player'
             return render_template('table.html',
                                    title=f"{app.config['TITLE']} {table.name}",
@@ -690,8 +678,6 @@ def table(table_id=''):
                                    cards_hand=cards_hand,
                                    cards_table=cards_table,
                                    cards_timestamp=cards_timestamp,
-                                   score=score,
-                                   tricks=tricks,
                                    game=game,
                                    mode=mode)
         else:

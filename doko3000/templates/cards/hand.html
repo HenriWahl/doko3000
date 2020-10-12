@@ -4,12 +4,12 @@
 {% include 'cards/card.html' %}
 {% endfor %}
 <div id="cards_stack" class="game-card ml-2
-{% if not player.id in score or score[player.id] == 0 %}
+{% if not player.id in table.round.stats['score'] or table.round.stats['score'][player.id] == 0 %}
 d-none
 {% endif %}
 ">
 <img class="img-fluid p-1"
      id="cards_stack_img"
      src="/static/img/cards/back.png"
-     title="{{ score[player.id] }}">
+     title="{{ table.round.stats['score'][player.id] }}">
 </div>
