@@ -644,7 +644,6 @@ class Round(Document):
                 tricks[trick.owner] += 1
         self.stats['score'] = deepcopy(score)
         self.stats['tricks'] = deepcopy(tricks)
-        return self.stats['score'], self.stats['tricks']
 
     def calculate_trick_order(self):
         """
