@@ -495,7 +495,8 @@ $(document).ready(function () {
                 player_id: $(this).data('player_id'),
                 table_id: $(this).data('table_id')
             })
-            $('.table_player_' + $(this).data('player_id')).remove()
+            // id needs to get % escaped
+            $('.table_player_' + $(this).data('player_id').replace(/%/g, '\\%')).remove()
         }
     })
 
