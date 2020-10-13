@@ -692,7 +692,7 @@ class Round(Document):
         undo last trick by request
         """
         # no card played yet, access previous trick
-        if len(self.current_trick.players) == 0:
+        if len(self.current_trick.players) == 0 and self.trick_count > 1:
             self.trick_count -= 1
         for player_id, card_id in zip(self.current_trick.players, self.current_trick.cards):
             self.game.players[player_id].cards.append(card_id)
