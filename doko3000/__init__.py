@@ -91,7 +91,7 @@ def who_am_i():
                        'round_reset': round_reset}
             room = request.sid
             # debugging...
-            if table.is_debugging:
+            if table and table.is_debugging:
                 table.log(event, payload, room)
             # ...and action
             socketio.emit(event, payload, room=room)

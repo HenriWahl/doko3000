@@ -11,7 +11,7 @@
                 {% else %}
                     {% set badge_class = 'light' %}
                 {% endif %}
-                <span class="badge badge-{{ badge_class }} align-text-top rounded-circle">{{ table.round.stats['tricks'][hud_player_id] }}</span>
+                <span class="badge badge-{{ badge_class }} align-text-top">{{ table.round.stats['tricks'][hud_player_id] }}</span>
             {% endif %}
     </span>
 

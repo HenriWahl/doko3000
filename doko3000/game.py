@@ -818,6 +818,20 @@ class Table(Document):
         return self.order[4:]
 
     @property
+    def sync_count(self):
+        """
+        help to stabilize client synchronization
+        """
+        # backward compatibility
+        if not self.get('sync_count'):
+            self.reset_sync_count()
+        return self['sync_count']
+
+    @sync_count.setter
+    def sync_count(self, value):
+        self['sync_count'] = value
+
+    @property
     def is_debugging(self):
         """
         flag showing if debugging is enabled or not
@@ -831,20 +845,6 @@ class Table(Document):
         else:
             self['is_debugging'] = False
         self.save()
-
-    @property
-    def sync_count(self):
-        """
-        help to stabilize client synchronization
-        """
-        # backward compatibility
-        if not self.get('sync_count'):
-            self.reset_sync_count()
-        return self['sync_count']
-
-    @sync_count.setter
-    def sync_count(self, value):
-        self['sync_count'] = value
 
     def increase_sync_count(self):
         """
