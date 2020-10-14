@@ -48,7 +48,7 @@
                    checked=""
                     {% endif %}
             >
-            <label class="custom-control-label" for="switch_card_9">Mit 9er Karten</label>
+            <label class="custom-control-label" for="switch_card_9">9er Karten</label>
         </div>
     </div>
 </div>
@@ -63,7 +63,22 @@
                    checked=""
                     {% endif %}
             >
-            <label class="custom-control-label" for="switch_allow_undo">Mit Stich rückgängig machen</label>
+            <label class="custom-control-label" for="switch_allow_undo">Stich zurücknehmen</label>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12">
+        <div class="custom-control custom-switch my-2 mx-3">
+            <input type="checkbox"
+                   class="custom-control-input"
+                   id="switch_allow_exchange"
+                   data-table_id="{{ table.id }}"
+                    {% if table.round.allow_exchange %}
+                   checked=""
+                    {% endif %}
+            >
+            <label class="custom-control-label" for="switch_allow_exchange">Contra/Re-Austausch</label>
         </div>
     </div>
 </div>

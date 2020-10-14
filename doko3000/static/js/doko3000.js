@@ -490,6 +490,25 @@ $(document).ready(function () {
         }
     })
 
+    // enable exchange option
+    $(document).on('click', '#switch_allow_exchange', function () {
+        if (this.checked) {
+            $('#menu_request_exchange').removeClass('d-none')
+            socket.emit('setup-table-change', {
+                action: 'allow_exchange',
+                player_id: player_id,
+                table_id: $(this).data('table_id')
+            })
+        } else {
+            $('#menu_request_exchange').addClass('d-none')
+            socket.emit('setup-table-change', {
+                action: 'prohibit_exchange',
+                player_id: player_id,
+                table_id: $(this).data('table_id')
+            })
+        }
+    })
+
     // enable debugging if user is admin
     $(document).on('click', '#switch_enable_debugging', function () {
         if (this.checked) {
@@ -834,7 +853,6 @@ $(document).ready(function () {
     })
 
     $(document).on('click', '#button_show_cards', function () {
-        console.log('show_cards')
         socket.emit('show-cards', {
             player_id: player_id,
             table_id: $(this).data('table_id')

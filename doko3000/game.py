@@ -364,6 +364,7 @@ class Round(Document):
             self['with_9'] = False
             # even if not logical too just keep the undo setting here too to keep the table/round-settings together
             self['allow_undo'] = True
+            self['allow_exchange'] = True
             # timestamp as checksum to avoid mess on client side if new cards are dealed
             # every deal gets its own timestamp to make cards belonging together
             self['cards_timestamp'] = 0
@@ -467,6 +468,19 @@ class Round(Document):
             self['allow_undo'] = value
         else:
             self['allow_undo'] = False
+        self.save()
+
+    @property
+    def allow_exchange(self):
+        # better via .get() in case the table is not updated yet
+        return self.get('allow_exchange', True)
+
+    @allow_exchange.setter
+    def allow_exchange(self, value):
+        if type(value) == bool:
+            self['allow_exchange'] = value
+        else:
+            self['allow_exchange'] = False
         self.save()
 
     @property

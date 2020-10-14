@@ -186,6 +186,10 @@ def setup_table(msg):
             table.round.allow_undo = True
         elif action == 'prohibit_undo':
             table.round.allow_undo = False
+        elif action == 'allow_exchange':
+            table.round.allow_exchange = True
+        elif action == 'prohibit_exchange':
+            table.round.allow_exchange = False
         elif action == 'enable_debugging':
             table.is_debugging = True
         elif action == 'disable_debugging':
