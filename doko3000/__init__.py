@@ -61,6 +61,9 @@ def load_user(id):
         return None
 
 
+#
+# ------------ Socket.io events ------------
+#
 @socketio.on('who-am-i')
 def who_am_i():
     if not current_user.is_anonymous:
@@ -114,7 +117,11 @@ def played_card(msg):
         is_last_turn = table.round.current_trick.is_last_turn()
         current_player_id = table.round.get_current_player_id()
         idle_players = table.idle_players
-        cards_table = table.round.current_trick.get_cards()
+        if not table.round.cards_shown:
+            cards_table = table.round.current_trick.get_cards()
+        else:
+            # cards_shown contains cqrds-showing player_id
+            cards_table = game.players[table.round.cards_shown].get_cards()
         played_cards = table.round.get_played_cards()
         cards_timestamp = table.round.cards_timestamp
         sync_count = table.increase_sync_count()
@@ -319,7 +326,11 @@ def deal_cards_to_player(msg):
             # spectator mode
             players = table.round.players
             players_cards = table.round.get_players_shuffled_cards()
-            cards_table = table.round.current_trick.get_cards()
+            if not table.round.cards_shown:
+                cards_table = table.round.current_trick.get_cards()
+            else:
+                # cards_shown contains cqrds-showing player_id
+                cards_table = game.players[table.round.cards_shown].get_cards()
             mode = 'spectator'
             event = 'sorry-no-cards-for-you',
             payload = {'sync_count': sync_count,
@@ -603,6 +614,52 @@ def round_reset(msg):
                           room=request.sid)
 
 
+@socketio.on('request-show-hand')
+def request_show_hand(msg):
+    player = game.players.get(msg.get('player_id'))
+    table = game.tables.get(msg.get('table_id'))
+    if player and \
+            table and \
+            player.id in table.players:
+        sync_count = table.sync_count
+        # ask player if cards really should be shown
+        socketio.emit('really-show-cards',
+                      {'table_id': table.id,
+                       'sync_count': sync_count,
+                       'html': render_template('round/request_show_cards.html',
+                                               table=table)},
+                      room=request.sid)
+
+@socketio.on('show-cards')
+def show_cards(msg):
+    player = game.players.get(msg.get('player_id'))
+    table = game.tables.get(msg.get('table_id'))
+    if player and \
+            table and \
+            player.id in table.players:
+        table.show_cards(player)
+        sync_count = table.sync_count
+        cards_timestamp = table.round.cards_timestamp
+        cards_table = game.players[player.id].get_cards()
+        event = 'cards-shown-by-user',
+        payload = {'table_id': table.id,
+                   'sync_count': sync_count,
+                   'html': {'cards_table': render_template('cards/table.html',
+                                                           cards_table=cards_table,
+                                                           table=table,
+                                                           cards_timestamp=cards_timestamp)
+                            }}
+        room = table.id
+        # debugging...
+        if table.is_debugging:
+            table.log(event, payload, room)
+        # ...and action
+        socketio.emit(event, payload, room=room)
+
+
+#
+# ------------ Routes ------------
+#
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = Login()
@@ -664,7 +721,11 @@ def table(table_id=''):
                                     not table.round.is_finished()
             current_player_id = table.round.current_player
             cards_hand = player.get_cards()
-            cards_table = table.round.current_trick.get_cards()
+            if not table.round.cards_shown:
+                cards_table = table.round.current_trick.get_cards()
+            else:
+                # cards_shown contains cqrds-showing player_id
+                cards_table = game.players[table.round.cards_shown].get_cards()
             cards_timestamp = table.round.cards_timestamp
             mode = 'player'
             return render_template('table.html',

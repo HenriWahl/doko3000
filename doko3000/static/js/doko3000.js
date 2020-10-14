@@ -102,6 +102,10 @@ $(document).ready(function () {
         }
     })
 
+    //
+    // ------------ Socket.io events ------------
+    //
+
     socket.on('connect', function () {
         // revalidate user ID
         socket.emit('who-am-i')
@@ -303,6 +307,14 @@ $(document).ready(function () {
         $('#modal_dialog').modal('show')
     })
 
+    socket.on('really-show-cards', function (msg) {
+        if (check_sync(msg)) {
+            $('.overlay-notification').addClass('d-none')
+            $('#modal_body').html(msg.html)
+            $("#modal_dialog").modal('show')
+        }
+    })
+
     socket.on('change-password-successful', function (msg) {
         $('#button_change_password').removeClass('btn-outline-primary')
         $('#button_change_password').removeClass('btn-outline-danger')
@@ -320,6 +332,16 @@ $(document).ready(function () {
         $('#indicate_change_password_successful').addClass('d-none')
         $('#submit_change_password').addClass('d-none')
     })
+
+    socket.on('cards-shown-by-user', function (msg) {
+        if (check_sync(msg)) {
+            $('#table').html(msg.html.cards_table)
+        }
+    })
+
+    //
+    // ------------ Document events ------------
+    //
 
     $(document).on('click', '.button-enter-table', function () {
         let table_id = $(this).data('table_id')
@@ -802,5 +824,20 @@ $(document).ready(function () {
         })
         // dummy return just in case
         return false
+    })
+
+    $(document).on('click', '#menu_request_show_hand', function () {
+        socket.emit('request-show-hand', {
+            player_id: player_id,
+            table_id: $(this).data('table_id')
+        })
+    })
+
+    $(document).on('click', '#button_show_cards', function () {
+        console.log('show_cards')
+        socket.emit('show-cards', {
+            player_id: player_id,
+            table_id: $(this).data('table_id')
+        })
     })
 })

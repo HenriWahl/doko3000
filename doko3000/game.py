@@ -370,6 +370,8 @@ class Round(Document):
             # statistics of current round
             self['stats'] = {'score': {},
                              'tricks': {}}
+            # cards shown by any player - if any cards are shown it contains the cards showing player_id
+            self['cards_shown'] = False
             # initialize
             self.reset(players=players)
         elif document_id:
@@ -484,6 +486,14 @@ class Round(Document):
         return self['stats']
 
     @property
+    def cards_shown(self):
+        return self.get('cards_shown', False)
+
+    @cards_shown.setter
+    def cards_shown(self, value):
+        self['cards_shown'] = value
+
+    @property
     def current_trick(self):
         """
         enable access to current trick
@@ -507,6 +517,9 @@ class Round(Document):
 
         # counting all turns
         self.turn_count = 0
+
+        # at the beginning of course no card is shown
+        self.cards_shown = False
 
         # counting all tricks
         # starting with first trick number 1
@@ -954,7 +967,14 @@ class Table(Document):
         self.players_ready = []
         self.save()
 
-    def log(self, *args):
+    def show_cards(self, player):
+        """
+        show cards of player on table
+        """
+        self.round.cards_shown = player.id
+        self.increase_sync_count()
+
+    def log(*args):
         print(args)
 
 
