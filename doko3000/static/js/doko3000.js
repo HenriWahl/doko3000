@@ -166,6 +166,10 @@ $(document).ready(function () {
             if (!msg.idle_players.includes(player_id)) {
                 $('#button_claim_trick').removeClass('d-none').fadeOut(1).delay(1500).fadeIn(1)
             }
+        } else if (msg.cards_shown) {
+            cards_locked = true
+            $('#turn_indicator').addClass('d-none')
+            $('#button_claim_trick').addClass('d-none')
         } else {
             cards_locked = false
             if (player_id == current_player_id) {
@@ -336,12 +340,15 @@ $(document).ready(function () {
     socket.on('cards-shown-by-user', function (msg) {
         if (check_sync(msg)) {
             $('#table').html(msg.html.cards_table)
+            cards_locked = true
+            $('#turn_indicator').addClass('d-none')
+            $('#button_claim_trick').addClass('d-none')
         }
     })
 
-    //
-    // ------------ Document events ------------
-    //
+//
+// ------------ Document events ------------
+//
 
     $(document).on('click', '.button-enter-table', function () {
         let table_id = $(this).data('table_id')
@@ -364,12 +371,12 @@ $(document).ready(function () {
             })
     })
 
-    // set focus onto defined form field
+// set focus onto defined form field
     $('#modal_dialog').on('shown.bs.modal', function () {
         $('.form-focus').focus()
     })
 
-    // create new table
+// create new table
     $(document).on('click', '#button_create_table', function () {
         $.getJSON('/create/table', function (data, status) {
             if (status == 'success') {
@@ -381,7 +388,7 @@ $(document).ready(function () {
         return false
     })
 
-    // parameter 'json' makes it equivalent to non-existing .postJSON
+// parameter 'json' makes it equivalent to non-existing .postJSON
     $(document).on('click', '#button_finish_create_table', function () {
         // parameter 'json' makes it equivalent to .getJSON
         // because there is no .postJSON but .post(..., 'json') so it will be the same for GET and POST here
@@ -403,7 +410,7 @@ $(document).ready(function () {
         return false
     })
 
-    // draggable list of players in setup table dialog
+// draggable list of players in setup table dialog
     $(document).on('click', '.setup-table', function () {
         $.getJSON('/setup/table/' + encodeURIComponent($(this).data('table_id')), function (data, status) {
             if (status == 'success' && data.allowed) {
@@ -433,7 +440,7 @@ $(document).ready(function () {
         return false
     })
 
-    // lock table number of players
+// lock table number of players
     $(document).on('click', '#table_lock', function () {
         if (this.checked) {
             $('#table_lock_icon').removeClass('oi-lock-unlocked')
@@ -454,7 +461,7 @@ $(document).ready(function () {
         }
     })
 
-    // enable playing with card '9'
+// enable playing with card '9'
     $(document).on('click', '#switch_card_9', function () {
         if (this.checked) {
             socket.emit('setup-table-change', {
@@ -471,7 +478,7 @@ $(document).ready(function () {
         }
     })
 
-    // allow undoing a trick when wrong card was played
+// allow undoing a trick when wrong card was played
     $(document).on('click', '#switch_allow_undo', function () {
         if (this.checked) {
             $('#menu_request_undo').removeClass('d-none')
@@ -490,7 +497,7 @@ $(document).ready(function () {
         }
     })
 
-    // enable exchange option
+// enable exchange option
     $(document).on('click', '#switch_allow_exchange', function () {
         if (this.checked) {
             $('#menu_request_exchange').removeClass('d-none')
@@ -509,7 +516,7 @@ $(document).ready(function () {
         }
     })
 
-    // enable debugging if user is admin
+// enable debugging if user is admin
     $(document).on('click', '#switch_enable_debugging', function () {
         if (this.checked) {
             socket.emit('setup-table-change', {
@@ -527,7 +534,7 @@ $(document).ready(function () {
     })
 
 
-    // delete a player in the draggable players order
+// delete a player in the draggable players order
     $(document).on('click', '.button-remove-player-from-table', function () {
         if (player_id != $(this).data('player_id')) {
             // used too if player leaves table via menu
@@ -541,7 +548,7 @@ $(document).ready(function () {
         }
     })
 
-    // create new user
+// create new user
     $(document).on('click', '#button_create_player', function () {
         $.getJSON('/create/player', function (data, status) {
             if (status == 'success') {
@@ -553,19 +560,19 @@ $(document).ready(function () {
         return false
     })
 
-    // take player id as password
+// take player id as password
     $(document).on('click', '#button_password_from_player', function () {
         $('#new_player_password').val($('#new_player_id').val())
         return false
     })
 
-    // create random password
+// create random password
     $(document).on('click', '#button_password_from_random', function () {
         $('#new_player_password').val(btoa(Math.random()).substr(5, 8))
         return false
     })
 
-    // parameter 'json' makes it equivalent to non-existing .postJSON
+// parameter 'json' makes it equivalent to non-existing .postJSON
     $(document).on('click', '#button_finish_create_player', function () {
         // parameter 'json' makes it equivalent to .getJSON
         // because there is no .postJSON but .post(..., 'json') so it will be the same for GET and POST here
@@ -587,7 +594,7 @@ $(document).ready(function () {
         return false
     })
 
-    // delete a player in the players list
+// delete a player in the players list
     $(document).on('click', '.button-delete-player', function () {
         if (player_id != $(this).data('player_id')) {
             $.getJSON('/delete/player/' + encodeURIComponent($(this).data('player_id')),
@@ -601,7 +608,7 @@ $(document).ready(function () {
         }
     })
 
-    // really delete player after safety dialog
+// really delete player after safety dialog
     $(document).on('click', '#button_really_delete_player', function () {
         if (player_id != $(this).data('player_id')) {
             // once again the .post + 'json' move
@@ -622,7 +629,7 @@ $(document).ready(function () {
         return false
     })
 
-    // delete a player in the players list
+// delete a player in the players list
     $(document).on('click', '.button-delete-table', function () {
         $.getJSON('/delete/table/' + encodeURIComponent($(this).data('table_id')),
             function (data, status) {
@@ -634,7 +641,7 @@ $(document).ready(function () {
             })
     })
 
-    // really delete table after safety dialog
+// really delete table after safety dialog
     $(document).on('click', '#button_really_delete_table', function () {
         // once again the .post + 'json' move
         $.post('/delete/table/' + encodeURIComponent($(this).data('table_id')),
@@ -686,7 +693,7 @@ $(document).ready(function () {
         return false
     })
 
-    // reload page after setup
+// reload page after setup
     $(document).on('click', '#button_finish_table_setup', function () {
         if (!location.pathname.startsWith('/table/')) {
             $.getJSON('/get/tables',
@@ -698,7 +705,7 @@ $(document).ready(function () {
         }
     })
 
-    // player setup
+// player setup
     $(document).on('click', '.setup-player', function () {
         $.getJSON('/setup/player/' + encodeURIComponent($(this).data('player_id')), function (data, status) {
             if (status == 'success') {
@@ -708,7 +715,7 @@ $(document).ready(function () {
         })
     })
 
-    // change password
+// change password
     $(document).on('click', '#button_change_password', function () {
         socket.emit('setup-player-change', {
             action: 'new_password',
@@ -717,7 +724,7 @@ $(document).ready(function () {
         })
     })
 
-    // reset password change button when password gets changed
+// reset password change button when password gets changed
     $(document).on('keyup', '#new_player_password', function () {
         $('#button_change_password').addClass('btn-outline-primary')
         $('#button_change_password').removeClass('btn-outline-success')
@@ -727,7 +734,7 @@ $(document).ready(function () {
         $('#indicate_change_password_failed').addClass('d-none')
     })
 
-    // make player an admin
+// make player an admin
     $(document).on('click', '#switch_player_is_admin', function () {
         if (this.checked) {
             socket.emit('setup-player-change', {
@@ -742,7 +749,7 @@ $(document).ready(function () {
         }
     })
 
-    // let player allow spectators
+// let player allow spectators
     $(document).on('click', '#switch_player_allows_spectators', function () {
         if (this.checked) {
             socket.emit('setup-player-change', {

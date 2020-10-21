@@ -117,13 +117,14 @@ def played_card(msg):
         is_last_turn = table.round.current_trick.is_last_turn()
         current_player_id = table.round.get_current_player_id()
         idle_players = table.idle_players
-        if not table.round.cards_shown:
-            cards_table = table.round.current_trick.get_cards()
-        else:
+        if table.round.cards_shown:
             # cards_shown contains cqrds-showing player_id
             cards_table = game.players[table.round.cards_shown].get_cards()
+        else:
+            cards_table = table.round.current_trick.get_cards()
         played_cards = table.round.get_played_cards()
         cards_timestamp = table.round.cards_timestamp
+        cards_shown = table.round.cards_shown
         sync_count = table.increase_sync_count()
         event = 'played-card-by-user',
         payload = {'player_id': player.id,
@@ -134,6 +135,7 @@ def played_card(msg):
                    'current_player_id': current_player_id,
                    'idle_players': idle_players,
                    'played_cards': played_cards,
+                   'cards_shown': cards_shown,
                    'sync_count': sync_count,
                    'html': {'cards_table': render_template('cards/table.html',
                                                            cards_table=cards_table,
@@ -330,11 +332,11 @@ def deal_cards_to_player(msg):
             # spectator mode
             players = table.round.players
             players_cards = table.round.get_players_shuffled_cards()
-            if not table.round.cards_shown:
-                cards_table = table.round.current_trick.get_cards()
-            else:
+            if table.round.cards_shown:
                 # cards_shown contains cqrds-showing player_id
                 cards_table = game.players[table.round.cards_shown].get_cards()
+            else:
+                cards_table = table.round.current_trick.get_cards()
             mode = 'spectator'
             event = 'sorry-no-cards-for-you',
             payload = {'sync_count': sync_count,
@@ -725,11 +727,12 @@ def table(table_id=''):
                                     not table.round.is_finished()
             current_player_id = table.round.current_player
             cards_hand = player.get_cards()
-            if not table.round.cards_shown:
-                cards_table = table.round.current_trick.get_cards()
-            else:
+            if table.round.cards_shown:
                 # cards_shown contains cqrds-showing player_id
                 cards_table = game.players[table.round.cards_shown].get_cards()
+            else:
+                cards_table = table.round.current_trick.get_cards()
+
             cards_timestamp = table.round.cards_timestamp
             mode = 'player'
             return render_template('table.html',
