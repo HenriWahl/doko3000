@@ -758,7 +758,11 @@ def table(table_id=''):
         else:
             players = table.round.players
             players_cards = table.round.get_players_shuffled_cards()
-            cards_table = table.round.current_trick.get_cards()
+            if table.round.cards_shown:
+                # cards_shown contains cqrds-showing player_id
+                cards_table = game.players[table.round.cards_shown].get_cards()
+            else:
+                cards_table = table.round.current_trick.get_cards()
             mode = 'spectator'
             return render_template('table.html',
                                    title=f"{app.config['TITLE']} {table.name}",

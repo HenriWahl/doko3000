@@ -343,7 +343,11 @@ $(document).ready(function () {
 
     socket.on('cards-shown-by-user', function (msg) {
         if (check_sync(msg)) {
-            $('#table').html(msg.html.cards_table)
+            if ($('.mode-spectator').hasClass('d-none')) {
+                $('#table').html(msg.html.cards_table)
+            } else {
+                $('#table_spectator').html(msg.html.cards_table)
+            }
             cards_locked = true
             $('#turn_indicator').addClass('d-none')
             $('#button_claim_trick').addClass('d-none')
