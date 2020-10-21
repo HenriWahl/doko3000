@@ -195,7 +195,21 @@ $(document).ready(function () {
     socket.on('your-cards-please', function (msg) {
         current_player_id = msg.current_player_id
         if (check_sync(msg)) {
-            cards_locked = false
+            if (msg.cards_shown) {
+                cards_locked = true
+            } else {
+                cards_locked = false
+            }
+            if (player_id == current_player_id && !cards_locked) {
+                $('#turn_indicator').removeClass('d-none')
+            } else {
+                $('#turn_indicator').addClass('d-none')
+            }
+            if (msg.trick_claiming_needed && !cards_locked) {
+                $('#button_claim_trick').removeClass('d-none').fadeOut(1).delay(1500).fadeIn(1)
+            } else {
+                $('#button_claim_trick').addClass('d-none')
+            }
             $('.mode-spectator').addClass('d-none')
             $('.mode-player').removeClass('d-none')
             $('#hud_players').html(msg.html.hud_players)
@@ -204,20 +218,10 @@ $(document).ready(function () {
             $('#hand').html(msg.html.cards_hand)
             $('#button_claim_trick').addClass('d-none')
             $('#modal_dialog').modal('hide')
-            if (player_id == current_player_id) {
-                $('#turn_indicator').removeClass('d-none')
-            } else {
-                $('#turn_indicator').addClass('d-none')
-            }
             if (player_id == msg.dealer && msg.dealing_needed) {
                 $('#button_deal_cards_again').removeClass('d-none')
             } else {
                 $('#button_deal_cards_again').addClass('d-none')
-            }
-            if (msg.trick_claiming_needed) {
-                $('#button_claim_trick').removeClass('d-none').fadeOut(1).delay(1500).fadeIn(1)
-            } else {
-                $('#button_claim_trick').addClass('d-none')
             }
         }
     })

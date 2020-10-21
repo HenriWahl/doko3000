@@ -289,9 +289,14 @@ def deal_cards_to_player(msg):
         sync_count = table.sync_count
         if player.id in table.round.players:
             cards_hand = player.get_cards()
-            cards_table = []
+            if table.round.cards_shown:
+                # cards_shown contains cqrds-showing player_id
+                cards_table = game.players[table.round.cards_shown].get_cards()
+            else:
+                cards_table = []
             mode = 'player'
             dealing_needed = table.round.turn_count == 0
+            cards_shown = table.round.cards_shown
             # if one trick right now was finished the claim-trick-button should be displayed again
             trick_claiming_needed = table.round.turn_count % 4 == 0 and \
                                     table.round.turn_count > 0 and \
@@ -304,6 +309,7 @@ def deal_cards_to_player(msg):
                        'dealer': dealer,
                        'dealing_needed': dealing_needed,
                        'trick_claiming_needed': trick_claiming_needed,
+                       'cards_shown': cards_shown,
                        'sync_count': sync_count,
                        'html': {'cards_hand': render_template('cards/hand.html',
                                                               cards_hand=cards_hand,
@@ -732,8 +738,8 @@ def table(table_id=''):
                 cards_table = game.players[table.round.cards_shown].get_cards()
             else:
                 cards_table = table.round.current_trick.get_cards()
-
             cards_timestamp = table.round.cards_timestamp
+            cards_shown = table.round.cards_shown
             mode = 'player'
             return render_template('table.html',
                                    title=f"{app.config['TITLE']} {table.name}",
@@ -746,6 +752,7 @@ def table(table_id=''):
                                    cards_hand=cards_hand,
                                    cards_table=cards_table,
                                    cards_timestamp=cards_timestamp,
+                                   cards_shown=cards_shown,
                                    game=game,
                                    mode=mode)
         else:
