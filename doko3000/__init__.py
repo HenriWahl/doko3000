@@ -480,7 +480,6 @@ def ready_for_next_round(msg):
             table and \
             player.id == current_user.get_id():
         table.add_ready_player(player.id)
-        game.players[player.id].remove_all_cards()
         dealer = table.dealer
         next_players = table.order[:4]
         number_of_rows = max(len(next_players), len(table.idle_players))
@@ -641,6 +640,7 @@ def request_show_hand(msg):
                        'html': render_template('round/request_show_cards.html',
                                                table=table)},
                       room=request.sid)
+
 
 @socketio.on('show-cards')
 def show_cards(msg):

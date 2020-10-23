@@ -46,7 +46,7 @@ class Deck:
              'König': 4,
              'Ass': 11}
     NUMBER = 2  # Doppelkopf :-)!
-    # NUMBER = 1 # Debugging
+    #NUMBER = 1 # Debugging
     cards = {}
 
     # counter for card IDs in deck
@@ -221,7 +221,7 @@ class Player(UserMixin, Document):
                 try:
                     for card_id in self.cards:
                         cards.append(Deck.cards[card_id])
-                except KeyError:
+                except KeyError as error:
                     # cards might have been here from debugging or an earlier game - just reset them
                     cards = []
                     self.cards = cards
@@ -526,7 +526,7 @@ class Round(Document):
         used by __init__ and by table at start of a new round
         """
         # if more than 4 players they change for every round
-        # changing too because of the position of dealer changes with every round
+        # changing too because of the position of player changes with every round
         self.players = players
 
         # counting all turns
@@ -604,10 +604,10 @@ class Round(Document):
             self.game.players[player_id].eichel_ober_count = 0
             for card_id in range(self.cards_per_player):
                 # cards are given to players, segmented by range
-                self.game.players[player_id].cards = self.cards[player_count * self.cards_per_player: \
-                                                                player_count * self.cards_per_player + \
+                self.game.players[player_id].cards = self.cards[player_count * self.cards_per_player:
+                                                                player_count * self.cards_per_player +
                                                                 self.cards_per_player]
-            # raiser counter for Eichel Ober cards if player has one or two
+            # raise counter for Eichel Ober cards if player has one or two
             for card_id in self.game.players[player_id].cards:
                 if Deck.cards[card_id].name == 'Eichel-Ober':
                     self.game.players[player_id].eichel_ober_count += 1
@@ -966,7 +966,8 @@ class Table(Document):
         """
         last dealer is moved to the end of the players list
         """
-        self.order.append(self.order.pop(0))
+        # self.order.append(self.order.pop(0))
+        self.order = self.order[1:] + self.order[:1]
         self.save()
 
     def add_ready_player(self, player_id):
