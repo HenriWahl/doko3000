@@ -204,6 +204,8 @@ def setup_table(msg):
             table.start()
             sync_count = table.sync_count
             # just tell everybody to get personal cards
+            # for unknown reason this does not seem to be necessary because the connection
+            # gets lost in every case and client just tries to reconnect
             socketio.emit('grab-your-cards',
                           {'table_id': table.id,
                            'sync_count': sync_count},
