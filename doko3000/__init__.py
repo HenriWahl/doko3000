@@ -118,69 +118,60 @@ def who_am_i():
 
 @socketio.on('played-card')
 def played_card(msg):
-    card_id = msg.get('card_id')
-    player = game.players.get(msg.get('player_id'))
-    table = game.tables.get(msg.get('table_id'))
-    if card_id in Deck.cards and \
-            player and \
-            table and \
-            player.table == table.id and \
-            len(table.round.current_trick.cards) < 4 and \
+    msg_ok, player, table = check_message(msg)
+    if msg_ok:
+        card_id = msg.get('card_id')
+        if card_id in Deck.cards and \
             current_user.get_id() == player.id == table.round.current_player:
-        table.round.current_trick.add_turn(player.id, card_id)
-        table.round.increase_turn_count()
-        card = Deck.cards[card_id]
-        player.remove_card(card.id)
-        is_last_turn = table.round.current_trick.is_last_turn()
-        # avoid jumping current player indicator in HUD
-        if len(table.round.current_trick.cards) < 4:
+            table.round.current_trick.add_turn(player.id, card_id)
+            table.round.increase_turn_count()
+            card = Deck.cards[card_id]
+            player.remove_card(card.id)
+            is_last_turn = table.round.current_trick.is_last_turn()
             current_player_id = table.round.get_current_player_id()
-        else:
-            current_player_id = player.id
-        idle_players = table.idle_players
-        if table.round.cards_shown:
-            # cards_shown contains cqrds-showing player_id
-            cards_table = game.players[table.round.cards_shown].get_cards()
-        else:
-            cards_table = table.round.current_trick.get_cards()
-        played_cards = table.round.get_played_cards()
-        cards_timestamp = table.round.cards_timestamp
-        cards_shown = table.round.cards_shown
-        sync_count = table.increase_sync_count()
-        event = 'played-card-by-user',
-        payload = {'player_id': player.id,
-                   'table_id': table.id,
-                   'card_id': card.id,
-                   'card_name': card.name,
-                   'is_last_turn': is_last_turn,
-                   'current_player_id': current_player_id,
-                   'idle_players': idle_players,
-                   'played_cards': played_cards,
-                   'cards_shown': cards_shown,
-                   'sync_count': sync_count,
-                   'html': {'cards_table': render_template('cards/table.html',
-                                                           cards_table=cards_table,
-                                                           table=table,
-                                                           cards_timestamp=cards_timestamp),
-                            'hud_players': render_template('top/hud_players.html',
-                                                           table=table,
-                                                           player=player,
-                                                           game=game,
-                                                           current_player_id=current_player_id)
-                            }}
-        room = table.id
-        # debugging...
-        if table.is_debugging:
-            table.log(event, payload, room)
-        # ...and action
-        socketio.emit(event, payload, room=room)
+            idle_players = table.idle_players
+            if table.round.cards_shown:
+                # cards_shown contains cqrds-showing player_id
+                cards_table = game.players[table.round.cards_shown].get_cards()
+            else:
+                cards_table = table.round.current_trick.get_cards()
+            played_cards = table.round.get_played_cards()
+            cards_timestamp = table.round.cards_timestamp
+            cards_shown = table.round.cards_shown
+            sync_count = table.increase_sync_count()
+            event = 'played-card-by-user',
+            payload = {'player_id': player.id,
+                       'table_id': table.id,
+                       'card_id': card.id,
+                       'card_name': card.name,
+                       'is_last_turn': is_last_turn,
+                       'current_player_id': current_player_id,
+                       'idle_players': idle_players,
+                       'played_cards': played_cards,
+                       'cards_shown': cards_shown,
+                       'sync_count': sync_count,
+                       'html': {'cards_table': render_template('cards/table.html',
+                                                               cards_table=cards_table,
+                                                               table=table,
+                                                               cards_timestamp=cards_timestamp),
+                                'hud_players': render_template('top/hud_players.html',
+                                                               table=table,
+                                                               player=player,
+                                                               game=game,
+                                                               current_player_id=current_player_id)
+                                }}
+            room = table.id
+            # debugging...
+            if table.is_debugging:
+                table.log(event, payload, room)
+            # ...and action
+            socketio.emit(event, payload, room=room)
 
 
 @socketio.on('enter-table')
 def enter_table_socket(msg):
-    player = game.players.get(msg.get('player_id'))
-    table = game.tables.get(msg.get('table_id'))
-    if player and table:
+    msg_ok, player, table = check_message(msg)
+    if msg_ok:
         if (table.locked and player.id in table.players) or \
                 not table.locked:
             game.tables[table.id].add_player(player.id)
@@ -235,6 +226,9 @@ def setup_table(msg):
 
 @socketio.on('setup-player-change')
 def setup_player(msg):
+    """
+    player settings might be set from admin too, so there is no check if current_user.id == player.id
+    """
     action = msg.get('action')
     player = game.players.get(msg.get('player_id'))
     if player:
@@ -261,8 +255,8 @@ def setup_player(msg):
 
 @socketio.on('deal-cards')
 def deal_cards(msg):
-    table = game.tables.get(msg.get('table_id'))
-    if table:
+    msg_ok, player, table = check_message(msg)
+    if msg_ok:
         table.reset_round()
         # table increases its sync_count when resetting round
         sync_count = table.sync_count
@@ -280,8 +274,8 @@ def deal_cards(msg):
 
 @socketio.on('deal-cards-again')
 def deal_cards_again(msg):
-    table = game.tables.get(msg.get('table_id'))
-    if table:
+    msg_ok, player, table = check_message(msg)
+    if msg_ok:
         sync_count = table.sync_count
         # ask dealer if really should be re-dealt
         socketio.emit('really-deal-again',
@@ -297,13 +291,8 @@ def deal_cards_to_player(msg):
     """
     give player cards after requesting them
     """
-    player = game.players.get(msg.get('player_id'))
-    table = game.tables.get(msg.get('table_id'))
-    if player and \
-            table and \
-            player.table == table.id and \
-            player.id == current_user.get_id() and \
-            player.id in table.players:
+    msg_ok, player, table = check_message(msg)
+    if msg_ok:
         dealer = table.dealer
         # just in case
         join_room(table.id)
@@ -399,24 +388,6 @@ def deal_cards_to_player(msg):
             socketio.emit(event, payload, room=room)
 
 
-# @socketio.on('sorted-cards')
-# def sorted_cards(msg):
-#     """
-#     while player sorts cards every card placed somewhere causes transmission of current card sort order
-#     which gets saved here
-#     """
-#     player = game.players.get(msg.get('player_id'))
-#     table = game.tables.get(msg.get('table_id'))
-#     if player and table:
-#         if player.id == current_user.get_id() and \
-#                 player.id in game.players and \
-#                 player.table == table.id:
-#             cards_hand_ids = msg.get('cards_hand_ids')
-#             if set(cards_hand_ids) == set(player.cards):
-#                 player.cards = cards_hand_ids
-#                 player.save()
-
-
 @socketio.on('sorted-cards')
 def sorted_cards(msg):
     """
@@ -433,70 +404,61 @@ def sorted_cards(msg):
 
 @socketio.on('claim-trick')
 def claimed_trick(msg):
-    player = game.players.get(msg.get('player_id'))
-    table = game.tables.get(msg.get('table_id'))
-    if player and \
-            table and \
-            player.id == current_user.get_id():
-        if player.id in table.round.players:
-            sync_count = table.increase_sync_count()
-            if not table.round.is_finished():
-                # when ownership changes it does at previous trick because normally there is a new one created
-                # so the new one becomes the current one and the reclaimed is the previous
-                if not len(table.round.current_trick.cards) == 0:
-                    # old trick, freshly claimed
-                    table.round.current_trick.owner = player.id
-                    # new trick for next turns
-                    table.round.add_trick(player.id)
-                else:
-                    # apparently the ownership of the previous trick is not clear - change it
-                    table.round.previous_trick.owner = player.id
-                    table.round.current_player = player.id
-                cards_timestamp = table.round.cards_timestamp
-                cards_table = []
-                table.round.calculate_trick_order()
-                table.round.calculate_stats()
-                socketio.emit('next-trick',
-                              {'current_player_id': player.id,
-                               'score': table.round.stats['score'],
-                               'table_id': table.id,
-                               'sync_count': sync_count,
-                               'html': {'hud_players': render_template('top/hud_players.html',
-                                                                       table=table,
-                                                                       player=player,
-                                                                       game=game,
-                                                                       current_player_id=player.id),
-                                        'cards_table': render_template('cards/table.html',
-                                                                       cards_table=cards_table,
-                                                                       table=table,
-                                                                       cards_timestamp=cards_timestamp)
-                                        }},
-                              room=table.id)
-            else:
+    msg_ok, player, table = check_message(msg)
+    if msg_ok:
+        sync_count = table.increase_sync_count()
+        if not table.round.is_finished():
+            # when ownership changes it does at previous trick because normally there is a new one created
+            # so the new one becomes the current one and the reclaimed is the previous
+            if not len(table.round.current_trick.cards) == 0:
+                # old trick, freshly claimed
                 table.round.current_trick.owner = player.id
-                players = game.players
-                table.round.calculate_stats()
-                table.shift_players()
-                # tell everybody stats and wait for everybody confirming next round
-                socketio.emit('round-finished',
-                              {'table_id': table.id,
-                               'sync_count': sync_count,
-                               'html': render_template('round/score.html',
-                                                       table=table,
-                                                       players=players)
-                               },
-                              room=table.id)
+                # new trick for next turns
+                table.round.add_trick(player.id)
+            else:
+                # apparently the ownership of the previous trick is not clear - change it
+                table.round.previous_trick.owner = player.id
+                table.round.current_player = player.id
+            cards_timestamp = table.round.cards_timestamp
+            cards_table = []
+            table.round.calculate_trick_order()
+            table.round.calculate_stats()
+            socketio.emit('next-trick',
+                          {'current_player_id': player.id,
+                           'score': table.round.stats['score'],
+                           'table_id': table.id,
+                           'sync_count': sync_count,
+                           'html': {'hud_players': render_template('top/hud_players.html',
+                                                                   table=table,
+                                                                   player=player,
+                                                                   game=game,
+                                                                   current_player_id=player.id),
+                                    'cards_table': render_template('cards/table.html',
+                                                                   cards_table=cards_table,
+                                                                   table=table,
+                                                                   cards_timestamp=cards_timestamp)
+                                    }},
+                          room=table.id)
+        else:
+            table.round.current_trick.owner = player.id
+            players = game.players
+            table.round.calculate_stats()
+            table.shift_players()
+            # tell everybody stats and wait for everybody confirming next round
+            socketio.emit('round-finished',
+                          {'table_id': table.id,
+                           'sync_count': sync_count,
+                           'html': render_template('round/score.html',
+                                                   table=table,
+                                                   players=players)
+                           },
+                          room=table.id)
 
 
 @socketio.on('need-final-result')
 def send_final_result(msg):
-    player = game.players.get(msg.get('player_id'))
-    table = game.tables.get(msg.get('table_id'))
-    if player and \
-            table and \
-            player.id in table.round.players and \
-            player.id == current_user.get_id() and \
-            player.table == table.id:
+    msg_ok, player, table = check_message(msg)
+    if msg_ok:
         players = game.players
         sync_count = table.sync_count
         # tell single player stats and wait for everybody confirming next round
@@ -512,12 +474,8 @@ def send_final_result(msg):
 
 @socketio.on('ready-for-next-round')
 def ready_for_next_round(msg):
-    player = game.players.get(msg.get('player_id'))
-    table = game.tables.get(msg.get('table_id'))
-    if player and \
-            table and \
-            player.id in table.round.players and \
-            player.id == current_user.get_id():
+    msg_ok, player, table = check_message(msg)
+    if msg_ok:
         table.add_ready_player(player.id)
         dealer = table.dealer
         next_players = table.order[:4]
@@ -541,12 +499,8 @@ def ready_for_next_round(msg):
 
 @socketio.on('request-round-finish')
 def request_round_finish(msg):
-    player = game.players.get(msg.get('player_id'))
-    table = game.tables.get(msg.get('table_id'))
-    if player and \
-            table and \
-            player.id in table.round.players and \
-            player.id == current_user.get_id():
+    msg_ok, player, table = check_message(msg)
+    if msg_ok:
         # clear list of ready players for next poll
         table.reset_ready_players()
         # just tell everybody to get personal cards
@@ -560,12 +514,8 @@ def request_round_finish(msg):
 
 @socketio.on('ready-for-round-finish')
 def round_finish(msg):
-    player = game.players.get(msg.get('player_id'))
-    table = game.tables.get(msg.get('table_id'))
-    if player and \
-            table and \
-            player.id in table.round.players and \
-            player.id == current_user.get_id():
+    msg_ok, player, table = check_message(msg)
+    if msg_ok:
         table.add_ready_player(player.id)
         if set(table.players_ready) >= set(table.round.players):
             table.shift_players()
@@ -591,12 +541,8 @@ def round_finish(msg):
 
 @socketio.on('request-round-reset')
 def request_round_reset(msg):
-    player = game.players.get(msg.get('player_id'))
-    table = game.tables.get(msg.get('table_id'))
-    if player and \
-            table and \
-            player.id in table.round.players and \
-            player.id == current_user.get_id():
+    msg_ok, player, table = check_message(msg)
+    if msg_ok:
         # clear list of ready players for next poll
         table.reset_ready_players()
         # just tell everybody to get personal cards
@@ -610,12 +556,8 @@ def request_round_reset(msg):
 
 @socketio.on('ready-for-round-reset')
 def round_reset(msg):
-    player = game.players.get(msg.get('player_id'))
-    table = game.tables.get(msg.get('table_id'))
-    if player and \
-            table and \
-            player.id in table.players and \
-            player.id == current_user.get_id():
+    msg_ok, player, table = check_message(msg)
+    if msg_ok:
         table.add_ready_player(player.id)
         if set(table.players_ready) >= set(table.round.players):
             table.reset_round()
@@ -634,12 +576,8 @@ def round_reset(msg):
 
 @socketio.on('request-undo')
 def request_undo(msg):
-    player = game.players.get(msg.get('player_id'))
-    table = game.tables.get(msg.get('table_id'))
-    if player and \
-            table and \
-            player.id in table.round.players and \
-            player.id == current_user.get_id():
+    msg_ok, player, table = check_message(msg)
+    if msg_ok:
         # makes only sense if there was any card played yet
         if table.round.turn_count > 0:
             # clear list of ready players for next poll
@@ -655,12 +593,8 @@ def request_undo(msg):
 
 @socketio.on('ready-for-undo')
 def round_reset(msg):
-    player = game.players.get(msg.get('player_id'))
-    table = game.tables.get(msg.get('table_id'))
-    if player and \
-            table and \
-            player.id in table.round.players and \
-            player.id == current_user.get_id():
+    msg_ok, player, table = check_message(msg)
+    if msg_ok:
         table.add_ready_player(player.id)
         if set(table.players_ready) >= set(table.round.players):
             table.round.undo()
@@ -675,12 +609,8 @@ def round_reset(msg):
 
 @socketio.on('request-show-hand')
 def request_show_hand(msg):
-    player = game.players.get(msg.get('player_id'))
-    table = game.tables.get(msg.get('table_id'))
-    if player and \
-            table and \
-            player.id in table.round.players and \
-            player.id == current_user.get_id():
+    msg_ok, player, table = check_message(msg)
+    if msg_ok:
         sync_count = table.sync_count
         # ask player if cards really should be shown
         socketio.emit('really-show-cards',
@@ -693,12 +623,8 @@ def request_show_hand(msg):
 
 @socketio.on('show-cards')
 def show_cards(msg):
-    player = game.players.get(msg.get('player_id'))
-    table = game.tables.get(msg.get('table_id'))
-    if player and \
-            table and \
-            player.id in table.round.players and \
-            player.id == current_user.get_id():
+    msg_ok, player, table = check_message(msg)
+    if msg_ok:
         table.show_cards(player)
         sync_count = table.sync_count
         cards_timestamp = table.round.cards_timestamp
