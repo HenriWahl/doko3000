@@ -820,7 +820,6 @@ $(document).ready(function () {
         return false
     })
 
-
     $(document).on('click', '#menu_request_round_finish', function () {
         socket.emit('request-round-finish', {
             player_id: player_id,
@@ -874,6 +873,13 @@ $(document).ready(function () {
 
     $(document).on('click', '#button_show_cards', function () {
         socket.emit('show-cards', {
+            player_id: player_id,
+            table_id: $(this).data('table_id')
+        })
+    })
+
+    $(document).on('click', '#menu_request_exchange', function () {
+        socket.emit('request-exchange', {
             player_id: player_id,
             table_id: $(this).data('table_id')
         })
