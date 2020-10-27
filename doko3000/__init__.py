@@ -60,11 +60,12 @@ def load_user(id):
     except KeyError:
         return None
 
+
 # no decorator possible for socketio.on-events so make this a function
 def check_message(msg):
     """
-    check if message is correctly send from player
-    tries to avoid permanently recurring code
+    check if message is correctly sent from player
+    tries to avoid permanently repeated code
     """
     player = game.players.get(msg.get('player_id'))
     table = game.tables.get(msg.get('table_id'))
@@ -76,6 +77,7 @@ def check_message(msg):
         return True, player, table
     else:
         return False, player, table
+
 
 #
 # ------------ Socket.io events ------------
@@ -122,7 +124,7 @@ def played_card(msg):
     if msg_ok:
         card_id = msg.get('card_id')
         if card_id in Deck.cards and \
-            current_user.get_id() == player.id == table.round.current_player:
+                current_user.get_id() == player.id == table.round.current_player:
             table.round.current_trick.add_turn(player.id, card_id)
             table.round.increase_turn_count()
             card = Deck.cards[card_id]
@@ -182,6 +184,9 @@ def enter_table_socket(msg):
 
 @socketio.on('setup-table-change')
 def setup_table(msg):
+    """
+    Table can be set up from lobby so it makes no sense to limit setup by using check_message()
+    """
     player = game.players.get(msg.get('player_id'))
     table = game.tables.get(msg.get('table_id'))
     action = msg.get('action')
@@ -278,7 +283,7 @@ def deal_cards_again(msg):
     if msg_ok:
         sync_count = table.sync_count
         # ask dealer if really should be re-dealt
-        socketio.emit('really-deal-again',
+        socketio.emit('confirm-deal-again',
                       {'table_id': table.id,
                        'sync_count': sync_count,
                        'html': render_template('round/request_deal_again.html',
@@ -533,10 +538,6 @@ def round_finish(msg):
                                                    game=game,
                                                    number_of_rows=number_of_rows)},
                           room=table.id)
-        else:
-            socketio.emit('please-hold-the-line',
-                          {'table_id': table.id},
-                          room=request.sid)
 
 
 @socketio.on('request-round-reset')
@@ -566,12 +567,6 @@ def round_reset(msg):
                           {'table_id': table.id,
                            'sync_count': sync_count},
                           room=table.id)
-        else:
-            sync_count = table.sync_count
-            socketio.emit('please-hold-the-line',
-                          {'table_id': table.id,
-                           'sync_count': sync_count},
-                          room=request.sid)
 
 
 @socketio.on('request-undo')
@@ -601,10 +596,6 @@ def round_reset(msg):
             socketio.emit('grab-your-cards',
                           {'table_id': table.id},
                           room=table.id)
-        else:
-            socketio.emit('please-hold-the-line',
-                          {'table_id': table.id},
-                          room=request.sid)
 
 
 @socketio.on('request-show-hand')
@@ -613,7 +604,7 @@ def request_show_hand(msg):
     if msg_ok:
         sync_count = table.sync_count
         # ask player if cards really should be shown
-        socketio.emit('really-show-cards',
+        socketio.emit('confirm-show-cards',
                       {'table_id': table.id,
                        'sync_count': sync_count,
                        'html': render_template('round/request_show_cards.html',
@@ -647,7 +638,24 @@ def show_cards(msg):
 
 @socketio.on('request-exchange')
 def request_exchange(msg):
-    pass
+    msg_ok, player, table = check_message(msg)
+    if msg_ok:
+        sync_count = table.sync_count
+        hochzeit = table.round.has_hochzeit()
+        exchange_type = 'contra'
+        if not hochzeit:
+            if player.eichel_ober_count == 1:
+                exchange_type = 're'
+        # ask player if exchange really should be started
+        socketio.emit('confirm-exchange',
+                      {'table_id': table.id,
+                       'sync_count': sync_count,
+                       'html': render_template('round/request_exchange.html',
+                                               table=table,
+                                               hochzeit=hochzeit,
+                                               exchange_type=exchange_type
+        )},
+                      room=request.sid)
 
 
 #

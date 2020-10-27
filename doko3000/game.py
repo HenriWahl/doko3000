@@ -649,6 +649,18 @@ class Round(Document):
         """
         return self.turn_count == 0
 
+    def has_hochzeit(self):
+        """
+        check if any player has 2 Eichel Ober cards which means a Hochzeit
+        necessary for exchanges - if someone a Hochzeit no exchange is possible
+        """
+        hochzeit = False
+        for player in self.players:
+            if self.game.players[player].eichel_ober_count == 2:
+                hochzeit = True
+                break
+        return hochzeit
+
     def calculate_stats(self):
         """
         get score and tricks count of players for display
