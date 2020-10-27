@@ -118,7 +118,7 @@ def who_am_i():
             socketio.emit(event, payload, room=room)
 
 
-@socketio.on('played-card')
+@socketio.on('card-played')
 def played_card(msg):
     msg_ok, player, table = check_message(msg)
     if msg_ok:
@@ -141,7 +141,7 @@ def played_card(msg):
             cards_timestamp = table.round.cards_timestamp
             cards_shown = table.round.cards_shown
             sync_count = table.increase_sync_count()
-            event = 'played-card-by-user',
+            event = 'card-played-by-user',
             payload = {'player_id': player.id,
                        'table_id': table.id,
                        'card_id': card.id,
@@ -643,9 +643,9 @@ def request_exchange(msg):
         sync_count = table.sync_count
         hochzeit = table.round.has_hochzeit()
         exchange_type = 'contra'
-        if not hochzeit:
-            if player.eichel_ober_count == 1:
-                exchange_type = 're'
+        if not hochzeit and player.eichel_ober_count == 1:
+            exchange_type = 're'
+        card_played = table.round.turn_count > 0
         # ask player if exchange really should be started
         socketio.emit('confirm-exchange',
                       {'table_id': table.id,
@@ -653,7 +653,8 @@ def request_exchange(msg):
                        'html': render_template('round/request_exchange.html',
                                                table=table,
                                                hochzeit=hochzeit,
-                                               exchange_type=exchange_type
+                                               exchange_type=exchange_type,
+                                               card_played=card_played
         )},
                       room=request.sid)
 

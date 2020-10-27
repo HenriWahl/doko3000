@@ -1,20 +1,22 @@
-{% if hochzeit %}
-<div class="mb-3 text-center"><strong>Ein {{ exchange_type.title() }}-Austausch ist nicht möglich.</strong></div>
-<div class="row">
-    <div  class="col-6">
+
+{% if hochzeit or card_played %}
+    <div class="mb-3 text-center"><strong>Ein {{ exchange_type.title() }}-Austausch ist nicht möglich.</strong></div>
+    <div class="row">
+        <div class="col-6">
+        </div>
+        <div class="col-6" data-table_id="{{ table.id }}">
+            <button class="btn btn-outline-primary btn-block btn" data-dismiss="modal"><strong>Zurück</strong></button>
+        </div>
     </div>
-    <div class="col-6" data-table_id="{{ table.id }}">
-        <button class="btn btn-outline-danger btn-block" data-dismiss="modal"><strong>Nein</strong></button>
-    </div>
-</div>
 {% else %}
-<div class="mb-3 text-center"><strong>Soll ein {{ exchange_type.title() }}-Austausch vorgenommen werden?</strong></div>
-<div class="row">
-    <div  class="col-6" id="button_start_exchange" data-table_id="{{ table.id }}">
-        <button class="btn btn-outline-success btn-block" data-dismiss="modal"><strong>Ja</strong></button>
+    <div class="mb-3 text-center"><strong>Soll ein {{ exchange_type.title() }}-Austausch vorgenommen werden?</strong>
     </div>
-    <div class="col-6" data-table_id="{{ table.id }}">
-        <button class="btn btn-outline-danger btn-block" data-dismiss="modal"><strong>Nein</strong></button>
+    <div class="row">
+        <div class="col-6" id="button_start_exchange" data-table_id="{{ table.id }}">
+            <button class="btn btn-outline-success btn-block" data-dismiss="modal"><strong>Ja</strong></button>
+        </div>
+        <div class="col-6" data-table_id="{{ table.id }}">
+            <button class="btn btn-outline-danger btn-block" data-dismiss="modal"><strong>Nein</strong></button>
+        </div>
     </div>
-</div>
 {% endif %}

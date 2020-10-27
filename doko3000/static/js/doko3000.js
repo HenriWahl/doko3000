@@ -63,20 +63,15 @@ $(document).ready(function () {
             dragging_cards.cancel(true)
         } else if (source.id == 'hand' && target.id == 'table' && player_id == current_player_id && !cards_locked) {
             if ($(card).data('cards_timestamp') == $('#cards_table_timestamp').data('cards_timestamp')) {
-                // only accept card if not too many on table - might happen after reload
-                if ($('#table').children('.game-card').length <= 4) {
-                    $('#table').append(card)
-                    // add tooltip
-                    $(card).attr('title', player_id)
-                    socket.emit('played-card', {
-                        player_id: player_id,
-                        card_id: $(card).data('id'),
-                        card_name: $(card).data('name'),
-                        table_id: $(card).data('table_id')
-                    })
-                } else {
-                    dragging_cards.cancel(true)
-                }
+                $('#table').append(card)
+                // add tooltip
+                $(card).attr('title', player_id)
+                socket.emit('card-played', {
+                    player_id: player_id,
+                    card_id: $(card).data('id'),
+                    card_name: $(card).data('name'),
+                    table_id: $(card).data('table_id')
+                })
             } else {
                 // card does not belong to hand because the dealer dealed again while the card was dragged around
                 $(card).remove()
@@ -146,7 +141,7 @@ $(document).ready(function () {
         $('#list_tables').html(msg.html)
     })
 
-    socket.on('played-card-by-user', function (msg) {
+    socket.on('card-played-by-user', function (msg) {
         if (check_sync(msg)) {
             current_player_id = msg.current_player_id
             $('#hud_players').html(msg.html.hud_players)
@@ -327,6 +322,15 @@ $(document).ready(function () {
             $("#modal_dialog").modal('show')
         }
     })
+
+    socket.on('confirm-exchange', function (msg) {
+        if (check_sync(msg)) {
+            $('.overlay-notification').addClass('d-none')
+            $('#modal_body').html(msg.html)
+            $("#modal_dialog").modal('show')
+        }
+    })
+
 
     socket.on('change-password-successful', function (msg) {
         $('#button_change_password').removeClass('btn-outline-primary')
