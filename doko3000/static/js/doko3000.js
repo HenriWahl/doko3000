@@ -146,6 +146,7 @@ $(document).ready(function () {
             current_player_id = msg.current_player_id
             $('#hud_players').html(msg.html.hud_players)
             $('.overlay-button').addClass('d-none')
+            $('#menu_request_exchange').addClass('disabled')
 
             // either #table_spectator or #table are visible and may show the cards on table
             if ($('#table_spectator').hasClass('d-none')) {
