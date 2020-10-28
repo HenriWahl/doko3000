@@ -44,9 +44,12 @@ socketio = SocketIO(app,
                     ping_timeout=15,
                     ping_interval=2,
                     logger=True)
-
+# load game data from database after initialization
 game = Game(db)
 game.load_from_db()
+
+# keep track of players and their sessions to enable directly emitting a socketio event
+sessions = {}
 
 
 @login.user_loader
@@ -90,6 +93,8 @@ def who_am_i():
             table = game.tables.get(player.table)
             round_finished = False
             round_reset = False
+            # store player session for later usage
+            sessions[player.id] = request.sid
             # if player already sits on a table inform client
             if table:
                 current_player_id = table.round.current_player
@@ -638,6 +643,9 @@ def show_cards(msg):
 
 @socketio.on('request-exchange')
 def request_exchange(msg):
+    """
+    player asks for exchange
+    """
     msg_ok, player, table = check_message(msg)
     if msg_ok:
         sync_count = table.sync_count
@@ -659,12 +667,40 @@ def request_exchange(msg):
                       room=request.sid)
 
 
-@socketio.on('exchange-ask-peer')
+@socketio.on('exchange-start')
 def exchange_ask_peer(msg):
+    """
+    exchange peer has to be asked
+    """
     msg_ok, player, table = check_message(msg)
     if msg_ok:
-        peer = table.round.get_peer(player.id)
-        print(peer)
+        peer_id = table.round.get_peer(player.id)
+        sync_count = table.sync_count
+        hochzeit = table.round.has_hochzeit()
+        exchange_type = 'contra'
+        if not hochzeit and player.eichel_ober_count == 1:
+            exchange_type = 're'
+        # ask peer player if exchange is ok
+        socketio.emit('exchange-ask-peer',
+                      {'table_id': table.id,
+                       'sync_count': sync_count,
+                       'html': render_template('round/exchange_ask_peer.html',
+                                               game=game,
+                                               table=table,
+                                               exchange_type=exchange_type,
+                                               exchange_player_id=player.id
+        )},
+                      room=sessions.get(peer_id))
+
+
+@socketio.on('exchange-peer-ready')
+def exchange_peer_ready(msg):
+    """
+    exchange peer is willing and ready
+    """
+    msg_ok, player, table = check_message(msg)
+    if msg_ok:
+        pass
 
 #
 # ------------ Routes ------------

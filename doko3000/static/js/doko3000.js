@@ -362,6 +362,13 @@ $(document).ready(function () {
         }
     })
 
+    socket.on('exchange-ask-peer', function (msg) {
+        if (check_sync(msg)) {
+            $('.overlay-notification').addClass('d-none')
+            $('#modal_body').html(msg.html)
+            $("#modal_dialog").modal('show')
+        }
+    })
 //
 // ------------ Document events ------------
 //
@@ -889,7 +896,14 @@ $(document).ready(function () {
     })
 
     $(document).on('click', '#button_start_exchange', function () {
-        socket.emit('exchange-ask-peer', {
+        socket.emit('exchange-start', {
+            player_id: player_id,
+            table_id: $(this).data('table_id')
+        })
+    })
+
+    $(document).on('click', '#button_exchange_confirm_peer', function () {
+        socket.emit('exchange-peer-ready', {
             player_id: player_id,
             table_id: $(this).data('table_id')
         })
