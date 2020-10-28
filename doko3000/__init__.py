@@ -659,6 +659,13 @@ def request_exchange(msg):
                       room=request.sid)
 
 
+@socketio.on('exchange-ask-peer')
+def exchange_ask_peer(msg):
+    msg_ok, player, table = check_message(msg)
+    if msg_ok:
+        peer = table.round.get_peer(player.id)
+        print(peer)
+
 #
 # ------------ Routes ------------
 #

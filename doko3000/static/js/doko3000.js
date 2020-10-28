@@ -146,8 +146,6 @@ $(document).ready(function () {
             current_player_id = msg.current_player_id
             $('#hud_players').html(msg.html.hud_players)
             $('.overlay-button').addClass('d-none')
-            $('#menu_request_exchange').addClass('disabled')
-
             // either #table_spectator or #table are visible and may show the cards on table
             if ($('#table_spectator').hasClass('d-none')) {
                 $('#table').html(msg.html.cards_table)
@@ -885,6 +883,13 @@ $(document).ready(function () {
 
     $(document).on('click', '#menu_request_exchange', function () {
         socket.emit('request-exchange', {
+            player_id: player_id,
+            table_id: $(this).data('table_id')
+        })
+    })
+
+    $(document).on('click', '#button_start_exchange', function () {
+        socket.emit('exchange-ask-peer', {
             player_id: player_id,
             table_id: $(this).data('table_id')
         })

@@ -661,6 +661,19 @@ class Round(Document):
                 break
         return hochzeit
 
+    def get_peer(self, player_id):
+        """
+        returns the peer player of given player - if there is hochzeit return False
+        """
+        if self.has_hochzeit() or \
+                not player_id in self.players:
+            return False
+        for peer_player_id in [x for x in self.players if x != player_id]:
+            # the two players having the same number of Eichel Ober are peers
+            if self.game.players[peer_player_id].eichel_ober_count == self.game.players[player_id].eichel_ober_count:
+                break
+        return peer_player_id
+
     def calculate_stats(self):
         """
         get score and tricks count of players for display
