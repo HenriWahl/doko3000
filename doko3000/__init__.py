@@ -470,11 +470,10 @@ def send_final_result(msg):
     msg_ok, player, table = check_message(msg)
     if msg_ok:
         players = game.players
-        sync_count = table.sync_count
         # tell single player stats and wait for everybody confirming next round
         socketio.emit('round-finished',
                       {'table_id': table.id,
-                       'sync_count': sync_count,
+                       'sync_count': table.sync_count,
                        'html': render_template('round/score.html',
                                                table=table,
                                                players=players)
@@ -487,7 +486,6 @@ def ready_for_next_round(msg):
     msg_ok, player, table = check_message(msg)
     if msg_ok:
         table.add_ready_player(player.id)
-        dealer = table.dealer
         next_players = table.order[:4]
         number_of_rows = max(len(next_players), len(table.idle_players))
         if set(table.players_ready) >= set(table.round.players):
@@ -496,10 +494,10 @@ def ready_for_next_round(msg):
             # just tell everybody to get personal cards
         socketio.emit('start-next-round',
                       {'table_id': table.id,
-                       'dealer': dealer,
+                       'dealer': table.dealer,
                        'html': render_template('round/info.html',
                                                table=table,
-                                               dealer=dealer,
+                                               dealer=table.dealer,
                                                next_players=next_players,
                                                game=game,
                                                number_of_rows=number_of_rows)
@@ -529,14 +527,13 @@ def round_finish(msg):
         table.add_ready_player(player.id)
         if set(table.players_ready) >= set(table.round.players):
             table.shift_players()
-            dealer = table.dealer
             table.reset_ready_players()
             next_players = table.order[:4]
             number_of_rows = max(len(next_players), len(table.idle_players))
             # just tell everybody to get personal cards
             socketio.emit('start-next-round',
                           {'table_id': table.id,
-                           'dealer': dealer,
+                           'dealer': table.dealer,
                            'html': render_template('round/info.html',
                                                    table=table,
                                                    next_players=next_players,
@@ -567,10 +564,9 @@ def round_reset(msg):
         table.add_ready_player(player.id)
         if set(table.players_ready) >= set(table.round.players):
             table.reset_round()
-            sync_count = table.sync_count
             socketio.emit('grab-your-cards',
                           {'table_id': table.id,
-                           'sync_count': sync_count},
+                           'sync_count': table.sync_count},
                           room=table.id)
 
 
@@ -607,11 +603,10 @@ def round_reset(msg):
 def request_show_hand(msg):
     msg_ok, player, table = check_message(msg)
     if msg_ok:
-        sync_count = table.sync_count
         # ask player if cards really should be shown
         socketio.emit('confirm-show-cards',
                       {'table_id': table.id,
-                       'sync_count': sync_count,
+                       'sync_count': table.sync_count,
                        'html': render_template('round/request_show_cards.html',
                                                table=table)},
                       room=request.sid)
@@ -622,12 +617,11 @@ def show_cards(msg):
     msg_ok, player, table = check_message(msg)
     if msg_ok:
         table.show_cards(player)
-        sync_count = table.sync_count
         cards_timestamp = table.round.cards_timestamp
         cards_table = game.players[player.id].get_cards()
         event = 'cards-shown-by-user',
         payload = {'table_id': table.id,
-                   'sync_count': sync_count,
+                   'sync_count': table.sync_count,
                    'html': {'cards_table': render_template('cards/table.html',
                                                            cards_table=cards_table,
                                                            table=table,
@@ -648,7 +642,6 @@ def request_exchange(msg):
     """
     msg_ok, player, table = check_message(msg)
     if msg_ok:
-        sync_count = table.sync_count
         hochzeit = table.round.has_hochzeit()
         exchange_type = 'contra'
         if not hochzeit and player.eichel_ober_count == 1:
@@ -657,13 +650,13 @@ def request_exchange(msg):
         # ask player if exchange really should be started
         socketio.emit('confirm-exchange',
                       {'table_id': table.id,
-                       'sync_count': sync_count,
+                       'sync_count': table.sync_count,
                        'html': render_template('round/request_exchange.html',
                                                table=table,
                                                hochzeit=hochzeit,
                                                exchange_type=exchange_type,
                                                card_played=card_played
-        )},
+                                               )},
                       room=request.sid)
 
 
@@ -674,8 +667,7 @@ def exchange_ask_peer(msg):
     """
     msg_ok, player, table = check_message(msg)
     if msg_ok:
-        peer_id = table.round.get_peer(player.id)
-        sync_count = table.sync_count
+        player_2 = table.round.get_peer(player.id)
         hochzeit = table.round.has_hochzeit()
         exchange_type = 'contra'
         if not hochzeit and player.eichel_ober_count == 1:
@@ -683,14 +675,14 @@ def exchange_ask_peer(msg):
         # ask peer player if exchange is ok
         socketio.emit('exchange-ask-peer',
                       {'table_id': table.id,
-                       'sync_count': sync_count,
+                       'sync_count': table.sync_count,
                        'html': render_template('round/exchange_ask_peer.html',
                                                game=game,
                                                table=table,
                                                exchange_type=exchange_type,
                                                exchange_player_id=player.id
-        )},
-                      room=sessions.get(peer_id))
+                                               )},
+                      room=sessions.get(player_2))
 
 
 @socketio.on('exchange-peer-ready')
@@ -700,7 +692,15 @@ def exchange_peer_ready(msg):
     """
     msg_ok, player, table = check_message(msg)
     if msg_ok:
-        pass
+        # peer of peer is exchange starting player again
+        player_1 = table.round.get_peer(player.id)
+
+        # tell exchange initializing player to finally begin transaction
+        socketio.emit('exchange-source-start',
+                      {'table_id': table.id,
+                       'sync_count': table.sync_count},
+                      room=sessions.get(player_1))
+
 
 #
 # ------------ Routes ------------

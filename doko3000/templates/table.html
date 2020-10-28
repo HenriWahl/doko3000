@@ -2,6 +2,7 @@
 
 {% block main_content %}
 
+    {# store initial sync count in page as a robust way to initialize it #}
     <span id="sync_count" data-sync_count="{{ table.sync_count }}"></span>
 
     <div id="button_deal_cards_again" class="overlay-button justify-content-center
@@ -48,13 +49,13 @@
         {% set mode_player_visible = '' %}
     {% endif %}
 
-    <div id="table_hand">
-                <div class="container-fluid m-0 p-0 d-flex justify-content-center align-items-center mode-spectator {{ mode_spectator_visible }}"
-                 id="table_spectator">
-                {% if mode == 'spectator' %}
-                    {% include 'cards/table.html' %}
-                {% endif %}
-            </div>
+    <div id="table_and_hand">
+        <div class="container-fluid m-0 p-0 d-flex justify-content-center align-items-center mode-spectator {{ mode_spectator_visible }}"
+             id="table_spectator">
+            {% if mode == 'spectator' %}
+                {% include 'cards/table.html' %}
+            {% endif %}
+        </div>
         <div class="row align-items-center w-100 h-50 m-0 p-0">
             <div class="w-100 h-100 m-0 p-0 spectator-hand mode-spectator {{ mode_spectator_visible }}"
                  id="hand_spectator_upper">
@@ -67,6 +68,9 @@
                 {% if mode == 'player' %}
                     {% include 'cards/table.html' %}
                 {% endif %}
+            </div>
+            <div class="container-fluid w-100 h-100 m-0 p-0 d-flex justify-content-center align-items-center mode-player d-none bg-primary"
+                 id="table_exchange">
             </div>
         </div>
         <div class="row align-items-center w-100 h-50 m-0 p-0">
