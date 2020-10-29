@@ -693,13 +693,13 @@ def exchange_peer_ready(msg):
     msg_ok, player, table = check_message(msg)
     if msg_ok:
         # peer of peer is exchange starting player again
-        player_1 = table.round.get_peer(player.id)
+        player1 = table.round.get_peer(player.id)
 
         # tell exchange initializing player to finally begin transaction
-        socketio.emit('exchange-source-start',
+        socketio.emit('exchange-player1-start',
                       {'table_id': table.id,
                        'sync_count': table.sync_count},
-                      room=sessions.get(player_1))
+                      room=sessions.get(player1))
 
 
 #
