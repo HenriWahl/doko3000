@@ -115,7 +115,11 @@ def played_card(msg):
         card = Deck.cards[card_id]
         player.remove_card(card.id)
         is_last_turn = table.round.current_trick.is_last_turn()
-        current_player_id = table.round.get_current_player_id()
+        # avoid jumping current player indicator in HUD
+        if len(table.round.current_trick.cards) < 4:
+            current_player_id = table.round.get_current_player_id()
+        else:
+            current_player_id = player.id
         idle_players = table.idle_players
         if table.round.cards_shown:
             # cards_shown contains cqrds-showing player_id
