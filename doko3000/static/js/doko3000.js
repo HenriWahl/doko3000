@@ -362,7 +362,15 @@ $(document).ready(function () {
         }
     })
 
-    socket.on('exchange-ask-peer', function (msg) {
+    socket.on('exchange-ask-player2', function (msg) {
+        if (check_sync(msg)) {
+            $('.overlay-notification').addClass('d-none')
+            $('#modal_body').html(msg.html)
+            $("#modal_dialog").modal('show')
+        }
+    })
+
+    socket.on('exchange-player1-cancel', function (msg) {
         if (check_sync(msg)) {
             $('.overlay-notification').addClass('d-none')
             $('#modal_body').html(msg.html)
@@ -902,8 +910,15 @@ $(document).ready(function () {
         })
     })
 
-    $(document).on('click', '#button_exchange_confirm_peer', function () {
-        socket.emit('exchange-peer-ready', {
+    $(document).on('click', '#button_exchange_confirm_player2', function () {
+        socket.emit('exchange-player2-ready', {
+            player_id: player_id,
+            table_id: $(this).data('table_id')
+        })
+    })
+
+    $(document).on('click', '#button_exchange_deny_player2', function () {
+        socket.emit('exchange-player2-deny', {
             player_id: player_id,
             table_id: $(this).data('table_id')
         })

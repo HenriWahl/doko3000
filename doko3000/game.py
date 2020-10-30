@@ -173,30 +173,6 @@ class Player(UserMixin, Document):
                 return True
         return False
 
-    # @property
-    # def left(self):
-    #     return self['left']
-    #
-    # @left.setter
-    # def left(self, value):
-    #     self['left'] = value
-    #
-    # @property
-    # def right(self):
-    #     return self['right']
-    #
-    # @right.setter
-    # def right(self, value):
-    #     self['right'] = value
-    #
-    # @property
-    # def opposite(self):
-    #     return self['opposite']
-    #
-    # @opposite.setter
-    # def opposite(self, value):
-    #     self['opposite'] = value
-
     def set_password(self, password):
         """
         create hash of given password

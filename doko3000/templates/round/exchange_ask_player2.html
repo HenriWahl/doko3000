@@ -1,10 +1,10 @@
 <div class="mb-3 text-center"><strong>Soll ein {{ exchange_type.title() }}-Austausch mit {{ game.players[exchange_player_id].name }} vorgenommen werden?</strong>
 </div>
 <div class="row">
-    <div class="col-6" id="button_exchange_confirm_peer" data-table_id="{{ table.id }}">
+    <div class="col-6" id="button_exchange_confirm_player2" data-table_id="{{ table.id }}">
         <button class="btn btn-outline-success btn-block" data-dismiss="modal"><strong>Ja</strong></button>
     </div>
-    <div class="col-6" data-table_id="{{ table.id }}">
+    <div class="col-6" id="button_exchange_deny_player2" data-table_id="{{ table.id }}">
         <button class="btn btn-outline-danger btn-block" data-dismiss="modal"><strong>Nein</strong></button>
     </div>
 </div>

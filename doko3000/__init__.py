@@ -661,9 +661,9 @@ def request_exchange(msg):
 
 
 @socketio.on('exchange-start')
-def exchange_ask_peer(msg):
+def exchange_ask_player2(msg):
     """
-    exchange peer has to be asked
+    exchange peer player2 has to be asked
     """
     msg_ok, player, table = check_message(msg)
     if msg_ok:
@@ -672,11 +672,11 @@ def exchange_ask_peer(msg):
         exchange_type = 'contra'
         if not hochzeit and player.eichel_ober_count == 1:
             exchange_type = 're'
-        # ask peer player if exchange is ok
-        socketio.emit('exchange-ask-peer',
+        # ask peer player2 if exchange is ok
+        socketio.emit('exchange-ask-player2',
                       {'table_id': table.id,
                        'sync_count': table.sync_count,
-                       'html': render_template('round/exchange_ask_peer.html',
+                       'html': render_template('round/exchange_ask_player2.html',
                                                game=game,
                                                table=table,
                                                exchange_type=exchange_type,
@@ -685,14 +685,14 @@ def exchange_ask_peer(msg):
                       room=sessions.get(player_2))
 
 
-@socketio.on('exchange-peer-ready')
-def exchange_peer_ready(msg):
+@socketio.on('exchange-player2-ready')
+def exchange_player2_ready(msg):
     """
     exchange peer is willing and ready
     """
     msg_ok, player, table = check_message(msg)
     if msg_ok:
-        # peer of peer is exchange starting player again
+        # peer of peer is exchange starting player again - necessary because answer comes from player2
         player1 = table.round.get_peer(player.id)
 
         # tell exchange initializing player to finally begin transaction
@@ -701,6 +701,31 @@ def exchange_peer_ready(msg):
                        'sync_count': table.sync_count},
                       room=sessions.get(player1))
 
+
+@socketio.on('exchange-player2-deny')
+def exchange_player2_deny(msg):
+    """
+    exchange peer doesn't want to exchange
+    """
+    msg_ok, player, table = check_message(msg)
+    if msg_ok:
+        # peer of peer is exchange starting player again - necessary because answer comes from player2
+        player1 = table.round.get_peer(player.id)
+        hochzeit = table.round.has_hochzeit()
+        exchange_type = 'contra'
+        if not hochzeit and player.eichel_ober_count == 1:
+            exchange_type = 're'
+        # tell exchange initializing player to finally begin transaction
+        socketio.emit('exchange-player1-cancel',
+                      {'table_id': table.id,
+                       'sync_count': table.sync_count,
+                       'html': render_template('round/exchange_player2_deny.html',
+                                               game=game,
+                                               table=table,
+                                               exchange_type=exchange_type,
+                                               exchange_player_id=player.id
+                                               )},
+                      room=sessions.get(player1))
 
 #
 # ------------ Routes ------------
