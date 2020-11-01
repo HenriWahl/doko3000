@@ -63,15 +63,20 @@ $(document).ready(function () {
             dragging_cards.cancel(true)
         } else if (source.id == 'hand' && target.id == 'table' && player_id == current_player_id && !cards_locked) {
             if ($(card).data('cards_timestamp') == $('#cards_table_timestamp').data('cards_timestamp')) {
-                $('#table').append(card)
-                // add tooltip
-                $(card).attr('title', player_id)
-                socket.emit('card-played', {
-                    player_id: player_id,
-                    card_id: $(card).data('id'),
-                    card_name: $(card).data('name'),
-                    table_id: $(card).data('table_id')
-                })
+                // only accept card if not too many on table - might happen after reload
+                if ($('#table').children('.game-card').length <= 4) {
+                    $('#table').append(card)
+                    // add tooltip
+                    $(card).attr('title', player_id)
+                    socket.emit('card-played', {
+                        player_id: player_id,
+                        card_id: $(card).data('id'),
+                        card_name: $(card).data('name'),
+                        table_id: $(card).data('table_id')
+                    })
+                } else {
+                    dragging_cards.cancel(true)
+                }
             } else {
                 // card does not belong to hand because the dealer dealed again while the card was dragged around
                 $(card).remove()
@@ -141,11 +146,12 @@ $(document).ready(function () {
         $('#list_tables').html(msg.html)
     })
 
-    socket.on('card-played-by-user', function (msg) {
+    socket.on('played-card-by-user', function (msg) {
         if (check_sync(msg)) {
             current_player_id = msg.current_player_id
             $('#hud_players').html(msg.html.hud_players)
             $('.overlay-button').addClass('d-none')
+
             // either #table_spectator or #table are visible and may show the cards on table
             if ($('#table_spectator').hasClass('d-none')) {
                 $('#table').html(msg.html.cards_table)
@@ -239,7 +245,7 @@ $(document).ready(function () {
         }
     })
 
-    socket.on('confirm-deal-again', function (msg) {
+    socket.on('really-deal-again', function (msg) {
         if (check_sync(msg)) {
             $('.overlay-notification').addClass('d-none')
             $('#modal_body').html(msg.html)
@@ -314,22 +320,13 @@ $(document).ready(function () {
         $('#modal_dialog').modal('show')
     })
 
-    socket.on('confirm-show-cards', function (msg) {
+    socket.on('really-show-cards', function (msg) {
         if (check_sync(msg)) {
             $('.overlay-notification').addClass('d-none')
             $('#modal_body').html(msg.html)
             $("#modal_dialog").modal('show')
         }
     })
-
-    socket.on('confirm-exchange', function (msg) {
-        if (check_sync(msg)) {
-            $('.overlay-notification').addClass('d-none')
-            $('#modal_body').html(msg.html)
-            $("#modal_dialog").modal('show')
-        }
-    })
-
 
     socket.on('change-password-successful', function (msg) {
         $('#button_change_password').removeClass('btn-outline-primary')
@@ -362,21 +359,6 @@ $(document).ready(function () {
         }
     })
 
-    socket.on('exchange-ask-player2', function (msg) {
-        if (check_sync(msg)) {
-            $('.overlay-notification').addClass('d-none')
-            $('#modal_body').html(msg.html)
-            $("#modal_dialog").modal('show')
-        }
-    })
-
-    socket.on('exchange-player1-player2-deny', function (msg) {
-        if (check_sync(msg)) {
-            $('.overlay-notification').addClass('d-none')
-            $('#modal_body').html(msg.html)
-            $("#modal_dialog").modal('show')
-        }
-    })
 //
 // ------------ Document events ------------
 //
@@ -838,6 +820,7 @@ $(document).ready(function () {
         return false
     })
 
+
     $(document).on('click', '#menu_request_round_finish', function () {
         socket.emit('request-round-finish', {
             player_id: player_id,
@@ -891,34 +874,6 @@ $(document).ready(function () {
 
     $(document).on('click', '#button_show_cards', function () {
         socket.emit('show-cards', {
-            player_id: player_id,
-            table_id: $(this).data('table_id')
-        })
-    })
-
-    $(document).on('click', '#menu_request_exchange', function () {
-        socket.emit('request-exchange', {
-            player_id: player_id,
-            table_id: $(this).data('table_id')
-        })
-    })
-
-    $(document).on('click', '#button_start_exchange', function () {
-        socket.emit('exchange-start', {
-            player_id: player_id,
-            table_id: $(this).data('table_id')
-        })
-    })
-
-    $(document).on('click', '#button_exchange_confirm_player2', function () {
-        socket.emit('exchange-player2-ready', {
-            player_id: player_id,
-            table_id: $(this).data('table_id')
-        })
-    })
-
-    $(document).on('click', '#button_exchange_deny_player2', function () {
-        socket.emit('exchange-player2-deny', {
             player_id: player_id,
             table_id: $(this).data('table_id')
         })
