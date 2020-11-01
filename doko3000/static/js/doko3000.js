@@ -6,6 +6,8 @@ let sync_count = 0
 let current_player_id = ''
 // lock dragging of cards while waiting for trick being claimed
 let cards_locked = false
+// table mode, might be normal or exchange
+let table_mode = 'normal'
 
 // show alert messages
 function show_message(place, message) {
@@ -20,11 +22,7 @@ function clear_message(place) {
 }
 
 function check_sync(msg) {
-
-    console.log(sync_count, msg.sync_count, $('#sync_count').data('sync_count'))
-
     // check if message is in sync
-
     // if not set yet take sync_count from freshly loaded HTML id
     if (sync_count == 0) {
         sync_count = $('#sync_count').data('sync_count')
@@ -58,58 +56,73 @@ $(document).ready(function () {
         }
     ]);
     dragging_cards.on('drop', function (card, target, source) {
+        console.log('table_mode:', table_mode)
         // do not drag your gained tricks around
         if (card.id == 'cards_stack') {
             dragging_cards.cancel(true)
-        } else if (source.id == 'hand' && target.id == 'table' && player_id == current_player_id && !cards_locked) {
-            if ($(card).data('cards_timestamp') == $('#cards_table_timestamp').data('cards_timestamp')) {
-                // only accept card if not too many on table - might happen after reload
-                if ($('#table').children('.game-card').length <= 4) {
-                    $('#table').append(card)
-                    // add tooltip
-                    $(card).attr('title', player_id)
-                    socket.emit('card-played', {
+        }
+        if (table_mode == 'normal') {
+            if (source.id == 'hand' && target.id == 'table' && player_id == current_player_id && !cards_locked) {
+                if ($(card).data('cards_timestamp') == $('#cards_table_timestamp').data('cards_timestamp')) {
+                    // only accept card if not too many on table - might happen after reload
+                    if ($('#table').children('.game-card').length <= 4) {
+                        $('#table').append(card)
+                        // add tooltip
+                        $(card).attr('title', player_id)
+                        socket.emit('card-played', {
+                            player_id: player_id,
+                            card_id: $(card).data('id'),
+                            card_name: $(card).data('name'),
+                            table_id: $(card).data('table_id')
+                        })
+                    } else {
+                        dragging_cards.cancel(true)
+                    }
+                } else {
+                    // card does not belong to hand because the dealer dealed again while the card was dragged around
+                    $(card).remove()
+                }
+            } else if (source.id == 'hand' && target.id == 'hand') {
+                // check if card and hand have the same timestamp - otherwise someone dealed new cards
+                // and the dragged card does not belong to the current cards
+                if ($(card).data('cards_timestamp') == $('#cards_hand_timestamp').data('cards_timestamp')) {
+                    // get cards order to end it to server for storing it
+                    let cards_hand_ids = []
+                    for (let card_hand of $('#hand').children('.game-card-hand')) {
+                        cards_hand_ids.push($(card_hand).data('id'))
+                    }
+                    socket.emit('sorted-cards', {
                         player_id: player_id,
-                        card_id: $(card).data('id'),
-                        card_name: $(card).data('name'),
-                        table_id: $(card).data('table_id')
+                        table_id: $(card).data('table_id'),
+                        cards_hand_ids: cards_hand_ids
                     })
+                    // to avoid later mess (cards stack inside the cards at hand) move stack to end
+                    $('#cards_stack').appendTo('#hand')
+                    return true
+                } else {
+                    // card does not belong to hand because the dealer dealed again while the card was dragged around
+                    $(card).remove()
+                }
+            } else if (source.id == 'table' || cards_locked || player_id != current_player_id) {
+                dragging_cards.cancel(true)
+            }
+        } else if (table_mode == 'exchange') {
+            console.log('exchange')
+            if ($(card).data('cards_timestamp') == $('#cards_table_timestamp').data('cards_timestamp')) {
+                // only accept maximum of 3 cards
+                console.log($('#table').children('.game-card').length)
+                if ($('#table').children('.game-card').length <= 3) {
+
                 } else {
                     dragging_cards.cancel(true)
                 }
-            } else {
-                // card does not belong to hand because the dealer dealed again while the card was dragged around
-                $(card).remove()
             }
-        } else if (source.id == 'hand' && target.id == 'hand') {
-            // check if card and hand have the same timestamp - otherwise someone dealed new cards
-            // and the dragged card does not belong to the current cards
-            if ($(card).data('cards_timestamp') == $('#cards_hand_timestamp').data('cards_timestamp')) {
-                // get cards order to end it to server for storing it
-                let cards_hand_ids = []
-                for (let card_hand of $('#hand').children('.game-card-hand')) {
-                    cards_hand_ids.push($(card_hand).data('id'))
-                }
-                socket.emit('sorted-cards', {
-                    player_id: player_id,
-                    table_id: $(card).data('table_id'),
-                    cards_hand_ids: cards_hand_ids
-                })
-                // to avoid later mess (cards stack inside the cards at hand) move stack to end
-                $('#cards_stack').appendTo('#hand')
-                return true
-            } else {
-                // card does not belong to hand because the dealer dealed again while the card was dragged around
-                $(card).remove()
-            }
-        } else if (source.id == 'table' || cards_locked || player_id != current_player_id) {
-            dragging_cards.cancel(true)
         }
     })
 
-    //
-    // ------------ Socket.io events ------------
-    //
+//
+// ------------ Socket.io events ------------
+//
 
     socket.on('connect', function () {
         // revalidate user ID
@@ -383,6 +396,15 @@ $(document).ready(function () {
             $("#modal_dialog").modal('show')
         }
     })
+
+    socket.on('exchange-player1-start', function (msg) {
+        if (check_sync(msg)) {
+            $('.overlay-notification').addClass('d-none')
+
+            table_mode = 'exchange'
+        }
+    })
+
 
 //
 // ------------ Document events ------------
