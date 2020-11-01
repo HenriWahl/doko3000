@@ -22,7 +22,7 @@
     </div>
 
     <button id="turn_indicator" class="overlay-notification btn btn-block btn-lg text-white
-    {% if current_player_id != current_user.id or cards_shown %}
+    {% if current_player_id != current_user.id or cards_shown or cards_table|length >= 4 %}
     d-none
     {% endif %}
     ">Du bist am Zug

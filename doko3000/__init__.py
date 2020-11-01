@@ -109,6 +109,7 @@ def played_card(msg):
             player and \
             table and \
             player.table == table.id and \
+            len(table.round.current_trick.cards) < 4 and \
             current_user.get_id() == player.id == table.round.current_player:
         table.round.current_trick.add_turn(player.id, card_id)
         table.round.increase_turn_count()

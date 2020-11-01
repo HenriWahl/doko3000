@@ -63,15 +63,20 @@ $(document).ready(function () {
             dragging_cards.cancel(true)
         } else if (source.id == 'hand' && target.id == 'table' && player_id == current_player_id && !cards_locked) {
             if ($(card).data('cards_timestamp') == $('#cards_table_timestamp').data('cards_timestamp')) {
-                $('#table').append(card)
-                // add tooltip
-                $(card).attr('title', player_id)
-                socket.emit('played-card', {
-                    player_id: player_id,
-                    card_id: $(card).data('id'),
-                    card_name: $(card).data('name'),
-                    table_id: $(card).data('table_id')
-                })
+                // only accept card if not too many on table - might happen after reload
+                if ($('#table').children('.game-card').length <= 4) {
+                    $('#table').append(card)
+                    // add tooltip
+                    $(card).attr('title', player_id)
+                    socket.emit('played-card', {
+                        player_id: player_id,
+                        card_id: $(card).data('id'),
+                        card_name: $(card).data('name'),
+                        table_id: $(card).data('table_id')
+                    })
+                } else {
+                    dragging_cards.cancel(true)
+                }
             } else {
                 // card does not belong to hand because the dealer dealed again while the card was dragged around
                 $(card).remove()
