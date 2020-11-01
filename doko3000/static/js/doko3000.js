@@ -320,7 +320,15 @@ $(document).ready(function () {
         $('#modal_dialog').modal('show')
     })
 
-    socket.on('really-show-cards', function (msg) {
+    socket.on('confirm-show-cards', function (msg) {
+        if (check_sync(msg)) {
+            $('.overlay-notification').addClass('d-none')
+            $('#modal_body').html(msg.html)
+            $("#modal_dialog").modal('show')
+        }
+    })
+
+    socket.on('confirm-exchange', function (msg) {
         if (check_sync(msg)) {
             $('.overlay-notification').addClass('d-none')
             $('#modal_body').html(msg.html)
@@ -356,6 +364,23 @@ $(document).ready(function () {
             cards_locked = true
             $('#turn_indicator').addClass('d-none')
             $('#button_claim_trick').addClass('d-none')
+        }
+    })
+
+
+    socket.on('exchange-ask-player2', function (msg) {
+        if (check_sync(msg)) {
+            $('.overlay-notification').addClass('d-none')
+            $('#modal_body').html(msg.html)
+            $("#modal_dialog").modal('show')
+        }
+    })
+
+    socket.on('exchange-player1-player2-deny', function (msg) {
+        if (check_sync(msg)) {
+            $('.overlay-notification').addClass('d-none')
+            $('#modal_body').html(msg.html)
+            $("#modal_dialog").modal('show')
         }
     })
 
@@ -874,6 +899,33 @@ $(document).ready(function () {
 
     $(document).on('click', '#button_show_cards', function () {
         socket.emit('show-cards', {
+            player_id: player_id,
+            table_id: $(this).data('table_id')
+        })
+    })
+    $(document).on('click', '#menu_request_exchange', function () {
+        socket.emit('request-exchange', {
+            player_id: player_id,
+            table_id: $(this).data('table_id')
+        })
+    })
+
+    $(document).on('click', '#button_start_exchange', function () {
+        socket.emit('exchange-start', {
+            player_id: player_id,
+            table_id: $(this).data('table_id')
+        })
+    })
+
+    $(document).on('click', '#button_exchange_confirm_player2', function () {
+        socket.emit('exchange-player2-ready', {
+            player_id: player_id,
+            table_id: $(this).data('table_id')
+        })
+    })
+
+    $(document).on('click', '#button_exchange_deny_player2', function () {
+        socket.emit('exchange-player2-deny', {
             player_id: player_id,
             table_id: $(this).data('table_id')
         })

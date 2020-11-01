@@ -668,7 +668,7 @@ def exchange_ask_player2(msg):
     """
     msg_ok, player, table = check_message(msg)
     if msg_ok:
-        player_2 = table.round.get_peer(player.id)
+        player2 = table.round.get_peer(player.id)
         hochzeit = table.round.has_hochzeit()
         exchange_type = 'contra'
         if not hochzeit and player.eichel_ober_count == 1:
@@ -683,7 +683,7 @@ def exchange_ask_player2(msg):
                                                exchange_type=exchange_type,
                                                exchange_player_id=player.id
                                                )},
-                      room=sessions.get(player_2))
+                      room=sessions.get(player2))
 
 
 @socketio.on('exchange-player2-ready')
