@@ -716,7 +716,7 @@ def exchange_player2_deny(msg):
         if not hochzeit and player.eichel_ober_count == 1:
             exchange_type = 're'
         # tell exchange initializing player to finally begin transaction
-        socketio.emit('exchange-player1-cancel',
+        socketio.emit('exchange-player1-player2-deny',
                       {'table_id': table.id,
                        'sync_count': table.sync_count,
                        'html': render_template('round/exchange_player2_deny.html',

@@ -370,7 +370,7 @@ $(document).ready(function () {
         }
     })
 
-    socket.on('exchange-player1-cancel', function (msg) {
+    socket.on('exchange-player1-player2-deny', function (msg) {
         if (check_sync(msg)) {
             $('.overlay-notification').addClass('d-none')
             $('#modal_body').html(msg.html)
