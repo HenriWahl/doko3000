@@ -146,7 +146,7 @@ $(document).ready(function () {
         $('#list_tables').html(msg.html)
     })
 
-    socket.on('played-card-by-user', function (msg) {
+    socket.on('card-played-by-user', function (msg) {
         if (check_sync(msg)) {
             current_player_id = msg.current_player_id
             $('#hud_players').html(msg.html.hud_players)

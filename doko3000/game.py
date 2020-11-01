@@ -628,7 +628,7 @@ class Round(Document):
     def has_hochzeit(self):
         """
         check if any player has 2 Eichel Ober cards which means a Hochzeit
-        necessary for exchanges - if someone a Hochzeit no exchange is possible
+        necessary for exchanges - if someone has a Hochzeit no exchange is possible
         """
         hochzeit = False
         for player in self.players:
