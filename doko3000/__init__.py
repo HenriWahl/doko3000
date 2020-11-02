@@ -204,15 +204,25 @@ def exchange_player_cards(msg):
     if msg_ok:
         if table.round.exchange and \
                 player.party in table.round.exchange:
-            exchange = table.round.exchange(player.party)
-            if set(msg.get('cards_table_ids')) == set(exchange[player.id].cards):
+            exchange = table.round.exchange[player.party]
+            if set(msg.get('cards_table_ids')) == set(exchange[player.id]):
                 # get peer id to send cards to
                 peer_id = [x for x in exchange if x!= player.id][0]
+                peer = game.players[peer_id]
+                peer.cards += exchange[player.id]
+                cards_hand = peer.cards
+                cards_timestamp = table.round.cards_timestamp
+                cards_exchange_count = len(exchange[player.id])
                 event = 'exchange-player-cards-to-client'
                 payload = {'player_id': peer_id,
                            'table_id': table.id,
-                           'cards': exchange[player.id].cards
-                           }
+                           'cards_exchange_count': cards_exchange_count,
+                           'html': {'cards_hand': render_template('cards/hand.html',
+                                                                  cards_hand=cards_hand,
+                                                                  table=table,
+                                                                  player=player,
+                                                                  cards_timestamp=cards_timestamp),
+                                    }}
                 room = sessions.get(peer_id)
                 # debugging...
                 if table.is_debugging:

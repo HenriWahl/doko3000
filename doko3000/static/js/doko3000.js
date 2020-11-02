@@ -427,6 +427,16 @@ $(document).ready(function () {
         }
     })
 
+    socket.on('exchange-player-cards-to-client', function (msg) {
+        if (check_sync(msg)) {
+            $('.overlay-notification').addClass('d-none')
+            $('#button_exchange_send_cards').removeClass('d-none')
+            table_mode = 'exchange'
+            $('#hand').html(msg.html.cards_hand)
+            console.log(table_mode, cards_locked)
+        }
+    })
+
 
 //
 // ------------ Document events ------------
