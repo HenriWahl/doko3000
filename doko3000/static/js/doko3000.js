@@ -275,7 +275,7 @@ $(document).ready(function () {
         }
     })
 
-    socket.on('really-deal-again', function (msg) {
+    socket.on('confirm-deal-again', function (msg) {
         if (check_sync(msg)) {
             $('.overlay-notification').addClass('d-none')
             $('#modal_body').html(msg.html)

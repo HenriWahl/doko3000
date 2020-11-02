@@ -123,6 +123,18 @@ def who_am_i():
             socketio.emit(event, payload, room=room)
 
 
+@socketio.on('enter-table')
+def enter_table_socket(msg):
+    msg_ok, player, table = check_message(msg)
+    if msg_ok:
+        if (table.locked and player.id in table.players) or \
+                not table.locked:
+            game.tables[table.id].add_player(player.id)
+            join_room(table.id)
+            # check if any formerly locked table is now emtpy and should be unlocked
+            game.check_tables()
+
+
 @socketio.on('card-played')
 def played_card(msg):
     msg_ok, player, table = check_message(msg)
@@ -182,23 +194,11 @@ def card_exchanged(msg):
     if msg_ok:
         if table.round.exchange and \
                 player.party in table.round.exchange:
-            print(msg)
             cards_table_ids = msg.get('cards_table_ids')
             table.round.update_exchange(player.id, cards_table_ids)
-            print(msg)
 
 
 
-@socketio.on('enter-table')
-def enter_table_socket(msg):
-    msg_ok, player, table = check_message(msg)
-    if msg_ok:
-        if (table.locked and player.id in table.players) or \
-                not table.locked:
-            game.tables[table.id].add_player(player.id)
-            join_room(table.id)
-            # check if any formerly locked table is now emtpy and should be unlocked
-            game.check_tables()
 
 
 @socketio.on('setup-table-change')

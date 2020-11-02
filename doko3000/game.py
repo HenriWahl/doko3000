@@ -128,6 +128,10 @@ class Player(UserMixin, Document):
 
     @property
     def party(self):
+        # backward compatible
+        if 'party' not in self:
+            self['party'] = ''
+            self.save()
         return self.get('party', '')
 
     @party.setter
@@ -390,7 +394,7 @@ class Round(Document):
 
     @property
     def id(self):
-        return self['id']
+        return self.get('id', '')
 
     @property
     def players(self):
@@ -473,6 +477,10 @@ class Round(Document):
 
     @property
     def exchange(self):
+        # backward compatible
+        if 'exchange' not in self:
+            self['exchange'] = {}
+            self.save()
         return self.get('exchange', {})
 
     @exchange.setter
@@ -599,24 +607,25 @@ class Round(Document):
         # simple counter to deal cards to all players
         player_count = 0
         for player_id in self.players:
+            player = self.game.players[player_id]
             # reset counter for Eichel Ober cards
-            self.game.players[player_id].eichel_ober_count = 0
+            player.eichel_ober_count = 0
             for card_id in range(self.cards_per_player):
                 # cards are given to players, segmented by range
-                self.game.players[player_id].cards = self.cards[player_count * self.cards_per_player:
+                player.cards = self.cards[player_count * self.cards_per_player:
                                                                 player_count * self.cards_per_player +
                                                                 self.cards_per_player]
             # raise counter for Eichel Ober cards if player has one or two
-            for card_id in self.game.players[player_id].cards:
+            for card_id in player.cards:
                 if Deck.cards[card_id].name == 'Eichel-Ober':
-                    self.game.players[player_id].eichel_ober_count += 1
+                    player.eichel_ober_count += 1
 
             # find out player's party
-            self.game.players[player_id].party = 'contra'
-            if self.eichel_ober_count == 2:
-                self.game.players[player_id].party = 'hochzeit'
-            elif self.eichel_ober_count == 1:
-                self.game.players[player_id].party = 're'
+            player.party = 'contra'
+            if player.eichel_ober_count == 2:
+                player.party = 'hochzeit'
+            elif player.eichel_ober_count == 1:
+                player.party = 're'
 
             # next player
             player_count += 1
@@ -673,7 +682,7 @@ class Round(Document):
         returns the peer player of given player - if there is hochzeit return False
         """
         if self.has_hochzeit() or \
-                not player_id in self.players:
+                player_id not in self.players:
             return False
         for peer_player_id in [x for x in self.players if x != player_id]:
             # the two players having the same number of Eichel Ober are peers
@@ -686,11 +695,8 @@ class Round(Document):
         opens exchange for the party of the player
         """
         player = self.game.players[player_id]
-        # legacy necessity
-        if not 'exchange' in self:
-            self.reset_exchange()
         if not self.has_hochzeit() and \
-            not player.party in self.exchange:
+            player.party not in self.exchange:
             # just containing eschanged cards per exchange peer
             self.exchange[player.party] = {player.id: [],
                                            self.get_peer(player.id): []}
@@ -827,7 +833,7 @@ class Table(Document):
             # get document data from CouchDB
             self.fetch()
         # yes, table_id
-        if not self['id'] in self.game.rounds:
+        if self['id'] not in self.game.rounds:
             self.add_round()
         self.save()
 
@@ -1041,7 +1047,7 @@ class Table(Document):
         """
         organize players who are ready for the next round in a list
         """
-        if not player_id in self.players_ready:
+        if player_id not in self.players_ready:
             self.players_ready.append(player_id)
             self.save()
 
