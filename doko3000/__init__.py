@@ -176,6 +176,19 @@ def played_card(msg):
             socketio.emit(event, payload, room=room)
 
 
+@socketio.on('card-exchanged')
+def card_exchanged(msg):
+    msg_ok, player, table = check_message(msg)
+    if msg_ok:
+        if table.round.exchange and \
+                player.party in table.round.exchange:
+            print(msg)
+            cards_table_ids = msg.get('cards_table_ids')
+            table.round.update_exchange(player.id, cards_table_ids)
+            print(msg)
+
+
+
 @socketio.on('enter-table')
 def enter_table_socket(msg):
     msg_ok, player, table = check_message(msg)

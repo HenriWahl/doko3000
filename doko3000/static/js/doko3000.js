@@ -112,6 +112,23 @@ $(document).ready(function () {
                 // only accept maximum of 3 cards
                 console.log($('#table').children('.game-card').length)
                 if ($('#table').children('.game-card').length <= 3) {
+                    // get cards order to end it to server for storing it
+                    let cards_hand_ids = []
+                    for (let card_hand of $('#hand').children('.game-card-hand')) {
+                        cards_hand_ids.push($(card_hand).data('id'))
+                    }
+                    let cards_table_ids = []
+                    for (let card_table of $('#table').children('.game-card')) {
+                        cards_table_ids.push($(card_table).data('id'))
+                    }
+
+                    socket.emit('card-exchanged', {
+                        player_id: player_id,
+                        table_id: $(card).data('table_id'),
+                        cards_hand_ids: cards_hand_ids,
+                        cards_table_ids: cards_table_ids
+                    })
+                    console.log('cards_table_ids:', cards_table_ids)
 
                 } else {
                     dragging_cards.cancel(true)

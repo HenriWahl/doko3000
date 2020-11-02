@@ -90,6 +90,8 @@ class Player(UserMixin, Document):
             self['is_admin'] = False
             # let idle players see player's cards
             self['allows_spectators'] = True
+            # store party when dealing to keep track of player's party when exchanging cards
+            self['party'] = ''
             # # other players to the left, opposite and right of table
             # self['left'] = self['opposite'] = self['right'] = None
             self.save()
@@ -102,15 +104,15 @@ class Player(UserMixin, Document):
 
     @property
     def id(self):
-        return self['id']
+        return self.get('id', '')
 
     @property
     def name(self):
-        return self['name']
+        return self.get('name', '')
 
     @property
     def password_hash(self):
-        return self['password_hash']
+        return self.get('password_hash', '')
 
     @password_hash.setter
     def password_hash(self, value):
@@ -118,11 +120,19 @@ class Player(UserMixin, Document):
 
     @property
     def cards(self):
-        return self['cards']
+        return self.get('cards', [])
 
     @cards.setter
     def cards(self, value):
         self['cards'] = value
+
+    @property
+    def party(self):
+        return self.get('party', '')
+
+    @party.setter
+    def party(self, value):
+        self['party'] = value
 
     @property
     def is_admin(self):
@@ -161,18 +171,6 @@ class Player(UserMixin, Document):
     @eichel_ober_count.setter
     def eichel_ober_count(self, value):
         self['eichel_ober_count'] = value
-
-    @property
-    def party(self):
-        """
-        return the players party, one of contra, re or hochzeit
-        """
-        party = 'contra'
-        if self.eichel_ober_count == 2:
-            party = 'hochzeit'
-        elif self.eichel_ober_count == 1:
-            party = 're'
-        return party
 
     def is_playing(self):
         """
@@ -612,6 +610,14 @@ class Round(Document):
             for card_id in self.game.players[player_id].cards:
                 if Deck.cards[card_id].name == 'Eichel-Ober':
                     self.game.players[player_id].eichel_ober_count += 1
+
+            # find out player's party
+            self.game.players[player_id].party = 'contra'
+            if self.eichel_ober_count == 2:
+                self.game.players[player_id].party = 'hochzeit'
+            elif self.eichel_ober_count == 1:
+                self.game.players[player_id].party = 're'
+
             # next player
             player_count += 1
 
@@ -685,10 +691,21 @@ class Round(Document):
             self.reset_exchange()
         if not self.has_hochzeit() and \
             not player.party in self.exchange:
-            self.exchange[player.party] = {'player1': { 'id': player.id,
-                                                        'cards': [] },
-                                           'player2': {'id': self.get_peer(player.id),
-                                                       'cards': []}}
+            # just containing eschanged cards per exchange peer
+            self.exchange[player.party] = {player.id: [],
+                                           self.get_peer(player.id): []}
+            self.save()
+            return True
+        return False
+
+    def update_exchange(self, player_id, cards_ids):
+        """
+        modify exchange during players are dragging and dropping cards
+        """
+        player = self.game.players[player_id]
+        if player.party in self.exchange and \
+                player_id in self.exchange[player.party]:
+            self.exchange[player.party][player.id] = cards_ids
             self.save()
             return True
         return False
@@ -697,7 +714,7 @@ class Round(Document):
         """
         used to remove all open exchanges, for example at .reset()
         """
-        self['exchange'] = {}
+        self.exchange = {}
 
     def calculate_stats(self):
         """
