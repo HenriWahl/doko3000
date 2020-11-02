@@ -162,6 +162,18 @@ class Player(UserMixin, Document):
     def eichel_ober_count(self, value):
         self['eichel_ober_count'] = value
 
+    @property
+    def party(self):
+        """
+        return the players party, one of contra, re or hochzeit
+        """
+        party = 'contra'
+        if self.eichel_ober_count == 2:
+            party = 'hochzeit'
+        elif self.eichel_ober_count == 1:
+            party = 're'
+        return party
+
     def is_playing(self):
         """
         double-check if player sits at some table - make sure it can be deleted
@@ -349,6 +361,8 @@ class Round(Document):
                              'tricks': {}}
             # cards shown by any player - if any cards are shown it contains the cards showing player_id
             self['cards_shown'] = False
+            # store exchange data in extra sub-dict - defaults to empty, filled by .create_exchange()
+            self['exchange'] = {}
             # initialize
             self.reset(players=players)
         elif document_id:
@@ -460,6 +474,14 @@ class Round(Document):
         self.save()
 
     @property
+    def exchange(self):
+        return self.get('exchange', {})
+
+    @exchange.setter
+    def exchange (self, value):
+        self['exchange'] = value
+
+    @property
     def cards_timestamp(self):
         # no setter available, will be set by calculate_cards_timestamp()
         if not self.get('cards_timestamp'):
@@ -510,6 +532,9 @@ class Round(Document):
 
         # at the beginning of course no card is shown
         self.cards_shown = False
+
+        # at start there is no exchange
+        self.reset_exchange()
 
         # counting all tricks
         # starting with first trick number 1
@@ -649,6 +674,30 @@ class Round(Document):
             if self.game.players[peer_player_id].eichel_ober_count == self.game.players[player_id].eichel_ober_count:
                 break
         return peer_player_id
+
+    def create_exchange(self, player_id):
+        """
+        opens exchange for the party of the player
+        """
+        player = self.game.players[player_id]
+        # legacy necessity
+        if not 'exchange' in self:
+            self.reset_exchange()
+        if not self.has_hochzeit() and \
+            not player.party in self.exchange:
+            self.exchange[player.party] = {'player1': { 'id': player.id,
+                                                        'cards': [] },
+                                           'player2': {'id': self.get_peer(player.id),
+                                                       'cards': []}}
+            self.save()
+            return True
+        return False
+
+    def reset_exchange(self):
+        """
+        used to remove all open exchanges, for example at .reset()
+        """
+        self['exchange'] = {}
 
     def calculate_stats(self):
         """

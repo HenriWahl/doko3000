@@ -645,7 +645,7 @@ def request_exchange(msg):
     if msg_ok:
         hochzeit = table.round.has_hochzeit()
         exchange_type = 'contra'
-        if not hochzeit and player.eichel_ober_count == 1:
+        if not hochzeit and player.party == 're':
             exchange_type = 're'
         card_played = table.round.turn_count > 0
         # ask player if exchange really should be started
@@ -671,7 +671,7 @@ def exchange_ask_player2(msg):
         player2 = table.round.get_peer(player.id)
         hochzeit = table.round.has_hochzeit()
         exchange_type = 'contra'
-        if not hochzeit and player.eichel_ober_count == 1:
+        if not hochzeit and player.party == 're':
             exchange_type = 're'
         # ask peer player2 if exchange is ok
         socketio.emit('exchange-ask-player2',
@@ -695,12 +695,12 @@ def exchange_player2_ready(msg):
     if msg_ok:
         # peer of peer is exchange starting player again - necessary because answer comes from player2
         player1 = table.round.get_peer(player.id)
-
-        # tell exchange initializing player to finally begin transaction
-        socketio.emit('exchange-player1-start',
-                      {'table_id': table.id,
-                       'sync_count': table.sync_count},
-                      room=sessions.get(player1))
+        if table.round.create_exchange(player1):
+            # tell exchange initializing player to finally begin transaction
+            socketio.emit('exchange-player1-start',
+                          {'table_id': table.id,
+                           'sync_count': table.sync_count},
+                          room=sessions.get(player1))
 
 
 @socketio.on('exchange-player2-deny')
@@ -714,7 +714,7 @@ def exchange_player2_deny(msg):
         player1 = table.round.get_peer(player.id)
         hochzeit = table.round.has_hochzeit()
         exchange_type = 'contra'
-        if not hochzeit and player.eichel_ober_count == 1:
+        if not hochzeit and player.party == 're':
             exchange_type = 're'
         # tell exchange initializing player to finally begin transaction
         socketio.emit('exchange-player1-player2-deny',

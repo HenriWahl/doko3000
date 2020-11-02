@@ -400,7 +400,7 @@ $(document).ready(function () {
     socket.on('exchange-player1-start', function (msg) {
         if (check_sync(msg)) {
             $('.overlay-notification').addClass('d-none')
-
+            $('#button_exchange_send_cards').removeClass('d-none')
             table_mode = 'exchange'
         }
     })
