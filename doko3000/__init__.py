@@ -198,8 +198,27 @@ def card_exchanged(msg):
             table.round.update_exchange(player.id, cards_table_ids)
 
 
-
-
+@socketio.on('exchange-player-cards-to-server')
+def exchange_player_cards(msg):
+    msg_ok, player, table = check_message(msg)
+    if msg_ok:
+        if table.round.exchange and \
+                player.party in table.round.exchange:
+            exchange = table.round.exchange(player.party)
+            if set(msg.get('cards_table_ids')) == set(exchange[player.id].cards):
+                # get peer id to send cards to
+                peer_id = [x for x in exchange if x!= player.id][0]
+                event = 'exchange-player-cards-to-client'
+                payload = {'player_id': peer_id,
+                           'table_id': table.id,
+                           'cards': exchange[player.id].cards
+                           }
+                room = sessions.get(peer_id)
+                # debugging...
+                if table.is_debugging:
+                    table.log(event, payload, room)
+                # ...and action
+                socketio.emit(event, payload, room=room)
 
 @socketio.on('setup-table-change')
 def setup_table(msg):

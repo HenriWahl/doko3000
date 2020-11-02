@@ -111,7 +111,8 @@ $(document).ready(function () {
             if ($(card).data('cards_timestamp') == $('#cards_table_timestamp').data('cards_timestamp')) {
                 // only accept maximum of 3 cards
                 console.log($('#table').children('.game-card').length)
-                if ($('#table').children('.game-card').length <= 3) {
+                console.log(cards_locked)
+                if ($('#table').children('.game-card').length <= 3 && !cards_locked) {
                     // get cards order to end it to server for storing it
                     let cards_hand_ids = []
                     for (let card_hand of $('#hand').children('.game-card-hand')) {
@@ -131,9 +132,13 @@ $(document).ready(function () {
                     console.log('cards_table_ids:', cards_table_ids)
 
                 } else {
+                    // no more cards than 3
                     dragging_cards.cancel(true)
                 }
-            }
+            } else {
+                // no draggin' and droppin' if cards are locked due to waiting for peer's cards
+                    dragging_cards.cancel(true)
+                }
         }
     })
 
@@ -969,4 +974,25 @@ $(document).ready(function () {
             table_id: $(this).data('table_id')
         })
     })
+
+    // finally send cards to be exchanged to peer player
+    $(document).on('click', '#button_exchange_send_cards', function () {
+        // hide exchange button
+        $(this).addClass('d-none')
+        // get cards on table to check with server
+        let cards_table_ids = []
+        for (let card_table of $('#table').children('.game-card')) {
+            cards_table_ids.push($(card_table).data('id'))
+        }
+        // clear table
+        $('#table').html('')
+        // change to avoid more cards being put onto table
+        cards_locked = true
+        socket.emit('exchange-player-cards-to-server', {
+            player_id: player_id,
+            table_id: $(this).data('table_id'),
+            cards_table_ids: cards_table_ids
+        })
+    })
+
 })
