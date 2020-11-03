@@ -1002,6 +1002,9 @@ $(document).ready(function () {
     $(document).on('click', '#button_exchange_send_cards', function () {
         // hide exchange button
         $(this).addClass('d-none')
+
+        console.log(1 <= $('#table').children('.game-card').length <= 3)
+
         // get cards on table to check with server
         let cards_table_ids = []
         for (let card_table of $('#table').children('.game-card')) {
