@@ -210,7 +210,7 @@ def exchange_player_cards(msg):
                 peer_id = [x for x in exchange if x!= player.id][0]
                 peer = game.players[peer_id]
                 peer.cards += exchange[player.id]
-                cards_hand = peer.cards
+                cards_hand = [Deck.cards[x] for x in Deck.cards if x in peer.cards]
                 cards_timestamp = table.round.cards_timestamp
                 cards_exchange_count = len(exchange[player.id])
                 event = 'exchange-player-cards-to-client'

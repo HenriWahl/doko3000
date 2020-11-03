@@ -420,21 +420,23 @@ $(document).ready(function () {
     })
 
     socket.on('exchange-player1-start', function (msg) {
-        if (check_sync(msg)) {
+        // if (check_sync(msg)) {
             $('.overlay-notification').addClass('d-none')
             $('#button_exchange_send_cards').removeClass('d-none')
             table_mode = 'exchange'
-        }
+        // }
     })
 
     socket.on('exchange-player-cards-to-client', function (msg) {
-        if (check_sync(msg)) {
+        console.log('exchange-player-cards-to-client 1')
+        // if (check_sync(msg)) {
+            console.log('exchange-player-cards-to-client 2')
             $('.overlay-notification').addClass('d-none')
             $('#button_exchange_send_cards').removeClass('d-none')
             table_mode = 'exchange'
             $('#hand').html(msg.html.cards_hand)
             console.log(table_mode, cards_locked)
-        }
+        // }
     })
 
 
