@@ -8,6 +8,11 @@ let current_player_id = ''
 let cards_locked = false
 // table mode, might be normal or exchange
 let table_mode = 'normal'
+// minimum cards to be exchanged - only interesting for player2, who has to return the same amount of cards as given
+let exchange_min_cards = 1
+// maximum number of cards to exchange - for player2 depends on number of cards given by player1
+let exchange_max_cards = 3
+
 
 // show alert messages
 function show_message(place, message) {
@@ -112,7 +117,7 @@ $(document).ready(function () {
                 // only accept maximum of 3 cards
                 console.log($('#table').children('.game-card').length)
                 console.log(cards_locked)
-                if ($('#table').children('.game-card').length <= 3 && !cards_locked) {
+                if ($('#table').children('.game-card').length <= exchange_max_cards && !cards_locked) {
                     // get cards order to end it to server for storing it
                     let cards_hand_ids = []
                     for (let card_hand of $('#hand').children('.game-card-hand')) {
@@ -137,8 +142,8 @@ $(document).ready(function () {
                 }
             } else {
                 // no draggin' and droppin' if cards are locked due to waiting for peer's cards
-                    dragging_cards.cancel(true)
-                }
+                dragging_cards.cancel(true)
+            }
         }
     })
 
@@ -421,21 +426,27 @@ $(document).ready(function () {
 
     socket.on('exchange-player1-start', function (msg) {
         // if (check_sync(msg)) {
-            $('.overlay-notification').addClass('d-none')
-            $('#button_exchange_send_cards').removeClass('d-none')
-            table_mode = 'exchange'
+        $('.overlay-notification').addClass('d-none')
+        $('#button_exchange_send_cards').removeClass('d-none')
+        table_mode = 'exchange'
         // }
     })
 
     socket.on('exchange-player-cards-to-client', function (msg) {
         console.log('exchange-player-cards-to-client 1')
         // if (check_sync(msg)) {
-            console.log('exchange-player-cards-to-client 2')
-            $('.overlay-notification').addClass('d-none')
+        console.log('exchange-player-cards-to-client 2')
+        $('.overlay-notification').addClass('d-none')
+        if (msg.table_mode == 'exchange') {
             $('#button_exchange_send_cards').removeClass('d-none')
-            table_mode = 'exchange'
-            $('#hand').html(msg.html.cards_hand)
-            console.log(table_mode, cards_locked)
+            table_mode = msg.table_mode
+            exchange_min_cards = msg.cards_exchange_count
+            exchange_max_cards = msg.cards_exchange_count
+        } else {
+            table_mode = msg.table_mode
+        }
+        $('#hand').html(msg.html.cards_hand)
+        console.log(table_mode, cards_locked)
         // }
     })
 

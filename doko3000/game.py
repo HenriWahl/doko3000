@@ -230,6 +230,14 @@ class Player(UserMixin, Document):
         self.cards.pop(self.cards.index(card_id))
         self.save()
 
+    def remove_cards(self, card_ids):
+        """
+        remove multiple cards during exchange
+        """
+        for card_id in card_ids:
+            self.cards.pop(self.cards.index(card_id))
+        self.save()
+
     def remove_all_cards(self):
         """
         if player is idle or gets new cards it doesn't need its old cards

@@ -206,6 +206,8 @@ def exchange_player_cards(msg):
                 player.party in table.round.exchange:
             exchange = table.round.exchange[player.party]
             if set(msg.get('cards_table_ids')) == set(exchange[player.id]):
+                # remove cards from exchanging player
+                player.remove_cards(exchange[player.id])
                 # get peer id to send cards to
                 peer_id = [x for x in exchange if x!= player.id][0]
                 peer = game.players[peer_id]
@@ -213,10 +215,16 @@ def exchange_player_cards(msg):
                 cards_hand = [Deck.cards[x] for x in Deck.cards if x in peer.cards]
                 cards_timestamp = table.round.cards_timestamp
                 cards_exchange_count = len(exchange[player.id])
+                # if peer has no cards yet put onto table exchange is still active
+                if not exchange[peer.id]:
+                    table_mode = 'exchange'
+                else:
+                    table_mode = 'normal'
                 event = 'exchange-player-cards-to-client'
                 payload = {'player_id': peer_id,
                            'table_id': table.id,
                            'cards_exchange_count': cards_exchange_count,
+                           'table_mode': table_mode,
                            'html': {'cards_hand': render_template('cards/hand.html',
                                                                   cards_hand=cards_hand,
                                                                   table=table,
