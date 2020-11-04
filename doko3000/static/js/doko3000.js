@@ -62,6 +62,8 @@ $(document).ready(function () {
     ]);
     dragging_cards.on('drop', function (card, target, source) {
         console.log('table_mode:', table_mode)
+        console.log('current_player_id:', current_player_id)
+        console.log('cards_locked:', cards_locked)
         // do not drag your gained tricks around
         if (card.id == 'cards_stack') {
             dragging_cards.cancel(true)
@@ -371,6 +373,8 @@ $(document).ready(function () {
     socket.on('confirm-exchange', function (msg) {
         if (check_sync(msg)) {
             $('.overlay-notification').addClass('d-none')
+            // there is no need anymore to deal cards
+            $('#button_deal_cards_again').addClass('d-none')
             $('#modal_body').html(msg.html)
             $("#modal_dialog").modal('show')
         }
@@ -411,6 +415,8 @@ $(document).ready(function () {
     socket.on('exchange-ask-player2', function (msg) {
         if (check_sync(msg)) {
             $('.overlay-notification').addClass('d-none')
+            // there is no need anymore to deal cards
+            $('#button_deal_cards_again').addClass('d-none')
             $('#modal_body').html(msg.html)
             $("#modal_dialog").modal('show')
         }
