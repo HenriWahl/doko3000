@@ -220,18 +220,11 @@ def exchange_player_cards(msg):
                     table_mode = 'exchange'
                 else:
                     table_mode = 'normal'
-                # when both players got cards the game can go on
-                if exchange[player.id] and \
-                    exchange[peer.id]:
-                    cards_locked = False
-                else:
-                    cards_locked = True
                 event = 'exchange-player-cards-to-client'
                 payload = {'player_id': peer_id,
                            'table_id': table.id,
                            'cards_exchange_count': cards_exchange_count,
                            'table_mode': table_mode,
-                           'cards_locked': cards_locked,
                            'html': {'cards_hand': render_template('cards/hand.html',
                                                                   cards_hand=cards_hand,
                                                                   table=table,
@@ -244,6 +237,18 @@ def exchange_player_cards(msg):
                     table.log(event, payload, room)
                 # ...and action
                 socketio.emit(event, payload, room=room)
+
+                # when both players got cards the game can go on
+                if exchange[player.id] and \
+                    exchange[peer.id]:
+                    # as there was no card yet and first player is the [1] because [0] was dealer
+                    current_player_id = table.round.players[1]
+                    socketio.emit('exchange-players-finished',
+                                  {'table_id': table.id,
+                                   'sync_count': table.sync_count,
+                                   'current_player_id': current_player_id},
+                                  room=table.id)
+
 
 @socketio.on('setup-table-change')
 def setup_table(msg):

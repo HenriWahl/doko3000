@@ -461,12 +461,24 @@ $(document).ready(function () {
 
     // tell everybody that the exchange is finally starting, so no new cards should be dealed or put onto table
     socket.on('exchange-players-starting', function (msg) {
-        console.log('xchange-players-starting')
-        $('.overlay-notification').addClass('d-none')
+        console.log('exchange-players-starting')
+        $('#turn_indicator').addClass('d-none')
         $('#button_deal_cards_again').addClass('d-none')
         cards_locked = true
     })
 
+    // tell everybody that the exchange is finally finished
+    socket.on('exchange-players-finished', function (msg) {
+        console.log('exchange-players-finished')
+        current_player_id = msg.current_player_id
+        cards_locked = false
+        console.log(player_id, msg.current_player_id, cards_locked)
+        if (player_id == current_player_id && !cards_locked) {
+            $('#turn_indicator').removeClass('d-none')
+        } else {
+            $('#turn_indicator').addClass('d-none')
+        }
+    })
 //
 // ------------ Document events ------------
 //
