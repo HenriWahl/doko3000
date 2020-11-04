@@ -1,8 +1,8 @@
 {# store timestamp in extra id to be compared with single dragged cards and their timestamp #}
 <span id="cards_table_timestamp" data-cards_timestamp="{{ cards_timestamp }}"></span>
 {% for card in cards_table %}
-  {# generate tooltip played_by info from current trick order #}
-  {% with played_by=table.round.trick_order[loop.index-1] %}
-    {% include 'cards/card.html' %}
-  {% endwith %}
+    {# generate tooltip played_by info from current trick order #}
+    {% with played_by=table.round.trick_order[loop.index-1] %}
+        {% include 'cards/card.html' %}
+    {% endwith %}
 {% endfor %}

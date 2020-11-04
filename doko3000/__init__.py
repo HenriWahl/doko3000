@@ -215,16 +215,23 @@ def exchange_player_cards(msg):
                 cards_hand = [Deck.cards[x] for x in Deck.cards if x in peer.cards]
                 cards_timestamp = table.round.cards_timestamp
                 cards_exchange_count = len(exchange[player.id])
-                # if peer has no cards yet put onto table exchange is still active
+                # if peer has no cards yet put onto table exchange is still in exchange mode
                 if not exchange[peer.id]:
                     table_mode = 'exchange'
                 else:
                     table_mode = 'normal'
+                # when both players got cards the game can go on
+                if exchange[player.id] and \
+                    exchange[peer.id]:
+                    cards_locked = False
+                else:
+                    cards_locked = True
                 event = 'exchange-player-cards-to-client'
                 payload = {'player_id': peer_id,
                            'table_id': table.id,
                            'cards_exchange_count': cards_exchange_count,
                            'table_mode': table_mode,
+                           'cards_locked': cards_locked,
                            'html': {'cards_hand': render_template('cards/hand.html',
                                                                   cards_hand=cards_hand,
                                                                   table=table,

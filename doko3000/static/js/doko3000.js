@@ -69,6 +69,7 @@ $(document).ready(function () {
             dragging_cards.cancel(true)
         }
         if (table_mode == 'normal') {
+            console.log(source.id, target.id == 'table', player_id, current_player_id, cards_locked)
             if (source.id == 'hand' && target.id == 'table' && player_id == current_player_id && !cards_locked) {
                 if ($(card).data('cards_timestamp') == $('#cards_table_timestamp').data('cards_timestamp')) {
                     // only accept card if not too many on table - might happen after reload
@@ -87,6 +88,7 @@ $(document).ready(function () {
                     }
                 } else {
                     // card does not belong to hand because the dealer dealed again while the card was dragged around
+                    console.log($(card).data('cards_timestamp'), $('#cards_table_timestamp').data('cards_timestamp'))
                     $(card).remove()
                 }
             } else if (source.id == 'hand' && target.id == 'hand') {
@@ -452,6 +454,7 @@ $(document).ready(function () {
             table_mode = msg.table_mode
         }
         $('#hand').html(msg.html.cards_hand)
+        cards_locked = false
         console.log(table_mode, cards_locked)
         // }
     })
@@ -1021,15 +1024,14 @@ $(document).ready(function () {
             for (let card_table of $('#table').children('.game-card')) {
                 cards_table_ids.push($(card_table).data('id'))
             }
-            // clear table
-            $('#table').html('')
+            // clear cards on table
+            $('#table').children('.game-card').remove()
             // change to avoid more cards being put onto table
             cards_locked = true
             socket.emit('exchange-player-cards-to-server', {
                 player_id: player_id,
                 table_id: $(this).data('table_id'),
                 cards_table_ids: cards_table_ids
-
             })
         }
     })
