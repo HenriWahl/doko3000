@@ -1000,25 +1000,32 @@ $(document).ready(function () {
 
     // finally send cards to be exchanged to peer player
     $(document).on('click', '#button_exchange_send_cards', function () {
-        // hide exchange button
-        $(this).addClass('d-none')
+        // only if enough cards are about to be sent
 
-        console.log(1 <= $('#table').children('.game-card').length <= 3)
+        console.log(exchange_min_cards, exchange_max_cards, $('#table').children('.game-card').length)
 
-        // get cards on table to check with server
-        let cards_table_ids = []
-        for (let card_table of $('#table').children('.game-card')) {
-            cards_table_ids.push($(card_table).data('id'))
+        if (exchange_min_cards <= $('#table').children('.game-card').length &&
+            $('#table').children('.game-card').length <= exchange_max_cards) {
+
+            // hide exchange button
+            $(this).addClass('d-none')
+
+            // get cards on table to check with server
+            let cards_table_ids = []
+            for (let card_table of $('#table').children('.game-card')) {
+                cards_table_ids.push($(card_table).data('id'))
+            }
+            // clear table
+            $('#table').html('')
+            // change to avoid more cards being put onto table
+            cards_locked = true
+            socket.emit('exchange-player-cards-to-server', {
+                player_id: player_id,
+                table_id: $(this).data('table_id'),
+                cards_table_ids: cards_table_ids
+
+            })
         }
-        // clear table
-        $('#table').html('')
-        // change to avoid more cards being put onto table
-        cards_locked = true
-        socket.emit('exchange-player-cards-to-server', {
-            player_id: player_id,
-            table_id: $(this).data('table_id'),
-            cards_table_ids: cards_table_ids
-        })
     })
 
 })
