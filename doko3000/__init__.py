@@ -753,6 +753,11 @@ def exchange_player2_ready(msg):
         # peer of peer is exchange starting player again - necessary because answer comes from player2
         player1 = table.round.get_peer(player.id)
         if table.round.create_exchange(player1):
+            # tell all players that there is an exchange going on
+            socketio.emit('exchange-players-starting',
+                          {'table_id': table.id,
+                           'sync_count': table.sync_count},
+                          room=table.id)
             # tell exchange initializing player to finally begin transaction
             socketio.emit('exchange-player1-start',
                           {'table_id': table.id,

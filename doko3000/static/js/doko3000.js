@@ -413,7 +413,6 @@ $(document).ready(function () {
         }
     })
 
-
     socket.on('exchange-ask-player2', function (msg) {
         if (check_sync(msg)) {
             $('.overlay-notification').addClass('d-none')
@@ -437,6 +436,7 @@ $(document).ready(function () {
         $('.overlay-notification').addClass('d-none')
         $('#button_exchange_send_cards').removeClass('d-none')
         table_mode = 'exchange'
+        cards_locked = false
         // }
     })
 
@@ -459,6 +459,13 @@ $(document).ready(function () {
         // }
     })
 
+    // tell everybody that the exchange is finally starting, so no new cards should be dealed or put onto table
+    socket.on('exchange-players-starting', function (msg) {
+        console.log('xchange-players-starting')
+        $('.overlay-notification').addClass('d-none')
+        $('#button_deal_cards_again').addClass('d-none')
+        cards_locked = true
+    })
 
 //
 // ------------ Document events ------------
