@@ -472,6 +472,7 @@ $(document).ready(function () {
         console.log('exchange-players-finished')
         current_player_id = msg.current_player_id
         cards_locked = false
+        table_mode = 'normal'
         console.log(player_id, msg.current_player_id, cards_locked)
         if (player_id == current_player_id && !cards_locked) {
             $('#turn_indicator').removeClass('d-none')
