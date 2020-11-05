@@ -65,18 +65,25 @@ def load_user(id):
 
 
 # no decorator possible for socketio.on-events so make this a function
-def check_message(msg):
+def check_message(msg, player_in_table=True):
     """
     check if message is correctly sent from player
     tries to avoid permanently repeated code
+
+    player_in_table is a condition when player not yet belongs to table
     """
     player = game.players.get(msg.get('player_id'))
     table = game.tables.get(msg.get('table_id'))
     if player and \
             table and \
             player.id in table.round.players and \
-            player.id == current_user.get_id() and \
+            player.id == current_user.id and \
             player.table == table.id:
+        return True, player, table
+    elif player and \
+            table and \
+            player.id == current_user.id and \
+            not player_in_table:
         return True, player, table
     else:
         return False, player, table
@@ -125,7 +132,7 @@ def who_am_i():
 
 @socketio.on('enter-table')
 def enter_table_socket(msg):
-    msg_ok, player, table = check_message(msg)
+    msg_ok, player, table = check_message(msg, player_in_table=False)
     if msg_ok:
         if (table.locked and player.id in table.players) or \
                 not table.locked:
@@ -209,7 +216,7 @@ def exchange_player_cards(msg):
                 # remove cards from exchanging player
                 player.remove_cards(exchange[player.id])
                 # get peer id to send cards to
-                peer_id = [x for x in exchange if x!= player.id][0]
+                peer_id = [x for x in exchange if x != player.id][0]
                 peer = game.players[peer_id]
                 peer.cards += exchange[player.id]
                 cards_hand = [Deck.cards[x] for x in Deck.cards if x in peer.cards]
@@ -240,7 +247,7 @@ def exchange_player_cards(msg):
 
                 # when both players got cards the game can go on
                 if exchange[player.id] and \
-                    exchange[peer.id]:
+                        exchange[peer.id]:
                     # as there was no card yet and first player is the [1] because [0] was dealer
                     current_player_id = table.round.players[1]
                     socketio.emit('exchange-players-finished',
@@ -794,6 +801,7 @@ def exchange_player2_deny(msg):
                                                exchange_player_id=player.id
                                                )},
                       room=sessions.get(player1))
+
 
 #
 # ------------ Routes ------------
