@@ -383,18 +383,18 @@ $(document).ready(function () {
     })
 
     socket.on('change-password-successful', function (msg) {
-        $('#button_change_password').removeClass('btn-outline-primary')
-        $('#button_change_password').removeClass('btn-outline-danger')
-        $('#button_change_password').addClass('btn-outline-success')
+        $('#button_change_password').removeClass('btn-primary')
+        $('#button_change_password').removeClass('btn-danger')
+        $('#button_change_password').addClass('btn-success')
         $('#indicate_change_password_successful').removeClass('d-none')
         $('#indicate_change_password_failed').addClass('d-none')
         $('#submit_change_password').addClass('d-none')
     })
 
     socket.on('change-password-failed', function (msg) {
-        $('#button_change_password').removeClass('btn-outline-primary')
-        $('#button_change_password').removeClass('btn-outline-success')
-        $('#button_change_password').addClass('btn-outline-danger')
+        $('#button_change_password').removeClass('btn-primary')
+        $('#button_change_password').removeClass('btn-success')
+        $('#button_change_password').addClass('btn-danger')
         $('#indicate_change_password_failed').removeClass('d-none')
         $('#indicate_change_password_successful').addClass('d-none')
         $('#submit_change_password').addClass('d-none')
@@ -860,9 +860,9 @@ $(document).ready(function () {
 
 // reset password change button when password gets changed
     $(document).on('keyup', '#new_player_password', function () {
-        $('#button_change_password').addClass('btn-outline-primary')
-        $('#button_change_password').removeClass('btn-outline-success')
-        $('#button_change_password').removeClass('btn-outline-danger')
+        $('#button_change_password').addClass('btn-primary')
+        $('#button_change_password').removeClass('btn-success')
+        $('#button_change_password').removeClass('btn-danger')
         $('#submit_change_password').removeClass('d-none')
         $('#indicate_change_password_successful').addClass('d-none')
         $('#indicate_change_password_failed').addClass('d-none')

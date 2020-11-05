@@ -30,7 +30,7 @@
              data-player_id="{{ player_id }}">
             <span class="oi oi-person"></span>
             {{ game.players[player_id].name }}
-            <span class="oi oi-x float-right text-danger btn btn-outline-light border-0 btn-sm button-remove-player-from-table"
+            <span class="oi oi-x float-right text-danger btn btn-light border-0 btn-sm button-remove-player-from-table"
                   data-player_id="{{ player_id }}"
                   data-table_id="{{ table.id }}"
             ></span>
@@ -102,7 +102,7 @@
 <div class="row mt-3">
     <div class="col-6" data-table_id="{{ table.id }}">
         <a href="/table/{{ table.id }}"
-           class="btn btn-outline-success btn-block"
+           class="btn btn-success btn-block"
            id="button_start_table"
            data-table_id="{{ table.id }}">
             <strong>
@@ -111,7 +111,7 @@
         </a>
     </div>
     <div class="col-6" id="button_finish_table_setup" data-table_id="{{ table.id }}">
-        <button class="btn btn-outline-primary btn-block btn" data-dismiss="modal"><strong>Zurück</strong>
+        <button class="btn btn-primary btn-block btn" data-dismiss="modal"><strong>Zurück</strong>
         </button>
     </div>
 
