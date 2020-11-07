@@ -65,19 +65,28 @@ def load_user(id):
 
 
 # no decorator possible for socketio.on-events so make this a function
-def check_message(msg, player_in_table=True):
+def check_message(msg, player_in_round=True, player_at_table=True):
     """
     check if message is correctly sent from player
     tries to avoid permanently repeated code
 
-    player_in_table is a condition when player not yet belongs to table
+    player_in_round is important if there are more than 4 players - the fifth is at taböle but not in round
+    player_at_table is a condition when player not yet belongs to table
     """
     player = game.players.get(msg.get('player_id'))
     table = game.tables.get(msg.get('table_id'))
-    if player_in_table:
+    if player_in_round:
         if player and \
                 table and \
                 player.id in table.round.players and \
+                player.id == current_user.id and \
+                player.table == table.id:
+            return True, player, table
+        else:
+            return False, player, table
+    elif player_at_table:
+        if player and \
+                table and \
                 player.id == current_user.id and \
                 player.table == table.id:
             return True, player, table
@@ -135,7 +144,7 @@ def who_am_i():
 
 @socketio.on('enter-table')
 def enter_table_socket(msg):
-    msg_ok, player, table = check_message(msg, player_in_table=False)
+    msg_ok, player, table = check_message(msg, player_in_round=False, player_at_table=False)
     if msg_ok:
         if (table.locked and player.id in table.players) or \
                 not table.locked:
@@ -374,7 +383,7 @@ def deal_cards_to_player(msg):
     """
     give player cards after requesting them
     """
-    msg_ok, player, table = check_message(msg, player_in_table=False)
+    msg_ok, player, table = check_message(msg, player_in_round=False)
     if msg_ok:
         dealer = table.dealer
         # just in case
@@ -556,7 +565,7 @@ def send_final_result(msg):
 
 @socketio.on('ready-for-next-round')
 def ready_for_next_round(msg):
-    msg_ok, player, table = check_message(msg)
+    msg_ok, player, table = check_message(msg, player_in_round=False)
     if msg_ok:
         table.add_ready_player(player.id)
         next_players = table.order[:4]
