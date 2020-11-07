@@ -29,7 +29,7 @@
 {% if current_user.is_admin and current_user.id != player.id %}
 <div class="row mt-3">
     <div class="col-12">
-        <div class="custom-control custom-switch my-2 mx-3">
+        <div class="custom-control custom-switch mx-3">
             <input type="checkbox"
                    class="custom-control-input"
                    id="switch_player_is_admin"
@@ -43,9 +43,9 @@
     </div>
 </div>
 {% endif %}
-<div class="row">
+<div class="row mt-3">
     <div class="col-12">
-        <div class="custom-control custom-switch my-2 mx-3">
+        <div class="custom-control custom-switch mx-3">
             <input type="checkbox"
                    class="custom-control-input"
                    id="switch_player_allows_spectators"
