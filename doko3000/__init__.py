@@ -74,19 +74,22 @@ def check_message(msg, player_in_table=True):
     """
     player = game.players.get(msg.get('player_id'))
     table = game.tables.get(msg.get('table_id'))
-    if player and \
-            table and \
-            player.id in table.round.players and \
-            player.id == current_user.id and \
-            player.table == table.id:
-        return True, player, table
-    elif player and \
-            table and \
-            player.id == current_user.id and \
-            not player_in_table:
-        return True, player, table
+    if player_in_table:
+        if player and \
+                table and \
+                player.id in table.round.players and \
+                player.id == current_user.id and \
+                player.table == table.id:
+            return True, player, table
+        else:
+            return False, player, table
     else:
-        return False, player, table
+        if player and \
+            table and \
+            player.id == current_user.id:
+            return True, player, table
+        else:
+            return False, player, table
 
 
 #
@@ -371,7 +374,7 @@ def deal_cards_to_player(msg):
     """
     give player cards after requesting them
     """
-    msg_ok, player, table = check_message(msg)
+    msg_ok, player, table = check_message(msg, player_in_table=False)
     if msg_ok:
         dealer = table.dealer
         # just in case

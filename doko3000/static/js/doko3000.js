@@ -276,6 +276,7 @@ $(document).ready(function () {
     })
 
     socket.on('sorry-no-cards-for-you', function (msg) {
+        console.log('sorry-no-cards-for-you', check_sync(msg))
         if (check_sync(msg)) {
             $('#modal_body').html('')
             $("#modal_dialog").modal('hide')
