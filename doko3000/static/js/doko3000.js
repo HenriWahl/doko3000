@@ -257,6 +257,9 @@ $(document).ready(function () {
             if (msg.exchange_needed) {
                 $('#button_exchange_send_cards').removeClass('d-none')
                 table_mode = 'exchange'
+            } else {
+                $('#button_exchange_send_cards').addClass('d-none')
+                table_mode = 'normal'
             }
             if (msg.trick_claiming_needed && !cards_locked) {
                 $('#button_claim_trick').removeClass('d-none').fadeOut(1).delay(1500).fadeIn(1)
@@ -271,7 +274,7 @@ $(document).ready(function () {
             $('#hand').html(msg.html.cards_hand)
             $('#button_claim_trick').addClass('d-none')
             $('#modal_dialog').modal('hide')
-            if (player_id == msg.dealer && msg.dealing_needed) {
+            if (player_id == msg.dealer && msg.dealing_needed && !msg.exchange_needed) {
                 $('#button_deal_cards_again').removeClass('d-none')
             } else {
                 $('#button_deal_cards_again').addClass('d-none')

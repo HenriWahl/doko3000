@@ -244,7 +244,8 @@ class Player(UserMixin, Document):
         remove multiple cards during exchange
         """
         for card_id in card_ids:
-            self.cards.pop(self.cards.index(card_id))
+            if card_id in self.cards:
+                self.cards.pop(self.cards.index(card_id))
         self.save()
 
     def remove_all_cards(self):
@@ -745,6 +746,9 @@ class Round(Document):
         """
         player = self.game.players[player_id]
         if player.party in self.exchange and player.id in self.exchange[player.party]:
+            # if player did not change anything echange is needed
+            if not self.exchange[player.party][player.id]:
+                return True
             # find out if any party member already has cards
             for member_id in self.exchange[player.party]:
                 if len(self.exchange[player.party][member_id]) > 0:

@@ -94,8 +94,8 @@ def check_message(msg, player_in_round=True, player_at_table=True):
             return False, player, table
     else:
         if player and \
-            table and \
-            player.id == current_user.id:
+                table and \
+                player.id == current_user.id:
             return True, player, table
         else:
             return False, player, table
@@ -735,6 +735,11 @@ def request_exchange(msg):
         if not hochzeit and player.party == 're':
             exchange_type = 're'
         card_played = table.round.turn_count > 0
+        exchanged_already = False
+        if table.round.exchange and \
+                player.party in table.round.exchange and \
+                table.round.exchange[player.party]:
+            exchanged_already = True
         # ask player if exchange really should be started
         socketio.emit('confirm-exchange',
                       {'table_id': table.id,
@@ -743,7 +748,8 @@ def request_exchange(msg):
                                                table=table,
                                                hochzeit=hochzeit,
                                                exchange_type=exchange_type,
-                                               card_played=card_played
+                                               card_played=card_played,
+                                               exchanged_already=exchanged_already
                                                )},
                       room=request.sid)
 
