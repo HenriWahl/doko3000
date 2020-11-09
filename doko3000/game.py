@@ -755,7 +755,7 @@ class Round(Document):
             # get ID of party member peer player to check its cards
             peer_id = [x for x in self.exchange[player.party] if x != player.id][0]
             # find out if the cards this player wants to exchange already found their way to its peer
-            if not self.exchange[player.party][player.id] in self.game.players[peer_id].cards:
+            if not all(x in self.game.players[peer_id].cards for x in self.exchange[player.party][player.id]):
                 return True
         return False
 
