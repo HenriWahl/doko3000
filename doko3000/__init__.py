@@ -390,12 +390,17 @@ def deal_cards_to_player(msg):
         join_room(table.id)
         current_player_id = table.round.current_player
         cards_timestamp = table.round.cards_timestamp
+        exchange_needed = table.round.is_exchange_needed(player.id)
         sync_count = table.sync_count
         if player.id in table.round.players:
             cards_hand = player.get_cards()
             if table.round.cards_shown:
                 # cards_shown contains cqrds-showing player_id
                 cards_table = game.players[table.round.cards_shown].get_cards()
+            elif exchange_needed:
+                cards_table = game.deck.get_cards(table.round.exchange[player.party][player.id])
+                # take out the cards from player's hand which lay on table
+                cards_hand = [x for x in cards_hand if x.id not in table.round.exchange[player.party][player.id]]
             else:
                 cards_table = []
             mode = 'player'
@@ -413,6 +418,7 @@ def deal_cards_to_player(msg):
                        'dealer': dealer,
                        'dealing_needed': dealing_needed,
                        'trick_claiming_needed': trick_claiming_needed,
+                       'exchange_needed': exchange_needed,
                        'cards_shown': cards_shown,
                        'sync_count': sync_count,
                        'html': {'cards_hand': render_template('cards/hand.html',
@@ -884,7 +890,9 @@ def table(table_id=''):
                 # cards_shown contains cqrds-showing player_id
                 cards_table = game.players[table.round.cards_shown].get_cards()
             elif exchange_needed:
-                cards_table = table.round.exchange[player.party][player.id]
+                cards_table = game.deck.get_cards(table.round.exchange[player.party][player.id])
+                # take out the cards from player's hand which lay on table
+                cards_hand = [x for x in cards_hand if x.id not in table.round.exchange[player.party][player.id]]
             else:
                 cards_table = table.round.current_trick.get_cards()
             cards_timestamp = table.round.cards_timestamp

@@ -58,6 +58,15 @@ class Deck:
                 cards[card_id] = Card(symbol, rank, card_id)
                 card_id += 1
 
+    def get_cards(self, cards_ids):
+        """
+        return card objects of card IDs in cards_ids list
+        """
+        cards = []
+        for card_id in cards_ids:
+            cards.append(self.cards[card_id])
+        return cards
+
 
 class Player(UserMixin, Document):
     """
@@ -1100,8 +1109,11 @@ class Game:
     """
 
     def __init__(self, db=None):
-
+        """
+        access to game DB and cards deck
+        """
         self.db = db
+        self.deck = Deck()
 
     def load_from_db(self):
         """

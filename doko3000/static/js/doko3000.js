@@ -249,10 +249,14 @@ $(document).ready(function () {
             } else {
                 cards_locked = false
             }
-            if (player_id == current_player_id && !cards_locked) {
+            if (player_id == current_player_id && !cards_locked && !msg.exchange_needed) {
                 $('#turn_indicator').removeClass('d-none')
             } else {
                 $('#turn_indicator').addClass('d-none')
+            }
+            if (msg.exchange_needed) {
+                $('#button_exchange_send_cards').removeClass('d-none')
+                table_mode = 'exchange'
             }
             if (msg.trick_claiming_needed && !cards_locked) {
                 $('#button_claim_trick').removeClass('d-none').fadeOut(1).delay(1500).fadeIn(1)
