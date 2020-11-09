@@ -705,7 +705,7 @@ class Round(Document):
         player = self.game.players[player_id]
         if not self.has_hochzeit() and \
             player.party not in self.exchange:
-            # just containing eschanged cards per exchange peer
+            # just containing exchanged cards per exchange peer
             self.exchange[player.party] = {player.id: [],
                                            self.get_peer(player.id): []}
             self.save()
@@ -729,6 +729,26 @@ class Round(Document):
         used to remove all open exchanges, for example at .reset()
         """
         self.exchange = {}
+
+    def is_exchange_needed(self, player_id):
+        """
+        check if there are ongoing exchanges where player is involved
+        """
+        player = self.game.players[player_id]
+        if player.party in self.exchange and player.id in self.exchange[player.party]:
+            # find out if any party member already has cards
+            for member_id in self.exchange[player.party]:
+                if len(self.exchange[player.party][member_id]) > 0:
+                    break
+            else:
+                # if both party member did not exchange any card yet exchange is needed
+                return True
+            # get ID of party member peer player to check its cards
+            peer_id = [x for x in self.exchange[player.party] if x != player.id][0]
+            # find out if the cards this player wants to exchange already found their way to its peer
+            if not self.exchange[player.party][player.id] in self.game.players[peer_id].cards:
+                return True
+        return False
 
     def calculate_stats(self):
         """

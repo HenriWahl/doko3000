@@ -877,11 +877,14 @@ def table(table_id=''):
             trick_claiming_needed = table.round.turn_count % 4 == 0 and \
                                     table.round.turn_count > 0 and \
                                     not table.round.is_finished()
+            exchange_needed = table.round.is_exchange_needed(player.id)
             current_player_id = table.round.current_player
             cards_hand = player.get_cards()
             if table.round.cards_shown:
                 # cards_shown contains cqrds-showing player_id
                 cards_table = game.players[table.round.cards_shown].get_cards()
+            elif exchange_needed:
+                cards_table = table.round.exchange[player.party][player.id]
             else:
                 cards_table = table.round.current_trick.get_cards()
             cards_timestamp = table.round.cards_timestamp
@@ -893,6 +896,7 @@ def table(table_id=''):
                                    dealer=dealer,
                                    dealing_needed=dealing_needed,
                                    trick_claiming_needed=trick_claiming_needed,
+                                   exchange_needed=exchange_needed,
                                    player=player,
                                    current_player_id=current_player_id,
                                    cards_hand=cards_hand,
