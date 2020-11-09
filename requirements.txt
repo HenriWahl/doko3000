@@ -1,0 +1,8 @@
+click
+cloudant
+eventlet
+flask
+flask-login
+flask-socketio
+flask-wtf
+gunicorn

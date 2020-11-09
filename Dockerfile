@@ -6,17 +6,10 @@ RUN apt -y update &&\
 
 RUN pip install --upgrade pip
 
-RUN pip install click\
-                cloudant\
-                eventlet\
-                flask\
-                flask-login\
-                flask-socketio\
-                flask-wtf\
-                gunicorn
-
 COPY ./ /doko3000
 WORKDIR /doko3000
+
+RUN pip install -r requirements.txt
 
 # run gunicorn workers as unprivileged user
 RUN useradd doko3000
