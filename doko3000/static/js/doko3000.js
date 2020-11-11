@@ -61,15 +61,11 @@ $(document).ready(function () {
         }
     ]);
     dragging_cards.on('drop', function (card, target, source) {
-        console.log('table_mode:', table_mode)
-        console.log('current_player_id:', current_player_id)
-        console.log('cards_locked:', cards_locked)
         // do not drag your gained tricks around
         if (card.id == 'cards_stack') {
             dragging_cards.cancel(true)
         }
         if (table_mode == 'normal') {
-            console.log(source.id, target.id == 'table', player_id, current_player_id, cards_locked)
             if (source.id == 'hand' && target.id == 'table' && player_id == current_player_id && !cards_locked) {
                 if ($(card).data('cards_timestamp') == $('#cards_table_timestamp').data('cards_timestamp')) {
                     // only accept card if not too many on table - might happen after reload
@@ -88,7 +84,6 @@ $(document).ready(function () {
                     }
                 } else {
                     // card does not belong to hand because the dealer dealed again while the card was dragged around
-                    console.log($(card).data('cards_timestamp'), $('#cards_table_timestamp').data('cards_timestamp'))
                     $(card).remove()
                 }
             } else if (source.id == 'hand' && target.id == 'hand') {
@@ -116,11 +111,8 @@ $(document).ready(function () {
                 dragging_cards.cancel(true)
             }
         } else if (table_mode == 'exchange') {
-            console.log('exchange')
             if ($(card).data('cards_timestamp') == $('#cards_table_timestamp').data('cards_timestamp')) {
                 // only accept maximum of 3 cards
-                console.log($('#table').children('.game-card').length)
-                console.log(cards_locked)
                 if ($('#table').children('.game-card').length <= exchange_max_cards && !cards_locked) {
                     // get cards order to end it to server for storing it
                     let cards_hand_ids = []
@@ -138,8 +130,6 @@ $(document).ready(function () {
                         cards_hand_ids: cards_hand_ids,
                         cards_table_ids: cards_table_ids
                     })
-                    console.log('cards_table_ids:', cards_table_ids)
-
                 } else {
                     // no more cards than 3
                     dragging_cards.cancel(true)
@@ -283,7 +273,6 @@ $(document).ready(function () {
     })
 
     socket.on('sorry-no-cards-for-you', function (msg) {
-        console.log('sorry-no-cards-for-you', check_sync(msg))
         if (check_sync(msg)) {
             $('#modal_body').html('')
             $("#modal_dialog").modal('hide')
@@ -449,9 +438,6 @@ $(document).ready(function () {
     })
 
     socket.on('exchange-player-cards-to-client', function (msg) {
-        console.log('exchange-player-cards-to-client 1')
-        // if (check_sync(msg)) {
-        console.log('exchange-player-cards-to-client 2')
         $('.overlay-notification').addClass('d-none')
         if (msg.table_mode == 'exchange') {
             $('#button_exchange_send_cards').removeClass('d-none')
@@ -463,13 +449,11 @@ $(document).ready(function () {
         }
         $('#hand').html(msg.html.cards_hand)
         cards_locked = false
-        console.log(table_mode, cards_locked)
         // }
     })
 
     // tell everybody that the exchange is finally starting, so no new cards should be dealed or put onto table
     socket.on('exchange-players-starting', function (msg) {
-        console.log('exchange-players-starting')
         $('#turn_indicator').addClass('d-none')
         $('#button_deal_cards_again').addClass('d-none')
         cards_locked = true
@@ -477,11 +461,9 @@ $(document).ready(function () {
 
     // tell everybody that the exchange is finally finished
     socket.on('exchange-players-finished', function (msg) {
-        console.log('exchange-players-finished')
         current_player_id = msg.current_player_id
         cards_locked = false
         table_mode = 'normal'
-        console.log(player_id, msg.current_player_id, cards_locked)
         if (player_id == current_player_id && !cards_locked) {
             $('#turn_indicator').removeClass('d-none')
         } else {
@@ -1038,9 +1020,6 @@ $(document).ready(function () {
     // finally send cards to be exchanged to peer player
     $(document).on('click', '#button_exchange_send_cards', function () {
         // only if enough cards are about to be sent
-
-        console.log(exchange_min_cards, exchange_max_cards, $('#table').children('.game-card').length)
-
         if (exchange_min_cards <= $('#table').children('.game-card').length &&
             $('#table').children('.game-card').length <= exchange_max_cards) {
 
