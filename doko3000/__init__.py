@@ -302,7 +302,8 @@ def setup_table(msg):
             table.is_debugging = False
         elif action == 'changed_order':
             order = msg.get('order')
-            if set(order) == set(table.order):
+            # in case there are spectator_only players just check if current active players are included
+            if set(table.order).issubset(set(order)):
                 table.players = order
         elif action == 'start_table':
             table.start()
