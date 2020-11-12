@@ -30,6 +30,9 @@
              data-player_id="{{ player_id }}">
             <span class="oi oi-person"></span>
             {{ game.players[player_id].name }}
+            {% if game.players[player_id].is_spectator_only %}
+                <span class="small oi oi-eye"></span>
+            {% endif %}
             <span class="oi oi-x float-right text-danger btn btn-light border-0 btn-sm button-remove-player-from-table"
                   data-player_id="{{ player_id }}"
                   data-table_id="{{ table.id }}"

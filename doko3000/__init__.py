@@ -396,7 +396,8 @@ def deal_cards_to_player(msg):
         cards_timestamp = table.round.cards_timestamp
         exchange_needed = table.round.is_exchange_needed(player.id)
         sync_count = table.sync_count
-        if player.id in table.round.players:
+        if player.id in table.round.players and \
+           player.id in table.players_active:
             cards_hand = player.get_cards()
             if table.round.cards_shown:
                 # cards_shown contains cqrds-showing player_id

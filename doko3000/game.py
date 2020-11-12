@@ -922,7 +922,7 @@ class Table(Document):
 
     @property
     def players(self):
-        return [x for x in self['players'] if not self.game.players[x].is_spectator_only]
+        return self['players']
 
     @players.setter
     def players(self, value):
@@ -942,6 +942,10 @@ class Table(Document):
         needed for data-* in HTML for JS
         """
         return dumps(self['players'])
+
+    @property
+    def players_active(self):
+        return [x for x in self['players'] if not self.game.players[x].is_spectator_only]
 
     @property
     def locked(self):
@@ -1070,7 +1074,6 @@ class Table(Document):
         """
         if self.order:
             players = self.order[:4]
-            bla = 1
         else:
             players = []
         self.round.reset(players=players)
@@ -1082,8 +1085,8 @@ class Table(Document):
         """
         completely new start from setup dialog
         """
-        # beginning order is the same like players
-        self.order = self.players[:]
+        # beginning order is the same like players without spectators
+        self.order = self.players_active[:]
         # new round of 4 players
         self.reset_round()
         # new sync count
