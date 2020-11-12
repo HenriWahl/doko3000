@@ -332,6 +332,10 @@ def setup_player(msg):
             player.allows_spectators = True
         elif action == 'denies_spectators':
             player.allows_spectators = False
+        elif action == 'is_spectator_only':
+            player.is_spectator_only = True
+        elif action == 'not_is_spectator_only':
+            player.is_spectator_only = False
         elif action == 'new_password':
             password = msg.get('password')
             if password:

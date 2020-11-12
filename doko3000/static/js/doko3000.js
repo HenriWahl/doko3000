@@ -29,6 +29,7 @@ function clear_message(place) {
 function check_sync(msg) {
     // check if message is in sync
     // if not set yet take sync_count from freshly loaded HTML id
+    console.log(sync_count)
     if (sync_count == 0) {
         sync_count = $('#sync_count').data('sync_count')
     }
@@ -273,7 +274,9 @@ $(document).ready(function () {
     })
 
     socket.on('sorry-no-cards-for-you', function (msg) {
+        console.log(msg)
         if (check_sync(msg)) {
+            console.log('ok')
             $('#modal_body').html('')
             $("#modal_dialog").modal('hide')
             $('.mode-spectator').removeClass('d-none')
@@ -873,7 +876,7 @@ $(document).ready(function () {
         }
     })
 
-// let player allow spectators
+    // let player allow spectators
     $(document).on('click', '#switch_player_allows_spectators', function () {
         if (this.checked) {
             socket.emit('setup-player-change', {
@@ -883,6 +886,21 @@ $(document).ready(function () {
         } else {
             socket.emit('setup-player-change', {
                 action: 'denies_spectators',
+                player_id: $(this).data('player_id')
+            })
+        }
+    })
+
+    // let player be spectator only
+    $(document).on('click', '#switch_player_is_spectator_only', function () {
+        if (this.checked) {
+            socket.emit('setup-player-change', {
+                action: 'is_spectator_only',
+                player_id: $(this).data('player_id')
+            })
+        } else {
+            socket.emit('setup-player-change', {
+                action: 'not_is_spectator_only',
                 player_id: $(this).data('player_id')
             })
         }

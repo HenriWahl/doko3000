@@ -99,6 +99,8 @@ class Player(UserMixin, Document):
             self['is_admin'] = False
             # let idle players see player's cards
             self['allows_spectators'] = True
+            # only watches other players playing
+            self['is_spectator_only'] = False
             # store party when dealing to keep track of player's party when exchanging cards
             self['party'] = ''
             # # other players to the left, opposite and right of table
@@ -166,6 +168,16 @@ class Player(UserMixin, Document):
     @allows_spectators.setter
     def allows_spectators(self, value):
         self['allows_spectators'] = value
+        self.save()
+
+    @property
+    def is_spectator_only(self):
+        # defaults to False as most players want to play
+        return self.get('is_spectator_only', False)
+
+    @is_spectator_only.setter
+    def is_spectator_only(self, value):
+        self['is_spectator_only'] = value
         self.save()
 
     @property
@@ -910,7 +922,7 @@ class Table(Document):
 
     @property
     def players(self):
-        return self['players']
+        return [x for x in self['players'] if not self.game.players[x].is_spectator_only]
 
     @players.setter
     def players(self, value):
@@ -1058,6 +1070,7 @@ class Table(Document):
         """
         if self.order:
             players = self.order[:4]
+            bla = 1
         else:
             players = []
         self.round.reset(players=players)
@@ -1080,7 +1093,6 @@ class Table(Document):
         """
         last dealer is moved to the end of the players list
         """
-        # self.order.append(self.order.pop(0))
         self.order = self.order[1:] + self.order[:1]
         self.save()
 
