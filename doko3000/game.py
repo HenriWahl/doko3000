@@ -1172,7 +1172,7 @@ class Game:
         # check for locked tables
         self.check_tables()
 
-    def add_player(self, player_id='', password='', is_admin=False):
+    def add_player(self, player_id='', password='', spectator_only=False, allows_spectators=False, is_admin=False):
         """
         adds a new player
         """
@@ -1185,6 +1185,8 @@ class Game:
                     self.players[player_id_quoted].set_password(password)
                 if is_admin:
                     self.players[player_id_quoted].is_admin = True
+                self.players[player_id_quoted].is_spectator_only = spectator_only
+                self.players[player_id_quoted].allows_spectators = allows_spectators
             return self.players.get(player_id_quoted)
 
     def add_table(self, table_id=''):

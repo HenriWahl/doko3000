@@ -1,17 +1,20 @@
 <ul class="list-group">
     {% for player in players %}
-    <li class="list-group-item list-group-item-action list-item-table"
-        id="{{ player.id }}"
-        data-player="{{ player.id }}">
-        <strong>
-            {{ player.name }}
-        </strong>
-        <button class="oi oi-trash float-right btn btn btn-outline-danger button-delete-player border-0"
-                data-player_id="{{ player.id }}">
-        </button>
-        <button class="oi oi-cog float-right btn btn btn-outline-primary setup-player border-0"
-                data-player_id="{{ player.id }}">
-        </button>
-    </li>
+        <li class="list-group-item list-group-item-action list-item-table"
+            id="{{ player.id }}"
+            data-player="{{ player.id }}">
+            <strong>
+                {{ player.name }}
+                {% if player.is_spectator_only %}
+                    <span class="small oi oi-eye"></span>
+                {% endif %}
+            </strong>
+            <button class="oi oi-trash float-right btn btn btn-outline-danger button-delete-player border-0"
+                    data-player_id="{{ player.id }}">
+            </button>
+            <button class="oi oi-cog float-right btn btn btn-outline-primary setup-player border-0"
+                    data-player_id="{{ player.id }}">
+            </button>
+        </li>
     {% endfor %}
 </ul>

@@ -1090,14 +1090,24 @@ def create_player():
         elif request.method == 'POST':
             new_player_id = request.values.get('new_player_id')
             new_player_password = request.values.get('new_player_password')
+            new_player_spectator_only = request.values.get('switch_new_player_is_spectator_only', False)
+            # convert 'on' from HTML form to True
+            if new_player_spectator_only:
+                new_player_spectator_only = True
+            new_player_allows_spectators = request.values.get('switch_new_player_allows_spectators', False)
+            # convert 'on' from HTML form to True
+            if new_player_allows_spectators:
+                new_player_allows_spectators = True
             if new_player_id:
                 if new_player_id in game.players:
                     return jsonify({'status': 'error',
                                     'message': 'Diesen Spieler gibt es schon :-('})
                 else:
                     if new_player_password:
-                        player = game.add_player(player_id=new_player_id, password=new_player_password)
-                        # player.set_password(new_player_password)
+                        player = game.add_player(player_id=new_player_id,
+                                                 password=new_player_password,
+                                                 spectator_only=new_player_spectator_only,
+                                                 allows_spectators=new_player_allows_spectators)
                         return jsonify({'status': 'ok'})
                     else:
                         return jsonify({'status': 'error',

@@ -274,9 +274,7 @@ $(document).ready(function () {
     })
 
     socket.on('sorry-no-cards-for-you', function (msg) {
-        console.log(msg)
         if (check_sync(msg)) {
-            console.log('ok')
             $('#modal_body').html('')
             $("#modal_dialog").modal('hide')
             $('.mode-spectator').removeClass('d-none')
@@ -837,6 +835,7 @@ $(document).ready(function () {
         $.getJSON('/setup/player/' + encodeURIComponent($(this).data('player_id')), function (data, status) {
             if (status == 'success') {
                 $("#modal_body").html(data.html)
+                clear_message('#modal_message')
                 $('#modal_dialog').modal('show')
             }
         })
