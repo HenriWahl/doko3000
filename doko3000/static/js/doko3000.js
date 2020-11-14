@@ -203,7 +203,7 @@ $(document).ready(function () {
         if (msg.is_last_turn) {
             cards_locked = true
             $('#turn_indicator').addClass('d-none')
-            if (!msg.idle_players.includes(player_id)) {
+            if (!msg.idle_players.includes(player_id) && !msg.players_spectator.includes(player_id)) {
                 $('#button_claim_trick').removeClass('d-none').fadeOut(1).delay(1500).fadeIn(1)
             }
         } else if (msg.cards_shown) {

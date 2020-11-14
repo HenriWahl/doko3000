@@ -186,6 +186,7 @@ def played_card(msg):
                        'is_last_turn': is_last_turn,
                        'current_player_id': current_player_id,
                        'idle_players': idle_players,
+                       'players_spectator': table.players_spectator,
                        'played_cards': played_cards,
                        'cards_shown': cards_shown,
                        'sync_count': sync_count,
@@ -1177,7 +1178,7 @@ def start_table(table_id):
     table = game.tables.get(table_id)
     if is_xhr(request) and \
             table:
-        if len(table.players) >= 4:
+        if len(table.players_active) >= 4:
             return jsonify({'status': 'ok',
                             'html': render_template('index/start_table.html',
                                                     table=table)})

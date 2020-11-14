@@ -948,6 +948,18 @@ class Table(Document):
         return [x for x in self['players'] if not self.game.players[x].is_spectator_only]
 
     @property
+    def players_spectator(self):
+        return [x for x in self['players'] if self.game.players[x].is_spectator_only]
+
+    @property
+    def idle_players(self):
+        """
+        players who have to wait until round is over - all which are more than 4
+        additionally those who are specators only
+        """
+        return self.order[4:]
+
+    @property
     def locked(self):
         # better via .get() in case the table is not updated yet
         return self.get('locked', False)
@@ -966,13 +978,6 @@ class Table(Document):
         give current dealer for next round back
         """
         return self.order[0]
-
-    @property
-    def idle_players(self):
-        """
-        players who have to wait until round is over - all which are more than 4
-        """
-        return self.order[4:]
 
     @property
     def sync_count(self):
