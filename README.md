@@ -33,3 +33,7 @@ After the round was finished the achieved score of the players is shown:
 The table settings allow to arrange players and enable some options:
 
 ![Table setup](doc/doko3000-table_setup.png)
+
+## Installation
+
+To be continued...
