@@ -474,7 +474,6 @@ $(document).ready(function () {
 
     // update either list of tables or users after a change
     socket.on('index-list-changed', function (msg) {
-        console.log(msg)
         if (!location.pathname.startsWith('/table/')) {
             $.getJSON('/get/' + msg.table,
                 function (data, status) {
@@ -759,8 +758,13 @@ $(document).ready(function () {
                 function (data, status) {
                     if (status == 'success') {
                         if (data.status == 'ok') {
-                            $('#list_players').html(data.html)
+                            // $('#list_players').html(data.html)
                             $('#modal_dialog').modal('hide')
+                            // tell other admins about player changes
+                            socket.emit('setup-player-change', {
+                            action: 'finished',
+                            player_id: player_id
+                        })
                         } else {
                             $('#modal_body').html(data.html)
                             clear_message('#modal_message')
@@ -927,7 +931,6 @@ $(document).ready(function () {
 
     // tell everybody there were changes in player setup
     $(document).on('click', '#button_finish_player_setup', function () {
-        console.log('change')
         socket.emit('setup-player-change', {
             action: 'finished',
             player_id: player_id

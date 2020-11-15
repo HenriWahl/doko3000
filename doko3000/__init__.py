@@ -1157,10 +1157,7 @@ def delete_player(player_id):
                                                         message=f"{player.id} sitzt noch am Tisch {player.table}.")})
         elif request.method == 'POST':
             if game.delete_player(player.id):
-                players = game.players.values()
-                return jsonify({'status': 'ok',
-                                'html': render_template('index/list_players.html',
-                                                        players=players)})
+                return jsonify({'status': 'ok'})
     # default return if nothing applies
     return redirect(url_for('index'))
 
