@@ -1,7 +1,10 @@
 The cards in /doko3000/static/img/cards are created by David Bellot and
 available under LGPL 2.1.
+
 Originally they are included in a SVG file which was splitted into only
-the needed cards and them converted to PNG.
+the needed cards and them converted to PNG. Additionally the needed cards have been modified to contain a larger margin, but the images itself stayed as they were.
+
+The modified svg-cards.svg file is contained in the above mentioned cards directory.
 
 Thanks David!
 
