@@ -152,6 +152,8 @@ def enter_table_socket(msg):
             join_room(table.id)
             # check if any formerly locked table is now emtpy and should be unlocked
             game.check_tables()
+            socketio.emit('index-list-changed',
+                          {'table': 'tables'})
 
 
 @socketio.on('card-played')
@@ -316,7 +318,13 @@ def setup_table(msg):
                           {'table_id': table.id,
                            'sync_count': sync_count},
                           room=table.id)
-
+            # tell others about table change
+            socketio.emit('index-list-changed',
+                          {'table': 'tables'})
+        elif action == 'finished':
+            # tell others about table change
+            socketio.emit('index-list-changed',
+                          {'table': 'tables'})
 
 @socketio.on('setup-player-change')
 def setup_player(msg):
@@ -349,7 +357,13 @@ def setup_player(msg):
                 socketio.emit('change-password-failed',
                               {'player_id': player.id},
                               room=request.sid)
-
+        elif action == 'finished':
+            # tell others about player change
+            socketio.emit('index-list-changed',
+                          {'table': 'players'})
+            # list of tables could use an update too in case player became spectator only
+            socketio.emit('index-list-changed',
+                          {'table': 'tables'})
 
 @socketio.on('deal-cards')
 def deal_cards(msg):

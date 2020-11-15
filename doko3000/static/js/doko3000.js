@@ -471,6 +471,20 @@ $(document).ready(function () {
             $('#turn_indicator').addClass('d-none')
         }
     })
+
+    // update either list of tables or users after a change
+    socket.on('index-list-changed', function (msg) {
+        console.log(msg)
+        if (!location.pathname.startsWith('/table/')) {
+            $.getJSON('/get/' + msg.table,
+                function (data, status) {
+                    if (status == 'success') {
+                        $('#list_' + msg.table).html(data.html)
+                    }
+                })
+        }
+    })
+
 //
 // ------------ Document events ------------
 //
@@ -818,16 +832,14 @@ $(document).ready(function () {
         return false
     })
 
-// reload page after setup
+    // tell everybody there were changes in table setup
     $(document).on('click', '#button_finish_table_setup', function () {
-        if (!location.pathname.startsWith('/table/')) {
-            $.getJSON('/get/tables',
-                function (data, status) {
-                    if (status == 'success') {
-                        $('#list_tables').html(data.html)
-                    }
-                })
-        }
+        console.log('change')
+        socket.emit('setup-table-change', {
+            action: 'finished',
+            player_id: player_id,
+            table_id: $(this).data('table_id')
+        })
     })
 
 // player setup
@@ -905,6 +917,15 @@ $(document).ready(function () {
         }
     })
 
+    // tell everybody there were changes in player setup
+    $(document).on('click', '#button_finish_player_setup', function () {
+        console.log('change')
+        socket.emit('setup-player-change', {
+            action: 'finished',
+            player_id: player_id
+        })
+    })
+
     $(document).on('click', '#button_deal_cards_again', function () {
         socket.emit('deal-cards-again', {
             player_id: player_id,
@@ -947,7 +968,6 @@ $(document).ready(function () {
         // dummy return just in case
         return false
     })
-
 
     $(document).on('click', '#menu_request_round_finish', function () {
         socket.emit('request-round-finish', {

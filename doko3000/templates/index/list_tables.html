@@ -1,60 +1,60 @@
 <ul class="list-group">
     {% for table in tables %}
-    <li class="list-group-item pr-2"
-        id="{{ table.id }}"
-        data-table_id="{{ table.id }}">
-        <div class="row">
-            <div class="col-md-6 col-sm-12">
-                <strong>
-                    {{ table.name}}
-                    {% if table.locked %}
-                    <span class="oi oi-lock-locked"></span>
-                    {% endif %}
-                </strong><br>
-
-                <span class="text-secondary">
-    {% for player_id in table.players %}
-                    <span class="table_{{ table.id }}_player_{{ player_id }}">
-                        {{ game.players[player_id].name }}
-                        {% if game.players[player_id].is_spectator_only %}
-                                                <span class="small oi oi-eye"></span>
+        <li class="list-group-item pr-2"
+            id="{{ table.id }}"
+            data-table_id="{{ table.id }}">
+            <div class="row">
+                <div class="col-md-6 col-sm-12">
+                    <strong>
+                        {{ table.name }}
+                        {% if table.locked %}
+                            <span class="oi oi-lock-locked"></span>
                         {% endif %}
-                        &nbsp
+                    </strong><br>
+
+                    <span class="text-secondary">
+    {% for player_id in table.players %}
+        <span class="table_{{ table.id }}_player_{{ player_id }}">
+                        {{ game.players[player_id].name }}
+            {% if game.players[player_id].is_spectator_only %}
+                <span class="small oi oi-eye"></span>
+            {% endif %}
+            &nbsp
                     </span>
     {% endfor %}
                 </span>
-            </div>
-            <div class="col-md-6 col-sm-12 d-flex align-items-center">
-                {% if current_user.id in table.players or not table.locked %}
-                {% set disabled = '' %}
-                {% else %}
-                {% set disabled = 'disabled' %}
-                {% endif %}
-                <span href="/table/{{ table.id }}"
-                   class="btn btn-success ml-auto text-nowrap button-enter-table {{ disabled }}"
-                   data-table_id="{{ table.id }}">
+                </div>
+                <div class="col-md-6 col-sm-12 d-flex align-items-center">
+                    {% if current_user.id in table.players or not table.locked %}
+                        {% set disabled = '' %}
+                    {% else %}
+                        {% set disabled = 'disabled' %}
+                    {% endif %}
+                    <span href="/table/{{ table.id }}"
+                          class="btn btn-success ml-auto text-nowrap button-enter-table {{ disabled }}"
+                          data-table_id="{{ table.id }}">
                     <span class="oi oi-account-login mr-1"></span>
                     Beitreten
                 </span>
-                <div class="dropdown">
-                    <a href="#" class="btn btn-outline-primary border-0 ml-2 {{ disabled }}" data-toggle="dropdown">
-                        <span class="oi oi-menu"></span>
-                    </a>
-                    <div class="dropdown-menu dropdown-menu-right shadow">
-                        <a href="#" class="dropdown-item setup-table text-nowrap"
-                           data-table_id="{{ table.id }}">
-                            <span class="oi oi-cog mr-2"></span>
-                            Einstellungen
+                    <div class="dropdown">
+                        <a href="#" class="btn btn-outline-primary border-0 ml-2 {{ disabled }}" data-toggle="dropdown">
+                            <span class="oi oi-menu"></span>
                         </a>
-                        <a href="#" class="dropdown-item text-danger text-nowrap button-delete-table {{ disabled }}"
-                           data-table_id="{{ table.id }}">
-                            <span class=" oi oi-trash mr-2"></span>
-                            Löschen
-                        </a>
+                        <div class="dropdown-menu dropdown-menu-right shadow">
+                            <a href="#" class="dropdown-item setup-table text-nowrap"
+                               data-table_id="{{ table.id }}">
+                                <span class="oi oi-cog mr-2"></span>
+                                Einstellungen
+                            </a>
+                            <a href="#" class="dropdown-item text-danger text-nowrap button-delete-table {{ disabled }}"
+                               data-table_id="{{ table.id }}">
+                                <span class=" oi oi-trash mr-2"></span>
+                                Löschen
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </li>
+        </li>
     {% endfor %}
 </ul>
