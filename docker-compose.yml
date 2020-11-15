@@ -1,0 +1,40 @@
+version: '3.7'
+
+networks:
+  doko3000:
+    name: doko3000
+
+volumes:
+  doko3000-couchdb-data:
+  doko3000-couchdb-config:
+
+services:
+  doko3000:
+    build: .
+    image: doko3000
+    container_name: doko3000
+    restart: always
+    networks:
+      - doko3000
+    ports:
+      - 5001:5000/tcp
+  couchdb:
+    image: couchdb
+    container_name: doko3000-couchdb
+    restart: always
+    volumes:
+      - doko3000-couchdb-data:/opt/couchdb/data
+      - doko3000-couchdb-config:/opt/couchdb/etc/local.d
+    networks:
+      - doko3000
+    environment:
+      COUCHDB_USER: admin
+      COUCHDB_PASSWORD: doko3000
+#  nginx:
+#    image: nginx:stable-alpine
+#    container_name: doko3000-nginx
+#    ports:
+#      - 80:80
+#    restart: always
+#    networks:
+#      - web
