@@ -321,10 +321,11 @@ def setup_table(msg):
             # tell others about table change
             socketio.emit('index-list-changed',
                           {'table': 'tables'})
-        elif action == 'finished':
-            # tell others about table change
-            socketio.emit('index-list-changed',
-                          {'table': 'tables'})
+    # new tables do not have an id
+    elif player and action == 'finished':
+        # tell others about table change
+        socketio.emit('index-list-changed',
+                      {'table': 'tables'})
 
 @socketio.on('setup-player-change')
 def setup_player(msg):
@@ -1184,11 +1185,7 @@ def delete_table(table_id):
                                                         message=f"Es sitzen noch Spieler am Tisch {table.name}.")})
         elif request.method == 'POST':
             if game.delete_table(table.id):
-                tables = game.tables.values()
-                return jsonify({'status': 'ok',
-                                'html': render_template('index/list_tables.html',
-                                                        tables=tables,
-                                                        game=game)})
+                return jsonify({'status': 'ok'})
     # default return if nothing applies
     return redirect(url_for('index'))
 

@@ -537,12 +537,16 @@ $(document).ready(function () {
                     show_message('#modal_message', data.message)
                 } else if (data.status == 'ok') {
                     $('#modal_dialog').modal('hide')
-                    $.getJSON('/get/tables',
-                        function (data, status) {
-                            if (status == 'success') {
-                                $('#list_tables').html(data.html)
-                            }
-                        })
+                    // $.getJSON('/get/tables',
+                    //     function (data, status) {
+                    //         if (status == 'success') {
+                    //             $('#list_tables').html(data.html)
+                    //         }
+                    //     })
+                    socket.emit('setup-table-change', {
+                        action: 'finished',
+                        player_id: player_id
+                    })
                 }
             }
         }, 'json')
@@ -787,8 +791,13 @@ $(document).ready(function () {
             function (data, status) {
                 if (status == 'success') {
                     if (data.status == 'ok') {
-                        $('#list_tables').html(data.html)
+                        // $('#list_tables').html(data.html)
                         $('#modal_dialog').modal('hide')
+                        // reload tables list everywhere
+                        socket.emit('setup-table-change', {
+                            action: 'finished',
+                            player_id: player_id
+                        })
                     } else {
                         $('#modal_body').html(data.html)
                         clear_message('#modal_message')
@@ -834,7 +843,6 @@ $(document).ready(function () {
 
     // tell everybody there were changes in table setup
     $(document).on('click', '#button_finish_table_setup', function () {
-        console.log('change')
         socket.emit('setup-table-change', {
             action: 'finished',
             player_id: player_id,
