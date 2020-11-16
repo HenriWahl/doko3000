@@ -61,6 +61,8 @@ $(document).ready(function () {
             direction: 'horizontal'
         }
     ]);
+
+
     dragging_cards.on('drop', function (card, target, source) {
         // do not drag your gained tricks around
         if (card.id == 'cards_stack') {
@@ -104,6 +106,9 @@ $(document).ready(function () {
                     // to avoid later mess (cards stack inside the cards at hand) move stack to end
                     $('#cards_stack').appendTo('#hand')
                     return true
+                } else if (card.id == 'cards_stack') {
+                    // do not drag your gained tricks around
+                    dragging_cards.cancel(true)
                 } else {
                     // card does not belong to hand because the dealer dealed again while the card was dragged around
                     $(card).remove()
@@ -762,9 +767,9 @@ $(document).ready(function () {
                             $('#modal_dialog').modal('hide')
                             // tell other admins about player changes
                             socket.emit('setup-player-change', {
-                            action: 'finished',
-                            player_id: player_id
-                        })
+                                action: 'finished',
+                                player_id: player_id
+                            })
                         } else {
                             $('#modal_body').html(data.html)
                             clear_message('#modal_message')
