@@ -910,7 +910,8 @@ class Table(Document):
     @order.setter
     def order(self, value):
         self['order'] = value
-        self.save()
+        # might lead to race condition, table will be saved mostly soon anyway
+        #self.save()
 
     @property
     def round(self):
@@ -987,6 +988,7 @@ class Table(Document):
         # backward compatibility
         if not self.get('sync_count'):
             self.reset_sync_count()
+            self.save()
         return self['sync_count']
 
     @sync_count.setter
@@ -1018,7 +1020,6 @@ class Table(Document):
 
     def reset_sync_count(self):
         self['sync_count'] = 1
-        self.save()
 
     def add_player(self, player_id):
         """
@@ -1092,10 +1093,10 @@ class Table(Document):
         """
         # beginning order is the same like players without spectators
         self.order = self.players_active[:]
-        # new round of 4 players
-        self.reset_round()
         # new sync count
         self.reset_sync_count()
+        # new round of 4 players
+        self.reset_round()
 
     def shift_players(self):
         """
