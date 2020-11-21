@@ -43,7 +43,9 @@ socketio = SocketIO(app,
                     # # seems to be better somewhat higher for clients not getting nervous when waiting for reset
                     ping_timeout=15,
                     ping_interval=2,
-                    logger=True)
+                    logger=True,
+                    engineio_logger=True,
+                    cors_allowed_origins=None)
 # load game data from database after initialization
 game = Game(db)
 game.load_from_db()
@@ -106,6 +108,9 @@ def check_message(msg, player_in_round=True, player_at_table=True):
 #
 @socketio.on('who-am-i')
 def who_am_i():
+
+    print(request)
+
     if not current_user.is_anonymous:
         player = game.players.get(current_user.get_id())
         if player:

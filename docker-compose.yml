@@ -16,8 +16,6 @@ services:
     restart: always
     networks:
       - doko3000
-    ports:
-      - 5001:5000/tcp
   couchdb:
     image: couchdb
     container_name: doko3000-couchdb
@@ -28,13 +26,19 @@ services:
     networks:
       - doko3000
     environment:
+      SECRET_KEY: change_me
       COUCHDB_USER: admin
       COUCHDB_PASSWORD: doko3000
-#  nginx:
-#    image: nginx:stable-alpine
-#    container_name: doko3000-nginx
-#    ports:
-#      - 80:80
-#    restart: always
-#    networks:
-#      - web
+  nginx:
+    image: nginx:stable-alpine
+    container_name: doko3000-nginx
+    ports:
+      - 80:80/tcp
+      - 443:443/tcp
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./cert.pem:/cert.pem
+      - ./key.pem:/key.pem
+    restart: always
+    networks:
+      - doko3000

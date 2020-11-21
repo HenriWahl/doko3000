@@ -1,7 +1,4 @@
 import os
-from pathlib import Path
-
-basedir = Path(__file__).parent
 
 
 class Config:
