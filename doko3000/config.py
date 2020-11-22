@@ -11,6 +11,11 @@ class Config:
     COUCHDB_DATABASE = os.environ.get('COUCHDB_DATABASE') or 'doko3000'
     COUCHDB_USER = os.environ.get('COUCHDB_USER') or 'admin'
     COUCHDB_PASSWORD = os.environ.get('COUCHDB_PASSWORD') or 'doko3000'
+    host = os.environ.get('HOST')
+    if host:
+        CORS_ALLOWED_ORIGINS = [f'http://{host}', f'https://{host}']
+    else:
+        CORS_ALLOWED_ORIGINS = []
 
 
 class DummyApp:

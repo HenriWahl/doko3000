@@ -15,7 +15,6 @@ from flask_login import current_user, \
     logout_user
 from flask_socketio import join_room, \
     SocketIO
-from werkzeug.middleware.proxy_fix import ProxyFix
 
 from .config import Config
 from .database import DB
@@ -23,6 +22,8 @@ from .game import Deck, \
     Game
 from .misc import is_xhr, \
     Login
+
+# from werkzeug.middleware.proxy_fix import ProxyFix
 
 # initialize app
 app = Flask(__name__)
@@ -47,8 +48,8 @@ socketio = SocketIO(app,
                     logger=True,
                     engineio_logger=True,
                     # allow_upgrades=False,
-                    cors_allowed_origins=[])
-app.wsgi_app = ProxyFix(app.wsgi_app)
+                    cors_allowed_origins=Config.CORS_ALLOWED_ORIGINS)
+# app.wsgi_app = ProxyFix(app.wsgi_app)
 
 # load game data from database after initialization
 game = Game(db)

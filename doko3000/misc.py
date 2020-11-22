@@ -14,6 +14,7 @@ class Login(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired()])
     submit = SubmitField('Login')
 
+
 # request.is_xhr()-replacement
 def is_xhr(request):
     if request.accept_mimetypes.accept_json and \
