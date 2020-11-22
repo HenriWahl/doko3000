@@ -1,0 +1,6 @@
+# secret key for flask sessions
+SECRET_KEY=change_me
+# CouchDB user used by doko3000 and couchdb containers
+COUCHDB_USER=admin
+# CouchDB password used by doko3000 and couchdb containers
+COUCHDB_PASSWORD=doko3000

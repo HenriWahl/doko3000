@@ -16,6 +16,8 @@ services:
     restart: always
     networks:
       - doko3000
+    env_file:
+      - environment
   couchdb:
     image: couchdb
     container_name: doko3000-couchdb
@@ -25,10 +27,8 @@ services:
       - doko3000-couchdb-config:/opt/couchdb/etc/local.d
     networks:
       - doko3000
-    environment:
-      SECRET_KEY: change_me
-      COUCHDB_USER: admin
-      COUCHDB_PASSWORD: doko3000
+    env_file:
+      - environment
   nginx:
     image: nginx:stable-alpine
     container_name: doko3000-nginx

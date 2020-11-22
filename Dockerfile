@@ -1,16 +1,19 @@
 FROM python:3.8
-LABEL maintainer=henri.wahl@t-online.de
+LABEL maintainer=h.wahl@t-online.de
 
 RUN apt -y update &&\
     apt -y upgrade
-RUN python -m pip install --upgrade pip
 
 COPY ./ /doko3000
 WORKDIR /doko3000
 
 RUN pip install -r requirements.txt
 
+# run gunicorn workers as unprivileged user
 RUN useradd doko3000
 
-ENV FLASK_APP=main.py
-CMD ["flask", "run", "--host", "::"]
+# entrypoint.sh sets the permissions for .pem files to be used by unprivileged gunicorn
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
