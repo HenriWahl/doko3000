@@ -46,8 +46,7 @@ socketio = SocketIO(app,
                     ping_interval=2,
                     logger=True,
                     engineio_logger=True,
-                    transport='polling',
-                    allow_upgrades=False,
+                    # allow_upgrades=False,
                     cors_allowed_origins=[])
 app.wsgi_app = ProxyFix(app.wsgi_app)
 
