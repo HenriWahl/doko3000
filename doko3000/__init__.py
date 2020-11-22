@@ -15,6 +15,7 @@ from flask_login import current_user, \
     logout_user
 from flask_socketio import join_room, \
     SocketIO
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 from .config import Config
 from .database import DB
@@ -45,7 +46,11 @@ socketio = SocketIO(app,
                     ping_interval=2,
                     logger=True,
                     engineio_logger=True,
-                    cors_allowed_origins=None)
+                    transport='polling',
+                    allow_upgrades=False,
+                    cors_allowed_origins=[])
+app.wsgi_app = ProxyFix(app.wsgi_app)
+
 # load game data from database after initialization
 game = Game(db)
 game.load_from_db()
@@ -108,9 +113,6 @@ def check_message(msg, player_in_round=True, player_at_table=True):
 #
 @socketio.on('who-am-i')
 def who_am_i():
-
-    print(request)
-
     if not current_user.is_anonymous:
         player = game.players.get(current_user.get_id())
         if player:
