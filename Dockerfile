@@ -4,7 +4,7 @@ LABEL maintainer=h.wahl@t-online.de
 RUN apt -y update &&\
     apt -y upgrade
 
-COPY ./ /doko3000
+COPY . /doko3000
 WORKDIR /doko3000
 
 RUN pip install -r requirements.txt
@@ -13,7 +13,7 @@ RUN pip install -r requirements.txt
 RUN useradd doko3000
 
 # entrypoint.sh sets the permissions for .pem files to be used by unprivileged gunicorn
-COPY entrypoint.sh /entrypoint.sh
+COPY docker/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
