@@ -23,8 +23,6 @@ from .game import Deck, \
 from .misc import is_xhr, \
     Login
 
-# from werkzeug.middleware.proxy_fix import ProxyFix
-
 # initialize app
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -45,11 +43,10 @@ socketio = SocketIO(app,
                     # # seems to be better somewhat higher for clients not getting nervous when waiting for reset
                     ping_timeout=15,
                     ping_interval=2,
-                    logger=True,
-                    engineio_logger=True,
+                    #logger=True,
+                    #engineio_logger=True,
                     # allow_upgrades=False,
                     cors_allowed_origins=Config.CORS_ALLOWED_ORIGINS)
-# app.wsgi_app = ProxyFix(app.wsgi_app)
 
 # load game data from database after initialization
 game = Game(db)

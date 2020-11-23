@@ -21,10 +21,3 @@ def is_xhr(request):
             request.accept_mimetypes.best in ACCEPTED_JSON_MIMETYPES:
         return True
     return False
-
-
-def debug(message):
-    """
-    simple debugging facility
-    """
-    print(message)

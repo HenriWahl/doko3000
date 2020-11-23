@@ -5,8 +5,8 @@ networks:
     name: doko3000
 
 volumes:
-  doko3000-couchdb-data:
   doko3000-couchdb-config:
+  doko3000-couchdb-data:
 
 services:
   doko3000:
