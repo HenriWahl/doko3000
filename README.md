@@ -62,22 +62,6 @@ All further steps are based on the `doko3000` directory:
  
     cd doko3000
      
-### docker-compose.yml
-  
-In [/docker](./docker) there are 3 example **docker-compose** configuration files. Just copy one of them to the root 
-directory you're in:
-  
-    cp docker/docker-compose.yml .
-  
-If you plan to use HTTPS better use the *docker-compose-https.yml* file, which will need some customization regarding
-the certificate and key file:
-  
-    cp docker/docker-compose-https.yml docker-compose.yml
-    
-The third file *docker-compose-https-letsencrypt.yml* can be used for Let's Encrypt setups and is based on 
-[Nginx and Let’s Encrypt with Docker in Less Than 5 Minutes](https://medium.com/@pentacent/nginx-and-lets-encrypt-with-docker-in-less-than-5-minutes-b4b8a60d3a71) -
-maybe there is a more elegant way but it works fine here. This docker-compose config surely has to be customized by you.
-    
 ### Environment file
  
 The file [docker/default.env](./docker/default.env) can be copied to **.env**, wherever **docker-compose** is intended to be run.
@@ -91,14 +75,28 @@ Inside the environment file you could set optional variables - if not, doko3000 
  
     cp docker/default.env .env
  
-If any of the configuration variables is important to you just change them there.
- 
-### Running the server
- 
-If everything is configured you can start the server with
- 
-    docker-compose up -d
- 
+If any of the configuration variables is important to you just change them there - for local testing it won't be needed.
+
+###  Running the server with docker-compose.yml
+  
+In [/docker](./docker) there are 3 example **docker-compose** configuration files. Just run one of them from the root 
+directory you're in.
+
+The simplest way is running it only accessible via HTTP on port 80:
+  
+    docker-compose -f docker/docker-compose.yml up -d
+  
+If you plan to use HTTPS better use the *docker-compose-https.yml* file. Copy the **certificate** and **key** file
+respectively as *cert.pem* and *key.pem* into [/docker](./docker) and run:
+  
+    docker-compose -f docker/docker-compose-https.yml up -d
+    
+The third file *docker-compose-https-letsencrypt.yml* can be used for Let's Encrypt setups and is based on 
+[Nginx and Let’s Encrypt with Docker in Less Than 5 Minutes](https://medium.com/@pentacent/nginx-and-lets-encrypt-with-docker-in-less-than-5-minutes-b4b8a60d3a71) -
+maybe there is a more elegant way but it works fine here. This docker-compose config surely has to be customized by you.
+
+### Et voilà!
+
 If you run it on your local machine, point your favorite browser to http://localhost and you will find the login page:
  
 ![doko3000 login](doc/doko3000-login.png)

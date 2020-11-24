@@ -10,12 +10,17 @@ volumes:
 
 services:
   doko3000:
-    build: .
+    build: ..
     image: doko3000
     container_name: doko3000
     restart: always
     networks:
       - doko3000
+    environment:
+      - HOST
+      - SECRET_KEY
+      - COUCHDB_USER
+      - COUCHDB_PASSWORD
   couchdb:
     image: couchdb
     container_name: doko3000-couchdb
@@ -25,14 +30,17 @@ services:
       - doko3000-couchdb-config:/opt/couchdb/etc/local.d
     networks:
       - doko3000
+    environment:
+      - COUCHDB_USER
+      - COUCHDB_PASSWORD
   nginx:
     image: nginx:stable-alpine
     container_name: doko3000-nginx
     ports:
       - 80:80/tcp
     volumes:
-      - ./docker/nginx.conf:/etc/nginx/conf.d/default.conf
-      - ./doko3000/static:/usr/share/nginx/html/static
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - ../doko3000/static:/usr/share/nginx/html/static
     restart: always
     networks:
       - doko3000
