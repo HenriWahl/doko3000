@@ -1154,7 +1154,9 @@ class Game:
         if len(self.players) == 0:
             self.add_player(player_id='admin',
                             password='admin',
-                            is_admin=True)
+                            is_admin=True,
+                            spectator_only=True,
+                            allows_spectators=True)
 
         # all tricks belonging to certain rounds shall stay in CouchDB too
         self.tricks = {}
