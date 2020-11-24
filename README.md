@@ -83,7 +83,7 @@ maybe there is a more elegant way but it works fine here. This docker-compose co
 The file [docker/default.env](./docker/default.env) can be copied to **.env**, wherever **docker-compose** is intended to be run.
 Inside the environment file you could set optional variables - if not, doko3000 is able to run with defaults too:
  
-- **HOST** - name of the server host to be used at least as *cors_allowed_origins* in flask7
+- **HOST** - name of the server host to be used at least as *cors_allowed_origins* in flask
 - **SECRET_KEY** - secret key for flask sessions
 - **COUCHDB_USER**  - CouchDB user used by doko3000 and couchdb containers
 - **COUCHDB_PASSWORD** - CouchDB password used by doko3000 and couchdb containers
