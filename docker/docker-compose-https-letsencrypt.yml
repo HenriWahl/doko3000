@@ -30,6 +30,7 @@ services:
   nginx:
     image: nginx:stable-alpine
     container_name: doko3000-nginx
+    restart: always
     ports:
       - 80:80/tcp
       - 443:443/tcp
@@ -39,8 +40,6 @@ services:
       - ./cards:/usr/share/nginx/html/static/img/cards
       - certbot-config:/etc/letsencrypt
       - certbot-www:/usr/share/nginx/html/certbot
-      - /etc/localtime:/etc/localtime:ro
-    restart: always
     networks:
       - doko3000
     command:

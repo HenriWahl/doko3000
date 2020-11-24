@@ -42,21 +42,20 @@ Doko3000 is a [Python](https://python.org) web application based on:
  - [Flask-SocketIO](https://flask-socketio.readthedocs.io) and
  - [CouchDB](https://couchdb.apache.org/).
  
- As **server** anything capable of running Python might work, but best experiences were made with **containers**.
+ As **server** anything capable of running Python might work, but best experiences were made with **containers** on Linux.
  
- As **client** any current browser will do, as long as it can make use of WebSocket, which are necessary for the game
- communication.
+ As **client** any current browser will do, as long as it can make use of WebSocket, which is
+  necessary for the game communication.
  
- 
- ### Environment file
+  ### Environment file
  
  The file [default.env](./docker/default.env) can be copied to **.env**, wherever **docker-compose** is intended to be run.
  Inside the environment file you could set optional variables:
  
- - **HOST**=localhost - name of the server host to be used at least as *cors_allowed_origins* in flask
- - **SECRET_KEY**=change_me - secret key for flask sessions
- - **COUCHDB_USER**=admin - CouchDB user used by doko3000 and couchdb containers
- - **COUCHDB_PASSWORD**=doko3000 - CouchDB password used by doko3000 and couchdb containers
+ - **HOST** = *localhost* - name of the server host to be used at least as *cors_allowed_origins* in flask
+ - **SECRET_KEY** = *change_me* - secret key for flask sessions
+ - **COUCHDB_USER** = *admin* - CouchDB user used by doko3000 and couchdb containers
+ - **COUCHDB_PASSWORD** = *doko3000* - CouchDB password used by doko3000 and couchdb containers
  
  
  *To be continued...*
