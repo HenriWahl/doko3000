@@ -62,20 +62,21 @@ All further steps are based on the `doko3000` directory:
  
     cd doko3000
      
-### Environment file
+### Environment file .env
  
-Inside the environment file you could set optional variables - if not, doko3000 is able to run with defaults too:
+Inside the environment file you should set optional variables:
  
 - **HOST** - name of the server host to be used at least as *cors_allowed_origins* in flask
 - **SECRET_KEY** - secret key for flask sessions
-- **COUCHDB_USER**  - CouchDB user used by doko3000 and couchdb containers
-- **COUCHDB_PASSWORD** - CouchDB password used by doko3000 and couchdb containers
+- **COUCHDB_USER**  - CouchDB user used by containers doko3000 and couchdb
+- **COUCHDB_PASSWORD** - CouchDB password used by containers doko3000 and couchdb
 
-The example file [/docker/default.env](./docker/default.env) can be copied to *.env*, wherever **docker-compose** is intended to be run:
+The example file [/docker/default.env](./docker/default.env) can be copied to *.env*, wherever
+**docker-compose** is intended to be run:
  
     cp docker/default.env .env
  
-If any of the configuration variables is important to you just change them there - for local testing it won't be needed.
+At least **COUCHDB_USER** and **COUCHDB_PASSWORD** have to be set.
 
 ###  Running the server with docker-compose.yml
   
