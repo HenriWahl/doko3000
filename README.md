@@ -99,7 +99,7 @@ If everything is configured you can start the server with
  
     docker-compose up -d
  
-Point your favorite browser to http://localhost and you will find the login page:
+If you run it on your local machine, point your favorite browser to http://localhost and you will find the login page:
  
 ![doko3000 login](doc/doko3000-login.png)
  
