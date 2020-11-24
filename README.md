@@ -11,14 +11,14 @@ It just provides a **virtual table** with **virtual cards**. Players play like i
 other via video conference in a parallel window.
 To keep as much normality during the pandemic, doko3000 is intended to be **as digital as necessary, as analog as possible**.
 This is why **no rules** are included, because there are so many and players should apply them like sitting at a real table.
-For the same reason there are **no scoreboards** or statistics - it will even feel more familiar if somebody of the group
+For the same reason there are **no global scoreboards** or statistics - it will even feel more familiar if somebody of the group
 notes the score as before.
 
 Ingame language at the moment is only german due to Doppelkopf being a mostly german phenomenon. Might change in the future.
 
 ## Screenshots
 
-Player sees cards in its hand and the ones on the table. The display at the top shows all 4 players of the current round:
+Every player sees cards in its hand and the ones on the table. The display at the top shows all 4 players of the current round:
 
 ![Playing doko3000](doc/doko3000-play.png)
 
@@ -49,7 +49,7 @@ Doko3000 is a [Python](https://python.org) web application mostly based on:
  
 As **server** anything capable of running Python might work, but best experiences were made with **containers** on Linux.
  
-As **client** any current browser will do, as long as it can make use of WebSocket, which is
+As **client** any current browser will do, as long as it can make use of **WebSocket**, which is
 necessary for the game communication.
  
 ### Getting doko3000
@@ -64,7 +64,6 @@ All further steps are based on the `doko3000` directory:
      
 ### Environment file
  
-The file [docker/default.env](./docker/default.env) can be copied to **.env**, wherever **docker-compose** is intended to be run.
 Inside the environment file you could set optional variables - if not, doko3000 is able to run with defaults too:
  
 - **HOST** - name of the server host to be used at least as *cors_allowed_origins* in flask
@@ -72,6 +71,7 @@ Inside the environment file you could set optional variables - if not, doko3000 
 - **COUCHDB_USER**  - CouchDB user used by doko3000 and couchdb containers
 - **COUCHDB_PASSWORD** - CouchDB password used by doko3000 and couchdb containers
 
+The example file [docker/default.env](./docker/default.env) can be copied to *.env*, wherever **docker-compose** is intended to be run:
  
     cp docker/default.env .env
  
@@ -86,7 +86,7 @@ The simplest way is running it only accessible via HTTP on port 80:
   
     docker-compose -f docker/docker-compose.yml up -d
   
-If you plan to use HTTPS better use the *docker-compose-https.yml* file. Copy the **certificate** and **key** file
+If you plan to use HTTPS better use the *docker-compose-https.yml* file. Copy the **certificate** and **key** files
 respectively as *cert.pem* and *key.pem* into [/docker](./docker) and run:
   
     docker-compose -f docker/docker-compose-https.yml up -d
