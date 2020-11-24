@@ -71,7 +71,7 @@ Inside the environment file you could set optional variables - if not, doko3000 
 - **COUCHDB_USER**  - CouchDB user used by doko3000 and couchdb containers
 - **COUCHDB_PASSWORD** - CouchDB password used by doko3000 and couchdb containers
 
-The example file [docker/default.env](./docker/default.env) can be copied to *.env*, wherever **docker-compose** is intended to be run:
+The example file [/docker/default.env](./docker/default.env) can be copied to *.env*, wherever **docker-compose** is intended to be run:
  
     cp docker/default.env .env
  
@@ -93,7 +93,7 @@ respectively as *cert.pem* and *key.pem* into [/docker](./docker) and run:
     
 The third file *docker-compose-https-letsencrypt.yml* can be used for Let's Encrypt setups and is based on 
 [Nginx and Let’s Encrypt with Docker in Less Than 5 Minutes](https://medium.com/@pentacent/nginx-and-lets-encrypt-with-docker-in-less-than-5-minutes-b4b8a60d3a71) -
-maybe there is a more elegant way but it works fine here. This docker-compose config surely has to be customized by you.
+maybe there is a more elegant way but it works fine here. This docker-compose config surely has to be customized.
 
 ### Et voilà!
 
