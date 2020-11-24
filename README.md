@@ -104,3 +104,8 @@ If you run it on your local machine, point your favorite browser to http://local
  
 The **default user** is `admin` with the password `admin` and admin rights. It can create other players and should
 get a new password soon.
+
+
+## Management
+
+The `admin` user has the right to create new players

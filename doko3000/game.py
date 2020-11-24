@@ -874,6 +874,8 @@ class Table(Document):
             # what table?
             self['id'] = table_id_quoted
             self['name'] = table_id
+            # sync starts with 1
+            self['sync_count'] = 1
             # default empty
             # quite likely order is about to vanish
             self['order'] = []
@@ -988,7 +990,6 @@ class Table(Document):
         # backward compatibility
         if not self.get('sync_count'):
             self.reset_sync_count()
-            self.save()
         return self['sync_count']
 
     @sync_count.setter
