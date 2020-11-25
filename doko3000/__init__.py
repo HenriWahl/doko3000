@@ -1029,6 +1029,23 @@ def enter_table_json(table_id='', player_id=''):
         return redirect(url_for('index'))
 
 
+@app.route('/get/welcome/<table_id>')
+@login_required
+def get_welcome(table_id):
+    """
+    get HTML snippet if welcome on table is needed
+    """
+    if is_xhr(request) and table_id:
+        table = game.tables.get(table_id)
+        if table and table.needs_welcome:
+            return jsonify({'needs_welcome': True,
+                                'html': render_template('round/welcome.html')})
+        else:
+            return jsonify({'needs_welcome': False})
+    else:
+        return redirect(url_for('index'))
+
+
 @app.route('/get/tables')
 @login_required
 def get_html_tables():

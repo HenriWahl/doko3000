@@ -500,7 +500,7 @@ $(document).ready(function () {
             table_id: table_id
         })
         // ask server via json if player is allowed to enter or not
-        return $.getJSON('/enter/table/' + encodeURIComponent($(this).data('table_id')) + '/' + encodeURIComponent(player_id),
+        return $.getJSON('/enter/table/' + encodeURIComponent(table_id) + '/' + encodeURIComponent(player_id),
             function (data, status) {
                 if (status == 'success' && data.allowed) {
                     // return data.allowed
@@ -508,6 +508,7 @@ $(document).ready(function () {
                         // use location.assign to avoid browsers decoding the id
                         location.assign('/table/' + encodeURIComponent(table_id))
                     }
+                    console.log($.getJSON('/get/welcome/' + encodeURIComponent(table_id)))
                 }
                 // dummy return just in case
                 return false

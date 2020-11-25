@@ -1010,6 +1010,13 @@ class Table(Document):
             self['is_debugging'] = False
         self.save()
 
+    @property
+    def needs_welcome(self):
+        if len(self.players) < 4:
+            return True
+        else:
+            return False
+
     def increase_sync_count(self):
         """
         to be called after various actions
