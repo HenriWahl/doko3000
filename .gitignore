@@ -1,4 +1,5 @@
 *.db
 *.idea
+*.pem
 .env
 

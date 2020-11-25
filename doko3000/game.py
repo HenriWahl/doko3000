@@ -236,7 +236,6 @@ class Player(UserMixin, Document):
                     # cards might have been here from debugging or an earlier game - just reset them
                     cards = []
                     self.cards = cards
-                    self.save()
             else:
                 self.cards = cards
                 # if not playing right now there is no need to save the cards

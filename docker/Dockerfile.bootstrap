@@ -1,0 +1,22 @@
+# https://getbootstrap.com/docs/4.5/getting-started/build-tools/#tooling-setup
+FROM node:buster
+ARG VERSION=4.5.3
+
+RUN apt -y update && \
+    apt -y upgrade && \
+    apt -y install apt-utils
+
+RUN apt -y install ruby \
+                   ruby-dev
+#RUN gem install bundler
+#RUN bundle install
+
+ADD https://github.com/twbs/bootstrap/archive/v${VERSION}.zip /src/bootstrap.zip
+
+# should be a mounted in volume
+WORKDIR /src
+RUN unzip bootstrap.zip
+WORKDIR /src/bootstrap-${VERSION}
+
+
+

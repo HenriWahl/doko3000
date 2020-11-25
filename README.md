@@ -1,6 +1,6 @@
 # doko3000
 
-Simple Doppelkopf deck simulation via web browser.
+Simple Doppelkopf card deck simulation via web browser.
 
 ## Overview
 
