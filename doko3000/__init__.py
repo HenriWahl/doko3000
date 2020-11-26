@@ -1039,7 +1039,8 @@ def get_welcome(table_id):
         table = game.tables.get(table_id)
         if table and table.needs_welcome:
             return jsonify({'needs_welcome': True,
-                                'html': render_template('round/welcome.html')})
+                                'html': render_template('round/welcome.html',
+                                                        table=table)})
         else:
             return jsonify({'needs_welcome': False})
     else:

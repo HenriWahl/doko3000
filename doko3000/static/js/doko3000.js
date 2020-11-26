@@ -62,7 +62,6 @@ $(document).ready(function () {
         }
     ]);
 
-
     dragging_cards.on('drop', function (card, target, source) {
         // do not drag your gained tricks around
         if (card.id == 'cards_stack') {
@@ -146,6 +145,19 @@ $(document).ready(function () {
             }
         }
     })
+
+    console.log($('#needs_welcome').data('state'))
+    if ($('#needs_welcome').data('state')) {
+        let table_id = $('#needs_welcome').data('table_id')
+        $.getJSON('/get/welcome/' + encodeURIComponent(table_id), function (data, status) {
+            if (status == 'success') {
+                console.log(data.html)
+                $('#modal_body').html(data.html)
+                clear_message('#modal_message')
+                $("#modal_dialog").modal('show')
+            }
+        })
+    }
 
 //
 // ------------ Socket.io events ------------
@@ -280,7 +292,7 @@ $(document).ready(function () {
 
     socket.on('sorry-no-cards-for-you', function (msg) {
         if (check_sync(msg)) {
-            $('#modal_body').html('')
+            // $('#modal_body').html('')
             $("#modal_dialog").modal('hide')
             $('.mode-spectator').removeClass('d-none')
             $('.mode-player').addClass('d-none')
@@ -508,7 +520,6 @@ $(document).ready(function () {
                         // use location.assign to avoid browsers decoding the id
                         location.assign('/table/' + encodeURIComponent(table_id))
                     }
-                    console.log($.getJSON('/get/welcome/' + encodeURIComponent(table_id)))
                 }
                 // dummy return just in case
                 return false

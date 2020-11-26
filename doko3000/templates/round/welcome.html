@@ -1,0 +1,31 @@
+<div class="text-center">
+    <h3>Willkommen an <strong>{{ table.name }}</strong></h3>
+</div>
+<div class="mt-3">
+    Wenn <strong>mindestens 4 Spieler</strong> anwesend sind:
+    <ul class="mt-2">
+        {#        <ul>#}
+        <li>
+            <strong>Menü</strong> <span class="badge badge-secondary"><span class="oi oi-menu"></span></span> oben links
+        </li>
+        <li>
+            in
+            <span class="badge badge-light">
+            <span class="oi oi-cog mr-1"></span>
+            Einstellungen
+            </span>
+            <strong>Reihenfolge</strong> und <strong>Optionen</strong> festlegen
+        </li>
+        <li>
+            neue Runde <strong>beginnen</strong> mit <span class="badge badge-success">Neu starten</span>
+        </li>
+    </ul>
+</div>
+<div class="row mt-4">
+    <div class="col-6">
+    </div>
+    <div class="col-6" id="button_close_welcome">
+        <button class="btn btn-primary btn-block btn" data-dismiss="modal"><strong>OK</strong>
+        </button>
+    </div>
+</div>
