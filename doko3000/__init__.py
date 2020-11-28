@@ -43,8 +43,8 @@ socketio = SocketIO(app,
                     # # seems to be better somewhat higher for clients not getting nervous when waiting for reset
                     ping_timeout=15,
                     ping_interval=2,
-                    #logger=True,
-                    #engineio_logger=True,
+                    # logger=True,
+                    # engineio_logger=True,
                     # allow_upgrades=False,
                     cors_allowed_origins=Config.CORS_ALLOWED_ORIGINS)
 
@@ -331,6 +331,7 @@ def setup_table(msg):
         socketio.emit('index-list-changed',
                       {'table': 'tables'})
 
+
 @socketio.on('setup-player-change')
 def setup_player(msg):
     """
@@ -369,6 +370,7 @@ def setup_player(msg):
             # list of tables could use an update too in case player became spectator only
             socketio.emit('index-list-changed',
                           {'table': 'tables'})
+
 
 @socketio.on('deal-cards')
 def deal_cards(msg):
@@ -418,7 +420,7 @@ def deal_cards_to_player(msg):
         exchange_needed = table.round.is_exchange_needed(player.id)
         sync_count = table.sync_count
         if player.id in table.round.players and \
-           player.id in table.players_active:
+                player.id in table.players_active:
             cards_hand = player.get_cards()
             if table.round.cards_shown:
                 # cards_shown contains cqrds-showing player_id
@@ -1039,8 +1041,8 @@ def get_welcome(table_id):
         table = game.tables.get(table_id)
         if table and table.needs_welcome:
             return jsonify({'needs_welcome': True,
-                                'html': render_template('round/welcome.html',
-                                                        table=table)})
+                            'html': render_template('round/welcome.html',
+                                                    table=table)})
         else:
             return jsonify({'needs_welcome': False})
     else:
@@ -1225,6 +1227,11 @@ def start_table(table_id):
         else:
             return jsonify({'status': 'error',
                             'html': render_template('error.html',
-                                                    message=f"Es sitzen nicht genug Spieler am Tisch {table.name}.")})
+                                                    message=f"Es sitzen nicht genug Spieler am Tisch {table.name}.",
+                                                    message_styled=[('Es sitzen', None),
+                                                                    ('nicht genug Spieler', 'strong'),
+                                                                    ('am Tisch', None),
+                                                                    (f'{table.name}', 'strong')]
+                                                    )})
     else:
         return redirect(url_for('index'))
