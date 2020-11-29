@@ -1,7 +1,10 @@
 {% extends "base.html" %}
 
 {% block main_content %}
-
+    {# store info if a welcome dialog on index shall explain how to create table #}
+    <span id="needs_welcome"
+          data-state="{{ game.needs_welcome|tojson }}">
+    </span>
 <div id="topbar">
     {% include "top/player.html" %}
 </div>

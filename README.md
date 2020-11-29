@@ -9,8 +9,10 @@ Doko3000 helps to keep the ongoing league competition going.
 
 It just provides a **virtual table** with **virtual cards**. Players play like in the real world, preferably talking to each
 other via video conference in a parallel window.
-To keep as much normality during the pandemic, doko3000 is intended to be **as digital as necessary, as analog as possible**.
+To preserve as much normality during the pandemic as possible, doko3000 is intended to be **as digital as necessary, as analog as possible**.
 This is why **no rules** are included, because there are so many and players should apply them like sitting at a real table.
+This means **absolute freedom** to play with **all custom rules** players are used to play.
+
 For the same reason there are **no global scoreboards** or statistics - it will even feel more familiar if somebody of the group
 notes the score as before.
 
@@ -46,6 +48,7 @@ Doko3000 is a [Python](https://python.org) web application mostly based on:
  - [Dragula](https://bevacqua.github.io/dragula/)
  - [Bootstrap](https://getbootstrap.com)
  - [jQuery](https://jquery.com)
+ - [Open Iconic](https://useiconic.com/open)
  
 As **server** anything capable of running Python might work, but best experiences were made with **containers** on Linux.
  
@@ -64,19 +67,22 @@ All further steps are based on the `doko3000` directory:
      
 ### Environment file .env
  
-Inside the environment file you should set optional variables:
+Inside the environment file can should set optional variables:
  
 - **HOST** - name of the server host to be used at least as *cors_allowed_origins* in flask
-- **SECRET_KEY** - secret key for flask sessions
-- **COUCHDB_USER**  - CouchDB user used by containers doko3000 and couchdb
+- **COUCHDB_URL** - URL of CouchDB server
+- **COUCHDB_DATABASE** - name of database on server
+- **COUCHDB_USER** - CouchDB user used by containers doko3000 and couchdb
 - **COUCHDB_PASSWORD** - CouchDB password used by containers doko3000 and couchdb
+- **SECRET_KEY** - secret key for flask sessions
 
 The example file [/docker/default.env](./docker/default.env) can be copied to `.env` wherever
 **docker-compose** is intended to be run:
  
     cp docker/default.env .env
  
-At least **COUCHDB_USER** and **COUCHDB_PASSWORD** have to be set.
+The default settings should already work - only **COUCHDB_USER** and **COUCHDB_PASSWORD** have to be set at least once
+initially to initialize the CouchDB database in the `doko3000-couchdb` container.
 
 ###  Running the server with docker-compose.yml
   

@@ -1032,19 +1032,28 @@ def enter_table_json(table_id='', player_id=''):
 
 
 @app.route('/get/welcome/<table_id>')
+@app.route('/get/welcome')
 @login_required
-def get_welcome(table_id):
+def get_welcome(table_id=None):
     """
-    get HTML snippet if welcome on table is needed
+    get HTML snippet if welcome on index or table is needed
     """
-    if is_xhr(request) and table_id:
-        table = game.tables.get(table_id)
-        if table and table.needs_welcome:
-            return jsonify({'needs_welcome': True,
-                            'html': render_template('round/welcome.html',
-                                                    table=table)})
+    if is_xhr(request):
+        if table_id:
+            table = game.tables.get(table_id)
+            if table and table.needs_welcome:
+                return jsonify({'needs_welcome': True,
+                                'html': render_template('round/welcome.html',
+                                                        table=table)})
+            else:
+                return jsonify({'needs_welcome': False})
         else:
-            return jsonify({'needs_welcome': False})
+            if game.needs_welcome:
+                return jsonify({'needs_welcome': True,
+                                'html': render_template('index/welcome.html',
+                                                        game=game)})
+            else:
+                return jsonify({'needs_welcome': False})
     else:
         return redirect(url_for('index'))
 
@@ -1227,11 +1236,7 @@ def start_table(table_id):
         else:
             return jsonify({'status': 'error',
                             'html': render_template('error.html',
-                                                    message=f"Es sitzen nicht genug Spieler am Tisch {table.name}.",
-                                                    message_styled=[('Es sitzen', None),
-                                                                    ('nicht genug Spieler', 'strong'),
-                                                                    ('am Tisch', None),
-                                                                    (f'{table.name}', 'strong')]
+                                                    message='Es sitzen nicht genug Spieler am Tisch.'
                                                     )})
     else:
         return redirect(url_for('index'))

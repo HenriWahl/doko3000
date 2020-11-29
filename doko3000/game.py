@@ -1147,6 +1147,16 @@ class Game:
         self.db = db
         self.deck = Deck()
 
+    @property
+    def needs_welcome(self):
+        """
+        checks if there is no table - if so, then show welcome message
+        """
+        if len(self.tables) == 0:
+            return True
+        else:
+            return False
+
     def load_from_db(self):
         """
         initialize all game components like tables and players
