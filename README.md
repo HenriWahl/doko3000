@@ -114,4 +114,8 @@ get a new password soon.
 
 ## Management
 
-The `admin` user has the right to create new players
+The `admin` user has the right to create new players, which themselves can be administrators too.
+
+Every player can create new tables.
+
+**More info will be added soon, stay tuned!**
