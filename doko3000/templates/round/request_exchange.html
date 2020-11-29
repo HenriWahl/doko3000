@@ -1,5 +1,5 @@
 {% if hochzeit or card_played or exchanged_already%}
-    <div class="mb-3 text-center">Ein <strong>{{ exchange_type.title() }}-Austausch</strong> ist nicht möglich.</div>
+    <div class="mb-3 text-center"><h5>Ein <strong>{{ exchange_type.title() }}-Austausch</strong> ist nicht möglich.</h5></div>
     <div class="row">
         <div class="col-6">
         </div>
@@ -8,7 +8,7 @@
         </div>
     </div>
 {% else %}
-    <div class="mb-3 text-center">Soll ein <strong>{{ exchange_type.title() }}-Austausch</strong> vorgenommen werden?
+    <div class="mb-3 text-center"><h5>Soll ein <strong>{{ exchange_type.title() }}-Austausch</strong> vorgenommen werden?</h5>
     </div>
     <div class="row">
         <div class="col-6" id="button_start_exchange" data-table_id="{{ table.id }}">
