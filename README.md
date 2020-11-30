@@ -124,4 +124,4 @@ If **at least 4 players** entered a table a round may begin. Configure it via th
 menu** at the upper left. The **order** of the players may be changed by **drag & drop**. As always the first
 player is dealing and the second will be the first to play. Run it via `Neu starten` **button**.
 
-**Good luck** and don't hesitate give some feedback at https://github.com/HenriWahl/doko3000/issues.
+**Good luck** and don't hesitate to give some feedback at https://github.com/HenriWahl/doko3000/issues.
