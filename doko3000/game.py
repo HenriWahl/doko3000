@@ -140,9 +140,9 @@ class Player(UserMixin, Document):
     @property
     def party(self):
         # backward compatible
-        if 'party' not in self:
-            self['party'] = ''
-            self.save()
+        #if 'party' not in self:
+        #    self['party'] = ''
+        #    # self.save()
         return self.get('party', '')
 
     @party.setter
@@ -507,9 +507,9 @@ class Round(Document):
     @property
     def exchange(self):
         # backward compatible
-        if 'exchange' not in self:
-            self['exchange'] = {}
-            self.save()
+        #if 'exchange' not in self:
+        #    self['exchange'] = {}
+        #    self.save()
         return self.get('exchange', {})
 
     @exchange.setter

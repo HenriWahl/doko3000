@@ -67,7 +67,7 @@ All further steps are based on the `doko3000` directory:
      
 ### Environment file .env
  
-Inside the environment file can should set optional variables:
+Inside the environment file some variables could be set:
  
 - **HOST** - name of the server host to be used at least as *cors_allowed_origins* in flask
 - **COUCHDB_URL** - URL of CouchDB server
@@ -82,7 +82,7 @@ The example file [/docker/default.env](./docker/default.env) can be copied to `.
     cp docker/default.env .env
  
 The default settings should already work - only **COUCHDB_USER** and **COUCHDB_PASSWORD** have to be set at least once
-initially to initialize the CouchDB database in the `doko3000-couchdb` container.
+to initialize the CouchDB database in the `doko3000-couchdb` container.
 
 ###  Running the server with docker-compose.yml
   
@@ -114,8 +114,14 @@ get a new password soon.
 
 ## Management
 
-The `admin` user has the right to create new players, which themselves can be administrators too.
+The `admin` user has the right to **create new players**, which themselves can be **administrators too**.
 
-Every player can create new tables.
+Every player is able to **create new tables** via the nice **green** `Neu` **button**.
 
-**More info will be added soon, stay tuned!**
+Players can enter a table by clicking the **green** `Beitreten` **button** in the table's row.
+
+If **at least 4 players** entered a table a round may begin. Configure it via the `Einstellungen` in the **hamburger 
+menu** at the upper left. The **order** of the players may be changed by **drag & drop**. As always the first
+player is dealing and the second will be the first to play. Run it via `Neu starten` **button**.
+
+**Good luck** and don't hesitate give some feedback at https://github.com/HenriWahl/doko3000/issues.
