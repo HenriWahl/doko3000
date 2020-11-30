@@ -1,9 +1,9 @@
-<table class="table table-borderless">
+<table class="table table-borderless table-striped">
     <thead>
     <tr>
-        <th>Spieler</th>
+        <th><h5><strong>Spieler</strong></h5></th>
         {% if table.idle_players %}
-        <th>Ersatzbank</th>
+        <th><h5><strong>Ersatzbank</strong></h5></th>
         {% endif %}
     </tr>
     </thead>
@@ -11,13 +11,13 @@
     {% for row in range(number_of_rows) %}
     <tr>
         {% if row < 4 %}
-        <td>{{ game.players[next_players[row]].name }}</td>
+        <td><h5>{{ game.players[next_players[row]].name }}</h5></td>
         {% else %}
         <td></td>
         {% endif %}
              {% if table.idle_players %}
                 {% if row < table.idle_players|length %}
-        <td>{{ game.players[table.idle_players[row]].name }}</td>
+        <td><h5>{{ game.players[table.idle_players[row]].name }}</h5></td>
              {% else %}
         <td></td>
              {% endif %}

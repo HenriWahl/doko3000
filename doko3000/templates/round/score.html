@@ -1,23 +1,25 @@
-<table class="table table-borderless">
+<table class="table table-borderless table-striped">
     <thead>
     <tr>
-        <th>Spieler</th>
-        <th>Punkte</th>
+        <th><h5><strong>Spieler</strong></h5></th>
+        <th><h5><strong>Punkte</strong></h5></th>
     </tr>
     </thead>
     <tbody>
     {% for player_id in table.round.stats['score'] %}
-    <tr>
-        <td>
-            {{ players[player_id].name }}
-            {% if players[player_id].eichel_ober_count > 0 %}
-                {% for eichel_ober in range(players[player_id].eichel_ober_count) %}
-            <span class="oi oi-media-record text-primary small"></span>
-                {% endfor %}
-            {% endif %}
-        </td>
-        <td>{{ table.round.stats['score'][player_id] }}</td>
-    </tr>
+        <tr>
+            <td>
+                <h5>
+                    {{ players[player_id].name }}
+                    {% if players[player_id].eichel_ober_count > 0 %}
+                        {% for eichel_ober in range(players[player_id].eichel_ober_count) %}
+                            <span class="oi oi-media-record text-primary small"></span>
+                        {% endfor %}
+                    {% endif %}
+                </h5>
+            </td>
+            <td><h5>{{ table.round.stats['score'][player_id] }}</h5></td>
+        </tr>
     {% endfor %}
     </tbody>
 </table>

@@ -36,17 +36,17 @@ class Deck:
     full deck of cards - enough to be static
     """
     SYMBOLS = ('Schell',
-               'Herz',
-               'Grün',
+               # 'Herz',
+               # 'Grün',
                'Eichel')
     RANKS = {'Neun': 0,
-             'Zehn': 10,
-             'Unter': 2,
-             'Ober': 3,
-             'König': 4,
+             # 'Zehn': 10,
+             # 'Unter': 2,
+             # 'Ober': 3,
+             # 'König': 4,
              'Ass': 11}
     NUMBER = 2  # Doppelkopf :-)!
-    # NUMBER = 1 # Debugging
+    #NUMBER = 1 # Debugging
     cards = {}
 
     # counter for card IDs in deck
