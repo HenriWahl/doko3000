@@ -322,9 +322,11 @@ def setup_table(msg):
                           {'table_id': table.id,
                            'sync_count': sync_count},
                           room=table.id)
-        # tell others about table change
-        socketio.emit('index-list-changed',
-                      {'table': 'tables'})
+        # # tell others about table change
+        elif action == 'finished':
+            # tell others about table change
+            socketio.emit('index-list-changed',
+                          {'table': 'tables'})
     # new tables do not have an id
     elif player and action == 'finished':
         # tell others about table change

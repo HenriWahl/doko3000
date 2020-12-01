@@ -496,6 +496,13 @@ $(document).ready(function () {
             } else {
                 $('#turn_indicator').addClass('d-none')
             }
+            // spectator shall see the refreshed exchanged cards
+            if (!$('.mode-spectator').hasClass('d-none')) {
+                socket.emit('my-cards-please', {
+                    player_id: player_id,
+                    table_id: msg.table_id
+                })
+            }
         })
 
         // update either list of tables or users after a change
