@@ -1,6 +1,6 @@
 # doko3000
 
-Simple Doppelkopf card deck simulation via web browser.
+Simple Doppelkopf card deck simulation web service.
 
 ## Overview
 
@@ -15,6 +15,8 @@ This means **absolute freedom** to play with **all custom rules** players are us
 
 For the same reason there are **no global scoreboards** or statistics - it will even feel more familiar if somebody of the group
 notes the score as before.
+
+Doko3000 runs on a **web server** and is accessed by the players via **web browser**.
 
 Ingame language at the moment is only german due to Doppelkopf being a mostly german phenomenon. Might change in the future.
 
