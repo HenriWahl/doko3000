@@ -75,7 +75,7 @@ class Player(UserMixin, Document):
     due to CouchDB Document class everything is now a dictionary
     """
 
-    def __init__(self, player_id='', document_id='', game=None):
+    def __init__(self, player_id='', document=None, game=None):
         # access to global game
         self.game = game
         if player_id:
@@ -106,10 +106,10 @@ class Player(UserMixin, Document):
             # # other players to the left, opposite and right of table
             # self['left'] = self['opposite'] = self['right'] = None
             self.save()
-        elif document_id:
-            Document.__init__(self, self.game.db.database, document_id=document_id)
-            # get document data from CouchDB
-            self.fetch()
+        elif document:
+            Document.__init__(self, self.game.db.database, document_id=document['_id'])
+            # get data from given document
+            self.update(document)
             # id needed for flask-login
             self['id'] = self['_id'].split('player-', 1)[1]
 
@@ -273,7 +273,7 @@ class Trick(Document):
     2 synchronized lists, players and cards, should be enough to be indexed
     """
 
-    def __init__(self, trick_id='', document_id='', game=None):
+    def __init__(self, trick_id='', document=None, game=None):
         self.game = game
         if trick_id:
             # ID generated from Round object
@@ -282,10 +282,10 @@ class Trick(Document):
             self['type'] = 'trick'
             # initialize
             self.reset()
-        elif document_id:
-            Document.__init__(self, self.game.db.database, document_id=document_id)
-            # get document data from CouchDB
-            self.fetch()
+        elif document:
+            Document.__init__(self, self.game.db.database, document_id=document['_id'])
+            # get document data from document
+            self.update(document)
 
     def __len__(self):
         return len(self['players'])
@@ -353,7 +353,7 @@ class Round(Document):
     eternal round, part of a table
     """
 
-    def __init__(self, players=[], game=None, round_id='', document_id=''):
+    def __init__(self, players=[], game=None, round_id='', document=None):
         """
         either initialize new round or load it from CouchDB
         """
@@ -396,10 +396,10 @@ class Round(Document):
             self['exchange'] = {}
             # initialize
             self.reset(players=players)
-        elif document_id:
-            Document.__init__(self, self.game.db.database, document_id=document_id)
-            # get document data from CouchDB
-            self.fetch()
+        elif document:
+            Document.__init__(self, self.game.db.database, document_id=document['_id'])
+            # get data from given document
+            self.update(document)
             # a new card deck for every round
             # decide if the '9'-cards are needed and do not give them to round if not
             if self.with_9:
@@ -860,8 +860,7 @@ class Table(Document):
     """
     Definition of a table used by group of players
     """
-
-    def __init__(self, table_id='', document_id='', game=None):
+    def __init__(self, table_id='', document=None, game=None):
         self.game = game
         if table_id:
             # ID for CouchDB - quoted and without '/'
@@ -882,10 +881,10 @@ class Table(Document):
             self['players_ready'] = []
             self['locked'] = False
             self['is_debugging'] = False
-        elif document_id:
-            Document.__init__(self, self.game.db.database, document_id=document_id)
-            # get document data from CouchDB
-            self.fetch()
+        elif document:
+            Document.__init__(self, self.game.db.database, document_id=document['_id'])
+            # get data from given document
+            self.update(document)
         # yes, table_id
         if self['id'] not in self.game.rounds:
             self.add_round()
@@ -1164,7 +1163,7 @@ class Game:
         # get players from CouchDB
         self.players = {}
         for player_id, document in self.db.filter_by_type('player').items():
-            self.players[player_id] = Player(document_id=document['_id'], game=self)
+            self.players[player_id] = Player(document=document, game=self)
 
         # if no player exists create a dummy admin account
         if len(self.players) == 0:
@@ -1177,17 +1176,17 @@ class Game:
         # all tricks belonging to certain rounds shall stay in CouchDB too
         self.tricks = {}
         for trick_id, document in self.db.filter_by_type('trick').items():
-            self.tricks[trick_id] = Trick(document_id=document['_id'], game=self)
+            self.tricks[trick_id] = Trick(document=document, game=self)
 
         # get rounds from CouchDB
         self.rounds = {}
         for round_id, document in self.db.filter_by_type('round').items():
-            self.rounds[round_id] = Round(document_id=document['_id'], game=self)
+            self.rounds[round_id] = Round(document=document, game=self)
 
         # store tables
         self.tables = {}
         for table_id, document in self.db.filter_by_type('table').items():
-            self.tables[table_id] = Table(document_id=document['_id'], game=self)
+            self.tables[table_id] = Table(document=document, game=self)
 
         # check for locked tables
         self.check_tables()

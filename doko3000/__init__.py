@@ -19,7 +19,9 @@ from flask_socketio import join_room, \
 from .config import Config
 from .database import DB
 from .game import Deck, \
-    Game
+    Game, \
+    Player, \
+    Trick
 from .misc import is_xhr, \
     Login
 
@@ -41,11 +43,10 @@ socketio = SocketIO(app,
                     manage_session=False,
                     # ping_timeout=2,
                     # # seems to be better somewhat higher for clients not getting nervous when waiting for reset
-                    ping_timeout=15,
-                    ping_interval=2,
+                    #ping_timeout=15,
+                    ping_interval=1,
                     # logger=True,
                     # engineio_logger=True,
-                    # allow_upgrades=False,
                     cors_allowed_origins=Config.CORS_ALLOWED_ORIGINS)
 
 # load game data from database after initialization
@@ -63,6 +64,8 @@ def load_user(id):
     """
     try:
         player = game.players[id]
+        if not type(player) == Player:
+            game.players[id] = Player(document_id=player['_id'], game=game)
         return player
     except KeyError:
         return None

@@ -22,19 +22,20 @@ Ingame language at the moment is only german due to Doppelkopf being a mostly ge
 
 ## Screenshots
 
-Every player sees cards in its hand and the ones on the table. The display at the top shows all 4 players of the current round:
+Every player sees cards in its hand and the ones on the table. Cards are played by **dragging and dropping** them 
+from hand to table. The display at the top shows all 4 players of the current round:
 
 ![Playing doko3000](doc/doko3000-play.png)
 
-A big green button appears when there is a trick to claim:
+A big green button appears when there is a trick to **claim**:
 
 ![Claiming a trick](doc/doko3000-claim_trick.png)
 
-After the round was finished the achieved score of the players is shown:
+After the round was finished the achieved **score** of the players is shown:
 
 ![Finished round](doc/doko3000-round_finished.png)
 
-The table settings allow to arrange players and enable some options:
+The table settings allow to **arrange players** and enable some **options**:
 
 ![Table setup](doc/doko3000-table_setup.png)
 
