@@ -892,8 +892,8 @@ def logout():
 @app.route('/', methods=['GET', 'POST'])
 @login_required
 def index():
-    players = game.players.values()
-    tables = game.tables.values()
+    players = sorted(game.players.values(), key=lambda x: x.name.lower())
+    tables = sorted(game.tables.values(), key=lambda x: x.name.lower())
     player = game.players.get(current_user.id)
     if player:
         return render_template('index.html',
@@ -1070,7 +1070,7 @@ def get_html_tables():
     get HTML list of tables to refresh index.html tables list after changes
     """
     if is_xhr(request):
-        tables = game.tables.values()
+        tables = sorted(game.tables.values(), key=lambda x: x.name.lower())
         return jsonify({'html': render_template('index/list_tables.html',
                                                 tables=tables,
                                                 game=game)})
@@ -1085,7 +1085,7 @@ def get_html_players():
     get HTML list of players to refresh index.html players list after changes
     """
     if is_xhr(request):
-        players = game.players.values()
+        players = sorted(game.players.values(), key=lambda x: x.name.lower())
         return jsonify({'html': render_template('index/list_players.html',
                                                 players=players)})
     else:
