@@ -888,7 +888,6 @@ class Table(Document):
         # yes, table_id
         if self['id'] not in self.game.rounds:
             self.add_round()
-        self.save()
 
     @property
     def id(self):
@@ -1079,6 +1078,7 @@ class Table(Document):
         else:
             players = []
         self.round = Round(players=players, round_id=self.id, game=self.game)
+        self.save()
 
     def reset_round(self):
         """
