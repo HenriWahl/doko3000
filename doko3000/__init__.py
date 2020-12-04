@@ -180,7 +180,7 @@ def played_card(msg):
             current_player_id = table.round.get_current_player_id()
             idle_players = table.idle_players
             if table.round.cards_shown:
-                # cards_shown contains cqrds-showing player_id
+                # cards_shown contains cards-showing player_id
                 cards_table = game.players[table.round.cards_shown].get_cards()
             else:
                 cards_table = table.round.current_trick.get_cards()

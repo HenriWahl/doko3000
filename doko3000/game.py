@@ -506,10 +506,6 @@ class Round(Document):
 
     @property
     def exchange(self):
-        # backward compatible
-        #if 'exchange' not in self:
-        #    self['exchange'] = {}
-        #    self.save()
         return self.get('exchange', {})
 
     @exchange.setter
