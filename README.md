@@ -121,10 +121,29 @@ The `admin` user has the right to **create new players**, which themselves can b
 
 Every player is able to **create new tables** via the nice **green** `Neu` **button**.
 
-Players can enter a table by clicking the **green** `Beitreten` **button** in the table's row.
+Players can enter a table by clicking the **green** `Beitreten` **button** in the table's row:
+
+![doko3000 sorting cards](doc/doko3000-create_table.gif)
 
 If **at least 4 players** entered a table a round may begin. Configure it via the `Einstellungen` in the **hamburger 
 menu** at the upper left. The **order** of the players may be changed by **drag & drop**. As always the first
-player is dealing and the second will be the first to play. Run it via `Neu starten` **button**.
+player is dealing and the second will be the first to play. Run it via `Neu starten` **button**:
+
+![doko3000 sorting cards](doc/doko3000-start.gif)
+
+
+## Gameplay
+
+Most likely every game starts with **sorting cards**:
+
+![doko3000 sorting cards](doc/doko3000-sorting_cards.gif)
+
+After all players had their turns it's time to **claim** the **trick**:
+
+![doko3000 sorting cards](doc/doko3000-playing_cards.gif)
+
+The last trick **finishes** the current round and makes the **score** appear:
+
+![doko3000 sorting cards](doc/doko3000-finished.gif)
 
 **Good luck** and don't hesitate to give some feedback at https://github.com/HenriWahl/doko3000/issues.
