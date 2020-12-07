@@ -20,24 +20,37 @@ Doko3000 runs on a **web server** and is accessed by the players via **web brows
 
 Ingame language at the moment is only german due to Doppelkopf being a mostly german phenomenon. Might change in the future.
 
-## Screenshots
 
-Every player sees cards in its hand and the ones on the table. Cards are played by **dragging and dropping** them 
-from hand to table. The display at the top shows all 4 players of the current round:
+## Gameplay
 
-![Playing doko3000](doc/doko3000-play.png)
+Most likely every game starts with **sorting cards**:
 
-A big green button appears when there is a trick to **claim**:
+![doko3000 sorting cards](doc/doko3000-sorting_cards.gif)
 
-![Claiming a trick](doc/doko3000-claim_trick.png)
+After all players had their turns it's time to **claim** the **trick**:
 
-After the round was finished the achieved **score** of the players is shown:
+![doko3000 playing cards](doc/doko3000-playing_cards.gif)
 
-![Finished round](doc/doko3000-round_finished.png)
+The last trick **finishes** the current round and makes the **score** appear:
 
-The table settings allow to **arrange players** and enable some **options**:
+![doko3000 finished](doc/doko3000-finished.gif)
 
-![Table setup](doc/doko3000-table_setup.png)
+
+## Management
+
+The `admin` user has the right to **create new players**, which themselves can be **administrators too**.
+
+Every player is able to **create new tables** via the nice **green** `Neu` **button**.
+
+Players can enter a table by clicking the **green** `Beitreten` **button** in the table's row:
+
+![doko3000 create table](doc/doko3000-create_table.gif)
+
+If **at least 4 players** entered a table a round may begin. Configure it via the `Einstellungen` in the **hamburger 
+menu** at the upper left. The **order** of the players may be changed by **drag & drop**. As always the first
+player is dealing and the second will be the first to play. Run it via `Neu starten` **button**:
+
+![doko3000 start](doc/doko3000-start.gif)
 
 
 ## Installation
@@ -109,41 +122,10 @@ maybe there is a more elegant way but it works fine here. This docker-compose co
 
 If you run it on your local machine, point your favorite browser to http://localhost and you will find the login page:
  
-![doko3000 login](doc/doko3000-login.png)
+![doko3000 login admin](doc/doko3000-login_admin.gif)
  
 The **default user** is `admin` with the password `admin` and admin rights. It can create other players and should
 get a new password soon.
 
-
-## Management
-
-The `admin` user has the right to **create new players**, which themselves can be **administrators too**.
-
-Every player is able to **create new tables** via the nice **green** `Neu` **button**.
-
-Players can enter a table by clicking the **green** `Beitreten` **button** in the table's row:
-
-![doko3000 sorting cards](doc/doko3000-create_table.gif)
-
-If **at least 4 players** entered a table a round may begin. Configure it via the `Einstellungen` in the **hamburger 
-menu** at the upper left. The **order** of the players may be changed by **drag & drop**. As always the first
-player is dealing and the second will be the first to play. Run it via `Neu starten` **button**:
-
-![doko3000 sorting cards](doc/doko3000-start.gif)
-
-
-## Gameplay
-
-Most likely every game starts with **sorting cards**:
-
-![doko3000 sorting cards](doc/doko3000-sorting_cards.gif)
-
-After all players had their turns it's time to **claim** the **trick**:
-
-![doko3000 sorting cards](doc/doko3000-playing_cards.gif)
-
-The last trick **finishes** the current round and makes the **score** appear:
-
-![doko3000 sorting cards](doc/doko3000-finished.gif)
 
 **Good luck** and don't hesitate to give some feedback at https://github.com/HenriWahl/doko3000/issues.
