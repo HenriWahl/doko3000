@@ -296,6 +296,15 @@ $(document).ready(function () {
                 } else {
                     $('#button_deal_cards_again').addClass('d-none')
                 }
+                // a true miracle which can't be repeated once led to 13 cards on player's hand
+                // instead of 12 - this measure should avoid it by just reloading after
+                // checking if number of cards in hand matches the correct number
+                if (msg.cards_per_player != $('#hand').children('.game-card-hand').length) {
+                    socket.emit('my-cards-please', {
+                        player_id: player_id,
+                        table_id: msg.table_id
+                    })
+                }
             }
         })
 

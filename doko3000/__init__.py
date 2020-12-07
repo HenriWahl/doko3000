@@ -447,6 +447,7 @@ def deal_cards_to_player(msg):
             # putting into variables makes debugging easier
             event = 'your-cards-please',
             payload = {'player_id': player.id,
+                       'table_id': table.id,
                        'turn_count': table.round.turn_count,
                        'current_player_id': current_player_id,
                        'dealer': dealer,
@@ -455,6 +456,7 @@ def deal_cards_to_player(msg):
                        'exchange_needed': exchange_needed,
                        'cards_shown': cards_shown,
                        'sync_count': sync_count,
+                       'cards_per_player': table.round.cards_per_player,
                        'html': {'cards_hand': render_template('cards/hand.html',
                                                               cards_hand=cards_hand,
                                                               table=table,
