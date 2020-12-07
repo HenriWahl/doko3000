@@ -63,6 +63,9 @@ $(document).ready(function () {
         ]);
 
         dragging_cards.on('drop', function (card, target, source) {
+
+            $.uniqueSort($('.game-card-hand'))
+
             // do not drag your gained tricks around
             if (card.id == 'cards_stack') {
                 dragging_cards.cancel(true)
@@ -288,6 +291,7 @@ $(document).ready(function () {
                 $('#hud_players').html(msg.html.hud_players)
                 $('#table').html(msg.html.cards_table)
                 $('#table_spectator').html('')
+                $('#hand').html('')
                 $('#hand').html(msg.html.cards_hand)
                 $('#button_claim_trick').addClass('d-none')
                 $('#modal_dialog').modal('hide')

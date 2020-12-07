@@ -41,10 +41,8 @@ login.login_message = ''
 # shorter ping interval for better sync
 socketio = SocketIO(app,
                     manage_session=False,
-                    # ping_timeout=2,
-                    # # seems to be better somewhat higher for clients not getting nervous when waiting for reset
-                    # ping_timeout=15,
-                    ping_timeout=5,
+                    # seems to be better somewhat higher for clients not getting nervous when waiting for reset
+                    ping_timeout=15,
                     ping_interval=1,
                     # logger=True,
                     # engineio_logger=True,
@@ -429,7 +427,7 @@ def deal_cards_to_player(msg):
                 player.id in table.players_active:
             cards_hand = player.get_cards()
             if table.round.cards_shown:
-                # cards_shown contains cqrds-showing player_id
+                # cards_shown contains cards-showing player_id
                 cards_table = game.players[table.round.cards_shown].get_cards()
             elif exchange_needed:
                 cards_table = game.deck.get_cards(table.round.exchange[player.party][player.id])
@@ -531,9 +529,13 @@ def sorted_cards(msg):
     msg_ok, player, table = check_message(msg)
     if msg_ok:
         cards_hand_ids = msg.get('cards_hand_ids')
-        if set(cards_hand_ids) == set(player.cards):
+        # send player its real cards back if cards on client don't match the ones on server
+        if set(cards_hand_ids) == set(player.cards) and \
+                len(cards_hand_ids) == len(player.cards):
             player.cards = cards_hand_ids
             player.save()
+        else:
+            deal_cards_to_player(msg)
 
 
 @socketio.on('claim-trick')
