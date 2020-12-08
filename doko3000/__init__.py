@@ -155,7 +155,7 @@ def who_am_i():
 @socketio.on('enter-table')
 def enter_table_socket(msg):
     """
-
+    sent if player wants to enter a table - allowed if table is not locked
     """
     msg_ok, player, table = check_message(msg, player_in_round=False, player_at_table=False)
     if msg_ok:
@@ -171,6 +171,9 @@ def enter_table_socket(msg):
 
 @socketio.on('card-played')
 def played_card(msg):
+    """
+    sent when a player played a card, update table and tell all other clients
+    """
     msg_ok, player, table = check_message(msg)
     if msg_ok:
         card_id = msg.get('card_id')
@@ -230,6 +233,9 @@ def played_card(msg):
 
 @socketio.on('card-exchanged')
 def card_exchanged(msg):
+    """
+    sent if re/contra exchange succeeded
+    """
     msg_ok, player, table = check_message(msg)
     if msg_ok:
         if table.round.exchange and \
@@ -240,6 +246,9 @@ def card_exchanged(msg):
 
 @socketio.on('exchange-player-cards-to-server')
 def exchange_player_cards(msg):
+    """
+    both stages of card exchange fire this message up, each transmitting its exchanged cards
+    """
     msg_ok, player, table = check_message(msg)
     if msg_ok:
         if table.round.exchange and \
@@ -293,7 +302,7 @@ def exchange_player_cards(msg):
 @socketio.on('setup-table-change')
 def setup_table(msg):
     """
-    Table can be set up from lobby so it makes no sense to limit setup by using check_message()
+    table can be set up from lobby so it makes no sense to limit setup by using check_message()
     """
     player = game.players.get(msg.get('player_id'))
     table = game.tables.get(msg.get('table_id'))
@@ -390,6 +399,9 @@ def setup_player(msg):
 
 @socketio.on('deal-cards')
 def deal_cards(msg):
+    """
+    dealer triggers distribution of cards to players
+    """
     msg_ok, player, table = check_message(msg)
     if msg_ok:
         table.reset_round()
