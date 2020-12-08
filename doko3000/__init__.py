@@ -112,6 +112,10 @@ def check_message(msg, player_in_round=True, player_at_table=True):
 #
 @socketio.on('who-am-i')
 def who_am_i():
+    """
+    sent by client at connection creation and if connection was refreshed
+    provide the important informartion about the game
+    """
     if not current_user.is_anonymous:
         player = game.players.get(current_user.get_id())
         if player:
@@ -150,6 +154,9 @@ def who_am_i():
 
 @socketio.on('enter-table')
 def enter_table_socket(msg):
+    """
+
+    """
     msg_ok, player, table = check_message(msg, player_in_round=False, player_at_table=False)
     if msg_ok:
         if (table.locked and player.id in table.players) or \

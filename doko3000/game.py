@@ -103,8 +103,6 @@ class Player(UserMixin, Document):
             self['is_spectator_only'] = False
             # store party when dealing to keep track of player's party when exchanging cards
             self['party'] = ''
-            # # other players to the left, opposite and right of table
-            # self['left'] = self['opposite'] = self['right'] = None
             self.save()
         elif document:
             Document.__init__(self, self.game.db.database, document_id=document['_id'])
@@ -135,14 +133,13 @@ class Player(UserMixin, Document):
 
     @cards.setter
     def cards(self, value):
+        """
+        either re or contra, depending of Eichel Ober ownership an important for contra/re exchange
+        """
         self['cards'] = value
 
     @property
     def party(self):
-        # backward compatible
-        #if 'party' not in self:
-        #    self['party'] = ''
-        #    # self.save()
         return self.get('party', '')
 
     @party.setter
@@ -905,8 +902,6 @@ class Table(Document):
     @order.setter
     def order(self, value):
         self['order'] = value
-        # might lead to race condition, table will be saved mostly soon anyway
-        #self.save()
 
     @property
     def round(self):
@@ -1016,10 +1011,13 @@ class Table(Document):
         to be called after various actions
         """
         self['sync_count'] += 1
-        # just return new timestamp to have it ready for use
+        # just return new sync count to have it ready for use
         return self['sync_count']
 
     def reset_sync_count(self):
+        """
+        initial count
+        """
         self['sync_count'] = 1
 
     def add_player(self, player_id):
