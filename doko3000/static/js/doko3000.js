@@ -334,8 +334,9 @@ $(document).ready(function () {
         socket.on('confirm-deal-again', function (msg) {
             if (check_sync(msg)) {
                 $('.overlay-notification').addClass('d-none')
-                $('#modal_body').html(msg.html)
-                $("#modal_dialog").modal('show')
+                // $('#modal_body').html(msg.html)
+                // $("#modal_dialog").modal('show')
+                show_dialog(msg.html)
             }
         })
 
@@ -365,8 +366,9 @@ $(document).ready(function () {
             if (check_sync(msg)) {
                 $('#button_claim_trick').addClass('d-none')
                 // cleanup content of dialog
-                $('#modal_body').html(msg.html)
-                $("#modal_dialog").modal('show')
+                // $('#modal_body').html(msg.html)
+                // $("#modal_dialog").modal('show')
+                show_dialog(msg.html)
             }
         })
 
@@ -374,7 +376,7 @@ $(document).ready(function () {
         socket.on('start-next-round', function (msg) {
             $('.overlay-button').addClass('d-none')
             $('.overlay-notification').addClass('d-none')
-            $('#modal_body').html(msg.html)
+            // $('#modal_body').html(msg.html)
             if (player_id == msg.dealer) {
                 $('#button_deal_cards').removeClass('d-none')
                 $('#button_close_info').addClass('d-none')
@@ -382,7 +384,8 @@ $(document).ready(function () {
                 $('#button_deal_cards').addClass('d-none')
                 $('#button_close_info').removeClass('d-none')
             }
-            $("#modal_dialog").modal('show')
+            // $("#modal_dialog").modal('show')
+            show_dialog(msg.html)
         })
 
         // sent on requested round reset
@@ -390,8 +393,9 @@ $(document).ready(function () {
             $('.overlay-button').addClass('d-none')
             $('.overlay-notification').addClass('d-none')
             // cleanup content of dialog
-            $('#modal_body').html(msg.html)
-            $('#modal_dialog').modal('show')
+            // $('#modal_body').html(msg.html)
+            // $('#modal_dialog').modal('show')
+            show_dialog(msg.html)
         })
 
         // sent on requested round finish
@@ -399,8 +403,9 @@ $(document).ready(function () {
             $('.overlay-button').addClass('d-none')
             $('.overlay-notification').addClass('d-none')
             // cleanup content of dialog
-            $('#modal_body').html(msg.html)
-            $('#modal_dialog').modal('show')
+            // $('#modal_body').html(msg.html)
+            // $('#modal_dialog').modal('show')
+            show_dialog(msg.html)
         })
 
         // sent if undo was requested
@@ -408,16 +413,18 @@ $(document).ready(function () {
             $('.overlay-button').addClass('d-none')
             $('.overlay-notification').addClass('d-none')
             // cleanup content of dialog
-            $('#modal_body').html(msg.html)
-            $('#modal_dialog').modal('show')
+            // $('#modal_body').html(msg.html)
+            // $('#modal_dialog').modal('show')
+            show_dialog(msg.html)
         })
 
         // if player wants to show cards confirm it
         socket.on('confirm-show-cards', function (msg) {
             if (check_sync(msg)) {
                 $('.overlay-notification').addClass('d-none')
-                $('#modal_body').html(msg.html)
-                $("#modal_dialog").modal('show')
+                // $('#modal_body').html(msg.html)
+                // $("#modal_dialog").modal('show')
+                show_dialog(msg.html)
             }
         })
 
@@ -427,8 +434,9 @@ $(document).ready(function () {
                 $('.overlay-notification').addClass('d-none')
                 // there is no need anymore to deal cards
                 $('#button_deal_cards_again').addClass('d-none')
-                $('#modal_body').html(msg.html)
-                $("#modal_dialog").modal('show')
+                // $('#modal_body').html(msg.html)
+                // $("#modal_dialog").modal('show')
+                show_dialog(msg.html)
             }
         })
 
@@ -472,8 +480,9 @@ $(document).ready(function () {
                 $('.overlay-notification').addClass('d-none')
                 // there is no need anymore to deal cards
                 $('#button_deal_cards_again').addClass('d-none')
-                $('#modal_body').html(msg.html)
-                $("#modal_dialog").modal('show')
+                // $('#modal_body').html(msg.html)
+                // $("#modal_dialog").modal('show')
+                show_dialog(msg.html)
             }
         })
 
@@ -481,8 +490,9 @@ $(document).ready(function () {
         socket.on('exchange-player1-player2-deny', function (msg) {
             if (check_sync(msg)) {
                 $('.overlay-notification').addClass('d-none')
-                $('#modal_body').html(msg.html)
-                $("#modal_dialog").modal('show')
+                // $('#modal_body').html(msg.html)
+                // $("#modal_dialog").modal('show')
+                show_dialog(msg.html)
             }
         })
 
@@ -616,8 +626,9 @@ $(document).ready(function () {
         $(document).on('click', '.setup-table', function () {
             $.getJSON('/setup/table/' + encodeURIComponent($(this).data('table_id')), function (data, status) {
                 if (status == 'success' && data.allowed) {
-                    $("#modal_body").html(data.html)
-                    $('#modal_dialog').modal('show')
+                    // $("#modal_body").html(data.html)
+                    // $('#modal_dialog').modal('show')
+                    show_dialog(data.html)
                     let dragging_players = dragula([document.querySelector('#setup_table_players'),
                         {
                             revertOnSpill: true,
