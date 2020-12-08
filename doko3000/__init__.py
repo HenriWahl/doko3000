@@ -421,6 +421,9 @@ def deal_cards(msg):
 
 @socketio.on('deal-cards-again')
 def deal_cards_again(msg):
+    """
+    current dealer pressed the deal-again-button
+    """
     msg_ok, player, table = check_message(msg)
     if msg_ok:
         sync_count = table.sync_count
@@ -563,7 +566,10 @@ def sorted_cards(msg):
 
 
 @socketio.on('claim-trick')
-def claimed_trick(msg):
+def claim_trick(msg):
+    """
+    when all players played their cards someone will claim the trick
+    """
     msg_ok, player, table = check_message(msg)
     if msg_ok:
         sync_count = table.increase_sync_count()
@@ -616,7 +622,10 @@ def claimed_trick(msg):
 
 
 @socketio.on('need-final-result')
-def send_final_result(msg):
+def need_final_result(msg):
+    """
+    at the end of the round the resulting score will be shown to the players
+    """
     msg_ok, player, table = check_message(msg)
     if msg_ok:
         players = game.players
@@ -633,6 +642,9 @@ def send_final_result(msg):
 
 @socketio.on('ready-for-next-round')
 def ready_for_next_round(msg):
+    """
+    every player commits being redy for the next round
+    """
     msg_ok, player, table = check_message(msg, player_in_round=False)
     if msg_ok:
         table.add_ready_player(player.id)
@@ -657,6 +669,9 @@ def ready_for_next_round(msg):
 
 @socketio.on('request-round-finish')
 def request_round_finish(msg):
+    """
+    players want to skip and finish the round
+    """
     msg_ok, player, table = check_message(msg)
     if msg_ok:
         # clear list of ready players for next poll
@@ -672,6 +687,9 @@ def request_round_finish(msg):
 
 @socketio.on('ready-for-round-finish')
 def round_finish(msg):
+    """
+    players confirm to finish the round
+    """
     msg_ok, player, table = check_message(msg)
     if msg_ok:
         table.add_ready_player(player.id)
@@ -694,6 +712,9 @@ def round_finish(msg):
 
 @socketio.on('request-round-reset')
 def request_round_reset(msg):
+    """
+    round shall be restarted
+    """
     msg_ok, player, table = check_message(msg)
     if msg_ok:
         # clear list of ready players for next poll
@@ -709,6 +730,9 @@ def request_round_reset(msg):
 
 @socketio.on('ready-for-round-reset')
 def round_reset(msg):
+    """
+    players confirm restarting the round
+    """
     msg_ok, player, table = check_message(msg)
     if msg_ok:
         table.add_ready_player(player.id)
@@ -722,6 +746,9 @@ def round_reset(msg):
 
 @socketio.on('request-undo')
 def request_undo(msg):
+    """
+    players request reverting the last trick
+    """
     msg_ok, player, table = check_message(msg)
     if msg_ok:
         # makes only sense if there was any card played yet
@@ -739,6 +766,9 @@ def request_undo(msg):
 
 @socketio.on('ready-for-undo')
 def round_reset(msg):
+    """
+    players comfirm reverting the last trick
+    """
     msg_ok, player, table = check_message(msg)
     if msg_ok:
         table.add_ready_player(player.id)
@@ -751,6 +781,9 @@ def round_reset(msg):
 
 @socketio.on('request-show-hand')
 def request_show_hand(msg):
+    """
+    player wants a shortcut and show the cards on hand
+    """
     msg_ok, player, table = check_message(msg)
     if msg_ok:
         # ask player if cards really should be shown
@@ -764,6 +797,9 @@ def request_show_hand(msg):
 
 @socketio.on('show-cards')
 def show_cards(msg):
+    """
+    player shows cards
+    """
     msg_ok, player, table = check_message(msg)
     if msg_ok:
         table.show_cards(player)
@@ -894,6 +930,9 @@ def exchange_player2_deny(msg):
 #
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    """
+    non-logged-in players get redirected here
+    """
     form = Login()
     if form.validate_on_submit():
         player_id_quoted = quote(form.player_id.data, safe='')
@@ -914,6 +953,9 @@ def login():
 
 @app.route('/logout')
 def logout():
+    """
+    byebye
+    """
     logout_user()
     return redirect(url_for('login'))
 
@@ -921,6 +963,9 @@ def logout():
 @app.route('/', methods=['GET', 'POST'])
 @login_required
 def index():
+    """
+    the lobby where tables are accessible and admins can create new players
+    """
     players = sorted(game.players.values(), key=lambda x: x.name.lower())
     tables = sorted(game.tables.values(), key=lambda x: x.name.lower())
     player = game.players.get(current_user.id)
@@ -938,6 +983,9 @@ def index():
 @app.route('/table/<table_id>')
 @login_required
 def table(table_id=''):
+    """
+    one of the tables to play
+    """
     player = game.players.get(current_user.get_id())
     table = game.tables.get(table_id)
     if player and \
@@ -1094,7 +1142,7 @@ def get_welcome(table_id=None):
 
 @app.route('/get/tables')
 @login_required
-def get_html_tables():
+def get_tables():
     """
     get HTML list of tables to refresh index.html tables list after changes
     """
@@ -1109,7 +1157,7 @@ def get_html_tables():
 
 @app.route('/get/players')
 @login_required
-def get_html_players():
+def get_players():
     """
     get HTML list of players to refresh index.html players list after changes
     """
