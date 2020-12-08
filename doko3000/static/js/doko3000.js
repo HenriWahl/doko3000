@@ -48,9 +48,6 @@ function check_sync(msg) {
 
 
 $(document).ready(function () {
-        // get initial timestamp from table
-        // sync_count = $('#sync_count').data('sync_count')
-
         // initialize SocketIO
         const socket = io()
 
@@ -251,12 +248,10 @@ $(document).ready(function () {
         })
 
         socket.on('grab-your-cards', function (msg) {
-            // if (check_sync(msg)) {
             socket.emit('my-cards-please', {
                 player_id: player_id,
                 table_id: msg.table_id
             })
-            // }
         })
 
         socket.on('your-cards-please', function (msg) {
@@ -312,7 +307,6 @@ $(document).ready(function () {
 
         socket.on('sorry-no-cards-for-you', function (msg) {
             if (check_sync(msg)) {
-                // $('#modal_body').html('')
                 $("#modal_dialog").modal('hide')
                 $('.mode-spectator').removeClass('d-none')
                 $('.mode-player').addClass('d-none')
@@ -467,12 +461,10 @@ $(document).ready(function () {
         })
 
         socket.on('exchange-player1-start', function (msg) {
-            // if (check_sync(msg)) {
             $('.overlay-notification').addClass('d-none')
             $('#button_exchange_send_cards').removeClass('d-none')
             table_mode = 'exchange'
             cards_locked = false
-            // }
         })
 
         socket.on('exchange-player-cards-to-client', function (msg) {
@@ -580,12 +572,6 @@ $(document).ready(function () {
                         show_message('#modal_message', data.message)
                     } else if (data.status == 'ok') {
                         $('#modal_dialog').modal('hide')
-                        // $.getJSON('/get/tables',
-                        //     function (data, status) {
-                        //         if (status == 'success') {
-                        //             $('#list_tables').html(data.html)
-                        //         }
-                        //     })
                         socket.emit('setup-table-change', {
                             action: 'finished',
                             player_id: player_id
