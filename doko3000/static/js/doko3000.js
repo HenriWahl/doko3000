@@ -16,18 +16,21 @@ let exchange_max_cards = 3
 
 // show alert messages
 function show_message(place, message) {
-    $(place).html('<div class="mx-3 mt-3 mb-1 alert alert-danger alert-dismissible dialog-message">' +
+    $('#modal_message').html('<div class="mx-3 mt-3 mb-1 alert alert-danger alert-dismissible dialog-message">' +
         '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
         message +
         '</div>')
 }
 
-function clear_message(place) {
-    $(place).html('')
+// show modal dialog and fill it with content
+function show_dialog(html) {
+    $('#modal_body').html(html)
+    $('#modal_message').html('')
+    $("#modal_dialog").modal('show')
 }
 
+// check if message is in sync
 function check_sync(msg) {
-    // check if message is in sync
     // if not set yet take sync_count from freshly loaded HTML id
     console.log(sync_count)
     if (sync_count == 0) {
@@ -69,6 +72,7 @@ $(document).ready(function () {
             if (card.id == 'cards_stack') {
                 dragging_cards.cancel(true)
             }
+            // 'normal' is not-currently-exchanging - quite normal
             if (table_mode == 'normal') {
                 if (source.id == 'hand' && target.id == 'table' && player_id == current_player_id && !cards_locked) {
                     if ($(card).data('cards_timestamp') == $('#cards_table_timestamp').data('cards_timestamp')) {
@@ -126,7 +130,6 @@ $(document).ready(function () {
                         for (let card_table of $('#table').children('.game-card')) {
                             cards_table_ids.push($(card_table).data('id'))
                         }
-
                         socket.emit('card-exchanged', {
                             player_id: player_id,
                             table_id: $(card).data('table_id'),
@@ -150,17 +153,19 @@ $(document).ready(function () {
                 let table_id = $('#needs_welcome').data('table_id')
                 $.getJSON('/get/welcome/' + encodeURIComponent(table_id), function (data, status) {
                     if (status == 'success') {
-                        $('#modal_body').html(data.html)
-                        clear_message('#modal_message')
-                        $("#modal_dialog").modal('show')
+                        // $('#modal_body').html(data.html)
+                        // clear_message('#modal_message')
+                        // $("#modal_dialog").modal('show')
+                        show_dialog(data.html)
                     }
                 })
             } else {
                 $.getJSON('/get/welcome', function (data, status) {
                         if (status == 'success') {
-                            $('#modal_body').html(data.html)
-                            clear_message('#modal_message')
-                            $("#modal_dialog").modal('show')
+                            // $('#modal_body').html(data.html)
+                            // clear_message('#modal_message')
+                            // $("#modal_dialog").modal('show')
+                            show_dialog(data.html)
                         }
                     }
                 )
@@ -170,11 +175,13 @@ $(document).ready(function () {
 // ------------ Socket.io events ------------
 //
 
+        // ask server about me and the game when connecting
         socket.on('connect', function () {
             // revalidate user ID
             socket.emit('who-am-i')
         })
 
+        // answer on 'who-am-i'
         socket.on('you-are-what-you-is', function (msg) {
             if (player_id == '') {
                 player_id = msg.player_id
@@ -201,11 +208,13 @@ $(document).ready(function () {
             }
         })
 
+        // update tables list due to new table being created
         socket.on('new-table-available', function (msg) {
             $('#list_tables').html(msg.html)
         })
 
-        socket.on('card-played-by-user', function (msg) {
+        // broadcasted to every player at the table
+        socket.on('card-played-by-player', function (msg) {
             if (check_sync(msg)) {
                 current_player_id = msg.current_player_id
                 $('#hud_players').html(msg.html.hud_players)
@@ -247,6 +256,7 @@ $(document).ready(function () {
             $('#button_deal_cards_again').addClass('d-none')
         })
 
+        // told to every player of current round to ask for cards
         socket.on('grab-your-cards', function (msg) {
             socket.emit('my-cards-please', {
                 player_id: player_id,
@@ -254,6 +264,7 @@ $(document).ready(function () {
             })
         })
 
+        // answer to my-cards-please
         socket.on('your-cards-please', function (msg) {
             current_player_id = msg.current_player_id
             if (check_sync(msg)) {
@@ -305,6 +316,7 @@ $(document).ready(function () {
             }
         })
 
+        // anser to my-cards-please if player is only spectator
         socket.on('sorry-no-cards-for-you', function (msg) {
             if (check_sync(msg)) {
                 $("#modal_dialog").modal('hide')
@@ -318,6 +330,7 @@ $(document).ready(function () {
             }
         })
 
+        // click on deal-again-button
         socket.on('confirm-deal-again', function (msg) {
             if (check_sync(msg)) {
                 $('.overlay-notification').addClass('d-none')
@@ -326,6 +339,7 @@ $(document).ready(function () {
             }
         })
 
+        // sent after someone claimed a trick
         socket.on('next-trick', function (msg) {
             if (check_sync(msg)) {
                 current_player_id = msg.current_player_id
@@ -346,6 +360,7 @@ $(document).ready(function () {
             }
         })
 
+        // sent at the end of a round
         socket.on('round-finished', function (msg) {
             if (check_sync(msg)) {
                 $('#button_claim_trick').addClass('d-none')
@@ -355,6 +370,7 @@ $(document).ready(function () {
             }
         })
 
+        // tells players the next round is beginning
         socket.on('start-next-round', function (msg) {
             $('.overlay-button').addClass('d-none')
             $('.overlay-notification').addClass('d-none')
@@ -369,6 +385,7 @@ $(document).ready(function () {
             $("#modal_dialog").modal('show')
         })
 
+        // sent on requested round reset
         socket.on('round-reset-requested', function (msg) {
             $('.overlay-button').addClass('d-none')
             $('.overlay-notification').addClass('d-none')
@@ -377,6 +394,7 @@ $(document).ready(function () {
             $('#modal_dialog').modal('show')
         })
 
+        // sent on requested round finish
         socket.on('round-finish-requested', function (msg) {
             $('.overlay-button').addClass('d-none')
             $('.overlay-notification').addClass('d-none')
@@ -385,6 +403,7 @@ $(document).ready(function () {
             $('#modal_dialog').modal('show')
         })
 
+        // sent if undo was requested
         socket.on('undo-requested', function (msg) {
             $('.overlay-button').addClass('d-none')
             $('.overlay-notification').addClass('d-none')
@@ -393,6 +412,7 @@ $(document).ready(function () {
             $('#modal_dialog').modal('show')
         })
 
+        // if player wants to show cards confirm it
         socket.on('confirm-show-cards', function (msg) {
             if (check_sync(msg)) {
                 $('.overlay-notification').addClass('d-none')
@@ -401,6 +421,7 @@ $(document).ready(function () {
             }
         })
 
+        // intended exchange is about to be confirmed
         socket.on('confirm-exchange', function (msg) {
             if (check_sync(msg)) {
                 $('.overlay-notification').addClass('d-none')
@@ -411,6 +432,7 @@ $(document).ready(function () {
             }
         })
 
+        // received if password was changed
         socket.on('change-password-successful', function (msg) {
             $('#button_change_password').removeClass('btn-primary')
             $('#button_change_password').removeClass('btn-danger')
@@ -420,6 +442,7 @@ $(document).ready(function () {
             $('#submit_change_password').addClass('d-none')
         })
 
+        // received if password was NOT changed
         socket.on('change-password-failed', function (msg) {
             $('#button_change_password').removeClass('btn-primary')
             $('#button_change_password').removeClass('btn-success')
@@ -429,7 +452,8 @@ $(document).ready(function () {
             $('#submit_change_password').addClass('d-none')
         })
 
-        socket.on('cards-shown-by-user', function (msg) {
+        // show cards of a player on request
+        socket.on('cards-shown-by-player', function (msg) {
             if (check_sync(msg)) {
                 if ($('.mode-spectator').hasClass('d-none')) {
                     $('#table').html(msg.html.cards_table)
@@ -442,6 +466,7 @@ $(document).ready(function () {
             }
         })
 
+        // peer of a player gets asked if exchange is wanted
         socket.on('exchange-ask-player2', function (msg) {
             if (check_sync(msg)) {
                 $('.overlay-notification').addClass('d-none')
@@ -452,6 +477,7 @@ $(document).ready(function () {
             }
         })
 
+        // player 2 doesn't want to exchange cards with player1
         socket.on('exchange-player1-player2-deny', function (msg) {
             if (check_sync(msg)) {
                 $('.overlay-notification').addClass('d-none')
@@ -460,6 +486,7 @@ $(document).ready(function () {
             }
         })
 
+        // player1 shall start card exchange
         socket.on('exchange-player1-start', function (msg) {
             $('.overlay-notification').addClass('d-none')
             $('#button_exchange_send_cards').removeClass('d-none')
@@ -467,6 +494,7 @@ $(document).ready(function () {
             cards_locked = false
         })
 
+        // exchanged cards arrive at exchanging peer
         socket.on('exchange-player-cards-to-client', function (msg) {
             $('.overlay-notification').addClass('d-none')
             if (msg.table_mode == 'exchange') {
@@ -524,6 +552,7 @@ $(document).ready(function () {
 // ------------ Document events ------------
 //
 
+        // player enters table
         $(document).on('click', '.button-enter-table', function () {
             let table_id = $(this).data('table_id')
             socket.emit('enter-table', {
@@ -545,24 +574,25 @@ $(document).ready(function () {
                 })
         })
 
-// set focus onto defined form field
+        // set focus onto defined form field
         $('#modal_dialog').on('shown.bs.modal', function () {
             $('.form-focus').focus()
         })
 
-// create new table
+        // create new table
         $(document).on('click', '#button_create_table', function () {
             $.getJSON('/create/table', function (data, status) {
                 if (status == 'success') {
-                    $('#modal_body').html(data.html)
-                    clear_message('#modal_message')
-                    $('#modal_dialog').modal('show')
+                    // $('#modal_body').html(data.html)
+                    // clear_message('#modal_message')
+                    // $('#modal_dialog').modal('show')
+                    show_dialog(data.html)
                 }
             })
             return false
         })
 
-// parameter 'json' makes it equivalent to non-existing .postJSON
+        // table will be created
         $(document).on('click', '#button_finish_create_table', function () {
             // parameter 'json' makes it equivalent to .getJSON
             // because there is no .postJSON but .post(..., 'json') so it will be the same for GET and POST here
@@ -582,7 +612,7 @@ $(document).ready(function () {
             return false
         })
 
-// draggable list of players in setup table dialog
+        // draggable list of players in setup table dialog
         $(document).on('click', '.setup-table', function () {
             $.getJSON('/setup/table/' + encodeURIComponent($(this).data('table_id')), function (data, status) {
                 if (status == 'success' && data.allowed) {
@@ -612,7 +642,7 @@ $(document).ready(function () {
             return false
         })
 
-// lock table number of players
+        // lock table number of players
         $(document).on('click', '#table_lock', function () {
             if (this.checked) {
                 $('#table_lock_icon').removeClass('oi-lock-unlocked')
@@ -633,7 +663,7 @@ $(document).ready(function () {
             }
         })
 
-// enable playing with card '9'
+        // enable playing with card '9'
         $(document).on('click', '#switch_card_9', function () {
             if (this.checked) {
                 socket.emit('setup-table-change', {
@@ -650,7 +680,7 @@ $(document).ready(function () {
             }
         })
 
-// allow undoing a trick when wrong card was played
+        // allow undoing a trick when wrong card was played
         $(document).on('click', '#switch_allow_undo', function () {
             if (this.checked) {
                 $('#menu_request_undo').removeClass('d-none')
@@ -669,7 +699,7 @@ $(document).ready(function () {
             }
         })
 
-// enable exchange option
+        // enable exchange option
         $(document).on('click', '#switch_allow_exchange', function () {
             if (this.checked) {
                 $('#menu_request_exchange').removeClass('d-none')
@@ -688,7 +718,7 @@ $(document).ready(function () {
             }
         })
 
-// enable debugging if user is admin
+        // enable debugging if user is admin
         $(document).on('click', '#switch_enable_debugging', function () {
             if (this.checked) {
                 socket.emit('setup-table-change', {
@@ -706,7 +736,7 @@ $(document).ready(function () {
         })
 
 
-// delete a player in the draggable players order
+        // delete a player in the draggable players order
         $(document).on('click', '.button-remove-player-from-table', function () {
             if (player_id != $(this).data('player_id')) {
                 // used too if player leaves table via menu
@@ -720,31 +750,32 @@ $(document).ready(function () {
             }
         })
 
-// create new user
+        // create new user
         $(document).on('click', '#button_create_player', function () {
             $.getJSON('/create/player', function (data, status) {
                 if (status == 'success') {
-                    $('#modal_body').html(data.html)
-                    clear_message('#modal_message')
-                    $('#modal_dialog').modal('show')
+                    // $('#modal_body').html(data.html)
+                    // clear_message('#modal_message')
+                    // $('#modal_dialog').modal('show')
+                    show_dialog(data.html)
                 }
             })
             return false
         })
 
-// take player id as password
+        // take player id as password
         $(document).on('click', '#button_password_from_player', function () {
             $('#new_player_password').val($('#new_player_id').val())
             return false
         })
 
-// create random password
+        // create random password
         $(document).on('click', '#button_password_from_random', function () {
             $('#new_player_password').val(btoa(Math.random()).substr(5, 8))
             return false
         })
 
-// parameter 'json' makes it equivalent to non-existing .postJSON
+        // parameter 'json' makes it equivalent to non-existing .postJSON
         $(document).on('click', '#button_finish_create_player', function () {
             // parameter 'json' makes it equivalent to .getJSON
             // because there is no .postJSON but .post(..., 'json') so it will be the same for GET and POST here
@@ -766,21 +797,22 @@ $(document).ready(function () {
             return false
         })
 
-// delete a player in the players list
+        // delete a player in the players list
         $(document).on('click', '.button-delete-player', function () {
             if (player_id != $(this).data('player_id')) {
                 $.getJSON('/delete/player/' + encodeURIComponent($(this).data('player_id')),
                     function (data, status) {
                         if (status == 'success') {
-                            $('#modal_body').html(data.html)
-                            clear_message('#modal_message')
-                            $('#modal_dialog').modal('show')
+                            // $('#modal_body').html(data.html)
+                            // clear_message('#modal_message')
+                            // $('#modal_dialog').modal('show')
+                            show_dialog(data.html)
                         }
                     })
             }
         })
 
-// really delete player after safety dialog
+        // really delete player after safety dialog
         $(document).on('click', '#button_really_delete_player', function () {
             if (player_id != $(this).data('player_id')) {
                 // once again the .post + 'json' move
@@ -796,9 +828,10 @@ $(document).ready(function () {
                                     player_id: player_id
                                 })
                             } else {
-                                $('#modal_body').html(data.html)
-                                clear_message('#modal_message')
-                                $('#modal_dialog').modal('show')
+                                // $('#modal_body').html(data.html)
+                                // clear_message('#modal_message')
+                                // $('#modal_dialog').modal('show')
+                                show_dialog(data.html)
                             }
                         }
                     }, 'json')
@@ -806,19 +839,20 @@ $(document).ready(function () {
             return false
         })
 
-// delete a player in the players list
+        // delete a player in the players list
         $(document).on('click', '.button-delete-table', function () {
             $.getJSON('/delete/table/' + encodeURIComponent($(this).data('table_id')),
                 function (data, status) {
                     if (status == 'success') {
-                        $('#modal_body').html(data.html)
-                        clear_message('#modal_message')
-                        $('#modal_dialog').modal('show')
+                        // $('#modal_body').html(data.html)
+                        // clear_message('#modal_message')
+                        // $('#modal_dialog').modal('show')
+                        show_dialog(data.html)
                     }
                 })
         })
 
-// really delete table after safety dialog
+        // really delete table after safety dialog
         $(document).on('click', '#button_really_delete_table', function () {
             // once again the .post + 'json' move
             $.post('/delete/table/' + encodeURIComponent($(this).data('table_id')),
@@ -833,9 +867,10 @@ $(document).ready(function () {
                                 player_id: player_id
                             })
                         } else {
-                            $('#modal_body').html(data.html)
-                            clear_message('#modal_message')
-                            $('#modal_dialog').modal('show')
+                            // $('#modal_body').html(data.html)
+                            // clear_message('#modal_message')
+                            // $('#modal_dialog').modal('show')
+                            show_dialog(data.html)
                         }
                     }
                 }, 'json')
@@ -843,6 +878,7 @@ $(document).ready(function () {
             return false
         })
 
+        // start next round by dealing new cards
         $(document).on('click', '#button_deal_cards', function () {
             socket.emit('deal-cards', {
                 player_id: player_id,
@@ -850,18 +886,21 @@ $(document).ready(function () {
             })
         })
 
+        // table settings button starts table with new settings
         $(document).on('click', '#button_start_table', function () {
             $.getJSON('/start/table/' + encodeURIComponent($(this).data('table_id')),
                 function (data, status) {
                     if (status == 'success') {
-                        $('#modal_body').html(data.html)
-                        clear_message('#modal_message')
-                        $('#modal_dialog').modal('show')
+                        // $('#modal_body').html(data.html)
+                        // clear_message('#modal_message')
+                        // $('#modal_dialog').modal('show')
+                        show_dialog(data.html)
                     }
                 })
             return false
         })
 
+        // start table button needs confirmation
         $(document).on('click', '#button_really_start_table', function () {
             $('#modal_dialog').modal('hide')
             socket.emit('setup-table-change', {
@@ -884,18 +923,19 @@ $(document).ready(function () {
             })
         })
 
-// player setup
+        // player setup
         $(document).on('click', '.setup-player', function () {
             $.getJSON('/setup/player/' + encodeURIComponent($(this).data('player_id')), function (data, status) {
                 if (status == 'success') {
-                    $("#modal_body").html(data.html)
-                    clear_message('#modal_message')
-                    $('#modal_dialog').modal('show')
+                    // $("#modal_body").html(data.html)
+                    // clear_message('#modal_message')
+                    // $('#modal_dialog').modal('show')
+                    show_dialog(data.html)
                 }
             })
         })
 
-// change password
+        // change password
         $(document).on('click', '#button_change_password', function () {
             socket.emit('setup-player-change', {
                 action: 'new_password',
@@ -904,7 +944,7 @@ $(document).ready(function () {
             })
         })
 
-// reset password change button when password gets changed
+        // reset password change button when password gets changed
         $(document).on('keyup', '#new_player_password', function () {
             $('#button_change_password').addClass('btn-primary')
             $('#button_change_password').removeClass('btn-success')
@@ -914,7 +954,7 @@ $(document).ready(function () {
             $('#indicate_change_password_failed').addClass('d-none')
         })
 
-// make player an admin
+        // make player an admin
         $(document).on('click', '#switch_player_is_admin', function () {
             if (this.checked) {
                 socket.emit('setup-player-change', {
@@ -967,6 +1007,7 @@ $(document).ready(function () {
             })
         })
 
+        // repeat dealing of cards
         $(document).on('click', '#button_deal_cards_again', function () {
             socket.emit('deal-cards-again', {
                 player_id: player_id,
@@ -974,6 +1015,7 @@ $(document).ready(function () {
             })
         })
 
+        // pressed big green button to claim trick
         $(document).on('click', '#button_claim_trick', function () {
             socket.emit('claim-trick', {
                 player_id: player_id,
@@ -981,6 +1023,7 @@ $(document).ready(function () {
             })
         })
 
+        // player is ready for the next round
         $(document).on('click', '#button_next_round', function () {
             socket.emit('ready-for-next-round', {
                 player_id: player_id,
@@ -988,6 +1031,7 @@ $(document).ready(function () {
             })
         })
 
+        // round reset was requested by hamburger menu
         $(document).on('click', '#menu_request_round_reset', function () {
             socket.emit('request-round-reset', {
                 player_id: player_id,
@@ -995,6 +1039,7 @@ $(document).ready(function () {
             })
         })
 
+        // confirmed round reset
         $(document).on('click', '#button_round_reset_yes', function () {
             let table_id = $(this).data('table_id')
             $.getJSON('/get/wait', function (data, status) {
@@ -1010,6 +1055,7 @@ $(document).ready(function () {
             return false
         })
 
+        // round finish requested
         $(document).on('click', '#menu_request_round_finish', function () {
             socket.emit('request-round-finish', {
                 player_id: player_id,
@@ -1017,6 +1063,7 @@ $(document).ready(function () {
             })
         })
 
+        // round finish request confirmed
         $(document).on('click', '#button_round_finish_yes', function () {
             let table_id = $(this).data('table_id')
             $.getJSON('/get/wait', function (data, status) {
@@ -1032,6 +1079,7 @@ $(document).ready(function () {
             return false
         })
 
+        // last trick undo request
         $(document).on('click', '#menu_request_undo', function () {
             socket.emit('request-undo', {
                 player_id: player_id,
@@ -1039,6 +1087,7 @@ $(document).ready(function () {
             })
         })
 
+        // last trick undo request confirmed
         $(document).on('click', '#button_undo_yes', function () {
             let table_id = $(this).data('table_id')
             $.getJSON('/get/wait', function (data, status) {
@@ -1054,6 +1103,7 @@ $(document).ready(function () {
             return false
         })
 
+        // player wants to show cards from hand
         $(document).on('click', '#menu_request_show_hand', function () {
             socket.emit('request-show-hand', {
                 player_id: player_id,
@@ -1061,12 +1111,15 @@ $(document).ready(function () {
             })
         })
 
-        $(document).on('click', '#button_show_cards', function () {
+        // player show cards confirmed
+        $(document).on('click', '#button_show_cards_yes', function () {
             socket.emit('show-cards', {
                 player_id: player_id,
                 table_id: $(this).data('table_id')
             })
         })
+
+        // player wants to exchange cards (re/contra)
         $(document).on('click', '#menu_request_exchange', function () {
             socket.emit('request-exchange', {
                 player_id: player_id,
@@ -1074,13 +1127,15 @@ $(document).ready(function () {
             })
         })
 
-        $(document).on('click', '#button_start_exchange', function () {
+        // player1 confirms intended exchange
+        $(document).on('click', '#button_start_exchange_yes', function () {
             socket.emit('exchange-start', {
                 player_id: player_id,
                 table_id: $(this).data('table_id')
             })
         })
 
+        // player 2 confirms exchange
         $(document).on('click', '#button_exchange_confirm_player2', function () {
             socket.emit('exchange-player2-ready', {
                 player_id: player_id,
@@ -1088,6 +1143,7 @@ $(document).ready(function () {
             })
         })
 
+        // player2 does not want to exchange cards
         $(document).on('click', '#button_exchange_deny_player2', function () {
             socket.emit('exchange-player2-deny', {
                 player_id: player_id,

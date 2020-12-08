@@ -200,7 +200,7 @@ def played_card(msg):
                 cards_timestamp = table.round.cards_timestamp
                 cards_shown = table.round.cards_shown
                 sync_count = table.increase_sync_count()
-                event = 'card-played-by-user',
+                event = 'card-played-by-player',
                 payload = {'player_id': player.id,
                            'table_id': table.id,
                            'card_id': card.id,
@@ -805,7 +805,7 @@ def show_cards(msg):
         table.show_cards(player)
         cards_timestamp = table.round.cards_timestamp
         cards_table = game.players[player.id].get_cards()
-        event = 'cards-shown-by-user',
+        event = 'cards-shown-by-player',
         payload = {'table_id': table.id,
                    'sync_count': table.sync_count,
                    'html': {'cards_table': render_template('cards/table.html',
@@ -912,7 +912,7 @@ def exchange_player2_deny(msg):
         exchange_type = 'contra'
         if not hochzeit and player.party == 're':
             exchange_type = 're'
-        # tell exchange initializing player to finally begin transaction
+        # tell exchange initializing player thant second player doesn't want to exchange cards
         socketio.emit('exchange-player1-player2-deny',
                       {'table_id': table.id,
                        'sync_count': table.sync_count,
