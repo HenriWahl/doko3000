@@ -167,54 +167,59 @@ def played_card(msg):
     msg_ok, player, table = check_message(msg)
     if msg_ok:
         card_id = msg.get('card_id')
-        if card_id in Deck.cards and \
-                len(table.round.current_trick.cards) < 4 and \
-                current_user.get_id() == player.id == table.round.current_player:
-            table.round.current_trick.add_turn(player.id, card_id)
-            table.round.increase_turn_count()
-            card = Deck.cards[card_id]
-            player.remove_card(card.id)
-            is_last_turn = table.round.current_trick.is_last_turn()
-            current_player_id = table.round.get_current_player_id()
-            idle_players = table.idle_players
-            if table.round.cards_shown:
-                # cards_shown contains cards-showing player_id
-                cards_table = game.players[table.round.cards_shown].get_cards()
-            else:
-                cards_table = table.round.current_trick.get_cards()
-            played_cards = table.round.get_played_cards()
-            cards_timestamp = table.round.cards_timestamp
-            cards_shown = table.round.cards_shown
-            sync_count = table.increase_sync_count()
-            event = 'card-played-by-user',
-            payload = {'player_id': player.id,
-                       'table_id': table.id,
-                       'card_id': card.id,
-                       'card_name': card.name,
-                       'is_last_turn': is_last_turn,
-                       'current_player_id': current_player_id,
-                       'idle_players': idle_players,
-                       'players_spectator': table.players_spectator,
-                       'played_cards': played_cards,
-                       'cards_shown': cards_shown,
-                       'sync_count': sync_count,
-                       'html': {'cards_table': render_template('cards/table.html',
-                                                               cards_table=cards_table,
-                                                               table=table,
-                                                               cards_timestamp=cards_timestamp),
-                                'hud_players': render_template('top/hud_players.html',
-                                                               table=table,
-                                                               player=player,
-                                                               game=game,
-                                                               current_player_id=current_player_id)
-                                }}
-            room = table.id
-            # debugging...
-            if table.is_debugging:
-                table.log(event, payload, room)
-            # ...and action
-            socketio.emit(event, payload, room=room)
-
+        # check if cards on hand are correct
+        cards_hand_ids = msg.get('cards_hand_ids')
+        if set(cards_hand_ids) | {card_id} == set(player.cards) and \
+                len(cards_hand_ids )+ 1 == len(player.cards):
+            if card_id in Deck.cards and \
+                    len(table.round.current_trick.cards) < 4 and \
+                    current_user.get_id() == player.id == table.round.current_player:
+                table.round.current_trick.add_turn(player.id, card_id)
+                table.round.increase_turn_count()
+                card = Deck.cards[card_id]
+                player.remove_card(card.id)
+                is_last_turn = table.round.current_trick.is_last_turn()
+                current_player_id = table.round.get_current_player_id()
+                idle_players = table.idle_players
+                if table.round.cards_shown:
+                    # cards_shown contains cards-showing player_id
+                    cards_table = game.players[table.round.cards_shown].get_cards()
+                else:
+                    cards_table = table.round.current_trick.get_cards()
+                played_cards = table.round.get_played_cards()
+                cards_timestamp = table.round.cards_timestamp
+                cards_shown = table.round.cards_shown
+                sync_count = table.increase_sync_count()
+                event = 'card-played-by-user',
+                payload = {'player_id': player.id,
+                           'table_id': table.id,
+                           'card_id': card.id,
+                           'card_name': card.name,
+                           'is_last_turn': is_last_turn,
+                           'current_player_id': current_player_id,
+                           'idle_players': idle_players,
+                           'players_spectator': table.players_spectator,
+                           'played_cards': played_cards,
+                           'cards_shown': cards_shown,
+                           'sync_count': sync_count,
+                           'html': {'cards_table': render_template('cards/table.html',
+                                                                   cards_table=cards_table,
+                                                                   table=table,
+                                                                   cards_timestamp=cards_timestamp),
+                                    'hud_players': render_template('top/hud_players.html',
+                                                                   table=table,
+                                                                   player=player,
+                                                                   game=game,
+                                                                   current_player_id=current_player_id)
+                                    }}
+                room = table.id
+                # debugging...
+                if table.is_debugging:
+                    table.log(event, payload, room)
+                # ...and action
+                socketio.emit(event, payload, room=room)
+        else:
+            deliver_cards_to_player(msg)
 
 @socketio.on('card-exchanged')
 def card_exchanged(msg):
@@ -410,7 +415,7 @@ def deal_cards_again(msg):
 
 
 @socketio.on('my-cards-please')
-def deal_cards_to_player(msg):
+def deliver_cards_to_player(msg):
     """
     give player cards after requesting them
     """
@@ -535,7 +540,7 @@ def sorted_cards(msg):
             player.cards = cards_hand_ids
             player.save()
         else:
-            deal_cards_to_player(msg)
+            deliver_cards_to_player(msg)
 
 
 @socketio.on('claim-trick')

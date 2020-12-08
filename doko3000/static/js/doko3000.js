@@ -63,9 +63,11 @@ $(document).ready(function () {
         ]);
 
         dragging_cards.on('drop', function (card, target, source) {
-
-            $.uniqueSort($('.game-card-hand'))
-
+            // get cards order to send it to server for storing or checking it
+            let cards_hand_ids = []
+            for (let card_hand of $('#hand').children('.game-card-hand')) {
+                cards_hand_ids.push($(card_hand).data('id'))
+            }
             // do not drag your gained tricks around
             if (card.id == 'cards_stack') {
                 dragging_cards.cancel(true)
@@ -82,7 +84,8 @@ $(document).ready(function () {
                                 player_id: player_id,
                                 card_id: $(card).data('id'),
                                 card_name: $(card).data('name'),
-                                table_id: $(card).data('table_id')
+                                table_id: $(card).data('table_id'),
+                                cards_hand_ids: cards_hand_ids
                             })
                         } else {
                             dragging_cards.cancel(true)
@@ -95,11 +98,11 @@ $(document).ready(function () {
                     // check if card and hand have the same timestamp - otherwise someone dealed new cards
                     // and the dragged card does not belong to the current cards
                     if ($(card).data('cards_timestamp') == $('#cards_hand_timestamp').data('cards_timestamp')) {
-                        // get cards order to end it to server for storing it
-                        let cards_hand_ids = []
-                        for (let card_hand of $('#hand').children('.game-card-hand')) {
-                            cards_hand_ids.push($(card_hand).data('id'))
-                        }
+                        // // get cards order to end it to server for storing it
+                        // let cards_hand_ids = []
+                        // for (let card_hand of $('#hand').children('.game-card-hand')) {
+                        //     cards_hand_ids.push($(card_hand).data('id'))
+                        // }
                         socket.emit('sorted-cards', {
                             player_id: player_id,
                             table_id: $(card).data('table_id'),
