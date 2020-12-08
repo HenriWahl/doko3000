@@ -98,11 +98,6 @@ $(document).ready(function () {
                     // check if card and hand have the same timestamp - otherwise someone dealed new cards
                     // and the dragged card does not belong to the current cards
                     if ($(card).data('cards_timestamp') == $('#cards_hand_timestamp').data('cards_timestamp')) {
-                        // // get cards order to end it to server for storing it
-                        // let cards_hand_ids = []
-                        // for (let card_hand of $('#hand').children('.game-card-hand')) {
-                        //     cards_hand_ids.push($(card_hand).data('id'))
-                        // }
                         socket.emit('sorted-cards', {
                             player_id: player_id,
                             table_id: $(card).data('table_id'),
