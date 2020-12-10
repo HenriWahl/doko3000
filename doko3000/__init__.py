@@ -126,21 +126,21 @@ def who_am_i():
             sessions[player.id] = request.sid
             # if player already sits on a table inform client
             if table:
-                current_player_id = table.round.current_player
+                current_player_id = table.round.current_player_id
                 round_finished = table.round.is_finished()
                 round_reset = table.round.is_reset()
                 join_room(table.id)
                 table_id = table.id
-                sync_count = table.sync_count
             else:
                 current_player_id = ''
                 table_id = ''
-                sync_count = 0
+                # table.sync_count = 0
+                table.reset_sync_count()
             # putting into variables makes debugging easier
             event = 'you-are-what-you-is'
             payload = {'player_id': player.id,
                        'table_id': table_id,
-                       'sync_count': sync_count,
+                       'sync_count': table.sync_count,
                        'current_player_id': current_player_id,
                        'round_finished': round_finished,
                        'round_reset': round_reset}
@@ -183,22 +183,18 @@ def played_card(msg):
                 len(cards_hand_ids )+ 1 == len(player.cards):
             if card_id in Deck.cards and \
                     len(table.round.current_trick.cards) < 4 and \
-                    current_user.get_id() == player.id == table.round.current_player:
+                    current_user.get_id() == player.id == table.round.current_player_id:
                 table.round.current_trick.add_turn(player.id, card_id)
                 table.round.increase_turn_count()
                 card = Deck.cards[card_id]
                 player.remove_card(card.id)
                 is_last_turn = table.round.current_trick.is_last_turn()
                 current_player_id = table.round.get_current_player_id()
-                idle_players = table.idle_players
                 if table.round.cards_shown:
                     # cards_shown contains cards-showing player_id
                     cards_table = game.players[table.round.cards_shown].get_cards()
                 else:
                     cards_table = table.round.current_trick.get_cards()
-                played_cards = table.round.get_played_cards()
-                cards_timestamp = table.round.cards_timestamp
-                cards_shown = table.round.cards_shown
                 sync_count = table.increase_sync_count()
                 event = 'card-played-by-player',
                 payload = {'player_id': player.id,
@@ -207,15 +203,14 @@ def played_card(msg):
                            'card_name': card.name,
                            'is_last_turn': is_last_turn,
                            'current_player_id': current_player_id,
-                           'idle_players': idle_players,
+                           'idle_players': table.idle_players,
                            'players_spectator': table.players_spectator,
-                           'played_cards': played_cards,
-                           'cards_shown': cards_shown,
+                           'played_cards': table.round.played_cards,
+                           'cards_shown': table.round.cards_shown,
                            'sync_count': sync_count,
                            'html': {'cards_table': render_template('cards/table.html',
                                                                    cards_table=cards_table,
-                                                                   table=table,
-                                                                   cards_timestamp=cards_timestamp),
+                                                                   table=table),
                                     'hud_players': render_template('top/hud_players.html',
                                                                    table=table,
                                                                    player=player,
@@ -262,7 +257,6 @@ def exchange_player_cards(msg):
                 peer = game.players[peer_id]
                 peer.cards += exchange[player.id]
                 cards_hand = [Deck.cards[x] for x in Deck.cards if x in peer.cards]
-                cards_timestamp = table.round.cards_timestamp
                 cards_exchange_count = len(exchange[player.id])
                 # if peer has no cards yet put onto table exchange is still in exchange mode
                 if not exchange[peer.id]:
@@ -277,8 +271,7 @@ def exchange_player_cards(msg):
                            'html': {'cards_hand': render_template('cards/hand.html',
                                                                   cards_hand=cards_hand,
                                                                   table=table,
-                                                                  player=player,
-                                                                  cards_timestamp=cards_timestamp),
+                                                                  player=player),
                                     }}
                 room = sessions.get(peer_id)
                 # debugging...
@@ -337,13 +330,12 @@ def setup_table(msg):
                 table.players = order
         elif action == 'start_table':
             table.start()
-            sync_count = table.sync_count
             # just tell everybody to get personal cards
             # for unknown reason this does not seem to be necessary because the connection
             # gets lost in every case and client just tries to reconnect
             socketio.emit('grab-your-cards',
                           {'table_id': table.id,
-                           'sync_count': sync_count},
+                           'sync_count': table.sync_count},
                           room=table.id)
         # # tell others about table change
         elif action == 'finished':
@@ -404,13 +396,12 @@ def deal_cards(msg):
     """
     msg_ok, player, table = check_message(msg)
     if msg_ok:
-        table.reset_round()
         # table increases its sync_count when resetting round
-        sync_count = table.sync_count
+        table.reset_round()
         # just tell everybody to get personal cards
         event = 'grab-your-cards',
         payload = {'table_id': table.id,
-                   'sync_count': sync_count}
+                   'sync_count': table.sync_count}
         room = table.id
         # debugging...
         if table.is_debugging:
@@ -426,11 +417,10 @@ def deal_cards_again(msg):
     """
     msg_ok, player, table = check_message(msg)
     if msg_ok:
-        sync_count = table.sync_count
         # ask dealer if really should be re-dealt
         socketio.emit('confirm-deal-again',
                       {'table_id': table.id,
-                       'sync_count': sync_count,
+                       'sync_count': table.sync_count,
                        'html': render_template('round/request_deal_again.html',
                                                table=table)},
                       room=request.sid)
@@ -443,13 +433,9 @@ def deliver_cards_to_player(msg):
     """
     msg_ok, player, table = check_message(msg, player_in_round=False)
     if msg_ok:
-        dealer = table.dealer
         # just in case
         join_room(table.id)
-        current_player_id = table.round.current_player
-        cards_timestamp = table.round.cards_timestamp
         exchange_needed = table.round.is_exchange_needed(player.id)
-        sync_count = table.sync_count
         if player.id in table.round.players and \
                 player.id in table.players_active:
             cards_hand = player.get_cards()
@@ -463,8 +449,6 @@ def deliver_cards_to_player(msg):
             else:
                 cards_table = []
             mode = 'player'
-            dealing_needed = table.round.turn_count == 0
-            cards_shown = table.round.cards_shown
             # if one trick right now was finished the claim-trick-button should be displayed again
             trick_claiming_needed = table.round.turn_count % 4 == 0 and \
                                     table.round.turn_count > 0 and \
@@ -474,29 +458,25 @@ def deliver_cards_to_player(msg):
             payload = {'player_id': player.id,
                        'table_id': table.id,
                        'turn_count': table.round.turn_count,
-                       'current_player_id': current_player_id,
-                       'dealer': dealer,
-                       'dealing_needed': dealing_needed,
+                       'current_player_id': table.round.current_player_id,
+                       'dealer': table.dealer,
+                       'needs_dealing': table.round.needs_dealing,
                        'trick_claiming_needed': trick_claiming_needed,
                        'exchange_needed': exchange_needed,
-                       'cards_shown': cards_shown,
-                       'sync_count': sync_count,
+                       'cards_shown': table.round.cards_shown,
+                       'sync_count': table.sync_count,
                        'cards_per_player': table.round.cards_per_player,
                        'html': {'cards_hand': render_template('cards/hand.html',
                                                               cards_hand=cards_hand,
                                                               table=table,
-                                                              player=player,
-                                                              cards_timestamp=cards_timestamp),
+                                                              player=player),
                                 'hud_players': render_template('top/hud_players.html',
                                                                table=table,
                                                                player=player,
-                                                               game=game,
-                                                               dealer=dealer,
-                                                               current_player_id=current_player_id),
+                                                               game=game),
                                 'cards_table': render_template('cards/table.html',
                                                                cards_table=cards_table,
                                                                table=table,
-                                                               cards_timestamp=cards_timestamp,
                                                                mode=mode)}
                        }
             room = request.sid
@@ -516,17 +496,14 @@ def deliver_cards_to_player(msg):
                 cards_table = table.round.current_trick.get_cards()
             mode = 'spectator'
             event = 'sorry-no-cards-for-you',
-            payload = {'sync_count': sync_count,
+            payload = {'sync_count': table.sync_count,
                        'html': {'hud_players': render_template('top/hud_players.html',
                                                                table=table,
                                                                player=player,
-                                                               game=game,
-                                                               dealer=dealer,
-                                                               current_player_id=current_player_id),
+                                                               game=game),
                                 'cards_table': render_template('cards/table.html',
                                                                cards_table=cards_table,
                                                                table=table,
-                                                               cards_timestamp=cards_timestamp,
                                                                mode=mode),
                                 'cards_hand_spectator_upper': render_template('cards/hand_spectator_upper.html',
                                                                               table=table,
@@ -584,7 +561,7 @@ def claim_trick(msg):
             else:
                 # apparently the ownership of the previous trick is not clear - change it
                 table.round.previous_trick.owner = player.id
-                table.round.current_player = player.id
+                table.round.current_player_id = player.id
             cards_timestamp = table.round.cards_timestamp
             cards_table = []
             table.round.calculate_trick_order()
@@ -993,14 +970,12 @@ def table(table_id=''):
             player.id in table.players:
         if player.id in table.round.players:
             dealer = table.dealer
-            # if no card is played already the dealer might deal
-            dealing_needed = table.round.turn_count == 0
             # if one trick right now was finished the claim-trick-button should be displayed again
             trick_claiming_needed = table.round.turn_count % 4 == 0 and \
                                     table.round.turn_count > 0 and \
                                     not table.round.is_finished()
             exchange_needed = table.round.is_exchange_needed(player.id)
-            current_player_id = table.round.current_player
+            current_player_id = table.round.current_player_id
             cards_hand = player.get_cards()
             if table.round.cards_shown:
                 # cards_shown contains cqrds-showing player_id
@@ -1018,7 +993,6 @@ def table(table_id=''):
                                    title=f"{app.config['TITLE']} {table.name}",
                                    table=table,
                                    dealer=dealer,
-                                   dealing_needed=dealing_needed,
                                    trick_claiming_needed=trick_claiming_needed,
                                    exchange_needed=exchange_needed,
                                    player=player,

@@ -41,7 +41,6 @@ function check_sync(msg) {
         return true
     } else {
         // sync_count won't be persistent anyway because page will be reloaded to make refresh safely work
-        // sync_count = msg.sync_count
         if (location.pathname.startsWith('/table/')) {
             location.reload()
         }
@@ -299,7 +298,7 @@ $(document).ready(function () {
                 $('#hand').html(msg.html.cards_hand)
                 $('#button_claim_trick').addClass('d-none')
                 $('#modal_dialog').modal('hide')
-                if (player_id == msg.dealer && msg.dealing_needed && !msg.exchange_needed) {
+                if (player_id == msg.dealer && msg.needs_dealing && !msg.exchange_needed) {
                     $('#button_deal_cards_again').removeClass('d-none')
                 } else {
                     $('#button_deal_cards_again').addClass('d-none')

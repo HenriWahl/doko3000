@@ -1,5 +1,5 @@
 {# store timestamp in extra id to be compared with single dragged cards and their timestamp #}
-<span id="cards_hand_timestamp" data-cards_timestamp="{{ cards_timestamp }}"></span>
+<span id="cards_hand_timestamp" data-cards_timestamp="{{ table.round.cards_timestamp }}"></span>
 {% for card in cards_hand %}
 {% include 'cards/card.html' %}
 {% endfor %}

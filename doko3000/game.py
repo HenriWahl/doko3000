@@ -435,11 +435,11 @@ class Round(Document):
         return self.get('turn_count', 0)
 
     @property
-    def current_player(self):
+    def current_player_id(self):
         return self.get('current_player', '')
 
-    @current_player.setter
-    def current_player(self, value):
+    @current_player_id.setter
+    def current_player_id(self, value):
         self['current_player'] = value
 
     @property
@@ -547,6 +547,25 @@ class Round(Document):
         """
         return self.tricks[self.trick_count - 1]
 
+    @property
+    def played_cards(self):
+        """
+        return list of all cards played in this round
+        """
+        played_cards = []
+        for trick in self.tricks.values():
+            for card in trick.cards:
+                played_cards.append(card)
+        return played_cards
+
+    @property
+    def needs_dealing(self):
+        """
+        returns information if dealing is needed because the round begins
+        """
+        # if no card was played yet we might need some cards
+        return self.turn_count == 0
+
     def reset(self, players=[]):
         """
         used by __init__ and by table at start of a new round
@@ -577,9 +596,9 @@ class Round(Document):
 
         # current player - starts with the one following the dealer
         if self.players:
-            self.current_player = self.players[1]
+            self.current_player_id = self.players[1]
         else:
-            self.current_player = None
+            self.current_player_id = None
 
         # needed for player HUD
         self.calculate_trick_order()
@@ -658,22 +677,22 @@ class Round(Document):
         """
         self.game.tricks[f'{self.id}-{self.trick_count}'].owner = player_id
         self.increase_trick_count()
-        self.current_player = player_id
+        self.current_player_id = player_id
         self.save()
 
     def get_current_player_id(self):
         """
         get player for next turn
         """
-        current_player_index = self.players.index(self.current_player)
-        if current_player_index < 3:
+        current_player_id_index = self.players.index(self.current_player_id)
+        if current_player_id_index < 3:
             # set new current player
-            self.current_player = self.players[current_player_index + 1]
+            self.current_player_id = self.players[current_player_id_index + 1]
         else:
-            self.current_player = self.players[0]
+            self.current_player_id = self.players[0]
         self.save()
         # current player is the next player
-        return self.current_player
+        return self.current_player_id
 
     def is_finished(self):
         """
@@ -794,9 +813,9 @@ class Round(Document):
         """
         get order by arranging players list starting from current player who is first in this trick
         """
-        if self.current_player:
-            current_player_index = self.players.index(self.current_player)
-            self.trick_order = self.players[current_player_index:] + self.players[:current_player_index]
+        if self.current_player_id:
+            current_player_id_index = self.players.index(self.current_player_id)
+            self.trick_order = self.players[current_player_id_index:] + self.players[:current_player_id_index]
 
     def increase_turn_count(self):
         self.turn_count += 1
@@ -822,16 +841,6 @@ class Round(Document):
                 players_cards.append([])
         return players_cards
 
-    def get_played_cards(self):
-        """
-        return list of all cards played in this round
-        """
-        played_cards = []
-        for trick in self.tricks.values():
-            for card in trick.cards:
-                played_cards.append(card)
-        return played_cards
-
     def undo(self):
         """
         undo last trick by request
@@ -844,7 +853,7 @@ class Round(Document):
             # decrease turn_count here to avoid extra self.save() like in increase_turn_count()
             self.turn_count -= 1
         # store last current trick starting player
-        self.current_player = self.current_trick.players[0]
+        self.current_player_id = self.current_trick.players[0]
         self.current_trick.reset()
         self.save()
 
@@ -1052,8 +1061,8 @@ class Table(Document):
             self.round.players.pop(self.round.players.index(player_id))
         while player_id in self.round.trick_order:
             self.round.trick_order.pop(self.round.trick_order.index(player_id))
-        if self.round.current_player == player_id:
-            self.round.current_player == ''
+        if self.round.current_player_id == player_id:
+            self.round.current_player_id == ''
         self.game.players[player_id].table = ''
         if player_id not in self.players and \
                 player_id not in self.order and \

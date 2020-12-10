@@ -11,7 +11,7 @@
     </span>
 
     <div id="button_deal_cards_again" class="overlay-button justify-content-center
-    {% if current_user.id != dealer or not dealing_needed or exchange_needed %}
+    {% if current_user.id != dealer or not table.round.needs_dealing or exchange_needed %}
     d-none
     {% endif %}"
          data-table_id="{{ table.id }}">
