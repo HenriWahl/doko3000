@@ -1,5 +1,6 @@
 # access to CouchDB
 
+from random import randint
 from time import sleep
 
 from cloudant import CouchDB
@@ -59,5 +60,6 @@ class Document3000(Document):
                 saved = True
                 print('SAVE', self.document_url)
             except Exception as error:
+                # sleep a random amount of time before next attempt
                 print(error)
-                sleep(0.1)
+                sleep(randint(10, 50)/100)
