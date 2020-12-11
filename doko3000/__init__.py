@@ -449,10 +449,6 @@ def deliver_cards_to_player(msg):
             else:
                 cards_table = []
             mode = 'player'
-            # if one trick right now was finished the claim-trick-button should be displayed again
-            trick_claiming_needed = table.round.turn_count % 4 == 0 and \
-                                    table.round.turn_count > 0 and \
-                                    not table.round.is_finished()
             # putting into variables makes debugging easier
             event = 'your-cards-please',
             payload = {'player_id': player.id,
@@ -461,7 +457,7 @@ def deliver_cards_to_player(msg):
                        'current_player_id': table.round.current_player_id,
                        'dealer': table.dealer,
                        'needs_dealing': table.round.needs_dealing,
-                       'trick_claiming_needed': trick_claiming_needed,
+                       'needs_trick_claiming': table.round.needs_trick_claiming,
                        'exchange_needed': exchange_needed,
                        'cards_shown': table.round.cards_shown,
                        'sync_count': table.sync_count,
@@ -970,10 +966,6 @@ def table(table_id=''):
             player.id in table.players:
         if player.id in table.round.players:
             dealer = table.dealer
-            # if one trick right now was finished the claim-trick-button should be displayed again
-            trick_claiming_needed = table.round.turn_count % 4 == 0 and \
-                                    table.round.turn_count > 0 and \
-                                    not table.round.is_finished()
             exchange_needed = table.round.is_exchange_needed(player.id)
             current_player_id = table.round.current_player_id
             cards_hand = player.get_cards()
@@ -993,7 +985,6 @@ def table(table_id=''):
                                    title=f"{app.config['TITLE']} {table.name}",
                                    table=table,
                                    dealer=dealer,
-                                   trick_claiming_needed=trick_claiming_needed,
                                    exchange_needed=exchange_needed,
                                    player=player,
                                    current_player_id=current_player_id,

@@ -567,6 +567,15 @@ class Round(Document3000):
         # if no card was played yet we might need some cards
         return self.turn_count == 0
 
+    @property
+    def needs_trick_claiming(self):
+        """
+        returns information if there is need for the claim trick button
+        """
+        return self.turn_count % 4 == 0 and \
+                self. turn_count > 0 and \
+                not self.is_finished()
+
     def reset(self, players=[]):
         """
         used by __init__ and by table at start of a new round

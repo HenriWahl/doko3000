@@ -284,7 +284,7 @@ $(document).ready(function () {
                     $('#button_exchange_send_cards').addClass('d-none')
                     table_mode = 'normal'
                 }
-                if (msg.trick_claiming_needed && !cards_locked) {
+                if (msg.needs_trick_claiming && !cards_locked) {
                     $('#button_claim_trick').removeClass('d-none').fadeOut(1).delay(1500).fadeIn(1)
                 } else {
                     $('#button_claim_trick').addClass('d-none')

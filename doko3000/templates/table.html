@@ -19,7 +19,7 @@
     </div>
 
     <div id="button_claim_trick" class="overlay-button justify-content-center
-     {% if player.id in table.idle_players or not trick_claiming_needed or cards_shown %}
+     {% if player.id in table.idle_players or not table.round.needs_trick_claiming or cards_shown %}
      d-none
      {% endif %}
      "
@@ -36,7 +36,7 @@
     </div>
 
     <button id="turn_indicator" class="overlay-notification btn btn-block btn-lg text-white
-    {% if current_player_id != current_user.id or trick_claiming_needed or cards_shown or exchange_needed or cards_table|length >= 4 %}
+    {% if current_player_id != current_user.id or table.round.needs_trick_claiming or cards_shown or exchange_needed or cards_table|length >= 4 %}
     d-none
     {% endif %}
     ">Du bist am Zug
