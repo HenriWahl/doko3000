@@ -375,16 +375,17 @@ $(document).ready(function () {
         socket.on('start-next-round', function (msg) {
             $('.overlay-button').addClass('d-none')
             $('.overlay-notification').addClass('d-none')
-            // $('#modal_body').html(msg.html)
+            // dialog has to be shown before buttons are treated
+            show_dialog(msg.html)
             if (player_id == msg.dealer) {
+                console.log('dealer')
                 $('#button_deal_cards').removeClass('d-none')
                 $('#button_close_info').addClass('d-none')
             } else {
                 $('#button_deal_cards').addClass('d-none')
                 $('#button_close_info').removeClass('d-none')
             }
-            // $("#modal_dialog").modal('show')
-            show_dialog(msg.html)
+
         })
 
         // sent on requested round reset
