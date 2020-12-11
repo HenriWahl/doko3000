@@ -1,7 +1,11 @@
 # access to CouchDB
 
+from time import sleep
+
 from cloudant import CouchDB
+from cloudant.document import Document
 from cloudant.query import Query
+
 
 class DB:
     """
@@ -35,3 +39,25 @@ class DB:
             item_id = item['_id'].split(f'{filter_type}-', 1)[1]
             result[item_id] = item
         return result
+
+
+class Document3000(Document):
+    """
+    extend Document class with a conflict-aware save()
+    """
+    def __init__(self, database=None, document_id=None):
+        super().__init__(database=database, document_id=document_id)
+
+    def save(self):
+        """
+        save() inside try/except
+        """
+        saved = False
+        while not saved:
+            try:
+                super().save()
+                saved = True
+                print('SAVE', self.document_url)
+            except Exception as error:
+                print(error)
+                sleep(0.1)

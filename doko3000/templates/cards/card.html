@@ -8,7 +8,7 @@
      data-name="{{ card.name }}"
      data-id="{{ card.id }}"
      data-table_id="{{ table.id }}"
-     data-cards_timestamp="{{ cards_timestamp }}"
+     data-cards_timestamp="{{ table.round.cards_timestamp }}"
         {% if played_by %}
      title="{{ played_by }}"
         {% endif %}}

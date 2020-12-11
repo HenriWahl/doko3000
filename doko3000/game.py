@@ -1,5 +1,4 @@
 # game logic part of doko3000
-
 from copy import deepcopy
 from json import dumps
 from random import seed, \
@@ -7,10 +6,12 @@ from random import seed, \
 from time import time
 from urllib.parse import quote
 
-from cloudant.document import Document
+# from cloudant.document import Document
 from flask_login import UserMixin
 from werkzeug.security import check_password_hash, \
     generate_password_hash
+
+from .database import Document3000
 
 
 class Card:
@@ -36,14 +37,14 @@ class Deck:
     full deck of cards - enough to be static
     """
     SYMBOLS = ('Schell',
-               # 'Herz',
-               # 'Grün',
+               'Herz',
+               'Grün',
                'Eichel')
     RANKS = {'Neun': 0,
-             # 'Zehn': 10,
-             # 'Unter': 2,
-             # 'Ober': 3,
-             # 'König': 4,
+             'Zehn': 10,
+             'Unter': 2,
+             'Ober': 3,
+             'König': 4,
              'Ass': 11}
     NUMBER = 2  # Doppelkopf :-)!
     #NUMBER = 1 # Debugging
@@ -68,7 +69,7 @@ class Deck:
         return cards
 
 
-class Player(UserMixin, Document):
+class Player(UserMixin, Document3000):
     """
     one single player on a table
 
@@ -82,7 +83,7 @@ class Player(UserMixin, Document):
             # ID for CouchDB - quoted and without '/', to be transported easily througout HTML and JS
             player_id_quoted = quote(player_id, safe='')
             self['_id'] = f"player-{player_id_quoted}"
-            Document.__init__(self, self.game.db.database)
+            super().__init__(database=self.game.db.database)
             # ID for flask-login
             self['id'] = player_id_quoted
             # type is for CouchDB
@@ -105,7 +106,7 @@ class Player(UserMixin, Document):
             self['party'] = ''
             self.save()
         elif document:
-            Document.__init__(self, self.game.db.database, document_id=document['_id'])
+            super().__init__(database=self.game.db.database, document_id=document['_id'])
             # get data from given document
             self.update(document)
             # id needed for flask-login
@@ -264,7 +265,7 @@ class Player(UserMixin, Document):
         self.save()
 
 
-class Trick(Document):
+class Trick(Document3000):
     """
     contains all players and cards of moves - always 4
     2 synchronized lists, players and cards, should be enough to be indexed
@@ -275,12 +276,12 @@ class Trick(Document):
         if trick_id:
             # ID generated from Round object
             self['_id'] = f'trick-{trick_id}'
-            Document.__init__(self, self.game.db.database)
+            super().__init__(database=self.game.db.database)
             self['type'] = 'trick'
             # initialize
             self.reset()
         elif document:
-            Document.__init__(self, self.game.db.database, document_id=document['_id'])
+            super().__init__(database=self.game.db.database, document_id=document['_id'])
             # get document data from document
             self.update(document)
 
@@ -345,7 +346,7 @@ class Trick(Document):
         return cards
 
 
-class Round(Document):
+class Round(Document3000):
     """
     eternal round, part of a table
     """
@@ -360,7 +361,7 @@ class Round(Document):
         if round_id:
             # ID for CouchDB - comes already quoted from table
             self['_id'] = f'round-{round_id}'
-            Document.__init__(self, self.game.db.database)
+            super().__init__(database=self.game.db.database)
             # type is for CouchDB
             self['type'] = 'round'
             # what table?
@@ -394,7 +395,7 @@ class Round(Document):
             # initialize
             self.reset(players=players)
         elif document:
-            Document.__init__(self, self.game.db.database, document_id=document['_id'])
+            super().__init__(database=self.game.db.database, document_id=document['_id'])
             # get data from given document
             self.update(document)
             # a new card deck for every round
@@ -858,7 +859,7 @@ class Round(Document):
         self.save()
 
 
-class Table(Document):
+class Table(Document3000):
     """
     Definition of a table used by group of players
     """
@@ -868,7 +869,7 @@ class Table(Document):
             # ID for CouchDB - quoted and without '/'
             table_id_quoted = quote(table_id, safe='')
             self['_id'] = f'table-{table_id_quoted}'
-            Document.__init__(self, self.game.db.database)
+            super().__init__(database=self.game.db.database)
             # type is for CouchDB
             self['type'] = 'table'
             # what table?
@@ -884,7 +885,7 @@ class Table(Document):
             self['locked'] = False
             self['is_debugging'] = False
         elif document:
-            Document.__init__(self, self.game.db.database, document_id=document['_id'])
+            super().__init__(database=self.game.db.database, document_id=document['_id'])
             # get data from given document
             self.update(document)
         # yes, table_id

@@ -73,8 +73,15 @@ $(document).ready(function () {
             }
             // 'normal' is not-currently-exchanging - quite normal
             if (table_mode == 'normal') {
+
+                console.log('normal', current_player_id)
+
                 if (source.id == 'hand' && target.id == 'table' && player_id == current_player_id && !cards_locked) {
+
+                    console.log('card', $(card).data('cards_timestamp'), $('#cards_table_timestamp').data('cards_timestamp'))
+
                     if ($(card).data('cards_timestamp') == $('#cards_table_timestamp').data('cards_timestamp')) {
+
                         // only accept card if not too many on table - might happen after reload
                         if ($('#table').children('.game-card').length <= 4) {
                             $('#table').append(card)
@@ -267,6 +274,9 @@ $(document).ready(function () {
         socket.on('your-cards-please', function (msg) {
             current_player_id = msg.current_player_id
             if (check_sync(msg)) {
+
+                console.log(msg)
+
                 if (msg.cards_shown) {
                     cards_locked = true
                 } else {
