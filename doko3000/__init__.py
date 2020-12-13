@@ -44,8 +44,8 @@ socketio = SocketIO(app,
                     # seems to be better somewhat higher for clients not getting nervous when waiting for reset
                     ping_timeout=15,
                     ping_interval=1,
-                    # logger=True,
-                    # engineio_logger=True,
+                    logger=True,
+                    engineio_logger=True,
                     cors_allowed_origins=Config.CORS_ALLOWED_ORIGINS)
 
 # load game data from database after initialization
