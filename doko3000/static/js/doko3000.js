@@ -568,6 +568,9 @@ $(document).ready(function () {
                 player_id: player_id,
                 table_id: table_id
             })
+
+            console.log('player_id', player_id)
+
             // ask server via json if player is allowed to enter or not
             return $.getJSON('/enter/table/' + encodeURIComponent(table_id) + '/' + encodeURIComponent(player_id),
                 function (data, status) {
