@@ -238,7 +238,7 @@ $(document).ready(function () {
                 if (!msg.idle_players.includes(player_id) && !msg.players_spectator.includes(player_id)) {
                     $('#button_claim_trick').removeClass('d-none').fadeOut(1).delay(1500).fadeIn(1)
                 }
-            } else if (msg.cards_shown) {
+            } else if (msg.player_showing_cards) {
                 cards_locked = true
                 $('#turn_indicator').addClass('d-none')
                 $('#button_claim_trick').addClass('d-none')
@@ -267,7 +267,7 @@ $(document).ready(function () {
         socket.on('your-cards-please', function (msg) {
             current_player_id = msg.current_player_id
             if (check_sync(msg)) {
-                if (msg.cards_shown) {
+                if (msg.player_showing_cards) {
                     cards_locked = true
                 } else {
                     cards_locked = false
