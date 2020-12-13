@@ -567,7 +567,7 @@ class Round(Document3000):
         returns information if dealing is needed because the round begins
         """
         # if no card was played yet we might need some cards
-        return self.turn_count == 0
+        return self.turn_count == 0 and len(self.players) == 4
 
     @property
     def needs_trick_claiming(self):
