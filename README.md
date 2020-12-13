@@ -91,6 +91,7 @@ Inside the environment file some variables could be set:
 - **COUCHDB_USER** - CouchDB user used by containers doko3000 and couchdb
 - **COUCHDB_PASSWORD** - CouchDB password used by containers doko3000 and couchdb
 - **SECRET_KEY** - secret key for flask sessions
+- **DEBUG** - enable Flask-Socketio debugging
 
 The example file [/docker/default.env](./docker/default.env) can be copied to `.env` wherever
 **docker-compose** is intended to be run:

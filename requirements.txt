@@ -3,6 +3,6 @@ cloudant
 eventlet
 flask
 flask-login
-flask-socketio
+flask-socketio<5.0
 flask-wtf
 gunicorn

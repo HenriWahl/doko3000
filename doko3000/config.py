@@ -17,6 +17,7 @@ class Config:
         CORS_ALLOWED_ORIGINS = [f'http://{host}', f'https://{host}']
     else:
         CORS_ALLOWED_ORIGINS = []
+    DEBUG = bool(os.environ.get('DEBUG')) or False
 
 
 class DummyApp:
