@@ -120,21 +120,16 @@ def who_am_i():
         player = game.players.get(current_user.get_id())
         if player:
             table = game.tables.get(player.table)
-            round_finished = False
-            round_reset = False
             # store player session for later usage
             sessions[player.id] = request.sid
             # if player already sits on a table inform client
             if table:
                 current_player_id = table.round.current_player_id
-                round_finished = table.round.is_finished()
-                round_reset = table.round.is_reset()
                 join_room(table.id)
                 table_id = table.id
             else:
                 current_player_id = ''
                 table_id = ''
-                # table.sync_count = 0
                 table.reset_sync_count()
             # putting into variables makes debugging easier
             event = 'you-are-what-you-is'
@@ -142,8 +137,8 @@ def who_am_i():
                        'table_id': table_id,
                        'sync_count': table.sync_count,
                        'current_player_id': current_player_id,
-                       'round_finished': round_finished,
-                       'round_reset': round_reset}
+                       'round_finished': table.round.is_finished,
+                       'round_reset': table.round.is_reset}
             room = request.sid
             # debugging...
             if table and table.is_debugging:
@@ -188,7 +183,6 @@ def played_card(msg):
                 table.round.increase_turn_count()
                 card = Deck.cards[card_id]
                 player.remove_card(card.id)
-                is_last_turn = table.round.current_trick.is_last_turn()
                 current_player_id = table.round.get_current_player_id()
                 if table.round.cards_shown:
                     # cards_shown contains cards-showing player_id
@@ -201,7 +195,7 @@ def played_card(msg):
                            'table_id': table.id,
                            'card_id': card.id,
                            'card_name': card.name,
-                           'is_last_turn': is_last_turn,
+                           'is_last_turn': table.round.current_trick.is_last_turn,
                            'current_player_id': current_player_id,
                            'idle_players': table.idle_players,
                            'players_spectator': table.players_spectator,
@@ -544,7 +538,7 @@ def claim_trick(msg):
     msg_ok, player, table = check_message(msg)
     if msg_ok:
         table.increase_sync_count()
-        if not table.round.is_finished():
+        if not table.round.is_finished:
             # when ownership changes it does at previous trick because normally there is a new one created
             # so the new one becomes the current one and the reclaimed is the previous
             if not len(table.round.current_trick.cards) == 0:
@@ -1203,7 +1197,7 @@ def delete_player(player_id):
             player and \
             current_user.is_admin:
         if request.method == 'GET':
-            if not player.is_playing():
+            if not player.is_playing:
                 return jsonify({'status': 'ok',
                                 'html': render_template('index/delete_player.html',
                                                         player=player)})

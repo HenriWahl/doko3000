@@ -195,6 +195,7 @@ class Player(UserMixin, Document3000):
     def eichel_ober_count(self, value):
         self['eichel_ober_count'] = value
 
+    @property
     def is_playing(self):
         """
         double-check if player sits at some table - make sure it can be deleted
@@ -305,6 +306,13 @@ class Trick(Document3000):
         self['owner'] = value
         self.save()
 
+    @property
+    def is_last_turn(self):
+        if len(self) > 3:
+            return True
+        else:
+            return False
+
     def reset(self):
         self['players'] = []
         self['cards'] = []
@@ -329,12 +337,6 @@ class Trick(Document3000):
             return self.players[turn_number - 1], self.cards[turn_number - 1]
         else:
             return
-
-    def is_last_turn(self):
-        if len(self) > 3:
-            return True
-        else:
-            return False
 
     def get_cards(self):
         """
@@ -574,7 +576,7 @@ class Round(Document3000):
         """
         return self.turn_count % 4 == 0 and \
                 self. turn_count > 0 and \
-                not self.is_finished()
+                not self.is_finished
 
     @property
     def card_played(self):
@@ -582,6 +584,20 @@ class Round(Document3000):
         info if any card has been played already
         """
         return self.turn_count > 0
+
+    @property
+    def is_finished(self):
+        """
+        check if round is over - reached when all cards are played
+        """
+        return len(self.cards) == self.turn_count
+
+    @property
+    def is_reset(self):
+        """
+        check if round has been freshly reset
+        """
+        return self.turn_count == 0
 
     def reset(self, players=[]):
         """
@@ -710,18 +726,6 @@ class Round(Document3000):
         self.save()
         # current player is the next player
         return self.current_player_id
-
-    def is_finished(self):
-        """
-        check if round is over - reached when all cards are played
-        """
-        return len(self.cards) == self.turn_count
-
-    def is_reset(self):
-        """
-        check if round has been freshly reset
-        """
-        return self.turn_count == 0
 
     def has_hochzeit(self):
         """
