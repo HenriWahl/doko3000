@@ -19,7 +19,7 @@ class Config:
         CORS_ALLOWED_ORIGINS = []
     DEBUG = bool(os.environ.get('DEBUG')) or False
     # avoid browser warnings about samesite missing
-    SESSION_COOKIE_SAMESITE = 'None'
+    SESSION_COOKIE_SAMESITE = 'Strict'
     SESSION_COOKIE_SECURE = True
 
 class DummyApp:
