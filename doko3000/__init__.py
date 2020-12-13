@@ -195,7 +195,7 @@ def played_card(msg):
                     cards_table = game.players[table.round.cards_shown].get_cards()
                 else:
                     cards_table = table.round.current_trick.get_cards()
-                sync_count = table.increase_sync_count()
+                table.increase_sync_count()
                 event = 'card-played-by-player',
                 payload = {'player_id': player.id,
                            'table_id': table.id,
@@ -207,7 +207,7 @@ def played_card(msg):
                            'players_spectator': table.players_spectator,
                            'played_cards': table.round.played_cards,
                            'cards_shown': table.round.cards_shown,
-                           'sync_count': sync_count,
+                           'sync_count': table.sync_count,
                            'html': {'cards_table': render_template('cards/table.html',
                                                                    cards_table=cards_table,
                                                                    table=table),
@@ -225,6 +225,7 @@ def played_card(msg):
                 socketio.emit(event, payload, room=room)
         else:
             deliver_cards_to_player(msg)
+
 
 @socketio.on('card-exchanged')
 def card_exchanged(msg):
@@ -483,10 +484,9 @@ def deliver_cards_to_player(msg):
             socketio.emit(event, payload, room=room)
         else:
             # spectator mode
-            players = table.round.players
             players_cards = table.round.get_players_shuffled_cards()
             if table.round.cards_shown:
-                # cards_shown contains cqrds-showing player_id
+                # cards_shown contains cards-showing player_id
                 cards_table = game.players[table.round.cards_shown].get_cards()
             else:
                 cards_table = table.round.current_trick.get_cards()
@@ -503,12 +503,10 @@ def deliver_cards_to_player(msg):
                                                                mode=mode),
                                 'cards_hand_spectator_upper': render_template('cards/hand_spectator_upper.html',
                                                                               table=table,
-                                                                              players=players,
                                                                               players_cards=players_cards,
                                                                               game=game),
                                 'cards_hand_spectator_lower': render_template('cards/hand_spectator_lower.html',
                                                                               table=table,
-                                                                              players=players,
                                                                               players_cards=players_cards,
                                                                               game=game)
                                 }}
@@ -545,7 +543,7 @@ def claim_trick(msg):
     """
     msg_ok, player, table = check_message(msg)
     if msg_ok:
-        sync_count = table.increase_sync_count()
+        table.increase_sync_count()
         if not table.round.is_finished():
             # when ownership changes it does at previous trick because normally there is a new one created
             # so the new one becomes the current one and the reclaimed is the previous
@@ -558,7 +556,6 @@ def claim_trick(msg):
                 # apparently the ownership of the previous trick is not clear - change it
                 table.round.previous_trick.owner = player.id
                 table.round.current_player_id = player.id
-            cards_timestamp = table.round.cards_timestamp
             cards_table = []
             table.round.calculate_trick_order()
             table.round.calculate_stats()
@@ -566,30 +563,26 @@ def claim_trick(msg):
                           {'current_player_id': player.id,
                            'score': table.round.stats['score'],
                            'table_id': table.id,
-                           'sync_count': sync_count,
+                           'sync_count': table.sync_count,
                            'html': {'hud_players': render_template('top/hud_players.html',
                                                                    table=table,
                                                                    player=player,
-                                                                   game=game,
-                                                                   current_player_id=player.id),
+                                                                   game=game),
                                     'cards_table': render_template('cards/table.html',
                                                                    cards_table=cards_table,
-                                                                   table=table,
-                                                                   cards_timestamp=cards_timestamp)
+                                                                   table=table)
                                     }},
                           room=table.id)
         else:
             table.round.current_trick.owner = player.id
-            players = game.players
             table.round.calculate_stats()
             table.shift_players()
             # tell everybody stats and wait for everybody confirming next round
             socketio.emit('round-finished',
                           {'table_id': table.id,
-                           'sync_count': sync_count,
+                           'sync_count': table.sync_count,
                            'html': render_template('round/score.html',
-                                                   table=table,
-                                                   players=players)
+                                                   table=table)
                            },
                           room=table.id)
 
@@ -601,14 +594,12 @@ def need_final_result(msg):
     """
     msg_ok, player, table = check_message(msg)
     if msg_ok:
-        players = game.players
         # tell single player stats and wait for everybody confirming next round
         socketio.emit('round-finished',
                       {'table_id': table.id,
                        'sync_count': table.sync_count,
                        'html': render_template('round/score.html',
-                                               table=table,
-                                               players=players)
+                                               table=table)
                        },
                       room=request.sid)
 
@@ -632,7 +623,6 @@ def ready_for_next_round(msg):
                        'dealer': table.dealer,
                        'html': render_template('round/info.html',
                                                table=table,
-                                               dealer=table.dealer,
                                                next_players=next_players,
                                                game=game,
                                                number_of_rows=number_of_rows)
@@ -776,15 +766,13 @@ def show_cards(msg):
     msg_ok, player, table = check_message(msg)
     if msg_ok:
         table.show_cards(player)
-        cards_timestamp = table.round.cards_timestamp
         cards_table = game.players[player.id].get_cards()
         event = 'cards-shown-by-player',
         payload = {'table_id': table.id,
                    'sync_count': table.sync_count,
                    'html': {'cards_table': render_template('cards/table.html',
                                                            cards_table=cards_table,
-                                                           table=table,
-                                                           cards_timestamp=cards_timestamp)
+                                                           table=table)
                             }}
         room = table.id
         # debugging...
@@ -805,7 +793,6 @@ def request_exchange(msg):
         exchange_type = 'contra'
         if not hochzeit and player.party == 're':
             exchange_type = 're'
-        card_played = table.round.turn_count > 0
         exchanged_already = False
         if table.round.exchange and \
                 player.party in table.round.exchange and \
@@ -819,7 +806,6 @@ def request_exchange(msg):
                                                table=table,
                                                hochzeit=hochzeit,
                                                exchange_type=exchange_type,
-                                               card_played=card_played,
                                                exchanged_already=exchanged_already
                                                )},
                       room=request.sid)
@@ -965,12 +951,10 @@ def table(table_id=''):
             table and \
             player.id in table.players:
         if player.id in table.round.players:
-            dealer = table.dealer
             exchange_needed = table.round.is_exchange_needed(player.id)
-            current_player_id = table.round.current_player_id
             cards_hand = player.get_cards()
             if table.round.cards_shown:
-                # cards_shown contains cqrds-showing player_id
+                # cards_shown contains cards-showing player_id
                 cards_table = game.players[table.round.cards_shown].get_cards()
             elif exchange_needed:
                 cards_table = game.deck.get_cards(table.round.exchange[player.party][player.id])
@@ -978,27 +962,20 @@ def table(table_id=''):
                 cards_hand = [x for x in cards_hand if x.id not in table.round.exchange[player.party][player.id]]
             else:
                 cards_table = table.round.current_trick.get_cards()
-            cards_timestamp = table.round.cards_timestamp
-            cards_shown = table.round.cards_shown
             mode = 'player'
             return render_template('table.html',
                                    title=f"{app.config['TITLE']} {table.name}",
                                    table=table,
-                                   dealer=dealer,
                                    exchange_needed=exchange_needed,
                                    player=player,
-                                   current_player_id=current_player_id,
                                    cards_hand=cards_hand,
                                    cards_table=cards_table,
-                                   cards_timestamp=cards_timestamp,
-                                   cards_shown=cards_shown,
                                    game=game,
                                    mode=mode)
         else:
-            players = table.round.players
             players_cards = table.round.get_players_shuffled_cards()
             if table.round.cards_shown:
-                # cards_shown contains cqrds-showing player_id
+                # cards_shown contains cards-showing player_id
                 cards_table = game.players[table.round.cards_shown].get_cards()
             else:
                 cards_table = table.round.current_trick.get_cards()
@@ -1008,7 +985,6 @@ def table(table_id=''):
                                    table=table,
                                    cards_table=cards_table,
                                    player=player,
-                                   players=players,
                                    players_cards=players_cards,
                                    game=game,
                                    mode=mode)
@@ -1199,10 +1175,10 @@ def create_player():
                                     'message': 'Diesen Spieler gibt es schon :-('})
                 else:
                     if new_player_password:
-                        player = game.add_player(player_id=new_player_id,
-                                                 password=new_player_password,
-                                                 spectator_only=new_player_spectator_only,
-                                                 allows_spectators=new_player_allows_spectators)
+                        game.add_player(player_id=new_player_id,
+                                        password=new_player_password,
+                                        spectator_only=new_player_spectator_only,
+                                        allows_spectators=new_player_allows_spectators)
                         return jsonify({'status': 'ok'})
                     else:
                         return jsonify({'status': 'error',

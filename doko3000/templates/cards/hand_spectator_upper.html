@@ -3,10 +3,10 @@
     <!-- player 2 -->
     <div class="col-6">
         <div class="row">
-            {% if players|length >=2 %}
+            {% if table.round.players|length >=2 %}
                 <div class="col-12">
                 <span class="mx-2 text-white">
-                <strong>{{ game.players[players[1]].name }}</strong>
+                <strong>{{ game.players[table.round.players[1]].name }}</strong>
                 </span>
                 </div>
                 <div class="col-12 container-fluid d-inline-flex">
@@ -20,10 +20,10 @@
     <!-- player 3 -->
     <div class="col-6">
         <div class="row">
-            {% if players|length >=3 %}
+            {% if table.round.players|length >=3 %}
                 <div class="col-12">
                 <span class="mx-2 float-right text-white">
-                    <strong>{{ game.players[players[2]].name }}</strong>
+                    <strong>{{ game.players[table.round.players[2]].name }}</strong>
                 </span>
                 </div>
                 <div class="col-12 container-fluid d-inline-flex justify-content-end">

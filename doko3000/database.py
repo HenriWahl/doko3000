@@ -1,8 +1,5 @@
 # access to CouchDB
 
-from random import randint
-from time import sleep
-
 from cloudant import CouchDB
 from cloudant.document import Document
 from cloudant.query import Query
@@ -51,15 +48,21 @@ class Document3000(Document):
 
     def save(self):
         """
-        save() inside try/except
+        save() inside try/except for debugging
         """
-        saved = False
-        while not saved:
-            try:
-                super().save()
-                saved = True
-                print('SAVE', self.document_url)
-            except Exception as error:
-                # sleep a random amount of time before next attempt
-                print(error)
-                sleep(randint(10, 50)/100)
+        # saved = False
+        # while not saved:
+        #     try:
+        #         super().save()
+        #         saved = True
+        #         print('SAVE', self.document_url)
+        #     except Exception as error:
+        #         # sleep a random amount of time before next attempt
+        #         print(error)
+        #         sleep(randint(10, 50)/100)
+        try:
+            super().save()
+        except Exception as error:
+            # sleep a random amount of time before next attempt
+            print('ERROR', self.document_url)
+            print(error)

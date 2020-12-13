@@ -2,10 +2,10 @@
 <!-- player 4 -->
 <div class="col-6">
     <div class="row h-100">
-        {% if players|length >=1 %}
+        {% if table.round.players|length >=1 %}
             <div class="col-12 mt-auto ml-0 pl-0">
            <span class="mx-2 text-white">
-               <strong>{{ game.players[players[0]].name }}</strong>
+               <strong>{{ game.players[table.round.players[0]].name }}</strong>
            </span>
                 <div class="container-fluid d-inline-flex m-0 p-0">
                     {% for card in players_cards[0] %}
@@ -19,10 +19,10 @@
 <!-- player 1 -->
 <div class="col-6">
     <div class="row h-100">
-        {% if players|length ==4 %}
+        {% if table.round.players|length ==4 %}
             <div class="col-12 mt-auto mr-0 pr-0">
            <span class="mx-2 float-right text-white">
-               <strong>{{ game.players[players[3]].name }}</strong>
+               <strong>{{ game.players[table.round.players[3]].name }}</strong>
            </span>
                 <div class="container-fluid d-inline-flex m-0 p-0 justify-content-end">
                     {% for card in players_cards[3] %}

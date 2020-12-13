@@ -576,6 +576,13 @@ class Round(Document3000):
                 self. turn_count > 0 and \
                 not self.is_finished()
 
+    @property
+    def card_played(self):
+        """
+        info if any card has been played already
+        """
+        return self.turn_count > 0
+
     def reset(self, players=[]):
         """
         used by __init__ and by table at start of a new round
