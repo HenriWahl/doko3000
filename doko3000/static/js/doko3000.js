@@ -188,6 +188,9 @@ $(document).ready(function () {
             if (current_player_id == '') {
                 current_player_id = msg.current_player_id
             }
+
+            console.log(msg)
+
             // check if being still in sync
             check_sync(msg)
 
