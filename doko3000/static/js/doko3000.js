@@ -188,9 +188,6 @@ $(document).ready(function () {
             if (current_player_id == '') {
                 current_player_id = msg.current_player_id
             }
-
-            console.log(msg)
-
             // check if being still in sync
             check_sync(msg)
 
@@ -571,9 +568,6 @@ $(document).ready(function () {
                 player_id: player_id,
                 table_id: table_id
             })
-
-            console.log('player_id', player_id)
-
             // ask server via json if player is allowed to enter or not
             return $.getJSON('/enter/table/' + encodeURIComponent(table_id) + '/' + encodeURIComponent(player_id),
                 function (data, status) {
