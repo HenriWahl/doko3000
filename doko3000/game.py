@@ -1144,6 +1144,9 @@ class Table(Document3000):
             self.save()
 
     def reset_ready_players(self):
+        """
+        reset list of ready players in cases they are about to be collected, e.g. when requesting a round reset
+        """
         self.players_ready = []
         self.save()
 
@@ -1155,6 +1158,9 @@ class Table(Document3000):
         self.increase_sync_count()
 
     def log(*args):
+        """
+        very poor logging
+        """
         print(args)
 
 
