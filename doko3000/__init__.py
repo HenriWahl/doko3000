@@ -127,15 +127,17 @@ def who_am_i():
                 current_player_id = table.round.current_player_id
                 join_room(table.id)
                 table_id = table.id
+                sync_count = table.sync_count
             else:
                 current_player_id = ''
                 table_id = ''
-                table.reset_sync_count()
+                # nonexisting table has no own sync_count
+                sync_count = 0
             # putting into variables makes debugging easier
             event = 'you-are-what-you-is'
             payload = {'player_id': player.id,
                        'table_id': table_id,
-                       'sync_count': table.sync_count,
+                       'sync_count': sync_count,
                        'current_player_id': current_player_id,
                        'round_finished': table.round.is_finished,
                        'round_reset': table.round.is_reset}
