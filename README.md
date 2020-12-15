@@ -128,5 +128,9 @@ If you run it on your local machine, point your favorite browser to http://local
 The **default user** is `admin` with the password `admin` and admin rights. It can create other players and should
 get a new password soon.
 
+### Custom cards
+
+If you want to use another card design you can just replace the cards in `/doko3000/static/img/cards`. If containers are used 
+this directory might just be mounted as volume.
 
 **Good luck** and don't hesitate to give some feedback at https://github.com/HenriWahl/doko3000/issues.
