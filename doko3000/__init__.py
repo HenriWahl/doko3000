@@ -582,7 +582,8 @@ def claim_trick(msg):
                           {'table_id': table.id,
                            'sync_count': table.sync_count,
                            'html': render_template('round/score.html',
-                                                   table=table)
+                                                   table=table,
+                                                   game=game)
                            },
                           room=table.id)
 
@@ -599,7 +600,8 @@ def need_final_result(msg):
                       {'table_id': table.id,
                        'sync_count': table.sync_count,
                        'html': render_template('round/score.html',
-                                               table=table)
+                                               table=table,
+                                               game=game)
                        },
                       room=request.sid)
 
