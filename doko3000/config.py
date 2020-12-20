@@ -17,7 +17,12 @@ class Config:
         CORS_ALLOWED_ORIGINS = [f'http://{host}', f'https://{host}']
     else:
         CORS_ALLOWED_ORIGINS = []
-    DEBUG = bool(os.environ.get('DEBUG')) or False
+    debug = os.environ.get('DEBUG')
+    # boolize DEBUG environment variable only if a number
+    if debug.isdigit():
+        DEBUG = bool(int(os.environ.get('DEBUG')))
+    else:
+        DEBUG = False
     # avoid browser warnings about samesite missing
     SESSION_COOKIE_SAMESITE = 'Strict'
     SESSION_COOKIE_SECURE = True
