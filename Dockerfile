@@ -1,4 +1,4 @@
-FROM python:3.9
+FROM python:3.8
 LABEL maintainer=henri.wahl@t-online.de
 
 RUN apt -y update &&\
