@@ -19,7 +19,7 @@ class Config:
         CORS_ALLOWED_ORIGINS = []
     debug = os.environ.get('DEBUG')
     # boolize DEBUG environment variable only if a number
-    if debug.isdigit():
+    if debug and debug.isdigit():
         DEBUG = bool(int(os.environ.get('DEBUG')))
     else:
         DEBUG = False
