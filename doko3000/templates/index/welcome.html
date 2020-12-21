@@ -29,8 +29,8 @@
             beigetreten.
         </div>
     </li>
-    <li>
-        {% if game.players[current_user.id].is_admin %}
+    {% if game.players[current_user.id].is_admin %}
+        <li>
             <div class="mt-1">
                 <strong>Spieler</strong> kann ein Administrator mit <span class="badge badge-primary">
                         Spieler
@@ -42,14 +42,14 @@
     </span>
                 anlegen.
             </div>
-            </li>
-            <li>
-                Der <span class="badge badge-light">admin</span> ist standardmäßig nur <strong>Zuschauer <span
-                    class="small oi oi-eye"></span>
-            </strong>.
-            </li>
-            </ul>
-        {% endif %}
+        </li>
+        <li>
+            Der <span class="badge badge-light">admin</span> ist standardmäßig nur <strong>Zuschauer <span
+                class="small oi oi-eye"></span>
+        </strong>.
+        </li>
+        </ul>
+    {% endif %}
 <div class="row mt-4">
     <div class="col-6">
     </div>

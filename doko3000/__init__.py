@@ -22,8 +22,7 @@ from .game import Deck, \
     Game, \
     Player, \
     Trick
-from .misc import is_xhr, \
-    Login
+from .misc import is_xhr
 
 # initialize app
 app = Flask(__name__)
@@ -894,22 +893,28 @@ def login():
     """
     non-logged-in players get redirected here
     """
-    form = Login()
-    if form.validate_on_submit():
-        player_id_quoted = quote(form.player_id.data, safe='')
+    form_values = list(request.values.keys())
+    if 'player_id' in form_values and \
+        'password' in form_values and \
+        'submit' in form_values:
+        player_id_quoted = quote(request.values['player_id'], safe='')
         player = game.players.get(player_id_quoted)
         if player:
-            if not player.check_password(form.password.data):
+            if not player.check_password(request.values['password']):
                 flash('Falsches Passwort :-(')
                 return redirect(url_for('login'))
-            login_user(player)
+            logged_in = login_user(player, remember=True)
+            # logged_in = login_user(player)
+            print('logged in', logged_in)
             return redirect(url_for('index'))
+            print('heul1')
         else:
             flash('Spieler nicht bekannt :-(')
             return redirect(url_for('login'))
-    return render_template('login.html',
-                           title=f"{app.config['TITLE']} Login",
-                           form=form)
+            print('heul2')
+    else:
+       return render_template('login.html',
+                              title=f"{app.config['TITLE']} Login")
 
 
 @app.route('/logout')

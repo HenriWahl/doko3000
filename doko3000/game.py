@@ -207,6 +207,12 @@ class Player(UserMixin, Document3000):
                 return True
         return False
 
+    def get_id(self):
+        """
+        for Flask load user mechanism
+        """
+        return self.id
+
     def set_password(self, password):
         """
         create hash of given password

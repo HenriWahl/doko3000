@@ -16,21 +16,19 @@
         <div class="card">
             <div class="card-body">
                 <form id="loginform" class="form-horizontal" role="form" method="POST">
-<!--                    <div style="margin-bottom: 25px" class="input-group">-->
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="oi oi-person"></i></span>
                         </div>
-                        {{ form.player_id(class='form-control') }}
+                        <input class="form-control" id="player_id" name="player_id" required type="text" value="">
                     </div>
                     <div style="margin-bottom: 25px" class="input-group">
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="oi oi-key"></i></span>
                         </div>
-                        {{ form.password(class='form-control') }}
+                        <input class="form-control" id="password" name="password" required type="password" value="">
                     </div>
-                    {{ form.submit(class='btn btn-lg btn-primary btn-block', value='Login') }}
-                    {{ form.hidden_tag() }}
+                    <input class="btn btn-lg btn-primary btn-block" id="submit" name="submit" type="submit" value="Login">
                 </form>
             </div>
         </div>
