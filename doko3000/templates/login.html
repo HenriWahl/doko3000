@@ -3,16 +3,12 @@
 {% block main_content %}
 <div class="row container-fluid justify-content-center align-items-center h-100 m-0 p-0" id="loginbox">
     <div class="col-xl-4 col-lg-5 col-md-6 col-sm-8">
-        {% with messages = get_flashed_messages() %}
-        {% if messages %}
         {% for message in messages %}
         <div class="alert alert-danger alert-dissmissible">
             <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
             {{ message }}
         </div>
         {% endfor %}
-        {% endif %}
-        {% endwith %}
         <div class="card">
             <div class="card-body">
                 <form id="loginform" class="form-horizontal" role="form" method="POST">
@@ -20,6 +16,7 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="oi oi-person"></i></span>
                         </div>
+{#                        {{ form.player_id(class='form-control') }}#}
                         <input class="form-control" id="player_id" name="player_id" required type="text" value="">
                     </div>
                     <div style="margin-bottom: 25px" class="input-group">

@@ -3,6 +3,7 @@ from urllib.parse import quote
 
 from flask import flash, \
     Flask, \
+    get_flashed_messages, \
     jsonify, \
     redirect, \
     render_template, \
@@ -903,18 +904,15 @@ def login():
             if not player.check_password(request.values['password']):
                 flash('Falsches Passwort :-(')
                 return redirect(url_for('login'))
-            logged_in = login_user(player, remember=True)
-            # logged_in = login_user(player)
-            print('logged in', logged_in)
+            login_user(player, remember=True)
             return redirect(url_for('index'))
-            print('heul1')
         else:
             flash('Spieler nicht bekannt :-(')
             return redirect(url_for('login'))
-            print('heul2')
     else:
-       return render_template('login.html',
-                              title=f"{app.config['TITLE']} Login")
+        return render_template('login.html',
+                              title=f"{app.config['TITLE']} Login",
+                              messages=get_flashed_messages())
 
 
 @app.route('/logout')
