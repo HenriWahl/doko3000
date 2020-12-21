@@ -1062,7 +1062,8 @@ class Table(Document3000):
         """
         if player_id not in self.players:
             self.players.append(player_id)
-            self.order.append(player_id)
+            if not self.game.players[player_id].is_spectator_only:
+                self.order.append(player_id)
             self.save()
         # remove old remains of previous table
         if self.game.players[player_id].table != self.id:

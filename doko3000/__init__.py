@@ -3,7 +3,6 @@ from urllib.parse import quote
 
 from flask import flash, \
     Flask, \
-    get_flashed_messages, \
     jsonify, \
     redirect, \
     render_template, \
@@ -62,7 +61,7 @@ def load_user(id):
     give user back if it exists, otherwise force login
     """
     try:
-        player = game.players[id]
+        player = game.players.get(id)
         if not type(player) == Player:
             game.players[id] = Player(document_id=player['_id'], game=game)
         return player
