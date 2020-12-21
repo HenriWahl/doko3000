@@ -43,7 +43,7 @@ socketio = SocketIO(app,
                     manage_session=False,
                     # seems to be better somewhat higher for clients not getting nervous when waiting for reset
                     ping_timeout=15,
-                    ping_interval=1,
+                    ping_interval=5,
                     logger=Config.DEBUG,
                     engineio_logger=Config.DEBUG,
                     cors_allowed_origins=Config.CORS_ALLOWED_ORIGINS)
@@ -903,16 +903,14 @@ def login():
         if player:
             if not player.check_password(request.values['password']):
                 flash('Falsches Passwort :-(')
-                return redirect(url_for('login'))
-            login_user(player, remember=True)
-            return redirect(url_for('index'))
+            else:
+                login_user(player, remember=True)
+                return redirect(url_for('index'))
         else:
             flash('Spieler nicht bekannt :-(')
-            return redirect(url_for('login'))
-    else:
-        return render_template('login.html',
-                              title=f"{app.config['TITLE']} Login",
-                              messages=get_flashed_messages())
+    # got to login if not logged in
+    return render_template('login.html',
+                          title=f"{app.config['TITLE']} Login")
 
 
 @app.route('/logout')
