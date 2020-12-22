@@ -1210,9 +1210,10 @@ def delete_player(player_id):
                                 'html': render_template('index/delete_player.html',
                                                         player=player)})
             else:
+                table = game.tables[player.table]
                 return jsonify({'status': 'error',
                                 'html': render_template('error.html',
-                                                        message=f"{player.id} sitzt noch am Tisch {player.table}.")})
+                                                        message=f"{player.name} sitzt noch am Tisch {table.name}.")})
         elif request.method == 'POST':
             if game.delete_player(player.id):
                 return jsonify({'status': 'ok'})
