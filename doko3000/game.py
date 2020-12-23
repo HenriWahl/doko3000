@@ -1004,7 +1004,10 @@ class Table(Document3000):
         """
         give current dealer for next round back
         """
-        return self.order[0]
+        if self.order:
+            return self.order[0]
+        else:
+            return False
 
     @property
     def sync_count(self):
