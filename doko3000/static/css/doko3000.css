@@ -47,6 +47,10 @@ html, body {
     /*background-color: rgba(0, 0, 0, 0.5);*/
 }
 
+.menu-ellipses {
+    transform: rotate(90deg);
+}
+
 #hud_players {
     /*position: fixed;*/
     /*top: 1em;*/
