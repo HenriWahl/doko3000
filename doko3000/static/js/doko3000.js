@@ -152,18 +152,12 @@ $(document).ready(function () {
                 let table_id = $('#needs_welcome').data('table_id')
                 $.getJSON('/get/welcome/' + encodeURIComponent(table_id), function (data, status) {
                     if (status == 'success') {
-                        // $('#modal_body').html(data.html)
-                        // clear_message('#modal_message')
-                        // $("#modal_dialog").modal('show')
                         show_dialog(data.html)
                     }
                 })
             } else {
                 $.getJSON('/get/welcome', function (data, status) {
                         if (status == 'success') {
-                            // $('#modal_body').html(data.html)
-                            // clear_message('#modal_message')
-                            // $("#modal_dialog").modal('show')
                             show_dialog(data.html)
                         }
                     }
@@ -333,8 +327,6 @@ $(document).ready(function () {
         socket.on('confirm-deal-again', function (msg) {
             if (check_sync(msg)) {
                 $('.overlay-notification').addClass('d-none')
-                // $('#modal_body').html(msg.html)
-                // $("#modal_dialog").modal('show')
                 show_dialog(msg.html)
             }
         })
@@ -364,9 +356,6 @@ $(document).ready(function () {
         socket.on('round-finished', function (msg) {
             if (check_sync(msg)) {
                 $('#button_claim_trick').addClass('d-none')
-                // cleanup content of dialog
-                // $('#modal_body').html(msg.html)
-                // $("#modal_dialog").modal('show')
                 show_dialog(msg.html)
             }
         })
@@ -391,9 +380,6 @@ $(document).ready(function () {
         socket.on('round-reset-requested', function (msg) {
             $('.overlay-button').addClass('d-none')
             $('.overlay-notification').addClass('d-none')
-            // cleanup content of dialog
-            // $('#modal_body').html(msg.html)
-            // $('#modal_dialog').modal('show')
             show_dialog(msg.html)
         })
 
@@ -401,9 +387,6 @@ $(document).ready(function () {
         socket.on('round-finish-requested', function (msg) {
             $('.overlay-button').addClass('d-none')
             $('.overlay-notification').addClass('d-none')
-            // cleanup content of dialog
-            // $('#modal_body').html(msg.html)
-            // $('#modal_dialog').modal('show')
             show_dialog(msg.html)
         })
 
@@ -411,9 +394,6 @@ $(document).ready(function () {
         socket.on('undo-requested', function (msg) {
             $('.overlay-button').addClass('d-none')
             $('.overlay-notification').addClass('d-none')
-            // cleanup content of dialog
-            // $('#modal_body').html(msg.html)
-            // $('#modal_dialog').modal('show')
             show_dialog(msg.html)
         })
 
@@ -421,8 +401,6 @@ $(document).ready(function () {
         socket.on('confirm-show-cards', function (msg) {
             if (check_sync(msg)) {
                 $('.overlay-notification').addClass('d-none')
-                // $('#modal_body').html(msg.html)
-                // $("#modal_dialog").modal('show')
                 show_dialog(msg.html)
             }
         })
@@ -433,8 +411,6 @@ $(document).ready(function () {
                 $('.overlay-notification').addClass('d-none')
                 // there is no need anymore to deal cards
                 $('#button_deal_cards_again').addClass('d-none')
-                // $('#modal_body').html(msg.html)
-                // $("#modal_dialog").modal('show')
                 show_dialog(msg.html)
             }
         })
@@ -479,8 +455,6 @@ $(document).ready(function () {
                 $('.overlay-notification').addClass('d-none')
                 // there is no need anymore to deal cards
                 $('#button_deal_cards_again').addClass('d-none')
-                // $('#modal_body').html(msg.html)
-                // $("#modal_dialog").modal('show')
                 show_dialog(msg.html)
             }
         })
@@ -489,8 +463,6 @@ $(document).ready(function () {
         socket.on('exchange-player1-player2-deny', function (msg) {
             if (check_sync(msg)) {
                 $('.overlay-notification').addClass('d-none')
-                // $('#modal_body').html(msg.html)
-                // $("#modal_dialog").modal('show')
                 show_dialog(msg.html)
             }
         })
@@ -592,9 +564,6 @@ $(document).ready(function () {
         $(document).on('click', '#button_create_table', function () {
             $.getJSON('/create/table', function (data, status) {
                 if (status == 'success') {
-                    // $('#modal_body').html(data.html)
-                    // clear_message('#modal_message')
-                    // $('#modal_dialog').modal('show')
                     show_dialog(data.html)
                 }
             })
@@ -745,7 +714,6 @@ $(document).ready(function () {
             }
         })
 
-
         // delete a player in the draggable players order
         $(document).on('click', '.button-remove-player-from-table', function () {
             if (player_id != $(this).data('player_id')) {
@@ -813,9 +781,6 @@ $(document).ready(function () {
                 $.getJSON('/delete/player/' + encodeURIComponent($(this).data('player_id')),
                     function (data, status) {
                         if (status == 'success') {
-                            // $('#modal_body').html(data.html)
-                            // clear_message('#modal_message')
-                            // $('#modal_dialog').modal('show')
                             show_dialog(data.html)
                         }
                     })
@@ -838,9 +803,6 @@ $(document).ready(function () {
                                     player_id: player_id
                                 })
                             } else {
-                                // $('#modal_body').html(data.html)
-                                // clear_message('#modal_message')
-                                // $('#modal_dialog').modal('show')
                                 show_dialog(data.html)
                             }
                         }
@@ -854,9 +816,6 @@ $(document).ready(function () {
             $.getJSON('/delete/table/' + encodeURIComponent($(this).data('table_id')),
                 function (data, status) {
                     if (status == 'success') {
-                        // $('#modal_body').html(data.html)
-                        // clear_message('#modal_message')
-                        // $('#modal_dialog').modal('show')
                         show_dialog(data.html)
                     }
                 })
@@ -869,7 +828,6 @@ $(document).ready(function () {
                 function (data, status) {
                     if (status == 'success') {
                         if (data.status == 'ok') {
-                            // $('#list_tables').html(data.html)
                             $('#modal_dialog').modal('hide')
                             // reload tables list everywhere
                             socket.emit('setup-table-change', {
@@ -877,9 +835,6 @@ $(document).ready(function () {
                                 player_id: player_id
                             })
                         } else {
-                            // $('#modal_body').html(data.html)
-                            // clear_message('#modal_message')
-                            // $('#modal_dialog').modal('show')
                             show_dialog(data.html)
                         }
                     }
@@ -901,9 +856,6 @@ $(document).ready(function () {
             $.getJSON('/start/table/' + encodeURIComponent($(this).data('table_id')),
                 function (data, status) {
                     if (status == 'success') {
-                        // $('#modal_body').html(data.html)
-                        // clear_message('#modal_message')
-                        // $('#modal_dialog').modal('show')
                         show_dialog(data.html)
                     }
                 })
@@ -937,9 +889,6 @@ $(document).ready(function () {
         $(document).on('click', '.setup-player', function () {
             $.getJSON('/setup/player/' + encodeURIComponent($(this).data('player_id')), function (data, status) {
                 if (status == 'success') {
-                    // $("#modal_body").html(data.html)
-                    // clear_message('#modal_message')
-                    // $('#modal_dialog').modal('show')
                     show_dialog(data.html)
                 }
             })
