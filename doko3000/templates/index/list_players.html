@@ -1,42 +1,48 @@
 <ul class="list-group">
     {% for player in players %}
-        {#        <li class="list-group-item list-group-item-action list-item-table pl-2"#}
         <li class="list-group-item p-1"
             id="{{ player.id }}"
             data-player="{{ player.id }}">
-            <span class="p-3">
-                <strong>
-                {{ player.name }}
-                {% if player.is_spectator_only %}
-                    <span class="small oi oi-eye"></span>
-                {% endif %}
-                </strong>
-        </span>
-            {#            <button class="oi oi-trash float-right btn btn btn-outline-danger button-delete-player border-0 p-2"#}
-            {#                    data-player_id="{{ player.id }}">#}
-            {#            </button>#}
-            {#            <button class="oi oi-cog float-right btn btn btn-outline-primary setup-player border-0 p-2"#}
-            {#                    data-player_id="{{ player.id }}">#}
-            {#            </button>#}
-            <div class="dropdown float-right">
-                {#                        <a href="#" class="btn btn-outline-primary border-0 ml-2" data-toggle="dropdown">#}
-                <a href="#" class="btn btn-outline-primary border-0 ml-2" data-toggle="dropdown">
-                    <span class="oi oi-ellipses menu-ellipses"></span>
-                </a>
-                <div class="dropdown-menu dropdown-menu-right shadow">
-                    <a href="#" class="dropdown-item setup-player text-nowrap"
-                       data-player_id="{{ player.id }}">
-                        <span class="oi oi-cog mr-2"></span>
-                        Einstellungen
-                    </a>
-                    <a href="#" class="dropdown-item text-danger text-nowrap button-delete-player"
-                       data-player_id="{{ player.id }}">
-                        <span class=" oi oi-trash mr-2"></span>
-                        Löschen
-                    </a>
+            {#            <span class="p-3">#}
+            <div class="row">
+                <div class="col-10 p-2">
+                <span class="ml-3">
+                    <strong>
+                        {{ player.name }}
+                        {% if player.is_spectator_only %}
+                            <span class="small oi oi-eye"></span>
+                        {% endif %}
+                    </strong>
+                </span>
+                    {#        </span>#}
+                    {#            <button class="oi oi-trash float-right btn btn btn-outline-danger button-delete-player border-0 p-2"#}
+                    {#                    data-player_id="{{ player.id }}">#}
+                    {#            </button>#}
+                    {#            <button class="oi oi-cog float-right btn btn btn-outline-primary setup-player border-0 p-2"#}
+                    {#                    data-player_id="{{ player.id }}">#}
+                    {#            </button>#}
+                </div>
+                <div class="col-2 p-1">
+                    <div class="dropdown float-right mr-2">
+                        {#                        <a href="#" class="btn btn-outline-primary border-0 ml-2" data-toggle="dropdown">#}
+                        <a href="#" class="btn btn-outline-primary border-0 ml-2" data-toggle="dropdown">
+                            <span class="oi oi-ellipses menu-ellipses p-0"></span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right shadow">
+                            <a href="#" class="dropdown-item setup-player text-nowrap"
+                               data-player_id="{{ player.id }}">
+                                <span class="oi oi-cog mr-2"></span>
+                                Einstellungen
+                            </a>
+                            <a href="#" class="dropdown-item text-danger text-nowrap button-delete-player"
+                               data-player_id="{{ player.id }}">
+                                <span class=" oi oi-trash mr-2"></span>
+                                Löschen
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
-
         </li>
     {% endfor %}
 </ul>
