@@ -1265,3 +1265,11 @@ def start_table(table_id):
                                                     )})
     else:
         return redirect(url_for('index'))
+
+@app.route('/remove/player/<player_id>/<table_id>', methods=['GET', 'POST'])
+@login_required
+def remove_player_from_table(player_id, table_id):
+    """
+    administrators may remove players from tables to be able to delete them (both)
+    """
+    pass

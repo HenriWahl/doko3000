@@ -808,7 +808,7 @@ $(document).ready(function () {
         })
 
         // delete a player in the players list
-        $(document).on('click', '.button-delete-player', function () {
+        $(document).on('click', '.delete-player', function () {
             if (player_id != $(this).data('player_id')) {
                 $.getJSON('/delete/player/' + encodeURIComponent($(this).data('player_id')),
                     function (data, status) {
