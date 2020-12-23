@@ -1,0 +1,11 @@
+<div class="mb-3 text-center"><h5>Soll <strong>{{ player.name }}</strong> tatsächlich den Tisch <strong>{{ table.name }}</strong> verlassen?</h5></div>
+<div class="row">
+    <div class="col-6" id="button_really_remove_player"
+         data-player_id="{{ player.id }}"
+         data-table_id="{{ table.id }}">
+        <button class="btn btn-success btn-block"><strong>Ja</strong></button>
+    </div>
+    <div class="col-6">
+        <button class="btn btn-danger btn-block" data-dismiss="modal"><strong>Nein</strong></button>
+    </div>
+</div>

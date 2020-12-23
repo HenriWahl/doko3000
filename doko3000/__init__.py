@@ -384,7 +384,7 @@ def setup_player(msg):
             # tell others about player change
             socketio.emit('index-list-changed',
                           {'table': 'players'})
-            # list of tables could use an update too in case player became spectator only
+            # list of tables could use an update too in e.g. case player became spectator only
             socketio.emit('index-list-changed',
                           {'table': 'tables'})
 
@@ -1210,9 +1210,10 @@ def delete_player(player_id):
                                 'html': render_template('index/delete_player.html',
                                                         player=player)})
             else:
+                table = game.tables.get(player.table)
                 return jsonify({'status': 'error',
                                 'html': render_template('error.html',
-                                                        message=f"{player.id} sitzt noch am Tisch {player.table}.")})
+                                                        message=f"{player.id} sitzt noch am Tisch {table.name}.")})
         elif request.method == 'POST':
             if game.delete_player(player.id):
                 return jsonify({'status': 'ok'})
@@ -1266,10 +1267,42 @@ def start_table(table_id):
     else:
         return redirect(url_for('index'))
 
+
 @app.route('/remove/player/<player_id>/<table_id>', methods=['GET', 'POST'])
+@app.route('/remove/player/<player_id>/', methods=['GET', 'POST'])
 @login_required
-def remove_player_from_table(player_id, table_id):
+def remove_player_from_table(player_id, table_id=None):
     """
-    administrators may remove players from tables to be able to delete them (both)
+    administrators may remove players from tables to be able to delete both of them
     """
-    pass
+    player = game.players.get(player_id)
+    table = game.tables.get(table_id)
+    if is_xhr(request) and \
+            player and \
+            current_user.is_admin:
+        if request.method == 'GET':
+            if table and \
+               player.table and \
+               table.id == player.table:
+                return jsonify({'status': 'ok',
+                                'html': render_template('index/remove_player.html',
+                                                        player=player,
+                                                        table=table)})
+            else:
+                return jsonify({'status': 'error',
+                                'html': render_template('error.html',
+                                                        message=f'{player.name} sitzt an keinem Tisch.'
+                                                        )})
+        elif request.method == 'POST':
+            if table and \
+               player.table and \
+               table.id == player.table:
+                if table.remove_player(player.id):
+                    return jsonify({'status': 'ok'})
+                else:
+                    return jsonify({'status': 'error',
+                                    'html': render_template('error.html',
+                                                            message=f'{player.name} konnte den Tisch {table.name} nicht verlassen.')
+                                    })
+    else:
+        return redirect(url_for('index'))

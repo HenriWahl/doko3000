@@ -47,6 +47,7 @@ html, body {
     /*background-color: rgba(0, 0, 0, 0.5);*/
 }
 
+/* turn ellipses-menu into smallish hamburger menulet */
 .menu-ellipses {
     transform: rotate(90deg);
 }

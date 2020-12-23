@@ -1103,6 +1103,7 @@ class Table(Document3000):
             self.round.save()
             self.save()
             self.game.players[player_id].save()
+            return True
 
     def add_round(self):
         """
