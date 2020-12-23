@@ -843,39 +843,6 @@ $(document).ready(function () {
             return false
         })
 
-        // delete a player in the players list
-        $(document).on('click', '.remove-player-from-table', function () {
-            if (player_id != $(this).data('player_id')) {
-                $.getJSON('/remove/player/' + encodeURIComponent($(this).data('player_id')) + '/' + encodeURIComponent($(this).data('table_id')),
-                    function (data, status) {
-                        if (status == 'success') {
-                            show_dialog(data.html)
-                        }
-                    })
-            }
-        })
-
-        // really delete player after safety dialog
-        $(document).on('click', '#button_really_remove_player', function () {
-            if (player_id != $(this).data('player_id')) {
-                // once again the .post + 'json' move
-                $.post('/remove/player/' + encodeURIComponent($(this).data('player_id')) + '/' + encodeURIComponent($(this).data('table_id')),
-                    function (data, status) {
-                        if (status == 'success') {
-                            if (data.status == 'ok') {
-                                $('#modal_dialog').modal('hide')
-                                // tell other players about change
-                                socket.emit('setup-player-change', {
-                                    action: 'finished',
-                                    player_id: player_id
-                                })
-                            }
-                        }
-                    }, 'json')
-            }
-            return false
-        })
-
         // start next round by dealing new cards
         $(document).on('click', '#button_deal_cards', function () {
             socket.emit('deal-cards', {
