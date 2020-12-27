@@ -24,16 +24,12 @@
     </div>
 </div>
 <div class="row">
-    {#    <div class="col-3 pt-2 mt-1 border">Geber</div>#}
     <div class="col-3 container d-flex flex-column m-0 p-0">
-{#        {% for player_id in table.players %}#}
-{#            {% if loop.index == 1 %}#}
-                <div class="p-2 m-1 ml-3 border border-white text-nowrap">
+
+                <div class="p-2 m-1 ml-3 border-bottom text-nowrap">
                         <span class="oi oi-layers mr-1"></span>
                         Geben:
                 </div>
-{#            {% endif %}#}
-{#        {% endfor %}#}
     </div>
     <div class="col-9 container d-flex flex-column" id="setup_table_players" data-table_id="{{ table.id }}">
         {% for player_id in table.players_active %}
