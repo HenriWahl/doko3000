@@ -23,22 +23,34 @@
         </label>
     </div>
 </div>
-<!--    <div clas="mt-2 mb-4"><strong>Spieler:</strong></div>-->
-<div class="container d-flex flex-column" id="setup_table_players" data-table_id="{{ table.id }}">
-    {% for player_id in table.players %}
-        <div class="p-2 m-1 border table_player_{{ player_id }} player"
-             data-player_id="{{ player_id }}">
-            <span class="oi oi-person"></span>
-            {{ game.players[player_id].name }}
-            {% if game.players[player_id].is_spectator_only %}
-                <span class="small oi oi-eye"></span>
-            {% endif %}
-            <span class="oi oi-x float-right text-danger btn btn-light border-0 btn-sm button-remove-player-from-table"
-                  data-player_id="{{ player_id }}"
-                  data-table_id="{{ table.id }}"
-            ></span>
-        </div>
-    {% endfor %}
+<div class="row">
+    {#    <div class="col-3 pt-2 mt-1 border">Geber</div>#}
+    <div class="col-3 container d-flex flex-column m-0 p-0">
+{#        {% for player_id in table.players %}#}
+{#            {% if loop.index == 1 %}#}
+                <div class="p-2 m-1 border border-white text-nowrap">
+                        <span class="oi oi-layers mr-1"></span>
+                        Geben:
+                </div>
+{#            {% endif %}#}
+{#        {% endfor %}#}
+    </div>
+    <div class="col-9 container d-flex flex-column" id="setup_table_players" data-table_id="{{ table.id }}">
+        {% for player_id in table.players_active %}
+            <div class="p-2 m-1 border table_player_{{ player_id }} player"
+                 data-player_id="{{ player_id }}">
+                <span class="oi oi-person"></span>
+                {{ game.players[player_id].name }}
+                {% if game.players[player_id].is_spectator_only %}
+                    <span class="small oi oi-eye"></span>
+                {% endif %}
+                <span class="oi oi-x float-right text-danger btn btn-light border-0 btn-sm button-remove-player-from-table"
+                      data-player_id="{{ player_id }}"
+                      data-table_id="{{ table.id }}"
+                ></span>
+            </div>
+        {% endfor %}
+    </div>
 </div>
 <div class="row mt-2">
     <div class="col-12">
