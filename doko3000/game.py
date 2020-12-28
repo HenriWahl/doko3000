@@ -1153,7 +1153,8 @@ class Table(Document3000):
         """
         if player_id not in self.players_ready:
             self.players_ready.append(player_id)
-            self.save()
+            # leads to race conditions and is of no big use
+            #self.save()
 
     def reset_ready_players(self):
         """
