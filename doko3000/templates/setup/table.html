@@ -24,14 +24,30 @@
     </div>
 </div>
 <div class="row">
-    <div class="col-3 container d-flex flex-column m-0 p-0">
-
-                <div class="p-2 m-1 ml-3 border-bottom text-nowrap">
-                        <span class="oi oi-layers mr-1"></span>
-                        Geben:
-                </div>
+    <div class="col-2 container d-flex flex-column m-0 p-0">
+        <div class="p-2 m-1 ml-3 border border-white text-nowrap">
+            <strong>
+            1
+            <span class="oi oi-layers mr-1"></span>
+                </strong>
+        </div>
+        <div class="p-2 m-1 ml-3 border border-white">
+            <strong>
+            2
+            </strong>
+        </div>
+        <div class="p-2 m-1 ml-3 border border-white">
+            <strong>
+            3
+            </strong>
+        </div>
+        <div class="p-2 m-1 ml-3 border border-white">
+            <strong>
+            4
+            </strong>
+        </div>
     </div>
-    <div class="col-9 container d-flex flex-column" id="setup_table_players" data-table_id="{{ table.id }}">
+    <div class="col-10 container d-flex flex-column" id="setup_table_players" data-table_id="{{ table.id }}">
         {% for player_id in table.players_active %}
             <div class="p-2 m-1 border table_player_{{ player_id }} player"
                  data-player_id="{{ player_id }}">
