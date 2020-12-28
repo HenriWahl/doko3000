@@ -24,7 +24,7 @@
     </div>
 </div>
 <div class="row">
-    <div class="col-2 container d-flex flex-column m-0 p-0">
+    <div class="col-2 col-lg-1 container d-flex flex-column m-0 p-0 pl-1">
         <div class="p-2 m-1 ml-3 border border-white text-nowrap">
             <strong>
             1
@@ -47,7 +47,7 @@
             </strong>
         </div>
     </div>
-    <div class="col-10 container d-flex flex-column" id="setup_table_players" data-table_id="{{ table.id }}">
+    <div class="col-10 col-lg-11 container d-flex flex-column pr-4" id="setup_table_players" data-table_id="{{ table.id }}">
         {% for player_id in table.players_active %}
             <div class="p-2 m-1 border table_player_{{ player_id }} player"
                  data-player_id="{{ player_id }}">
