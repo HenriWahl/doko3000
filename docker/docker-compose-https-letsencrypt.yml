@@ -61,4 +61,4 @@ services:
     networks:
       - doko3000
     entrypoint:
-      "/bin/sh -c 'trap exit TERM; while :; do certbot --webroot-path=/usr/share/nginx/html/certbot renew; sleep 12h & wait $${!}; done;'"
+      "/bin/sh -c 'trap exit TERM; while :; do certbot --webroot --webroot-path=/usr/share/nginx/html/certbot renew; sleep 12h & wait $${!}; done;'"
