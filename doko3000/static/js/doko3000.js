@@ -170,7 +170,12 @@ $(document).ready(function () {
 
         // ask server about me and the game when connecting
         socket.on('connect', function () {
-            // revalidate user ID
+            // validate user ID and sync state
+            socket.emit('who-am-i')
+        })
+
+        socket.on('reconnect', function () {
+            // revalidate user ID and sync state
             socket.emit('who-am-i')
         })
 
