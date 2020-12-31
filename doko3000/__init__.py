@@ -40,8 +40,8 @@ login.login_message = ''
 # shorter ping interval for better sync
 socketio = SocketIO(app,
                     manage_session=False,
-                    ping_timeout=10,
-                    ping_interval=2,
+                    ping_timeout=5,
+                    ping_interval=1,
                     logger=Config.DEBUG,
                     engineio_logger=Config.DEBUG,
                     cors_allowed_origins=Config.CORS_ALLOWED_ORIGINS)

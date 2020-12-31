@@ -51,7 +51,7 @@ function check_sync(msg) {
 
 $(document).ready(function () {
         // initialize SocketIO
-        const socket = io()
+        const socket = io({timeout: 5000})
 
         // initialize drag&drop
         let dragging_cards = dragula([document.querySelector('#hand'),
@@ -175,10 +175,25 @@ $(document).ready(function () {
         })
 
         socket.on('reconnect', function () {
+            console.log('reconnect')
             // revalidate user ID and sync state
             socket.emit('who-am-i')
         })
 
+         socket.on('error', function () {
+            console.log('error')
+        })
+
+        socket.on('connection_error', function () {
+            console.log('connection_error')
+        })
+        socket.on('ping', function () {
+            console.log('ping')
+        })
+
+        socket.on('pong', function () {
+            console.log('pong')
+        })
         // answer on 'who-am-i'
         socket.on('you-are-what-you-is', function (msg) {
             if (player_id == '') {
