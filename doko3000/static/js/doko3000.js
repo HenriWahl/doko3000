@@ -51,7 +51,10 @@ function check_sync(msg) {
 
 $(document).ready(function () {
         // initialize SocketIO
-        const socket = io({timeout: 5000})
+        // const socket = io({timeout: 5000})
+        const socket = io('/',  {
+            path: '/doko3000.io'
+        })
 
         // initialize drag&drop
         let dragging_cards = dragula([document.querySelector('#hand'),
@@ -279,6 +282,7 @@ $(document).ready(function () {
 
         // answer to my-cards-please
         socket.on('your-cards-please', function (msg) {
+            console.log('your-cards-please')
             current_player_id = msg.current_player_id
             if (check_sync(msg)) {
                 if (msg.player_showing_cards) {

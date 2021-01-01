@@ -39,6 +39,7 @@ login.login_message = ''
 # extend by socket.io
 # shorter ping interval for better sync
 socketio = SocketIO(app,
+                    path='/doko3000.io',
                     manage_session=False,
                     ping_timeout=5,
                     ping_interval=1,
@@ -61,7 +62,7 @@ def load_user(id):
     """
     try:
         player = game.players.get(id)
-        if not type(player) == Player:
+        if player and not type(player) == Player:
             game.players[id] = Player(document_id=player['_id'], game=game)
         return player
     except KeyError:
