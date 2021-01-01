@@ -60,12 +60,10 @@ def load_user(id):
     """
     give user back if it exists, otherwise force login
     """
-    try:
-        player = game.players.get(id)
-        if player and not type(player) == Player:
-            game.players[id] = Player(document_id=player['_id'], game=game)
+    player = game.players.get(id)
+    if player:
         return player
-    except KeyError:
+    else:
         return None
 
 
