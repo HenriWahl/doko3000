@@ -62,7 +62,7 @@ def load_user(id):
     """
     try:
         player = game.players.get(id)
-        if not type(player) == Player:
+        if player and not type(player) == Player:
             game.players[id] = Player(document_id=player['_id'], game=game)
         return player
     except KeyError:
