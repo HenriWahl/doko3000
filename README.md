@@ -1,6 +1,6 @@
 # doko3000
 
-Simple Doppelkopf card deck simulation web service.
+Simple Doppelkopf multiplayer card deck simulation web service.
 
 ## Overview
 
