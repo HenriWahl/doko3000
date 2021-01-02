@@ -52,7 +52,7 @@ function check_sync(msg) {
 $(document).ready(function () {
         // initialize SocketIO
         // const socket = io({timeout: 5000})
-        const socket = io('/',  {
+        const socket = io({
             path: '/doko3000.io'
         })
 
