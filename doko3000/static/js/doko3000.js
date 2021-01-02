@@ -183,20 +183,6 @@ $(document).ready(function () {
             socket.emit('who-am-i')
         })
 
-         socket.on('error', function () {
-            console.log('error')
-        })
-
-        socket.on('connection_error', function () {
-            console.log('connection_error')
-        })
-        socket.on('ping', function () {
-            console.log('ping')
-        })
-
-        socket.on('pong', function () {
-            console.log('pong')
-        })
         // answer on 'who-am-i'
         socket.on('you-are-what-you-is', function (msg) {
             if (player_id == '') {
