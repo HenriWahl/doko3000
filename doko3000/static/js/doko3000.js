@@ -427,6 +427,20 @@ $(document).ready(function () {
             }
         })
 
+       // a player requested an exchange and nobody should be able to play a card until the request is decided
+       socket.on('player1-requested-exchange', function(msg) {
+            if (check_sync(msg)) {
+                table_mode = 'locked'
+            }
+       })
+
+        // a player denied an exchange and now table mode must be normal again
+       socket.on('player2-denied-exchange', function(msg) {
+            if (check_sync(msg)) {
+                table_mode = 'normal'
+            }
+       })
+
         // received if password was changed
         socket.on('change-password-successful', function (msg) {
             $('#button_change_password').removeClass('btn-primary')
@@ -1097,7 +1111,7 @@ $(document).ready(function () {
                 player_id: player_id,
                 table_id: $(this).data('table_id')
             })
-            table_mode = 'exchange_requested'
+            table_mode = 'locked'
         })
 
         // player1 confirms intended exchange

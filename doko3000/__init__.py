@@ -178,7 +178,7 @@ def played_card(msg):
         # check if cards on hand are correct
         cards_hand_ids = msg.get('cards_hand_ids')
         if set(cards_hand_ids) | {card_id} == set(player.cards) and \
-                len(cards_hand_ids )+ 1 == len(player.cards):
+                len(cards_hand_ids) + 1 == len(player.cards):
             if card_id in Deck.cards and \
                     len(table.round.current_trick.cards) < 4 and \
                     current_user.get_id() == player.id == table.round.current_player_id:
@@ -799,7 +799,13 @@ def request_exchange(msg):
                 player.party in table.round.exchange and \
                 table.round.exchange[player.party]:
             exchanged_already = True
-        # ask player if exchange really should be started
+        # tell everybody there is an ongoing exchange in case it is possible
+        if not (hochzeit or table.round.card_played or exchanged_already):
+            socketio.emit('player1-requested-exchange',
+                          {'table_id': table.id,
+                           'sync_count': table.sync_count},
+                          to=table.id)
+        # ask player if exchange really should be started or tell it is not possible
         socketio.emit('confirm-exchange',
                       {'table_id': table.id,
                        'sync_count': table.sync_count,
@@ -872,7 +878,12 @@ def exchange_player2_deny(msg):
         exchange_type = 'contra'
         if not hochzeit and player.party == 're':
             exchange_type = 're'
-        # tell exchange initializing player thant second player doesn't want to exchange cards
+        # tell everybody that there will be no exchange
+        socketio.emit('player2-denied-exchange',
+                      {'table_id': table.id,
+                       'sync_count': table.sync_count},
+                      to=table.id)
+        # tell exchange initializing player that second player doesn't want to exchange cards
         socketio.emit('exchange-player1-player2-deny',
                       {'table_id': table.id,
                        'sync_count': table.sync_count,
@@ -895,8 +906,8 @@ def login():
     """
     form_values = list(request.values.keys())
     if 'player_id' in form_values and \
-        'password' in form_values and \
-        'submit' in form_values:
+            'password' in form_values and \
+            'submit' in form_values:
         player_id_quoted = quote(request.values['player_id'], safe='')
         player = game.players.get(player_id_quoted)
         if player:
@@ -909,7 +920,7 @@ def login():
             flash('Spieler nicht bekannt :-(')
     # got to login if not logged in
     return render_template('login.html',
-                          title=f"{app.config['TITLE']} Login")
+                           title=f"{app.config['TITLE']} Login")
 
 
 @app.route('/logout')
