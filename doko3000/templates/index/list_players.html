@@ -10,10 +10,10 @@
                     <strong>
                         {{ player.name }}
                         {% if player.is_spectator_only %}
-                            <span class="small oi oi-eye"></span>
+                            <span class="small oi oi-eye" title="Nur Zuschauer"></span>
                         {% endif %}
                         {% if player.is_admin %}
-                            <span class="small oi oi-flash"></span>
+                            <span class="small oi oi-flash" title="Administrator"></span>
                         {% endif %}
                     </strong>
                 </span>

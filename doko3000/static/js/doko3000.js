@@ -145,6 +145,9 @@ $(document).ready(function () {
                     // no draggin' and droppin' if cards are locked due to waiting for peer's cards
                     dragging_cards.cancel(true)
                 }
+            } else {
+                // no draggin' and droppin' in any other case
+                dragging_cards.cancel(true)
             }
         })
 
@@ -473,6 +476,7 @@ $(document).ready(function () {
             if (check_sync(msg)) {
                 $('.overlay-notification').addClass('d-none')
                 show_dialog(msg.html)
+                table_mode = 'normal'
             }
         })
 
@@ -1093,6 +1097,7 @@ $(document).ready(function () {
                 player_id: player_id,
                 table_id: $(this).data('table_id')
             })
+            table_mode = 'exchange_requested'
         })
 
         // player1 confirms intended exchange
