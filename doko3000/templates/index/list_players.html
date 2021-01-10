@@ -12,6 +12,9 @@
                         {% if player.is_spectator_only %}
                             <span class="small oi oi-eye"></span>
                         {% endif %}
+                        {% if player.is_admin %}
+                            <span class="small oi oi-flash"></span>
+                        {% endif %}
                     </strong>
                 </span>
                 </div>
