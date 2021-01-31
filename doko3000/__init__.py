@@ -548,7 +548,7 @@ def claim_trick(msg):
             # so the new one becomes the current one and the reclaimed is the previous
             if not len(table.round.current_trick.cards) == 0:
                 # old trick, freshly claimed
-                table.round.current_trick.owner = player.id
+                #table.round.current_trick.owner = player.id
                 # new trick for next turns
                 table.round.add_trick(player.id)
             else:

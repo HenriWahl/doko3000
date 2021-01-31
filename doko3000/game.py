@@ -470,7 +470,21 @@ class Round(Document3000):
 
     @property
     def trick_count(self):
-        return self.get('trick_count', 0)
+        # might be better to calculate trick count instead of tracking it - led to wrong value
+        trick_count = int(self.turn_count/4) + (1 if self.turn_count % 4 > 0 or self.turn_count == 0 else 0)
+
+        # if a trick has an owner the next trick will be the current one
+        if self.tricks.get(trick_count) and \
+            self.tricks.get(trick_count).owner:
+            trick_count += 1
+
+
+        trick_count_2 = len([x for x in self.tricks.values() if x.owner]) + 1
+
+        print(self.get('trick_count'), trick_count, trick_count_2, [x for x in self.tricks.values() if x.owner])
+
+        #return self.get('trick_count', 0)
+        return trick_count_2
 
     @trick_count.setter
     def trick_count(self, value):
@@ -554,7 +568,7 @@ class Round(Document3000):
         """
         return previous trick to enable reclaiming
         """
-        return self.tricks[self.trick_count - 1]
+        return self.tricks.get(self.trick_count - 1)
 
     @property
     def played_cards(self):
@@ -629,7 +643,6 @@ class Round(Document3000):
         for trick in self.tricks.values():
             if trick is not None:
                 trick.reset()
-
         # dynamic order, depending on who gets tricks
         self.trick_order = []
 
