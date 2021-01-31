@@ -378,8 +378,6 @@ class Round(Document3000):
             self['players'] = []
             # keep track of turns in round
             self['turn_count'] = 0
-            # keep track of tricks in round
-            self['trick_count'] = 0
             # ID of player which has current turn
             self['current_player'] = ''
             # as default play without '9'-cards
@@ -469,28 +467,6 @@ class Round(Document3000):
         self['turn_count'] = value
 
     @property
-    def trick_count(self):
-        # might be better to calculate trick count instead of tracking it - led to wrong value
-        trick_count = int(self.turn_count/4) + (1 if self.turn_count % 4 > 0 or self.turn_count == 0 else 0)
-
-        # if a trick has an owner the next trick will be the current one
-        if self.tricks.get(trick_count) and \
-            self.tricks.get(trick_count).owner:
-            trick_count += 1
-
-
-        trick_count_2 = len([x for x in self.tricks.values() if x.owner]) + 1
-
-        print(self.get('trick_count'), trick_count, trick_count_2, [x for x in self.tricks.values() if x.owner])
-
-        #return self.get('trick_count', 0)
-        return trick_count_2
-
-    @trick_count.setter
-    def trick_count(self, value):
-        self['trick_count'] = value
-
-    @property
     def trick_order(self):
         return self.get('trick_order', [])
 
@@ -533,6 +509,12 @@ class Round(Document3000):
         self['exchange'] = value
 
     @property
+    def trick_count(self):
+        # just count tricks which already have an owner - this is the number of already played tricks
+        #return len([x for x in self.tricks.values() if x.owner]) + 1
+        return len([x for x in self.tricks.values() if x.owner])
+
+    @property
     def cards_timestamp(self):
         # no setter available, will be set by calculate_cards_timestamp()
         if not self.get('cards_timestamp'):
@@ -561,14 +543,17 @@ class Round(Document3000):
         """
         enable access to current trick
         """
-        return self.tricks.get(self.trick_count)
+        # current trick is always ahead of trick count, because the latter counts the done tricks
+        # return self.tricks.get(self.trick_count)
+        return self.tricks.get(self.trick_count + 1)
 
     @property
     def previous_trick(self):
         """
         return previous trick to enable reclaiming
         """
-        return self.tricks.get(self.trick_count - 1)
+        # return self.tricks.get(self.trick_count - 1)
+        return self.tricks.get(self.trick_count)
 
     @property
     def played_cards(self):
@@ -610,7 +595,11 @@ class Round(Document3000):
         """
         check if round is over - reached when all cards are played
         """
-        return len(self.cards) == self.turn_count
+
+        print(len(self.cards), self.cards_per_player, self.turn_count, self.trick_count)
+
+        # return len(self.cards) == self.turn_count
+        return self.cards_per_player == self.trick_count
 
     @property
     def is_reset(self):
@@ -636,9 +625,6 @@ class Round(Document3000):
         # at start there is no exchange
         self.reset_exchange()
 
-        # counting all tricks
-        # starting with first trick number 1
-        self.trick_count = 1
         # tricks have to be reset too when round is reset
         for trick in self.tricks.values():
             if trick is not None:
@@ -723,12 +709,12 @@ class Round(Document3000):
             # next player
             player_count += 1
 
-    def add_trick(self, player_id):
+    def take_trick(self, player_id):
         """
         set player as owner of current trick
         """
-        self.game.tricks[f'{self.id}-{self.trick_count}'].owner = player_id
-        self.increase_trick_count()
+        # trick_count + 1 is the current trick which will be taken
+        self.game.tricks[f'{self.id}-{self.trick_count + 1}'].owner = player_id
         self.current_player_id = player_id
         self.save()
 
@@ -861,10 +847,6 @@ class Round(Document3000):
         self.turn_count += 1
         self.save()
 
-    def increase_trick_count(self):
-        self.trick_count += 1
-        self.save()
-
     def get_players_shuffled_cards(self):
         """
         retrieve all cards of all players for spectator mode
@@ -885,14 +867,20 @@ class Round(Document3000):
         """
         undo last trick by request
         """
-        # no card played yet, access previous trick
-        if len(self.current_trick.players) == 0 and self.trick_count > 1:
-            self.trick_count -= 1
         for player_id, card_id in zip(self.current_trick.players, self.current_trick.cards):
             self.game.players[player_id].cards.append(card_id)
             # decrease turn_count here to avoid extra self.save() like in increase_turn_count()
             self.turn_count -= 1
         # store last current trick starting player
+        print(self.trick_count)
+        # if self.trick_count > 0:
+        #     # if already some tricks exist take first player as it started the trick
+        #     self.current_player_id = self.current_trick.players[0]
+        #     self.current_trick.reset()
+        # else:
+        #     # during first trick it is still empty so take the start player
+        #     self.current_player_id = self.players[0]
+        # if already some tricks exist take first player as it started the trick
         self.current_player_id = self.current_trick.players[0]
         self.current_trick.reset()
         self.save()

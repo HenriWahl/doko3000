@@ -547,10 +547,8 @@ def claim_trick(msg):
             # when ownership changes it does at previous trick because normally there is a new one created
             # so the new one becomes the current one and the reclaimed is the previous
             if not len(table.round.current_trick.cards) == 0:
-                # old trick, freshly claimed
-                #table.round.current_trick.owner = player.id
-                # new trick for next turns
-                table.round.add_trick(player.id)
+                # makes player owner of trick
+                table.round.take_trick(player.id)
             else:
                 # apparently the ownership of the previous trick is not clear - change it
                 table.round.previous_trick.owner = player.id
