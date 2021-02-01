@@ -595,10 +595,6 @@ class Round(Document3000):
         """
         check if round is over - reached when all cards are played
         """
-
-        print(len(self.cards), self.cards_per_player, self.turn_count, self.trick_count)
-
-        # return len(self.cards) == self.turn_count
         return self.cards_per_player == self.trick_count
 
     @property
@@ -872,7 +868,6 @@ class Round(Document3000):
             # decrease turn_count here to avoid extra self.save() like in increase_turn_count()
             self.turn_count -= 1
         # store last current trick starting player
-        print(self.trick_count)
         # if self.trick_count > 0:
         #     # if already some tricks exist take first player as it started the trick
         #     self.current_player_id = self.current_trick.players[0]
@@ -881,7 +876,8 @@ class Round(Document3000):
         #     # during first trick it is still empty so take the start player
         #     self.current_player_id = self.players[0]
         # if already some tricks exist take first player as it started the trick
-        self.current_player_id = self.current_trick.players[0]
+        if self.current_trick.players:
+            self.current_player_id = self.current_trick.players[0]
         self.current_trick.reset()
         self.save()
 

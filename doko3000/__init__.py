@@ -727,9 +727,9 @@ def request_undo(msg):
 
 
 @socketio.on('ready-for-undo')
-def round_reset(msg):
+def round_undo(msg):
     """
-    players comfirm reverting the last trick
+    players confirm reverting the last trick
     """
     msg_ok, player, table = check_message(msg)
     if msg_ok:
