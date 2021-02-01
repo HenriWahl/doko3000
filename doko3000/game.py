@@ -897,7 +897,9 @@ class Round(Document3000):
             self.current_player_id = self.current_trick.players[0]
             self.current_trick.reset()
 
-        Jetzt ändert sich das HUD nicht ....
+        # recaclulate statistics due to reverted ownerships
+        self.calculate_stats()
+
 
 class Table(Document3000):
     """
