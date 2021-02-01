@@ -37,14 +37,14 @@ class Deck:
     full deck of cards - enough to be static
     """
     SYMBOLS = ('Schell',
-               'Herz',
-               'Grün',
+               # 'Herz',
+               # 'Grün',
                'Eichel')
     RANKS = {'Neun': 0,
              'Zehn': 10,
-             'Unter': 2,
-             'Ober': 3,
-             'König': 4,
+             # 'Unter': 2,
+             # 'Ober': 3,
+             # 'König': 4,
              'Ass': 11}
     NUMBER = 2  # Doppelkopf :-)!
     #NUMBER = 1 # Debugging
@@ -595,7 +595,7 @@ class Round(Document3000):
         """
         check if round is over - reached when all cards are played
         """
-        return self.cards_per_player == self.trick_count
+        return self.cards_per_player == self.trick_count + 1
 
     @property
     def is_reset(self):
