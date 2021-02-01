@@ -511,7 +511,6 @@ class Round(Document3000):
     @property
     def trick_count(self):
         # just count tricks which already have an owner - this is the number of already played tricks
-        #return len([x for x in self.tricks.values() if x.owner]) + 1
         return len([x for x in self.tricks.values() if x.owner])
 
     @property
@@ -542,17 +541,16 @@ class Round(Document3000):
     def current_trick(self):
         """
         enable access to current trick
+        current trick is always ahead of trick count, because the latter counts the done tricks
         """
-        # current trick is always ahead of trick count, because the latter counts the done tricks
-        # return self.tricks.get(self.trick_count)
         return self.tricks.get(self.trick_count + 1)
 
     @property
     def previous_trick(self):
         """
         return previous trick to enable reclaiming
+        trick count counts the done tricks so the previous trick has the index of tricḱ_count
         """
-        # return self.tricks.get(self.trick_count - 1)
         return self.tricks.get(self.trick_count)
 
     @property
@@ -595,6 +593,8 @@ class Round(Document3000):
         """
         check if round is over - reached when all cards are played
         """
+        # because claiming of the last trick can just happen at reaching its end
+        # it has to get added +1
         return self.cards_per_player == self.trick_count + 1
 
     @property
