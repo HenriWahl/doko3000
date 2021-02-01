@@ -863,10 +863,10 @@ class Round(Document3000):
         """
         undo last trick by request
         """
-        for player_id, card_id in zip(self.current_trick.players, self.current_trick.cards):
-            self.game.players[player_id].cards.append(card_id)
-            # decrease turn_count here to avoid extra self.save() like in increase_turn_count()
-            self.turn_count -= 1
+        # for player_id, card_id in zip(self.current_trick.players, self.current_trick.cards):
+        #     self.game.players[player_id].cards.append(card_id)
+        #     # decrease turn_count here to avoid extra self.save() like in increase_turn_count()
+        #     self.turn_count -= 1
         # store last current trick starting player
         # if self.trick_count > 0:
         #     # if already some tricks exist take first player as it started the trick
@@ -875,12 +875,29 @@ class Round(Document3000):
         # else:
         #     # during first trick it is still empty so take the start player
         #     self.current_player_id = self.players[0]
-        # if already some tricks exist take first player as it started the trick
-        if self.current_trick.players:
+        if self.trick_count > 0:
+            # if already some tricks exist take first player as it started the trick
+            if self.current_trick.players:
+                for player_id, card_id in zip(self.current_trick.players, self.current_trick.cards):
+                    self.game.players[player_id].cards.append(card_id)
+                    # decrease turn_count here to avoid extra self.save() like in increase_turn_count()
+                    self.turn_count -= 1
+                self.current_player_id = self.current_trick.players[0]
+                self.current_trick.reset()
+            # otherwise the previous trick is to be treated
+            else:
+                for player_id, card_id in zip(self.previous_trick.players, self.previous_trick.cards):
+                    self.game.players[player_id].cards.append(card_id)
+                    # decrease turn_count here to avoid extra self.save() like in increase_turn_count()
+                    self.turn_count -= 1
+                self.current_player_id = self.previous_trick.players[0]
+                self.previous_trick.reset()
+            self.save()
+        else:
             self.current_player_id = self.current_trick.players[0]
-        self.current_trick.reset()
-        self.save()
+            self.current_trick.reset()
 
+        Jetzt ändert sich das HUD nicht ....
 
 class Table(Document3000):
     """
