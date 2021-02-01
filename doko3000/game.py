@@ -1,6 +1,7 @@
 # game logic part of doko3000
 from copy import deepcopy
 from json import dumps
+from os import environ
 from random import seed, \
     shuffle
 from time import time
@@ -36,16 +37,23 @@ class Deck:
     """
     full deck of cards - enough to be static
     """
-    SYMBOLS = ('Schell',
-               'Herz',
-               'Grün',
-               'Eichel')
-    RANKS = {'Neun': 0,
-             'Zehn': 10,
-             'Unter': 2,
-             'Ober': 3,
-             'König': 4,
-             'Ass': 11}
+    if 'DOKO3000_DEVEL_REDUCED_CARD_SET' in environ:
+        SYMBOLS = ('Schell',
+                   'Eichel')
+        RANKS = {'Neun': 0,
+                 'Zehn': 10,
+                 'Ass': 11}
+    else:
+        SYMBOLS = ('Schell',
+                   'Herz',
+                   'Grün',
+                   'Eichel')
+        RANKS = {'Neun': 0,
+                 'Zehn': 10,
+                 'Unter': 2,
+                 'Ober': 3,
+                 'König': 4,
+                 'Ass': 11}
     NUMBER = 2  # Doppelkopf :-)!
     cards = {}
 
@@ -1145,8 +1153,11 @@ class Table(Document3000):
     def shift_players(self):
         """
         last dealer is moved to the end of the players list
+        spectators get glued at the end to avoid them appearing out of nothing
         """
-        self.order = self.order[1:] + self.order[:1]
+        self.players = self.players_active[1:] + self.players_active[:1] + self.players_spectator
+        self.order = self.players_active[:]
+        #self.order = self.order[1:] + self.order[:1]
         self.save()
 
     def add_ready_player(self, player_id):
