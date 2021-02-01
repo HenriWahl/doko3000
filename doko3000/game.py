@@ -47,7 +47,6 @@ class Deck:
              'König': 4,
              'Ass': 11}
     NUMBER = 2  # Doppelkopf :-)!
-    #NUMBER = 1 # Debugging
     cards = {}
 
     # counter for card IDs in deck
@@ -243,9 +242,6 @@ class Player(UserMixin, Document3000):
                     self.cards = cards
             else:
                 self.cards = cards
-                # if not playing right now there is no need to save the cards
-                # sometimes provokes a 409 error from cloudant
-                # self.save()
         return cards
 
     def remove_card(self, card_id):
@@ -863,18 +859,7 @@ class Round(Document3000):
         """
         undo last trick by request
         """
-        # for player_id, card_id in zip(self.current_trick.players, self.current_trick.cards):
-        #     self.game.players[player_id].cards.append(card_id)
-        #     # decrease turn_count here to avoid extra self.save() like in increase_turn_count()
-        #     self.turn_count -= 1
-        # store last current trick starting player
-        # if self.trick_count > 0:
-        #     # if already some tricks exist take first player as it started the trick
-        #     self.current_player_id = self.current_trick.players[0]
-        #     self.current_trick.reset()
-        # else:
-        #     # during first trick it is still empty so take the start player
-        #     self.current_player_id = self.players[0]
+        # when there are already tricks gained they can be used
         if self.trick_count > 0:
             # if already some tricks exist take first player as it started the trick
             if self.current_trick.players:
@@ -894,6 +879,7 @@ class Round(Document3000):
                 self.previous_trick.reset()
             self.save()
         else:
+            # otherwise only the current trick need to be used
             self.current_player_id = self.current_trick.players[0]
             self.current_trick.reset()
 
@@ -1169,8 +1155,6 @@ class Table(Document3000):
         """
         if player_id not in self.players_ready:
             self.players_ready.append(player_id)
-            # leads to race conditions and is of no big use
-            #self.save()
 
     def reset_ready_players(self):
         """

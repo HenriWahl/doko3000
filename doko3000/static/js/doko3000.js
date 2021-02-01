@@ -48,6 +48,14 @@ function check_sync(msg) {
     }
 }
 
+// check if normal player or spectator
+function is_normal_player() {
+    if ($('.mode-spectator').hasClass('d-none')) {
+        return true }
+    else {
+        return false
+    }
+}
 
 $(document).ready(function () {
         // initialize SocketIO
@@ -390,23 +398,26 @@ $(document).ready(function () {
 
         // sent on requested round reset
         socket.on('round-reset-requested', function (msg) {
+            if (is_normal_player()) {
             $('.overlay-button').addClass('d-none')
             $('.overlay-notification').addClass('d-none')
-            show_dialog(msg.html)
+            show_dialog(msg.html)}
         })
 
         // sent on requested round finish
         socket.on('round-finish-requested', function (msg) {
+            if (is_normal_player()) {
             $('.overlay-button').addClass('d-none')
             $('.overlay-notification').addClass('d-none')
-            show_dialog(msg.html)
+            show_dialog(msg.html)}
         })
 
         // sent if undo was requested
         socket.on('undo-requested', function (msg) {
+            if (is_normal_player()) {
             $('.overlay-button').addClass('d-none')
             $('.overlay-notification').addClass('d-none')
-            show_dialog(msg.html)
+            show_dialog(msg.html)}
         })
 
         // if player wants to show cards confirm it
@@ -464,7 +475,7 @@ $(document).ready(function () {
         // show cards of a player on request
         socket.on('cards-shown-by-player', function (msg) {
             if (check_sync(msg)) {
-                if ($('.mode-spectator').hasClass('d-none')) {
+                if (is_normal_player()) {
                     $('#table').html(msg.html.cards_table)
                 } else {
                     $('#table_spectator').html(msg.html.cards_table)
@@ -536,7 +547,7 @@ $(document).ready(function () {
                 $('#turn_indicator').addClass('d-none')
             }
             // spectator shall see the refreshed exchanged cards
-            if (!$('.mode-spectator').hasClass('d-none')) {
+            if (!is_normal_player()) {
                 socket.emit('my-cards-please', {
                     player_id: player_id,
                     table_id: msg.table_id
