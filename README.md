@@ -20,6 +20,14 @@ Doko3000 runs on a **web server** and is accessed by the players via **web brows
 
 Ingame language at the moment is only german due to Doppelkopf being a mostly german phenomenon. Might change in the future.
 
+## Demo
+
+Have a look at it at work at https://doko3000-demo.better-than.tv. Four accounts are available with their respective passwords:
+
+- **demo1:** demo1
+- **demo2:** demo2
+- **demo3:** demo3
+- **demo4:** demo4
 
 ## Gameplay
 
