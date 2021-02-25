@@ -301,10 +301,19 @@ def setup_table(msg):
     if player and table:
         if action == 'remove_player':
             table.remove_player(player.id)
+            # tell others about table change
+            socketio.emit('index-list-changed',
+                          {'table': 'tables'})
         elif action == 'lock_table':
             table.locked = True
+            # tell others about table change
+            socketio.emit('index-list-changed',
+                          {'table': 'tables'})
         elif action == 'unlock_table':
             table.locked = False
+            # tell others about table change
+            socketio.emit('index-list-changed',
+                          {'table': 'tables'})
         elif action == 'play_with_9':
             table.round.with_9 = True
         elif action == 'play_without_9':
