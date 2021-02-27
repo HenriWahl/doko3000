@@ -29,6 +29,7 @@ app = Flask(__name__)
 app.config.from_object(Config)
 # timestamp for files which may change during debugging like .js and .css
 app.jinja_env.globals.update(timestamp=int(time()))
+
 # initialize database
 db = DB(app)
 # login
@@ -53,6 +54,17 @@ game.load_from_db()
 
 # keep track of players and their sessions to enable directly emitting a socketio event
 sessions = {}
+
+
+@app.after_request
+def add_headers_to_response(response):
+    """
+    avoid client-side caching by adding headers to response
+    """
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate'
+    return response
 
 
 @login.user_loader
