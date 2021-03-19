@@ -1296,3 +1296,12 @@ def start_table(table_id):
                                                     )})
     else:
         return redirect(url_for('index'))
+
+
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def catch_all(path):
+    """
+    catch all rule
+    """
+    return redirect(url_for('index'))
