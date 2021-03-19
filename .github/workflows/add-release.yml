@@ -1,4 +1,4 @@
-name: add-release
+name: add-release 2
 on: [push]
   #push:
   #  tags: 'v*'
