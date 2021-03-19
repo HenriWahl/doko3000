@@ -1,9 +1,9 @@
-name: add-release 2
+name: add-release
 on: [push]
   #push:
   #  tags: 'v*'
-
-  upload-release:
+jobs:
+  action-automatic-releases:
     runs-on: ubuntu-latest
     steps:
       - uses: marvinpinto/action-automatic-releases@latest
