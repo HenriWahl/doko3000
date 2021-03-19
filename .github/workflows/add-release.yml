@@ -1,7 +1,7 @@
 name: add-release
 on:
   push:
-  tags: 'v*'
+    tags: 'v*'
 jobs:
   action-automatic-releases:
     runs-on: ubuntu-latest
