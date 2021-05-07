@@ -40,8 +40,7 @@ class Deck:
     if 'DOKO3000_DEVEL_REDUCED_CARD_SET' in environ:
         SYMBOLS = ('Schell',
                    'Eichel')
-        RANKS = {'Neun': 0,
-                 'Zehn': 10,
+        RANKS = {'Zehn': 10,
                  'Ass': 11}
     else:
         SYMBOLS = ('Schell',

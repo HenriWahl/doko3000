@@ -32,7 +32,7 @@ function show_dialog(html) {
 // check if message is in sync
 function check_sync(msg) {
     // if not set yet take sync_count from freshly loaded HTML id
-    console.log(sync_count)
+    console.log('sync_count', sync_count)
     if (sync_count == 0) {
         sync_count = $('#sync_count').data('sync_count')
     }
@@ -188,7 +188,6 @@ $(document).ready(function () {
         })
 
         socket.on('reconnect', function () {
-            console.log('reconnect')
             // revalidate user ID and sync state
             socket.emit('who-am-i')
         })
@@ -278,7 +277,6 @@ $(document).ready(function () {
 
         // answer to my-cards-please
         socket.on('your-cards-please', function (msg) {
-            console.log('your-cards-please')
             current_player_id = msg.current_player_id
             if (check_sync(msg)) {
                 if (msg.player_showing_cards) {
@@ -883,6 +881,11 @@ $(document).ready(function () {
 
         // start next round by dealing new cards
         $(document).on('click', '#button_deal_cards', function () {
+            // avoid players clicking multiple times
+            // optical by bootstrap
+            $(this).addClass('disabled')
+            // really by button property
+            $(this).prop('disabled', true)
             socket.emit('deal-cards', {
                 player_id: player_id,
                 table_id: $(this).data('table_id')

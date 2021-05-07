@@ -2,4 +2,5 @@
 *.idea
 *.pem
 .env
+docker-compose.yml
 
