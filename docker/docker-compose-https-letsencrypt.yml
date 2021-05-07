@@ -16,6 +16,8 @@ services:
     image: doko3000
     container_name: doko3000
     restart: always
+    depends_on:
+      - couchdb
     networks:
       - doko3000
     environment:
