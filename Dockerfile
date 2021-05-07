@@ -1,5 +1,5 @@
 FROM python:3.8
-LABEL maintainer=henri.wahl@t-online.de
+LABEL maintainer=henri.wahl@mailbox.org
 
 RUN apt -y update &&\
     apt -y upgrade
