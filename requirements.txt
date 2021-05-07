@@ -1,6 +1,6 @@
 click
 cloudant
-eventlet
+eventlet==0.30.2
 flask
 flask-login
 flask-socketio
