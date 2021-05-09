@@ -51,8 +51,8 @@ function check_sync(msg) {
 // check if normal player or spectator
 function is_normal_player() {
     if ($('.mode-spectator').hasClass('d-none')) {
-        return true }
-    else {
+        return true
+    } else {
         return false
     }
 }
@@ -67,9 +67,17 @@ $(document).ready(function () {
         let dragging_cards = dragula([document.querySelector('#hand'),
             document.querySelector('#table'), {
                 revertOnSpill: true,
-                direction: 'horizontal'
+                direction: 'horizontal',
             }
         ]);
+
+        // fix to make gained cards stack on players hand non-movable
+        dragging_cards.on('over', function (card, source) {
+            // do not drag your gained tricks around
+            if (card.id == 'cards_stack') {
+                dragging_cards.cancel(true)
+            }
+        })
 
         dragging_cards.on('drop', function (card, target, source) {
             // get cards order to send it to server for storing or checking it
@@ -397,25 +405,28 @@ $(document).ready(function () {
         // sent on requested round reset
         socket.on('round-reset-requested', function (msg) {
             if (is_normal_player()) {
-            $('.overlay-button').addClass('d-none')
-            $('.overlay-notification').addClass('d-none')
-            show_dialog(msg.html)}
+                $('.overlay-button').addClass('d-none')
+                $('.overlay-notification').addClass('d-none')
+                show_dialog(msg.html)
+            }
         })
 
         // sent on requested round finish
         socket.on('round-finish-requested', function (msg) {
             if (is_normal_player()) {
-            $('.overlay-button').addClass('d-none')
-            $('.overlay-notification').addClass('d-none')
-            show_dialog(msg.html)}
+                $('.overlay-button').addClass('d-none')
+                $('.overlay-notification').addClass('d-none')
+                show_dialog(msg.html)
+            }
         })
 
         // sent if undo was requested
         socket.on('undo-requested', function (msg) {
             if (is_normal_player()) {
-            $('.overlay-button').addClass('d-none')
-            $('.overlay-notification').addClass('d-none')
-            show_dialog(msg.html)}
+                $('.overlay-button').addClass('d-none')
+                $('.overlay-notification').addClass('d-none')
+                show_dialog(msg.html)
+            }
         })
 
         // if player wants to show cards confirm it
@@ -436,19 +447,19 @@ $(document).ready(function () {
             }
         })
 
-       // a player requested an exchange and nobody should be able to play a card until the request is decided
-       socket.on('player1-requested-exchange', function(msg) {
+        // a player requested an exchange and nobody should be able to play a card until the request is decided
+        socket.on('player1-requested-exchange', function (msg) {
             if (check_sync(msg)) {
                 table_mode = 'locked'
             }
-       })
+        })
 
         // a player denied an exchange and now table mode must be normal again
-       socket.on('player2-denied-exchange', function(msg) {
+        socket.on('player2-denied-exchange', function (msg) {
             if (check_sync(msg)) {
                 table_mode = 'normal'
             }
-       })
+        })
 
         // received if password was changed
         socket.on('change-password-successful', function (msg) {
