@@ -565,7 +565,7 @@ $(document).ready(function () {
         })
 
         // update either list of tables or users after a change
-        socket.on('index-list-changed', function (msg) {
+        socket.on('player-entered-table', function (msg) {
             if (!location.pathname.startsWith('/table/')) {
                 $.getJSON('/get/' + msg.table,
                     function (data, status) {
@@ -573,6 +573,10 @@ $(document).ready(function () {
                             $('#list_' + msg.table).html(data.html)
                         }
                     })
+            }
+            else {
+                // otherwise update HUD
+                $('#hud_players').html(msg.html.hud_players)
             }
         })
 

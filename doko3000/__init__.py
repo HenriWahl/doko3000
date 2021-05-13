@@ -174,9 +174,15 @@ def enter_table_socket(msg):
             game.tables[table.id].add_player(player.id)
             join_room(table.id)
             # check if any formerly locked table is now emtpy and should be unlocked
-            game.check_tables()
-            socketio.emit('index-list-changed',
-                          {'table': 'tables'})
+            game.check_tables()  #
+            socketio.emit('player-entered-table',
+                          {'table': 'tables',
+                           'html': {'hud_players': render_template('top/hud_players.html',
+                                                                   table=table,
+                                                                   player=player,
+                                                                   game=game)
+                                    }}
+                          )
 
 
 @socketio.on('card-played')
@@ -223,8 +229,7 @@ def played_card(msg):
                                     'hud_players': render_template('top/hud_players.html',
                                                                    table=table,
                                                                    player=player,
-                                                                   game=game,
-                                                                   current_player_id=current_player_id)
+                                                                   game=game)
                                     }}
                 room = table.id
                 # debugging...

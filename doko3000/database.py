@@ -50,16 +50,6 @@ class Document3000(Document):
         """
         save() inside try/except for debugging
         """
-        # saved = False
-        # while not saved:
-        #     try:
-        #         super().save()
-        #         saved = True
-        #         print('SAVE', self.document_url)
-        #     except Exception as error:
-        #         # sleep a random amount of time before next attempt
-        #         print(error)
-        #         sleep(randint(10, 50)/100)
         try:
             super().save()
         except Exception as error:
