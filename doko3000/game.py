@@ -1173,7 +1173,7 @@ class Table(Document3000):
         self.players_ready = []
         self.save()
 
-    def show_cards(self, player):
+    def show_hand(self, player):
         """
         show cards of player on table
         """

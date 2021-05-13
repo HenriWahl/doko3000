@@ -430,7 +430,7 @@ $(document).ready(function () {
         })
 
         // if player wants to show cards confirm it
-        socket.on('confirm-show-cards', function (msg) {
+        socket.on('confirm-show-hand', function (msg) {
             if (check_sync(msg)) {
                 $('.overlay-notification').addClass('d-none')
                 show_dialog(msg.html)
@@ -1127,9 +1127,9 @@ $(document).ready(function () {
             })
         })
 
-        // player show cards confirmed
-        $(document).on('click', '#button_show_cards_yes', function () {
-            socket.emit('show-cards', {
+        // player show hand confirmed
+        $(document).on('click', '#button_show_hand_yes', function () {
+            socket.emit('show-hand', {
                 player_id: player_id,
                 table_id: $(this).data('table_id')
             })

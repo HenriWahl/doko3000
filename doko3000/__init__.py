@@ -785,22 +785,22 @@ def request_show_hand(msg):
     msg_ok, player, table = check_message(msg)
     if msg_ok:
         # ask player if cards really should be shown
-        socketio.emit('confirm-show-cards',
+        socketio.emit('confirm-show-hand',
                       {'table_id': table.id,
                        'sync_count': table.sync_count,
-                       'html': render_template('round/request_show_cards.html',
+                       'html': render_template('round/request_show_hand.html',
                                                table=table)},
                       to=request.sid)
 
 
-@socketio.on('show-cards')
-def show_cards(msg):
+@socketio.on('show-hand')
+def show_hand(msg):
     """
     player shows cards
     """
     msg_ok, player, table = check_message(msg)
     if msg_ok:
-        table.show_cards(player)
+        table.show_hand(player)
         cards_table = game.players[player.id].get_cards()
         event = 'cards-shown-by-player'
         payload = {'table_id': table.id,
