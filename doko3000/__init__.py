@@ -982,8 +982,8 @@ def index():
                                player=player,
                                game=game,
                                title=f"{app.config['TITLE']}")
-    else:
-        return redirect(url_for('login'))
+    # default return if nothing applies
+    return redirect(url_for('index'))
 
 
 @app.route('/table/<table_id>')
@@ -1035,6 +1035,7 @@ def table(table_id=''):
                                    players_cards=players_cards,
                                    game=game,
                                    mode=mode)
+    # default return if nothing applies
     return redirect(url_for('index'))
 
 
@@ -1059,8 +1060,8 @@ def setup_table(table_id):
                                                     game=game)})
         else:
             return jsonify({'allowed': False})
-    else:
-        return redirect(url_for('index'))
+    # default return if nothing applies
+    return redirect(url_for('index'))
 
 
 @app.route('/setup/player/<player_id>')
@@ -1074,10 +1075,8 @@ def setup_player(player_id):
         if player:
             return jsonify({'html': render_template('setup/player.html',
                                                     player=player)})
-        else:
-            return redirect(url_for('index'))
-    else:
-        return redirect(url_for('index'))
+    # default return if nothing applies
+    return redirect(url_for('index'))
 
 
 @app.route('/enter/table/<table_id>/<player_id>')
@@ -1097,14 +1096,14 @@ def enter_table_json(table_id='', player_id=''):
                  not table.locked):
             allowed = True
         return jsonify({'allowed': allowed})
-    else:
-        return redirect(url_for('index'))
+    # default return if nothing applies
+    return redirect(url_for('index'))
 
 
 @app.route('/get/welcome/<table_id>')
 @app.route('/get/welcome')
 @login_required
-def get_welcome(table_id=None):
+def get_welcome(table_id=''):
     """
     get HTML snippet if welcome on index or table is needed
     """
@@ -1124,8 +1123,8 @@ def get_welcome(table_id=None):
                                                         game=game)})
             else:
                 return jsonify({'needs_welcome': False})
-    else:
-        return redirect(url_for('index'))
+    # default return if nothing applies
+    return redirect(url_for('index'))
 
 
 @app.route('/get/tables')
@@ -1139,8 +1138,8 @@ def get_tables():
         return jsonify({'html': render_template('index/list_tables.html',
                                                 tables=tables,
                                                 game=game)})
-    else:
-        return redirect(url_for('index'))
+    # default return if nothing applies
+    return redirect(url_for('index'))
 
 
 @app.route('/get/players')
@@ -1153,20 +1152,26 @@ def get_players():
         players = sorted(game.players.values(), key=lambda x: x.name.lower())
         return jsonify({'html': render_template('index/list_players.html',
                                                 players=players)})
-    else:
-        return redirect(url_for('index'))
+    # default return if nothing applies
+    return redirect(url_for('index'))
 
 
+@app.route('/get/wait/<table_id>/<player_id>')
 @app.route('/get/wait')
 @login_required
-def get_wait():
+def get_wait(table_id='', player_id=''):
     """
     get HTML snippet asking for patience
     """
-    if is_xhr(request):
-        return jsonify({'html': render_template('round/wait.html')})
-    else:
-        return redirect(url_for('index'))
+    if is_xhr(request) and table_id:
+        player = game.players.get(player_id)
+        table = game.tables.get(table_id)
+        if player and \
+                table and \
+                player_id in table.players:
+            return jsonify({'html': render_template('round/wait.html')})
+    # default return if nothing applies
+    return redirect(url_for('index'))
 
 
 @app.route('/create/table', methods=['GET', 'POST'])
@@ -1190,10 +1195,8 @@ def create_table():
             else:
                 return jsonify({'status': 'error',
                                 'message': 'Der Tisch braucht einen Namen'})
-        else:
-            return redirect(url_for('index'))
-    else:
-        return redirect(url_for('index'))
+    # default return if nothing applies
+    return redirect(url_for('index'))
 
 
 @app.route('/create/player', methods=['GET', 'POST'])
@@ -1233,10 +1236,8 @@ def create_player():
             else:
                 return jsonify({'status': 'error',
                                 'message': 'Der Spieler braucht einen Namen'})
-        else:
-            return redirect(url_for('index'))
-    else:
-        return redirect(url_for('index'))
+    # default return if nothing applies
+    return redirect(url_for('index'))
 
 
 @app.route('/delete/player/<player_id>', methods=['GET', 'POST'])
@@ -1309,8 +1310,8 @@ def start_table(table_id):
                             'html': render_template('error.html',
                                                     message='Es sitzen nicht genug Spieler am Tisch.'
                                                     )})
-    else:
-        return redirect(url_for('index'))
+    # default return if nothing applies
+    return redirect(url_for('index'))
 
 
 @app.route('/', defaults={'path': ''})
