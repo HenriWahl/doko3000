@@ -1,8 +1,23 @@
 <div class="m-3 text-center">
     <h5>
-    <span class="spinner-border align-middle"></span>
-    <span class="align-middle ml-3">
-        Warten auf <strong>andere Spieler</strong>...
+        <span class="spinner-border align-middle"></span>
+        <span class="align-middle ml-3">
+            {% for player_waiting in players_round %}
+                {% if player_waiting.id == player.id or player_waiting.id in table.players_ready %}
+                    {% set color = 'text-success' %}
+                    {% set check = '' %}
+                    {% else %}
+                    {% set color = '' %}
+                    {% set check = 'd-none' %}
+                {% endif %}
+                <span class="mx-1">
+                    <span class="{{ color }}" id="player_waiting_name_{{ player_waiting.id }}">
+                        {{ player_waiting.name }}
+                    </span>
+                    <span class="oi oi-check text-success {{ check }}" id="player_waiting_check_{{ player_waiting.id }}>
+                    </span>
+                </span>
+            {% endfor %}
     </span>
-        </h5>
+    </h5>
 </div>

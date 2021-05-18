@@ -371,7 +371,7 @@ def setup_table(msg):
                           {'table_id': table.id,
                            'sync_count': table.sync_count},
                           to=table.id)
-        # # tell others about table change
+        # tell others about table change
         elif action == 'finished':
             # tell others about table change
             socketio.emit('index-list-changed',
@@ -1168,8 +1168,10 @@ def get_wait(table_id='', player_id=''):
         if player and \
                 table and \
                 player_id in table.players:
+            players_round = [x for x in game.players.values() if x.id in table.round.players]
             return jsonify({'html': render_template('round/wait-display.html',
                                                     table=table,
+                                                    players_round=players_round,
                                                     player=player)})
     # default return if nothing applies
     return redirect(url_for('index'))
