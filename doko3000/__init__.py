@@ -1157,7 +1157,6 @@ def get_players():
 
 
 @app.route('/get/wait/<table_id>/<player_id>')
-@app.route('/get/wait')
 @login_required
 def get_wait(table_id='', player_id=''):
     """
@@ -1169,7 +1168,9 @@ def get_wait(table_id='', player_id=''):
         if player and \
                 table and \
                 player_id in table.players:
-            return jsonify({'html': render_template('round/wait.html')})
+            return jsonify({'html': render_template('round/wait-display.html',
+                                                    table=table,
+                                                    player=player)})
     # default return if nothing applies
     return redirect(url_for('index'))
 

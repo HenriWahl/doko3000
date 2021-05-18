@@ -1058,7 +1058,8 @@ $(document).ready(function () {
         // confirmed round reset
         $(document).on('click', '#button_round_reset_yes', function () {
             let table_id = $(this).data('table_id')
-            $.getJSON('/get/wait', function (data, status) {
+            console.log('/get/wait/' + encodeURIComponent(table_id) + '/' + encodeURIComponent(player_id))
+            $.getJSON('/get/wait/' + encodeURIComponent(table_id) + '/' + encodeURIComponent(player_id), function (data, status) {
                 if (status == 'success') {
                     $('#modal_body').html(data.html)
                     socket.emit('ready-for-round-reset', {
@@ -1082,7 +1083,7 @@ $(document).ready(function () {
         // round finish request confirmed
         $(document).on('click', '#button_round_finish_yes', function () {
             let table_id = $(this).data('table_id')
-            $.getJSON('/get/wait', function (data, status) {
+            $.getJSON('/get/wait/' + encodeURIComponent(table_id) + '/' + encodeURIComponent(player_id), function (data, status) {
                 if (status == 'success') {
                     $('#modal_body').html(data.html)
                     socket.emit('ready-for-round-finish', {
@@ -1106,7 +1107,7 @@ $(document).ready(function () {
         // last trick undo request confirmed
         $(document).on('click', '#button_undo_yes', function () {
             let table_id = $(this).data('table_id')
-            $.getJSON('/get/wait', function (data, status) {
+            $.getJSON('/get/wait/' + encodeURIComponent(table_id) + '/' + encodeURIComponent(player_id), function (data, status) {
                 if (status == 'success') {
                     $('#modal_body').html(data.html)
                     socket.emit('ready-for-undo', {
