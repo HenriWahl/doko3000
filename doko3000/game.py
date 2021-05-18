@@ -867,23 +867,29 @@ class Round(Document3000):
         """
         undo last trick by request
         """
-        # if already some tricks exist take first player as it started the trick
-        if self.current_trick.players:
-            for player_id, card_id in zip(self.current_trick.players, self.current_trick.cards):
-                self.game.players[player_id].cards.append(card_id)
-                # decrease turn_count here to avoid extra self.save() like in increase_turn_count()
-                self.turn_count -= 1
+        # when there are already tricks gained they can be used
+        if self.trick_count > 0:
+            # if already some tricks exist take first player as it started the trick
+            if self.current_trick.players:
+                for player_id, card_id in zip(self.current_trick.players, self.current_trick.cards):
+                    self.game.players[player_id].cards.append(card_id)
+                    # decrease turn_count here to avoid extra self.save() like in increase_turn_count()
+                    self.turn_count -= 1
+                self.current_player_id = self.current_trick.players[0]
+                self.current_trick.reset()
+            # otherwise the previous trick is to be treated
+            else:
+                for player_id, card_id in zip(self.previous_trick.players, self.previous_trick.cards):
+                    self.game.players[player_id].cards.append(card_id)
+                    # decrease turn_count here to avoid extra self.save() like in increase_turn_count()
+                    self.turn_count -= 1
+                self.current_player_id = self.previous_trick.players[0]
+                self.previous_trick.reset()
+            self.save()
+        else:
+            # otherwise only the current trick need to be used
             self.current_player_id = self.current_trick.players[0]
             self.current_trick.reset()
-        # otherwise the previous trick is to be treated
-        else:
-            for player_id, card_id in zip(self.previous_trick.players, self.previous_trick.cards):
-                self.game.players[player_id].cards.append(card_id)
-                # decrease turn_count here to avoid extra self.save() like in increase_turn_count()
-                self.turn_count -= 1
-            self.current_player_id = self.previous_trick.players[0]
-            self.previous_trick.reset()
-        self.save()
 
         # recaclulate statistics due to reverted ownerships
         self.calculate_stats()
