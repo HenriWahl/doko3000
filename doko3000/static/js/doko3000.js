@@ -576,6 +576,11 @@ $(document).ready(function () {
             }
         })
 
+        // update HUD after player entered table
+        socket.on('hud-changed', function (msg) {
+                $('#hud_players').html(msg.html.hud_players)
+        })
+
 //
 // ------------ Document events ------------
 //

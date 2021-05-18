@@ -171,12 +171,28 @@ def enter_table_socket(msg):
     if msg_ok:
         if (table.locked and player.id in table.players) or \
                 not table.locked:
+            # store old table if it exists to be able to send it a updated HUD too
+            if player.table:
+                table_old = game.tables.get(player.table)
+            else:
+                table_old = None
             game.tables[table.id].add_player(player.id)
             join_room(table.id)
             # check if any formerly locked table is now emtpy and should be unlocked
             game.check_tables()
             socketio.emit('index-list-changed',
                           {'table': 'tables'})
+            # send message to old table and new one to update HUD on old table too
+            for target_table in [table_old, table]:
+                if target_table:
+                    socketio.emit('hud-changed',
+                                  {'html': {'hud_players': render_template('top/hud_players.html',
+                                                                           table=target_table,
+                                                                           player=player,
+                                                                           game=game)
+                                            }},
+                                  to=target_table.id
+                                  )
 
 
 @socketio.on('card-played')
@@ -223,8 +239,7 @@ def played_card(msg):
                                     'hud_players': render_template('top/hud_players.html',
                                                                    table=table,
                                                                    player=player,
-                                                                   game=game,
-                                                                   current_player_id=current_player_id)
+                                                                   game=game)
                                     }}
                 room = table.id
                 # debugging...
