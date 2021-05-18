@@ -37,7 +37,7 @@ class Deck:
     """
     full deck of cards - enough to be static
     """
-    if 'DOKO3000_DEVEL_REDUCED_CARD_SET' in environ:
+    if environ.get('DOKO3000_DEVEL_REDUCED_CARD_SET').lower() in ['1', 'true', 'yes']:
         SYMBOLS = ('Schell',
                    'Eichel')
         RANKS = {'Zehn': 10,
