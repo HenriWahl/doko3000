@@ -364,6 +364,15 @@ def setup_table(msg):
                 table.players = order
         elif action == 'start_table':
             table.start()
+            # when player sits on table and starts from start page it shall be redirected directly to its table
+            if player.id in table.players:
+                # get current URL
+                url_path = f'/{request.referrer.replace(request.url_root, "", 1)}'
+                # when being called from start page aka '/' just enter table if already being a member
+                if url_path == '/':
+                    socketio.emit('redirect-to-path',
+                                  {'path': f'/table/{table.id}'},
+                                  to=request.sid)
             # just tell everybody to get personal cards
             # for unknown reason this does not seem to be necessary because the connection
             # gets lost in every case and client just tries to reconnect

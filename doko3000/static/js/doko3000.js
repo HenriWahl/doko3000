@@ -578,7 +578,7 @@ $(document).ready(function () {
 
         // update HUD after player entered table
         socket.on('hud-changed', function (msg) {
-                $('#hud_players').html(msg.html.hud_players)
+            $('#hud_players').html(msg.html.hud_players)
         })
 
 
@@ -589,6 +589,13 @@ $(document).ready(function () {
             // show green check tick mark and need to escape '%'
             $('#player_waiting_check_' + msg.player_ready_id.replace(/%/g, '\\%')).removeClass('d-none')
         })
+
+        // get redirected to named path - 1st use is going to table after restart from start screen
+        socket.on('redirect-to-path', function (msg) {
+            location.assign(encodeURIComponent(msg.path))
+        })
+
+
 //
 // ------------ Document events ------------
 //
@@ -1060,7 +1067,6 @@ $(document).ready(function () {
         // confirmed round reset
         $(document).on('click', '#button_round_reset_yes', function () {
             let table_id = $(this).data('table_id')
-            console.log('/get/wait/' + encodeURIComponent(table_id) + '/' + encodeURIComponent(player_id))
             $.getJSON('/get/wait/' + encodeURIComponent(table_id) + '/' + encodeURIComponent(player_id), function (data, status) {
                 if (status == 'success') {
                     $('#modal_body').html(data.html)
