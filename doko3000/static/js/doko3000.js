@@ -654,8 +654,6 @@ $(document).ready(function () {
         $(document).on('click', '.setup-table', function () {
             $.getJSON('/setup/table/' + encodeURIComponent($(this).data('table_id')), function (data, status) {
                 if (status == 'success' && data.allowed) {
-                    // $("#modal_body").html(data.html)
-                    // $('#modal_dialog').modal('show')
                     show_dialog(data.html)
                     let dragging_players = dragula([document.querySelector('#setup_table_players'),
                         {
@@ -678,7 +676,6 @@ $(document).ready(function () {
                     })
                 }
             })
-            return false
         })
 
         // lock table number of players
