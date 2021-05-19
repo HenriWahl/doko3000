@@ -1181,7 +1181,7 @@ def get_wait(table_id='', player_id=''):
                 table and \
                 player_id in table.players:
             players_round = [x for x in game.players.values() if x.id in table.round.players]
-            return jsonify({'html': render_template('round/wait-display.html',
+            return jsonify({'html': render_template('round/wait.html',
                                                     table=table,
                                                     players_round=players_round,
                                                     player=player)})
