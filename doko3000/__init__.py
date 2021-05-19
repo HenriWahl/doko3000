@@ -642,7 +642,7 @@ def need_final_result(msg):
 @socketio.on('ready-for-next-round')
 def ready_for_next_round(msg):
     """
-    every player commits being redy for the next round
+    every player commits being ready for the next round
     """
     msg_ok, player, table = check_message(msg, player_in_round=False)
     if msg_ok:
@@ -653,16 +653,16 @@ def ready_for_next_round(msg):
             # now shifted when round is finished
             table.reset_ready_players()
             # just tell everybody to get personal cards
-        socketio.emit('start-next-round',
-                      {'table_id': table.id,
-                       'dealer': table.dealer,
-                       'html': render_template('round/info.html',
-                                               table=table,
-                                               next_players=next_players,
-                                               game=game,
-                                               number_of_rows=number_of_rows)
-                       },
-                      to=request.sid)
+            socketio.emit('start-next-round',
+                          {'table_id': table.id,
+                           'dealer': table.dealer,
+                           'html': render_template('round/info.html',
+                                                   table=table,
+                                                   next_players=next_players,
+                                                   game=game,
+                                                   number_of_rows=number_of_rows)
+                           },
+                          to=request.sid)
 
 
 @socketio.on('request-round-finish')
@@ -691,6 +691,10 @@ def round_finish(msg):
     msg_ok, player, table = check_message(msg)
     if msg_ok:
         table.add_ready_player(player.id)
+        # notify other players clients so they can update the waiting progress indicator
+        socketio.emit('ready-player-added',
+                      {'table_id': table.id,
+                       'player_ready_id': player.id})
         if set(table.players_ready) >= set(table.round.players):
             table.shift_players()
             table.reset_ready_players()
@@ -734,6 +738,10 @@ def round_reset(msg):
     msg_ok, player, table = check_message(msg)
     if msg_ok:
         table.add_ready_player(player.id)
+        # notify other players clients so they can update the waiting progress indicator
+        socketio.emit('ready-player-added',
+                      {'table_id': table.id,
+                       'player_ready_id': player.id})
         if set(table.players_ready) >= set(table.round.players):
             table.reset_round()
             socketio.emit('grab-your-cards',
@@ -770,6 +778,10 @@ def round_undo(msg):
     msg_ok, player, table = check_message(msg)
     if msg_ok:
         table.add_ready_player(player.id)
+        # notify other players clients so they can update the waiting progress indicator
+        socketio.emit('ready-player-added',
+                      {'table_id': table.id,
+                       'player_ready_id': player.id})
         if set(table.players_ready) >= set(table.round.players):
             table.round.undo()
             socketio.emit('grab-your-cards',

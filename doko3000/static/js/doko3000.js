@@ -581,6 +581,14 @@ $(document).ready(function () {
                 $('#hud_players').html(msg.html.hud_players)
         })
 
+
+        // display progress while waiting for ready players
+        socket.on('ready-player-added', function (msg) {
+            // make player name green and need to escape '%'
+            $('#player_waiting_name_' + msg.player_ready_id.replace(/%/g, '\\%')).addClass('text-success')
+            // show green check tick mark and need to escape '%'
+            $('#player_waiting_check_' + msg.player_ready_id.replace(/%/g, '\\%')).removeClass('d-none')
+        })
 //
 // ------------ Document events ------------
 //
