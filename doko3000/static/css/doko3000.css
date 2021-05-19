@@ -27,24 +27,11 @@ html, body {
     bottom: 0%;
 }
 
-/*#table {*/
-/*    !*margin-right: 0; !important;*!*/
-/*    !*padding-right: 0; !important;*!*/
-/*}*/
-
-/*#hand {*/
-/*    !*margin-right: 0; !important;*!*/
-/*    !*padding-right: 0; !important;*!*/
-/*}*/
-
 #index_menu {
-    /*position: fixed;*/
     top: 10%;
     height: 90%;
     width: 100%;
     left: 0;
-    /*z-index: 100;*/
-    /*background-color: rgba(0, 0, 0, 0.5);*/
 }
 
 /* turn ellipses-menu into smallish hamburger menulet */
@@ -53,15 +40,7 @@ html, body {
 }
 
 #hud_players {
-    /*position: fixed;*/
-    /*top: 1em;*/
-    /*height: 10%;*/
-    /*width: 80%;*/
-    /*left: 10%;*/
-    /*right: 10%;*/
-    /*z-index: 100;*/
     color: white;
-    /*background-color: rgba(0, 0, 0, 0.5);*/
     text-align: center;
 }
 
@@ -83,8 +62,6 @@ html, body {
     left: 0;
     top: 0;
     z-index: 100;
-    /*background-color: rgba(0, 0, 0, 0.5);*/
-    /*background: linear-gradient(to top, #cccccc00 0%, #111111cc 100%);*/
     background: linear-gradient(to top, #ffffff00 0%, #111111ff 100%);
 }
 
@@ -127,6 +104,19 @@ html, body {
     right: 30%;
     z-index: 500;
     background-color: rgba(0, 0, 0, 0.5);
+    cursor: default !important;
+    /* btn-block */
+    display: block;
+    /* btn-group-lg */
+    padding: .5rem 1rem;
+    font-size: 1.25rem;
+    line-height: 0;
+    border-radius: .3rem;
+    /* btn */
+    user-select: none;
+    text-align: center;
+    vertical-align: middle;
+    border: 0 solid;
 }
 
 .game-card {
@@ -150,7 +140,7 @@ html, body {
 }
 
 #table_spectator.d-none {
-        position: relative;
+    position: relative;
     width: 0%;
     height: 0%;
     z-index: 0;
