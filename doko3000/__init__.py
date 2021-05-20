@@ -375,6 +375,10 @@ def setup_table(msg):
                     socketio.emit('redirect-to-path',
                                   {'path': f'/table/{table.id}'},
                                   to=request.sid)
+                socketio.emit('redirect-to-path',
+                              {'path': f'/table/{table.id}',
+                               'url_path': url_path},
+                              to=request.sid)
             # just tell everybody to get personal cards
             # for unknown reason this does not seem to be necessary because the connection
             # gets lost in every case and client just tries to reconnect
