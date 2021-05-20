@@ -369,7 +369,8 @@ def setup_table(msg):
                 # get current URL
                 url_path = f'/{request.referrer.replace(request.url_root, "", 1)}'
                 # when being called from start page aka '/' just enter table if already being a member
-                print(url_path)
+                from sys import stderr
+                stderr.write('url_path:', url_path)
                 if url_path == '/':
                     socketio.emit('redirect-to-path',
                                   {'path': f'/table/{table.id}'},

@@ -1,26 +1,26 @@
-import os
-
+from os import environ
 
 class Config:
     TITLE = 'doko3000'
     # to be given by environment variable
-    SECRET_KEY = os.environ.get('SECRET_KEY') or 'dummykey'
+    SECRET_KEY = environ.get('SECRET_KEY') or 'dummykey'
     # database
     # CouchDB, according to https://hub.docker.com/_/couchdb
-    COUCHDB_URL = os.environ.get('COUCHDB_URL') or 'http://couchdb:5984'
-    COUCHDB_DATABASE = os.environ.get('COUCHDB_DATABASE') or 'doko3000'
-    COUCHDB_USER = os.environ.get('COUCHDB_USER') or 'admin'
-    COUCHDB_PASSWORD = os.environ.get('COUCHDB_PASSWORD') or 'doko3000'
+    COUCHDB_URL = environ.get('COUCHDB_URL') or 'http://couchdb:5984'
+    COUCHDB_DATABASE = environ.get('COUCHDB_DATABASE') or 'doko3000'
+    COUCHDB_USER = environ.get('COUCHDB_USER') or 'admin'
+    COUCHDB_PASSWORD = environ.get('COUCHDB_PASSWORD') or 'doko3000'
     # needed for CORS in flask-socketio
-    host = os.environ.get('HOST')
+    host = environ.get('HOST')
     if host:
         CORS_ALLOWED_ORIGINS = [f'http://{host}', f'https://{host}']
     else:
         CORS_ALLOWED_ORIGINS = []
-    debug = os.environ.get('DEBUG')
-    # boolize DEBUG environment variable only if a number
-    if debug and debug.isdigit():
-        DEBUG = bool(int(os.environ.get('DEBUG')))
+    debug = environ.get('DEBUG')
+    # boolize DEBUG environment variable
+    if environ.get('DEBUG') and \
+       environ.get('DEBUG').lower() in ['1', 'true', 'yes']:
+        DEBUG = True
     else:
         DEBUG = False
     # avoid browser warnings about samesite missing
