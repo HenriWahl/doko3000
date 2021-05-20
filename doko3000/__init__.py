@@ -657,17 +657,17 @@ def ready_for_next_round(msg):
         if set(table.players_ready) >= set(table.round.players):
             # now shifted when round is finished
             table.reset_ready_players()
-            # just tell everybody to get personal cards
-            socketio.emit('start-next-round',
-                          {'table_id': table.id,
-                           'dealer': table.dealer,
-                           'html': render_template('round/info.html',
-                                                   table=table,
-                                                   next_players=next_players,
-                                                   game=game,
-                                                   number_of_rows=number_of_rows)
-                           },
-                          to=request.sid)
+        # just tell everybody to get personal cards
+        socketio.emit('start-next-round',
+                      {'table_id': table.id,
+                       'dealer': table.dealer,
+                       'html': render_template('round/info.html',
+                                               table=table,
+                                               next_players=next_players,
+                                               game=game,
+                                               number_of_rows=number_of_rows)
+                       },
+                      to=request.sid)
 
 
 @socketio.on('request-round-finish')
