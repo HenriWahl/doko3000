@@ -1,6 +1,5 @@
 from time import time
-from urllib.parse import quote, \
-    unquote
+from urllib.parse import quote
 
 from flask import flash, \
     Flask, \
@@ -368,7 +367,7 @@ def setup_table(msg):
             # when player sits on table and starts from start page it shall be redirected directly to its table
             if player.id in table.players:
                 socketio.emit('redirect-to-path',
-                              {'path': f'/table/{unquote(table.id)}'},
+                              {'path': f'/table/{table.id}'},
                               to=request.sid)
             # just tell everybody to get personal cards
             # for unknown reason this does not seem to be necessary because the connection

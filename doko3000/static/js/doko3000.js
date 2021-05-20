@@ -592,9 +592,10 @@ $(document).ready(function () {
 
         // get redirected to named path - 1st use is going to table after restart from start screen
         socket.on('redirect-to-path', function (msg) {
-            console.log(msg)
-            // location.assign(encodeURIComponent(msg.path))
-            location.assign(msg.path)
+            // due to stupid design decision to use URL-encoded IDs for URLs like /table/<ID>
+            // there has to be conversion again
+            // should change in the future...
+            location.assign(encodeURIComponent(msg.path))
         })
 
 
