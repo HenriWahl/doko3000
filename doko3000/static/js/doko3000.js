@@ -594,7 +594,7 @@ $(document).ready(function () {
         socket.on('redirect-to-path', function (msg) {
             console.log(msg)
             // location.assign(encodeURIComponent(msg.path))
-            location.assign(msg.path)
+            //location.assign(msg.path)
         })
 
 
