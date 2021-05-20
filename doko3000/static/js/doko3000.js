@@ -593,7 +593,8 @@ $(document).ready(function () {
         // get redirected to named path - 1st use is going to table after restart from start screen
         socket.on('redirect-to-path', function (msg) {
             console.log(msg)
-            location.assign(encodeURIComponent(msg.path))
+            // location.assign(encodeURIComponent(msg.path))
+            location.assign(msg.path)
         })
 
 
