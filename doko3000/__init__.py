@@ -215,9 +215,9 @@ def played_card(msg):
                 card = Deck.cards[card_id]
                 player.remove_card(card.id)
                 current_player_id = table.round.get_current_player_id()
-                if table.round.player_showing_cards:
-                    # player_showing_cards contains cards-showing player_id
-                    cards_table = game.players[table.round.player_showing_cards].get_cards()
+                if table.round.player_showing_hand:
+                    # player_showing_hand contains cards-showing player_id
+                    cards_table = game.players[table.round.player_showing_hand].get_cards()
                 else:
                     cards_table = table.round.current_trick.get_cards()
                 table.increase_sync_count()
@@ -231,7 +231,7 @@ def played_card(msg):
                            'idle_players': table.idle_players,
                            'players_spectator': table.players_spectator,
                            'played_cards': table.round.played_cards,
-                           'player_showing_cards': table.round.player_showing_cards,
+                           'player_showing_hand': table.round.player_showing_hand,
                            'sync_count': table.sync_count,
                            'html': {'cards_table': render_template('cards/table.html',
                                                                    cards_table=cards_table,
@@ -480,9 +480,9 @@ def deliver_cards_to_player(msg):
         if player.id in table.round.players and \
                 player.id in table.players_active:
             cards_hand = player.get_cards()
-            if table.round.player_showing_cards:
-                # player_showing_cards contains cards-showing player_id
-                cards_table = game.players[table.round.player_showing_cards].get_cards()
+            if table.round.player_showing_hand:
+                # player_showing_hand contains cards-showing player_id
+                cards_table = game.players[table.round.player_showing_hand].get_cards()
             elif exchange_needed:
                 cards_table = game.deck.get_cards(table.round.exchange[player.party][player.id])
                 # take out the cards from player's hand which lay on table
@@ -500,7 +500,7 @@ def deliver_cards_to_player(msg):
                        'needs_dealing': table.round.needs_dealing,
                        'needs_trick_claiming': table.round.needs_trick_claiming,
                        'exchange_needed': exchange_needed,
-                       'player_showing_cards': table.round.player_showing_cards,
+                       'player_showing_hand': table.round.player_showing_hand,
                        'sync_count': table.sync_count,
                        'cards_per_player': table.round.cards_per_player,
                        'html': {'cards_hand': render_template('cards/hand.html',
@@ -525,9 +525,9 @@ def deliver_cards_to_player(msg):
         else:
             # spectator mode
             players_cards = table.round.get_players_shuffled_cards()
-            if table.round.player_showing_cards:
-                # player_showing_cards contains cards-showing player_id
-                cards_table = game.players[table.round.player_showing_cards].get_cards()
+            if table.round.player_showing_hand:
+                # player_showing_hand contains cards-showing player_id
+                cards_table = game.players[table.round.player_showing_hand].get_cards()
             else:
                 cards_table = table.round.current_trick.get_cards()
             mode = 'spectator'
@@ -1017,9 +1017,9 @@ def table(table_id=''):
         if player.id in table.round.players:
             exchange_needed = table.round.is_exchange_needed(player.id)
             cards_hand = player.get_cards()
-            if table.round.player_showing_cards:
-                # player_showing_cards contains cards-showing player_id
-                cards_table = game.players[table.round.player_showing_cards].get_cards()
+            if table.round.player_showing_hand:
+                # player_showing_hand contains cards-showing player_id
+                cards_table = game.players[table.round.player_showing_hand].get_cards()
             elif exchange_needed:
                 cards_table = game.deck.get_cards(table.round.exchange[player.party][player.id])
                 # take out the cards from player's hand which lay on table
@@ -1038,9 +1038,9 @@ def table(table_id=''):
                                    mode=mode)
         else:
             players_cards = table.round.get_players_shuffled_cards()
-            if table.round.player_showing_cards:
-                # player_showing_cards contains cards-showing player_id
-                cards_table = game.players[table.round.player_showing_cards].get_cards()
+            if table.round.player_showing_hand:
+                # player_showing_hand contains cards-showing player_id
+                cards_table = game.players[table.round.player_showing_hand].get_cards()
             else:
                 cards_table = table.round.current_trick.get_cards()
             mode = 'spectator'

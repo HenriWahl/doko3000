@@ -399,7 +399,7 @@ class Round(Document3000):
             self['stats'] = {'score': {},
                              'tricks': {}}
             # cards shown by any player - if any cards are shown it contains the cards showing player_id
-            self['player_showing_cards'] = False
+            self['player_showing_hand'] = False
             # store exchange data in extra sub-dict - defaults to empty, filled by .create_exchange()
             self['exchange'] = {}
             # initialize
@@ -534,12 +534,12 @@ class Round(Document3000):
         return self['stats']
 
     @property
-    def player_showing_cards(self):
-        return self.get('player_showing_cards', False)
+    def player_showing_hand(self):
+        return self.get('player_showing_hand', False)
 
-    @player_showing_cards.setter
-    def player_showing_cards(self, value):
-        self['player_showing_cards'] = value
+    @player_showing_hand.setter
+    def player_showing_hand(self, value):
+        self['player_showing_hand'] = value
 
     @property
     def current_trick(self):
@@ -620,7 +620,7 @@ class Round(Document3000):
         self.turn_count = 0
 
         # at the beginning of course no card is shown
-        self.player_showing_cards = False
+        self.player_showing_hand = False
 
         # at start there is no exchange
         self.reset_exchange()
@@ -1174,11 +1174,11 @@ class Table(Document3000):
         self.players_ready = []
         self.save()
 
-    def show_cards(self, player):
+    def show_hand(self, player):
         """
         show cards of player on table
         """
-        self.round.player_showing_cards = player.id
+        self.round.player_showing_hand = player.id
         self.increase_sync_count()
 
     def log(*args):
