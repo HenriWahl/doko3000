@@ -658,6 +658,7 @@ def ready_for_next_round(msg):
             # now shifted when round is finished
             table.reset_ready_players()
         # just tell everybody to get personal cards
+        # to avoid future errors: this block should NOT be indented, it is already as intended
         socketio.emit('start-next-round',
                       {'table_id': table.id,
                        'dealer': table.dealer,
