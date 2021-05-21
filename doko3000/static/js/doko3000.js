@@ -913,9 +913,6 @@ $(document).ready(function () {
         // start next round by dealing new cards
         $(document).on('click', '#button_deal_cards', function () {
             // avoid players clicking multiple times
-            // optical by bootstrap
-            $(this).addClass('disabled')
-            // really by button property
             $(this).prop('disabled', true)
             socket.emit('deal-cards', {
                 player_id: player_id,

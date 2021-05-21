@@ -96,18 +96,17 @@ html, body {
 
 .overlay-notification {
     position: fixed;
-    width: 40%;
+    width: 50%;
     height: 10%;
     top: 5%;
     bottom: 85%;
-    left: 30%;
-    right: 30%;
+    left: 25%;
+    right: 25%;
     z-index: 500;
     background-color: rgba(0, 0, 0, 0.5);
     cursor: default !important;
     /* btn-block */
     display: block;
-    /* btn-group-lg */
     padding: .5rem 1rem;
     font-size: 1.25rem;
     line-height: 0;
