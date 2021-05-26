@@ -67,20 +67,11 @@ html, body {
 
 .topbar-button {
     border-style: none;
-    z-index: 600;
+    z-index: 800;
 }
 
 .topbar-menu {
-    z-index: 600;
-}
-
-#overlay_hud {
-    position: fixed;
-    top: 10%;
-    width: 20%;
-    height: 30%;
-    right: 80%;
-    z-index: 900;
+    z-index: 800;
 }
 
 .overlay-button {
@@ -98,17 +89,15 @@ html, body {
     position: fixed;
     width: 100%;
     height: 3rem;
-    top: 2rem;
     left: 15px;
     right: 15px;
-    z-index: 400;
-
 }
 
 .turn-indicator-message {
     color: white;
     background-color:rgba(0, 0, 0, 0.5);
     cursor: default !important;
+    z-index: 200;
     /* btn-block */
     display: block;
     padding: .5rem 1rem;
@@ -118,17 +107,11 @@ html, body {
     /* btn */
     user-select: none;
     text-align: center;
-    vertical-align: middle;
     border: 0 solid;
 }
 
 .game-card {
     z-index: 99;
-}
-
-.dropdown-item {
-    z-index: 1000;
-!important;
 }
 
 .spectator-hand .img-fluid {
