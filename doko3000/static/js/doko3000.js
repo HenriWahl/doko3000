@@ -1056,6 +1056,22 @@ $(document).ready(function () {
             })
         })
 
+        // wait for beginning of next round
+        $(document).on('click', '#button_close_info', function () {
+            let table_id = $(this).data('table_id')
+            $.getJSON('/get/wait/' + encodeURIComponent(table_id) + '/' + encodeURIComponent(player_id), function (data, status) {
+                if (status == 'success') {
+                    $('#modal_body').html(data.html)
+                    socket.emit('ready-for-next-round-and-read-info', {
+                        player_id: player_id,
+                        table_id: table_id
+                    })
+                }
+            })
+            // dummy return just in case
+            return false
+        })
+
         // round reset was requested by hamburger menu
         $(document).on('click', '#menu_request_round_reset', function () {
             socket.emit('request-round-reset', {

@@ -3,7 +3,7 @@
         <span class="spinner-border align-middle"></span>
         <span class="align-middle ml-3">
             {% for player_waiting in players_round %}
-                {% if player_waiting.id == player.id or player_waiting.id in table.players_ready %}
+                {% if player_waiting.id == player.id or player_waiting.id in table.players_ready or table.players_ready|length == 0 %}
                     {% set color = 'text-success' %}
                     {% set check = '' %}
                 {% else %}

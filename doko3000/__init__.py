@@ -671,6 +671,19 @@ def ready_for_next_round(msg):
                       to=request.sid)
 
 
+@socketio.on('ready-for-next-round-and-read-info')
+def round_reset(msg):
+    """
+    players confirm restarting the round
+    """
+    msg_ok, player, table = check_message(msg)
+    if msg_ok:
+        # notify other players clients so they can update the waiting progress indicator
+        socketio.emit('ready-player-added',
+                      {'table_id': table.id,
+                       'player_ready_id': player.id})
+
+
 @socketio.on('request-round-finish')
 def request_round_finish(msg):
     """
