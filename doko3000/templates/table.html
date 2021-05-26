@@ -35,13 +35,14 @@
         <button class="btn btn-info btn-block btn-lg p-4"><strong>Austauschen</strong></button>
     </div>
 
-    <div class="overlay-notification row">
-    <span class="col-1 col-sm-2 col-md-3 col-lg-4"></span>
-    <button id="turn_indicator" class="overlay-notification-message col-10 col-sm-8 col-md-6 col-lg-4
+    <div id="turn_indicator" class="overlay-notification row
     {% if table.round.current_player_id != current_user.id or table.round.needs_trick_claiming or table.round.player_showing_hand or exchange_needed or cards_table|length >= 4 %}
     d-none
     {% endif %}
-    ">Du bist am Zug
+    ">
+    <span class="col-1 col-sm-2 col-md-3 col-lg-4"></span>
+    <button class="overlay-notification-message col-10 col-sm-8 col-md-6 col-lg-4">
+        Du bist am Zug
     </button>
 </div>
     <div class="container-fluid row p-0 m-0" id="topbar">
