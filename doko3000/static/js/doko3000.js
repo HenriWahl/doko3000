@@ -352,7 +352,7 @@ $(document).ready(function () {
         // click on deal-again-button
         socket.on('confirm-deal-again', function (msg) {
             if (check_sync(msg)) {
-                $('.overlay-notification').addClass('d-none')
+                $('#turn_indicator').addClass('d-none')
                 show_dialog(msg.html)
             }
         })
@@ -389,7 +389,7 @@ $(document).ready(function () {
         // tells players the next round is beginning
         socket.on('start-next-round', function (msg) {
             $('.overlay-button').addClass('d-none')
-            $('.overlay-notification').addClass('d-none')
+            $('#turn_indicator').addClass('d-none')
             // dialog has to be shown before buttons are treated
             show_dialog(msg.html)
             if (player_id == msg.dealer) {
@@ -406,7 +406,7 @@ $(document).ready(function () {
         socket.on('round-reset-requested', function (msg) {
             if (is_normal_player()) {
                 $('.overlay-button').addClass('d-none')
-                $('.overlay-notification').addClass('d-none')
+                $('#turn_indicator').addClass('d-none')
                 show_dialog(msg.html)
             }
         })
@@ -415,7 +415,7 @@ $(document).ready(function () {
         socket.on('round-finish-requested', function (msg) {
             if (is_normal_player()) {
                 $('.overlay-button').addClass('d-none')
-                $('.overlay-notification').addClass('d-none')
+                $('#turn_indicator').addClass('d-none')
                 show_dialog(msg.html)
             }
         })
@@ -424,7 +424,7 @@ $(document).ready(function () {
         socket.on('undo-requested', function (msg) {
             if (is_normal_player()) {
                 $('.overlay-button').addClass('d-none')
-                $('.overlay-notification').addClass('d-none')
+                $('#turn_indicator').addClass('d-none')
                 show_dialog(msg.html)
             }
         })
@@ -432,7 +432,7 @@ $(document).ready(function () {
         // if player wants to show cards confirm it
         socket.on('confirm-show-hand', function (msg) {
             if (check_sync(msg)) {
-                $('.overlay-notification').addClass('d-none')
+                $('#turn_indicator').addClass('d-none')
                 show_dialog(msg.html)
             }
         })
@@ -440,7 +440,7 @@ $(document).ready(function () {
         // intended exchange is about to be confirmed
         socket.on('confirm-exchange', function (msg) {
             if (check_sync(msg)) {
-                $('.overlay-notification').addClass('d-none')
+                $('#turn_indicator').addClass('d-none')
                 // there is no need anymore to deal cards
                 $('#button_deal_cards_again').addClass('d-none')
                 show_dialog(msg.html)
@@ -498,7 +498,7 @@ $(document).ready(function () {
         // peer of a player gets asked if exchange is wanted
         socket.on('exchange-ask-player2', function (msg) {
             if (check_sync(msg)) {
-                $('.overlay-notification').addClass('d-none')
+                $('#turn_indicator').addClass('d-none')
                 // there is no need anymore to deal cards
                 $('#button_deal_cards_again').addClass('d-none')
                 show_dialog(msg.html)
@@ -508,7 +508,7 @@ $(document).ready(function () {
         // player 2 doesn't want to exchange cards with player1
         socket.on('exchange-player1-player2-deny', function (msg) {
             if (check_sync(msg)) {
-                $('.overlay-notification').addClass('d-none')
+                $('#turn_indicator').addClass('d-none')
                 show_dialog(msg.html)
                 table_mode = 'normal'
             }
@@ -516,7 +516,7 @@ $(document).ready(function () {
 
         // player1 shall start card exchange
         socket.on('exchange-player1-start', function (msg) {
-            $('.overlay-notification').addClass('d-none')
+            $('#turn_indicator').addClass('d-none')
             $('#button_exchange_send_cards').removeClass('d-none')
             table_mode = 'exchange'
             cards_locked = false
@@ -524,7 +524,7 @@ $(document).ready(function () {
 
         // exchanged cards arrive at exchanging peer
         socket.on('exchange-player-cards-to-client', function (msg) {
-            $('.overlay-notification').addClass('d-none')
+            $('#turn_indicator').addClass('d-none')
             if (msg.table_mode == 'exchange') {
                 $('#button_exchange_send_cards').removeClass('d-none')
                 table_mode = msg.table_mode
