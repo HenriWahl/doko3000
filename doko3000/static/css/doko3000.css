@@ -96,14 +96,19 @@ html, body {
 
 .overlay-notification {
     position: fixed;
-    width: 50%;
-    height: 10%;
-    top: 5%;
-    bottom: 85%;
-    left: 25%;
-    right: 25%;
+    width: 100%;
+    height: 3rem;
+    top: 2rem;
+    /*bottom: 85%;*/
+    left: 15px;
+    right: 15px;
     z-index: 500;
-    background-color: rgba(0, 0, 0, 0.5);
+
+}
+
+.overlay-notification-message {
+    color: white;
+    background-color:rgba(0, 0, 0, 0.5);
     cursor: default !important;
     /* btn-block */
     display: block;
