@@ -1,40 +1,41 @@
-<div id="hud_players" class="row">
-    <div class="col-12 align-items-center">
-        {% for hud_player_id in table.round.trick_order %}
-            <span id="hud_player_{{ hud_player_id }}" class="hud_player mx-1 text-nowrap
+<div id="hud_players" class="row w-100">
+    <div class="row w-100">
+        <div class="col-12 align-items-center">
+            {% for hud_player_id in table.round.trick_order %}
+                <span id="hud_player_{{ hud_player_id }}" class="hud_player mx-1 text-nowrap
         {% if loop.index0 == table.round.current_trick.cards|length %}
         hud-player-active
         {% endif %}
     ">{{ game.players[hud_player_id].name }}
-                {% if table.round.stats['tricks'][hud_player_id] > 0 %}
-                    {% if loop.index0 == table.round.current_trick.cards|length %}
-                        {% set badge_class = 'dark' %}
-                    {% else %}
-                        {% set badge_class = 'light' %}
+                    {% if table.round.stats['tricks'][hud_player_id] > 0 %}
+                        {% if loop.index0 == table.round.current_trick.cards|length %}
+                            {% set badge_class = 'dark' %}
+                        {% else %}
+                            {% set badge_class = 'light' %}
+                        {% endif %}
+                        <span class="badge badge-{{ badge_class }} align-text-top">{{ table.round.stats['tricks'][hud_player_id] }}</span>
                     {% endif %}
-                    <span class="badge badge-{{ badge_class }} align-text-top">{{ table.round.stats['tricks'][hud_player_id] }}</span>
-                {% endif %}
     </span>
-
-        {% endfor %}
-
-        {% for idle_player_id in table.idle_players %}
-            <span class="text-muted mr-1">
+            {% endfor %}
+            {% for idle_player_id in table.idle_players %}
+                <span class="text-muted mr-1">
             {{ game.players[idle_player_id].name }}
         </span>
-        {% endfor %}
+            {% endfor %}
+        </div>
     </div>
-
-    <div class="mt-4">
-        <span class="col-sm-1 col-md-2 col-lg-3 col-xl-4"></span>
-        <div id="turn_indicator" class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-4
-    {% if table.round.current_player_id != current_user.id or table.round.needs_trick_claiming or table.round.player_showing_hand or exchange_needed or cards_table|length >= 4 %}
+    <div id="turn_indicator" class="mt-4 row w-100
+{% if table.round.current_player_id != current_user.id or table.round.needs_trick_claiming or table.round.player_showing_hand or exchange_needed or cards_table|length >= 4 %}
     d-none
     {% endif %}
     ">
+        <div class="col-sm-1 col-md-2 col-lg-3 col-xl-4"></div>
+        <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-4">
             <button class="turn-indicator-message">
                 Du bist am Zug
             </button>
         </div>
+        <div class="col-sm-1 col-md-3 col-lg-3 col-xl-4"></div>
+
     </div>
 </div>

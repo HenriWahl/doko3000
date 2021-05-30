@@ -236,7 +236,7 @@ $(document).ready(function () {
         socket.on('card-played-by-player', function (msg) {
             if (check_sync(msg)) {
                 current_player_id = msg.current_player_id
-                $('#hud_players').html(msg.html.hud_players)
+                $('#hud_players').replaceWith(msg.html.hud_players)
                 $('.overlay-button').addClass('d-none')
 
                 // either #table_spectator or #table are visible and may show the cards on table
@@ -311,7 +311,7 @@ $(document).ready(function () {
                 }
                 $('.mode-spectator').addClass('d-none')
                 $('.mode-player').removeClass('d-none')
-                $('#hud_players').html(msg.html.hud_players)
+                $('#hud_players').replaceWith(msg.html.hud_players)
                 $('#table').html(msg.html.cards_table)
                 $('#table_spectator').html('')
                 $('#hand').html('')
@@ -341,7 +341,7 @@ $(document).ready(function () {
                 // $('#modal_dialog').modal('hide')
                 $('.mode-spectator').removeClass('d-none')
                 $('.mode-player').addClass('d-none')
-                $('#hud_players').html(msg.html.hud_players)
+                $('#hud_players').replaceWith(msg.html.hud_players)
                 $('#table').html('')
                 $('#table_spectator').html(msg.html.cards_table)
                 $('#hand_spectator_upper').html(msg.html.cards_hand_spectator_upper)
@@ -368,7 +368,7 @@ $(document).ready(function () {
                 } else {
                     $('#turn_indicator').addClass('d-none')
                 }
-                $('#hud_players').html(msg.html.hud_players)
+                $('#hud_players').replaceWith(msg.html.hud_players)
                 if (msg.score[player_id] > 0) {
                     $('#cards_stack_img').attr('title', msg.score[player_id])
                     $('#cards_stack').removeClass('d-none')
@@ -578,7 +578,7 @@ $(document).ready(function () {
 
         // update HUD after player entered table
         socket.on('hud-changed', function (msg) {
-            $('#hud_players').html(msg.html.hud_players)
+            $('#hud_players').replaceWith(msg.html.hud_players)
         })
 
 
