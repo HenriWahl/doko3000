@@ -365,17 +365,19 @@ def setup_table(msg):
         elif action == 'start_table':
             table.start()
             # when player sits on table and starts from start page it shall be redirected directly to its table
-            if player.id in table.players:
+            if not '/table/' in request.referrer and \
+                    player.id in table.players:
                 socketio.emit('redirect-to-path',
                               {'path': f'/table/{table.id}'},
                               to=request.sid)
-            # just tell everybody to get personal cards
-            # for unknown reason this does not seem to be necessary because the connection
-            # gets lost in every case and client just tries to reconnect
-            socketio.emit('grab-your-cards',
-                          {'table_id': table.id,
-                           'sync_count': table.sync_count},
-                          to=table.id)
+            else:
+                # just tell everybody to get personal cards
+                # for unknown reason this does not seem to be necessary because the connection
+                # gets lost in every case and client just tries to reconnect
+                socketio.emit('grab-your-cards',
+                              {'table_id': table.id,
+                               'sync_count': table.sync_count},
+                              to=table.id)
         # tell others about table change
         elif action == 'finished':
             # tell others about table change
