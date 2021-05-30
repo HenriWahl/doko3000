@@ -587,7 +587,7 @@ def claim_trick(msg):
     if msg_ok:
         table.increase_sync_count()
         if not table.round.is_finished:
-            # when ownership changes it does at previous trick because normally there is a new one created
+            # when ownership channew one beges it does at previous trick because normally there is a new one created
             # so the new one becomes the current one and the reclaimed is the previous
             if not len(table.round.current_trick.cards) == 0:
                 # makes player owner of trick
