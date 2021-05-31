@@ -173,6 +173,7 @@ $(document).ready(function () {
                 let table_id = $('#needs_welcome').data('table_id')
                 $.getJSON('/get/welcome/' + encodeURIComponent(table_id), function (data, status) {
                     if (status == 'success') {
+                        console.log($('#needs_welcome').data('state'))
                         show_dialog(data.html)
                     }
                 })
@@ -338,6 +339,7 @@ $(document).ready(function () {
         // anser to my-cards-please if player is only spectator
         socket.on('sorry-no-cards-for-you', function (msg) {
             if (check_sync(msg)) {
+                console.log(msg)
                 $('#modal_dialog').modal('hide')
                 $('.mode-spectator').removeClass('d-none')
                 $('.mode-player').addClass('d-none')

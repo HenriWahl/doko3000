@@ -524,7 +524,7 @@ def deliver_cards_to_player(msg):
                 table.log(event, payload, room)
             # ...and action
             socketio.emit(event, payload, to=room)
-        else:
+        elif not table.needs_welcome:
             # spectator mode
             players_cards = table.round.get_players_shuffled_cards()
             if table.round.player_showing_hand:
