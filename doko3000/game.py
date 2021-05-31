@@ -1143,6 +1143,8 @@ class Table(Document3000):
         """
         completely new start from setup dialog
         """
+        # reset ready players
+        self.players_ready = []
         # beginning order is the same like players without spectators
         self.order = self.players_active[:]
         # new sync count

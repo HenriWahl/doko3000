@@ -656,9 +656,9 @@ def ready_for_next_round(msg):
         table.add_ready_player(player.id)
         next_players = table.order[:4]
         number_of_rows = max(len(next_players), len(table.idle_players))
-        if set(table.players_ready) >= set(table.round.players):
-            # now shifted when round is finished
-            table.reset_ready_players()
+        # if set(table.players_ready) >= set(table.round.players):
+        #     # now shifted when round is finished
+        #     table.reset_ready_players()
         # just tell everybody to get personal cards
         # to avoid future errors: this block should NOT be indented, it is already as intended
         socketio.emit('start-next-round',
