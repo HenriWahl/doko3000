@@ -338,7 +338,7 @@ $(document).ready(function () {
         // anser to my-cards-please if player is only spectator
         socket.on('sorry-no-cards-for-you', function (msg) {
             if (check_sync(msg)) {
-                // $('#modal_dialog').modal('hide')
+                $('#modal_dialog').modal('hide')
                 $('.mode-spectator').removeClass('d-none')
                 $('.mode-player').addClass('d-none')
                 $('#hud_players').html(msg.html.hud_players)
