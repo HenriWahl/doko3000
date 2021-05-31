@@ -1,36 +1,26 @@
-<div id="hud_players">
-    <div class="row w-100">
-        <div class="col-12">
-            {% for hud_player_id in table.round.trick_order %}
-                <span id="hud_player_{{ hud_player_id }}" class="hud_player mx-1 text-nowrap
+<div class="row w-100">
+    <div class="col-12">
+        {% for hud_player_id in table.round.trick_order %}
+            <span id="hud_player_{{ hud_player_id }}" class="hud_player mx-1 text-nowrap
         {% if loop.index0 == table.round.current_trick.cards|length %}
         hud-player-active
         {% endif %}
     ">{{ game.players[hud_player_id].name }}
-                    {% if table.round.stats['tricks'][hud_player_id] > 0 %}
-                        {% if loop.index0 == table.round.current_trick.cards|length %}
-                            {% set badge_class = 'dark' %}
-                        {% else %}
-                            {% set badge_class = 'light' %}
-                        {% endif %}
-                        <span class="badge badge-{{ badge_class }} align-text-top">{{ table.round.stats['tricks'][hud_player_id] }}</span>
+                {% if table.round.stats['tricks'][hud_player_id] > 0 %}
+                    {% if loop.index0 == table.round.current_trick.cards|length %}
+                        {% set badge_class = 'dark' %}
+                    {% else %}
+                        {% set badge_class = 'light' %}
                     {% endif %}
+                    <span class="badge badge-{{ badge_class }} align-text-top">{{ table.round.stats['tricks'][hud_player_id] }}</span>
+                {% endif %}
     </span>
-            {% endfor %}
-            {% for idle_player_id in table.idle_players %}
-                <span class="text-muted mr-1">
+        {% endfor %}
+        {% for idle_player_id in table.idle_players %}
+            <span class="text-muted mr-1">
             {{ game.players[idle_player_id].name }}
         </span>
-            {% endfor %}
-        </div>
-    </div>
-    <div id="turn_indicator" class="mt-4 row w-100 d-none">
-        <div class="col-sm-1 col-md-2 col-lg-3 col-xl-4"></div>
-        <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-4">
-            <button class="turn-indicator-message">
-                Du bist am Zug
-            </button>
-        </div>
-        <div class="col-sm-1 col-md-3 col-lg-3 col-xl-4"></div>
+        {% endfor %}
     </div>
 </div>
+

@@ -35,13 +35,31 @@
         <button class="btn btn-info btn-block btn-lg p-4"><strong>Austauschen</strong></button>
     </div>
 
-</div>
+    </div>
     <div class="container-fluid row p-0 m-0" id="topbar">
         <div class="col-3 p-0">
             {% include "top/menu.html" %}
         </div>
         <div class="col-6 p-0 mt-2">
-            {% include 'top/hud_players.html' %}
+            <div id="hud_players">
+                {% include 'top/hud_players.html' %}
+            </div>
+            <div id="turn_indicator" class="mt-4 row
+    {% if table.round.current_player_id != current_user.id or table.round.needs_trick_claiming or table.round.player_showing_hand or exchange_needed or cards_table|length >= 4 %}
+    d-none
+    {% endif %}
+    ">
+                <div class="col-sm-1 col-md-2 col-lg-3"></div>
+                <div class="col-12 col-sm-10 col-md-8 col-lg-6">
+                    <button class="turn-indicator-message d-sm-none">
+                        Du bist am Zug
+                    </button>
+                    <button class="turn-indicator-message d-none d-sm-block h5">
+                        Du bist am Zug
+                    </button>
+                </div>
+                <div class="col-sm-1 col-md-3 col-lg-3 col-xl-4"></div>
+            </div>
         </div>
         <div class="col-3 p-0">
             {% include "top/player.html" %}

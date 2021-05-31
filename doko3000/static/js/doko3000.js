@@ -236,7 +236,7 @@ $(document).ready(function () {
         socket.on('card-played-by-player', function (msg) {
             if (check_sync(msg)) {
                 current_player_id = msg.current_player_id
-                $('#hud_players').replaceWith(msg.html.hud_players)
+                $('#hud_players').html(msg.html.hud_players)
                 $('.overlay-button').addClass('d-none')
 
                 // either #table_spectator or #table are visible and may show the cards on table
@@ -292,6 +292,9 @@ $(document).ready(function () {
                 } else {
                     cards_locked = false
                 }
+                $('.mode-spectator').addClass('d-none')
+                $('.mode-player').removeClass('d-none')
+                $('#hud_players').html(msg.html.hud_players)
                 if (player_id == current_player_id && !cards_locked && !msg.exchange_needed) {
                     $('#turn_indicator').removeClass('d-none')
                 } else {
@@ -309,9 +312,6 @@ $(document).ready(function () {
                 } else {
                     $('#button_claim_trick').addClass('d-none')
                 }
-                $('.mode-spectator').addClass('d-none')
-                $('.mode-player').removeClass('d-none')
-                $('#hud_players').html(msg.html.hud_players)
                 $('#table').html(msg.html.cards_table)
                 $('#table_spectator').html('')
                 $('#hand').html('')
