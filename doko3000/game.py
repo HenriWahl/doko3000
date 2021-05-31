@@ -597,9 +597,13 @@ class Round(Document3000):
         """
         check if round is over - reached when all cards are played
         """
-        # because claiming of the last trick can just happen at reaching its end
-        # it has to get added +1
-        return self.cards_per_player == self.trick_count + 1
+        # count number of already played cards
+        played_cards = []
+        # pick tricks with already played cards
+        for trick in [x for x in self.tricks.values() if len(x.cards) > 0]:
+            played_cards += trick.cards
+        # just return if all cards are played or not
+        return len(played_cards) == len(self.cards)
 
     @property
     def is_reset(self):
