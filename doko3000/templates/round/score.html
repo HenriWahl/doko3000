@@ -20,9 +20,9 @@
                     <div class="d-flex flex-wrap">
                         {% for trick in table.round.tricks.values() %}
                             {% if trick.owner and trick.owner == player_id %}
-                                <ul class="list-group list-group-horizontal no-border mr-2 mb-2 border-0 w-25 zoom">
+                                <ul class="list-group list-group-horizontal white-border mr-2 mb-2 border-0 w-25 zoom">
                                 {% for card in trick.cards %}
-                                    <li class="list-group-item p-0 no-border bg-transparent">
+                                    <li class="list-group-item p-0 white-border bg-transparent">
                                     <img class="img-fluid" src="/static/img/cards/{{ game.deck.cards[card].name }}.png">
                                     </li>
                                 {% endfor %}
