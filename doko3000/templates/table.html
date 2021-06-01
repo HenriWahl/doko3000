@@ -41,14 +41,18 @@
             {% include "top/menu.html" %}
         </div>
         <div class="col-6 p-0 mt-2">
+
+            {% set turn_indicator = '' %}
+            {% if table.round.current_player_id != current_user.id or table.round.needs_trick_claiming or table.round.player_showing_hand or exchange_needed or cards_table|length >= 4 %}
+                {% set turn_indicator = 'd-none' %}
+            {% endif %}
+            {% if table.round.current_player_id == current_user.id and table.round.needs_trick_claiming %}
+                {% set turn_indicator = '' %}
+            {% endif %}
             <div id="hud_players">
                 {% include 'top/hud_players.html' %}
             </div>
-            <div id="turn_indicator" class="mt-4 row
-    {% if table.round.current_player_id != current_user.id or table.round.needs_trick_claiming or table.round.player_showing_hand or exchange_needed or cards_table|length >= 4 %}
-    d-none
-    {% endif %}
-    ">
+            <div id="turn_indicator" class="mt-4 row {{ turn_indicator }}">
                 <div class="col-sm-1 col-md-2 col-lg-3"></div>
                 <div class="col-12 col-sm-10 col-md-8 col-lg-6">
                     <button class="turn-indicator-message d-sm-none">
