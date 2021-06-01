@@ -214,6 +214,17 @@ class Player(UserMixin, Document3000):
                 return True
         return False
 
+    @property
+    def tricks(self):
+        """
+        return current tricks of player, e.g. for displaying then at score dialog
+        """
+        tricks = []
+        if self.is_playing:
+            for trick in [x for x in self.game.tables[self.table].round.tricks.values() if x.owner==self.id]:
+                tricks.append(trick)
+        return tricks
+
     def get_id(self):
         """
         for Flask load user mechanism

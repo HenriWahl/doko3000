@@ -8,7 +8,7 @@
     <tbody>
     {% for player_id in table.round.stats['score'] %}
         <tr>
-            <td>
+            <td class="w-75">
                 <h5>
                     {{ game.players[player_id].name }}
                     {% if game.players[player_id].eichel_ober_count > 0 %}
@@ -17,8 +17,25 @@
                         {% endfor %}
                     {% endif %}
                 </h5>
+                    <div class="d-flex">
+                        {% for trick in table.round.tricks.values() %}
+                            {% if trick.owner and trick.owner == player_id %}
+                                <ul class="list-group list-group-horizontal no-border mr-1 mb-1 border-0 col-4">
+                                {% for card in trick.cards %}
+                                    <li class="list-group-item p-0 no-border">
+                                    <img class="img-fluid" src="/static/img/cards/{{ game.deck.cards[card].name }}.png">
+                                    </li>
+                                {% endfor %}
+                                </ul>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
             </td>
-            <td><h5>{{ table.round.stats['score'][player_id] }}</h5></td>
+            <td class="w-25">
+                <h5>
+                    {{ table.round.stats['score'][player_id] }}
+                </h5>
+            </td>
         </tr>
     {% endfor %}
     </tbody>

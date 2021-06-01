@@ -85,14 +85,6 @@ html, body {
     z-index: 300;
 }
 
-/*.turn-indicator-area {*/
-/*    position: fixed;*/
-/*    width: 100%;*/
-/*    height: 3rem;*/
-/*    left: 15px;*/
-/*    right: 15px;*/
-/*}*/
-
 .turn-indicator-message {
     color: white;
     background-color:rgba(0, 0, 0, 0.5);
@@ -131,4 +123,8 @@ html, body {
     width: 0%;
     height: 0%;
     z-index: 0;
+}
+
+.no-border {
+    border: 0 solid;
 }
