@@ -83,20 +83,16 @@ class Player(UserMixin, Document3000):
     due to CouchDB Document class everything is now a dictionary
     """
 
-    def __init__(self, player_id='', document=None, game=None):
+    def __init__(self, name='', document=None, game=None):
         # access to global game
         self.game = game
-        if player_id:
-            # ID for CouchDB - quoted and without '/', to be transported easily througout HTML and JS
-            player_id_quoted = quote(player_id, safe='')
-            self['_id'] = f"player-{player_id_quoted}"
+        if name:
+            self['_id'] = self.game.create_player_id()
             super().__init__(database=self.game.db.database)
-            # ID for flask-login
-            self['id'] = player_id_quoted
             # type is for CouchDB
             self['type'] = 'player'
             # name of player - to become somewhat more natural
-            self['name'] = player_id
+            self['name'] = name
             # password hash
             self['password_hash'] = ''
             # current set of cards
@@ -117,11 +113,12 @@ class Player(UserMixin, Document3000):
             # get data from given document
             self.update(document)
             # id needed for flask-login
-            self['id'] = self['_id'].split('player-', 1)[1]
+            #self['id'] = self['_id'].split('player-', 1)[1]
 
     @property
     def id(self):
-        return self.get('id', '')
+        # meanwhile returns CouchDB ID
+        return self.get('_id', '')
 
     @property
     def name(self):
@@ -227,7 +224,7 @@ class Player(UserMixin, Document3000):
 
     def get_id(self):
         """
-        for Flask load user mechanism
+        for Flask load user mechanism - has to be overloading
         """
         return self.id
 
@@ -1256,22 +1253,24 @@ class Game:
         # check for locked tables
         self.check_tables()
 
-    def add_player(self, player_id='', password='', spectator_only=False, allows_spectators=False, is_admin=False):
+    def add_player(self, name='', password='', spectator_only=False, allows_spectators=False, is_admin=False):
         """
         adds a new player
         """
-        if player_id:
+        if name:
             # quoted player_id for CouchDB, HTML and JS
-            player_id_quoted = quote(player_id, safe='')
-            if player_id_quoted not in self.players:
-                self.players[player_id_quoted] = Player(player_id=player_id, game=self)
+            # player_id_quoted = quote(name, safe='')
+            if name not in [x.name for x in self.players.values()]:
+                player = Player(name=name, game=self)
+                self.players[player.id] = player
                 if password:
-                    self.players[player_id_quoted].set_password(password)
+                    self.players[player.id].set_password(password)
                 if is_admin:
-                    self.players[player_id_quoted].is_admin = True
-                self.players[player_id_quoted].is_spectator_only = spectator_only
-                self.players[player_id_quoted].allows_spectators = allows_spectators
-            return self.players.get(player_id_quoted)
+                    self.players[player.id].is_admin = True
+                self.players[player.id].is_spectator_only = spectator_only
+                self.players[player.id].allows_spectators = allows_spectators
+            # return self.players.get(player.id)
+            return True
 
     def add_table(self, table_id=''):
         """
@@ -1299,6 +1298,16 @@ class Game:
             self.players[player_id].delete()
             self.players.pop(player_id)
             return True
+        return False
+
+    def get_player(self, name):
+        """
+        return player object for login
+        """
+        # filter players
+        players_list = [x for x in self.players.values() if x.name == name]
+        if len(players_list) == 1:
+            return players_list[0]
         return False
 
     def delete_table(self, table_id):
@@ -1333,3 +1342,12 @@ class Game:
         for table in self.tables.values():
             if table.locked and len(table.players) == 0:
                 table.locked = False
+
+    def create_player_id(self):
+        """
+        creates id for player and checks if it already exists
+        """
+        player_id = 1
+        while f'player-{str(player_id)}' in self.players:
+            player_id += 1
+        return f'player-{str(player_id)}'

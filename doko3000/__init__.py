@@ -1,5 +1,4 @@
 from time import time
-from urllib.parse import quote
 
 from flask import flash, \
     Flask, \
@@ -126,7 +125,7 @@ def who_am_i():
     provide the important informartion about the game
     """
     if not current_user.is_anonymous:
-        player = game.players.get(current_user.get_id())
+        player = game.players.get(current_user.id)
         if player:
             table = game.tables.get(player.table)
             # store player session for later usage
@@ -209,7 +208,7 @@ def played_card(msg):
                 len(cards_hand_ids) + 1 == len(player.cards):
             if card_id in Deck.cards and \
                     len(table.round.current_trick.cards) < 4 and \
-                    current_user.get_id() == player.id == table.round.current_player_id:
+                    current_user.id == player.id == table.round.current_player_id:
                 table.round.current_trick.add_turn(player.id, card_id)
                 table.round.increase_turn_count()
                 card = Deck.cards[card_id]
@@ -972,11 +971,10 @@ def login():
     non-logged-in players get redirected here
     """
     form_values = list(request.values.keys())
-    if 'player_id' in form_values and \
+    if 'name' in form_values and \
             'password' in form_values and \
             'submit' in form_values:
-        player_id_quoted = quote(request.values['player_id'], safe='')
-        player = game.players.get(player_id_quoted)
+        player = game.get_player(request.values['name'])
         if player:
             if not player.check_password(request.values['password']):
                 flash('Falsches Passwort :-(')
@@ -1007,7 +1005,7 @@ def index():
     """
     players = sorted(game.players.values(), key=lambda x: x.name.lower())
     tables = sorted(game.tables.values(), key=lambda x: x.name.lower())
-    player = game.players.get(current_user.id)
+    player = game.players.get(current_user.get_id())
     if player:
         return render_template('index.html',
                                tables=tables,
@@ -1025,7 +1023,7 @@ def table(table_id=''):
     """
     one of the tables to play
     """
-    player = game.players.get(current_user.get_id())
+    player = game.players.get(current_user.id)
     table = game.tables.get(table_id)
     if player and \
             table and \
@@ -1082,10 +1080,10 @@ def setup_table(table_id):
     if is_xhr(request) and table_id:
         table = game.tables.get(table_id)
         if table and \
-                current_user.get_id() in game.players and \
-                (current_user.get_id() in table.players or
+                current_user.id in game.players and \
+                (current_user.id in table.players or
                  not table.locked):
-            player = game.players[current_user.get_id()]
+            player = game.players[current_user.id]
             return jsonify({'allowed': True,
                             'html': render_template('setup/table.html',
                                                     table=table,
@@ -1245,7 +1243,7 @@ def create_player():
         if request.method == 'GET':
             return jsonify({'html': render_template('index/create_player.html')})
         elif request.method == 'POST':
-            new_player_id = request.values.get('new_player_id')
+            new_player_name = request.values.get('new_player_name')
             new_player_password = request.values.get('new_player_password')
             new_player_spectator_only = request.values.get('switch_new_player_is_spectator_only', False)
             # convert 'on' from HTML form to True
@@ -1255,13 +1253,13 @@ def create_player():
             # convert 'on' from HTML form to True
             if new_player_allows_spectators:
                 new_player_allows_spectators = True
-            if new_player_id:
-                if new_player_id in game.players:
+            if new_player_name:
+                if game.get_player(new_player_name):
                     return jsonify({'status': 'error',
                                     'message': 'Diesen Spieler gibt es schon :-('})
                 else:
                     if new_player_password:
-                        game.add_player(player_id=new_player_id,
+                        game.add_player(name=new_player_name,
                                         password=new_player_password,
                                         spectator_only=new_player_spectator_only,
                                         allows_spectators=new_player_allows_spectators)
