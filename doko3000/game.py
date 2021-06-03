@@ -425,6 +425,14 @@ class Round(Document3000):
             # cards per player depend on playing with '9'-cards or not
             self.cards_per_player = len(self.cards) // 4
 
+        # id migration fix - append "player-"
+        # pretty silly but pragmatical, because the user base might be pretty small still
+        # so no big problems are to be expected
+        # no extra .save() needed because the next one will happen soon
+        self.players = [f'player-{x}' if not x.startswith('b') else x for x in self.players]
+        if self.trick_order:
+            self.trick_order = [f'player-{x}' if not x.startswith('b') else x for x in self.trick_order]
+
         # just make sure tricks exist
         # + 1 due to range counting behaviour
         # no matter if '9'-cards are used just create database entries for all 12 possible tricks
