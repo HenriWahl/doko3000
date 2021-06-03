@@ -933,6 +933,11 @@ class Table(Document3000):
         # yes, table_id
         if self['id'] not in self.game.rounds:
             self.add_round()
+        # id migration fix - append "player-"
+        # pretty silly but pragmatical, because the user base might be pretty small still
+        # so no big problems are to be expected
+        # no extra .save() needed because the next one will happen soon
+        self.players = [f'player-{x}' if not x.startswith('b') else x for x in self.players]
 
     @property
     def id(self):
@@ -1224,7 +1229,7 @@ class Game:
         """
         # get players from CouchDB
         self.players = {}
-        for player_id, document in self.db.filter_by_type('player').items():
+        for player_id, document in self.db.filter_by_type_real_id('player').items():
             self.players[player_id] = Player(document=document, game=self)
 
         # if no player exists create a dummy admin account

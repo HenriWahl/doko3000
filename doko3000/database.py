@@ -34,11 +34,18 @@ class DB:
         """
         result = {}
         for item in Query(self.database, selector={'type': filter_type}).result:
-            #item_id = item['_id'].split(f'{filter_type}-', 1)[1]
-            #result[item_id] = item
-            result[item['_id']] = item
+            item_id = item['_id'].split(f'{filter_type}-', 1)[1]
+            result[item_id] = item
         return result
 
+    def filter_by_type_real_id(self, filter_type):
+        """
+        retrieves documents filtered by type and ordered by non-document-id
+        """
+        result = {}
+        for item in Query(self.database, selector={'type': filter_type}).result:
+            result[item['_id']] = item
+        return result
 
 class Document3000(Document):
     """
