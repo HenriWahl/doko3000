@@ -5,7 +5,6 @@ from os import environ
 from random import seed, \
     shuffle
 from time import time
-from urllib.parse import quote
 
 # from cloudant.document import Document
 from flask_login import UserMixin
@@ -38,7 +37,7 @@ class Deck:
     full deck of cards - enough to be static
     """
     if environ.get('DOKO3000_DEVEL_REDUCED_CARD_SET') and \
-       environ.get('DOKO3000_DEVEL_REDUCED_CARD_SET').lower() in ['1', 'true', 'yes']:
+            environ.get('DOKO3000_DEVEL_REDUCED_CARD_SET').lower() in ['1', 'true', 'yes']:
         SYMBOLS = ('Schell',
                    'Eichel')
         RANKS = {'Zehn': 10,
@@ -112,8 +111,6 @@ class Player(UserMixin, Document3000):
             super().__init__(database=self.game.db.database, document_id=document['_id'])
             # get data from given document
             self.update(document)
-            # id needed for flask-login
-            #self['id'] = self['_id'].split('player-', 1)[1]
 
     @property
     def id(self):
@@ -218,7 +215,7 @@ class Player(UserMixin, Document3000):
         """
         tricks = []
         if self.is_playing:
-            for trick in [x for x in self.game.tables[self.table].round.tricks.values() if x.owner==self.id]:
+            for trick in [x for x in self.game.tables[self.table].round.tricks.values() if x.owner == self.id]:
                 tricks.append(trick)
         return tricks
 
@@ -425,13 +422,17 @@ class Round(Document3000):
             # cards per player depend on playing with '9'-cards or not
             self.cards_per_player = len(self.cards) // 4
 
-        # id migration fix - append "player-"
+        # id migration fix - prepend "player-"
         # pretty silly but pragmatical, because the user base might be pretty small still
         # so no big problems are to be expected
         # no extra .save() needed because the next one will happen soon
-        self.players = [f'player-{x}' if not x.startswith('b') else x for x in self.players]
+        self.players = [f'player-{x}' if not x.startswith('player-') else x for x in self.players]
         if self.trick_order:
-            self.trick_order = [f'player-{x}' if not x.startswith('b') else x for x in self.trick_order]
+            self.trick_order = [f'player-{x}' if not x.startswith('player-') else x for x in self.trick_order]
+        self.stats['score'] = {(f'player-{x}' if not x.startswith('player-') else x): y for (x, y) in
+                               self.stats['score'].items()}
+        self.stats['tricks'] = {(f'player-{x}' if not x.startswith('player-') else x): y for (x, y) in
+                                self.stats['tricks'].items()}
 
         # just make sure tricks exist
         # + 1 due to range counting behaviour
@@ -525,7 +526,7 @@ class Round(Document3000):
         return self.get('exchange', {})
 
     @exchange.setter
-    def exchange (self, value):
+    def exchange(self, value):
         self['exchange'] = value
 
     @property
@@ -598,8 +599,8 @@ class Round(Document3000):
         returns information if there is need for the claim trick button
         """
         return self.turn_count % 4 == 0 and \
-                self. turn_count > 0 and \
-                not self.is_finished
+               self.turn_count > 0 and \
+               not self.is_finished
 
     @property
     def card_played(self):
@@ -712,8 +713,8 @@ class Round(Document3000):
             for card_id in range(self.cards_per_player):
                 # cards are given to players, segmented by range
                 player.cards = self.cards[player_count * self.cards_per_player:
-                                                                player_count * self.cards_per_player +
-                                                                self.cards_per_player]
+                                          player_count * self.cards_per_player +
+                                          self.cards_per_player]
             # raise counter for Eichel Ober cards if player has one or two
             for card_id in player.cards:
                 if Deck.cards[card_id].name == 'Eichel-Ober':
@@ -783,7 +784,7 @@ class Round(Document3000):
         """
         player = self.game.players[player_id]
         if not self.has_hochzeit() and \
-            player.party not in self.exchange:
+                player.party not in self.exchange:
             # just containing exchanged cards per exchange peer
             self.exchange[player.party] = {player.id: [],
                                            self.get_peer(player.id): []}
@@ -913,18 +914,17 @@ class Table(Document3000):
     """
     Definition of a table used by group of players
     """
-    def __init__(self, table_id='', document=None, game=None):
+
+    def __init__(self, name='', document=None, game=None):
+        # access to global game
         self.game = game
-        if table_id:
-            # ID for CouchDB - quoted and without '/'
-            table_id_quoted = quote(table_id, safe='')
-            self['_id'] = f'table-{table_id_quoted}'
+        if name:
+            self['_id'] = self.game.create_table_id()
             super().__init__(database=self.game.db.database)
             # type is for CouchDB
             self['type'] = 'table'
             # what table?
-            self['id'] = table_id_quoted
-            self['name'] = table_id
+            self['name'] = name
             # sync starts with 1
             self['sync_count'] = 1
             # default empty
@@ -939,17 +939,18 @@ class Table(Document3000):
             # get data from given document
             self.update(document)
         # yes, table_id
-        if self['id'] not in self.game.rounds:
+        if self.id not in self.game.rounds:
             self.add_round()
-        # id migration fix - append "player-"
+        # id migration fix - prepend "player-"
         # pretty silly but pragmatical, because the user base might be pretty small still
         # so no big problems are to be expected
         # no extra .save() needed because the next one will happen soon
-        self.players = [f'player-{x}' if not x.startswith('b') else x for x in self.players]
+        self.players = [f'player-{x}' if not x.startswith('player-') else x for x in self.players]
 
     @property
     def id(self):
-        return self['id']
+        # meanwhile returns CouchDB ID
+        return self.get('_id', '')
 
     @property
     def name(self):
@@ -1178,7 +1179,7 @@ class Table(Document3000):
         """
         self.players = self.players_active[1:] + self.players_active[:1] + self.players_spectator
         self.order = self.players_active[:]
-        #self.order = self.order[1:] + self.order[:1]
+        # self.order = self.order[1:] + self.order[:1]
         self.save()
 
     def add_ready_player(self, player_id):
@@ -1220,6 +1221,8 @@ class Game:
         """
         self.db = db
         self.deck = Deck()
+        # load game objects from CouchDB
+        self.load_from_db()
 
     @property
     def needs_welcome(self):
@@ -1245,7 +1248,7 @@ class Game:
             self.add_player(player_id='admin',
                             password='admin',
                             is_admin=True,
-                            spectator_only=True,
+                            is_spectator_only=True,
                             allows_spectators=True)
 
         # all tricks belonging to certain rounds shall stay in CouchDB too
@@ -1263,16 +1266,17 @@ class Game:
         for table_id, document in self.db.filter_by_type('table').items():
             self.tables[table_id] = Table(document=document, game=self)
 
+        # convert IDs from legacy url encoded to numerical
+        self.convert_ids()
+
         # check for locked tables
         self.check_tables()
 
-    def add_player(self, name='', password='', spectator_only=False, allows_spectators=False, is_admin=False):
+    def add_player(self, name='', password='', is_spectator_only=False, allows_spectators=False, is_admin=False):
         """
         adds a new player
         """
         if name:
-            # quoted player_id for CouchDB, HTML and JS
-            # player_id_quoted = quote(name, safe='')
             if name not in [x.name for x in self.players.values()]:
                 player = Player(name=name, game=self)
                 self.players[player.id] = player
@@ -1280,20 +1284,24 @@ class Game:
                     self.players[player.id].set_password(password)
                 if is_admin:
                     self.players[player.id].is_admin = True
-                self.players[player.id].is_spectator_only = spectator_only
+                self.players[player.id].is_spectator_only = is_spectator_only
                 self.players[player.id].allows_spectators = allows_spectators
-            # return self.players.get(player.id)
-            return True
+            # return player object to get is ID for example
+            return player
+        # when no name was given
+        return False
 
-    def add_table(self, table_id=''):
+    def add_table(self, name=''):
         """
         adds a new table (to sit and play on, no database table!)
         """
-        if table_id:
-            table_id_quoted = quote(table_id, safe='')
-            if table_id_quoted not in self.tables:
-                self.tables[table_id_quoted] = Table(table_id=table_id, game=self)
-            return self.tables.get(table_id_quoted)
+        if name:
+            if name not in [x.name for x in self.tables.values()]:
+                table = Table(name=name, game=self)
+                self.tables[table.id] = table
+            return table
+        # when no name was given
+        return False
 
     def delete_player(self, player_id):
         """
@@ -1364,3 +1372,37 @@ class Game:
         while f'player-{str(player_id)}' in self.players:
             player_id += 1
         return f'player-{str(player_id)}'
+
+    def create_table_id(self):
+        """
+        creates id for table and checks if it already exists
+        """
+        table_id = 1
+        while f'table-{str(table_id)}' in self.tables:
+            table_id += 1
+        return f'table-{str(table_id)}'
+
+    def convert_ids(self):
+        """
+        find and convert old url encoded IDs to numerical ones
+        """
+        converted_players = {}
+        converted_tables = {}
+        # first collect all legacy players and tables
+        for player in self.players.values():
+            if '%' in player.id:
+                converted_player = self.add_player(name=player.name,
+                                                   password=player.password,
+                                                   is_spectator_only=player.is_spectator_only,
+                                                   allows_spectators=player.allows_spectators,
+                                                   is_admin=player.is_admin)
+                if converted_player:
+                    converted_players[converted_player.id] = converted_player
+        for table in self.tables.values():
+            if '%' in table.id:
+                converted_table = self.add_table(name=table.name)
+                if converted_table:
+                    converted_tables[converted_table.id] = converted_table
+        # correct ID of players and tables in collection
+
+        pass

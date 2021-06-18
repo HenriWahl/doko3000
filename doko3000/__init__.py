@@ -49,7 +49,8 @@ socketio = SocketIO(app,
 
 # load game data from database after initialization
 game = Game(db)
-game.load_from_db()
+# done by __init__() already
+#game.load_from_db()
 
 # keep track of players and their sessions to enable directly emitting a socketio event
 sessions = {}
@@ -234,7 +235,8 @@ def played_card(msg):
                            'sync_count': table.sync_count,
                            'html': {'cards_table': render_template('cards/table.html',
                                                                    cards_table=cards_table,
-                                                                   table=table),
+                                                                   table=table,
+                                                                   game=game),
                                     'hud_players': render_template('top/hud_players.html',
                                                                    table=table,
                                                                    player=player,
@@ -1261,7 +1263,7 @@ def create_player():
                     if new_player_password:
                         game.add_player(name=new_player_name,
                                         password=new_player_password,
-                                        spectator_only=new_player_spectator_only,
+                                        is_spectator_only=new_player_spectator_only,
                                         allows_spectators=new_player_allows_spectators)
                         return jsonify({'status': 'ok'})
                     else:

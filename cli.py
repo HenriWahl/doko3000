@@ -12,7 +12,8 @@ from doko3000.game import Game
 app = DummyApp()
 db = DB(app)
 game = Game(db)
-game.load_from_db()
+# done by __init__() already
+#game.load_from_db()
 
 @click.group()
 def run():

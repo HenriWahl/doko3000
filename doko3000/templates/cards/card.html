@@ -10,7 +10,7 @@
      data-table_id="{{ table.id }}"
      data-cards_timestamp="{{ table.round.cards_timestamp }}"
         {% if played_by %}
-     title="{{ played_by }}"
+     title="{{ game.players[played_by].name }}"
         {% endif %}}
 >
     <picture>
