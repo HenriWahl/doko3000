@@ -28,9 +28,9 @@ class DB:
     def add(self, data):
         self.database.create_document(data.__dict__)
 
-    def filter_by_type(self, filter_type):
+    def filter_by_type_as_number(self, filter_type):
         """
-        retrieves documents filtered by type and ordered by non-document-id
+        retrieves documents filtered by type and ordered by non-document-id as number for tricks and rounds
         """
         result = {}
         for item in Query(self.database, selector={'type': filter_type}).result:
@@ -40,7 +40,7 @@ class DB:
 
     def filter_by_type_real_id(self, filter_type):
         """
-        retrieves documents filtered by type and ordered by non-document-id
+        retrieves documents filtered by type and ordered by document-id, needed for tables and players
         """
         result = {}
         for item in Query(self.database, selector={'type': filter_type}).result:

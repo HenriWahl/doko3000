@@ -1253,17 +1253,17 @@ class Game:
 
         # all tricks belonging to certain rounds shall stay in CouchDB too
         self.tricks = {}
-        for trick_id, document in self.db.filter_by_type('trick').items():
+        for trick_id, document in self.db.filter_by_type_as_number('trick').items():
             self.tricks[trick_id] = Trick(document=document, game=self)
 
         # get rounds from CouchDB
         self.rounds = {}
-        for round_id, document in self.db.filter_by_type('round').items():
+        for round_id, document in self.db.filter_by_type_as_number('round').items():
             self.rounds[round_id] = Round(document=document, game=self)
 
         # store tables
         self.tables = {}
-        for table_id, document in self.db.filter_by_type('table').items():
+        for table_id, document in self.db.filter_by_type_real_id('table').items():
             self.tables[table_id] = Table(document=document, game=self)
 
         # convert IDs from legacy url encoded to numerical
@@ -1272,12 +1272,12 @@ class Game:
         # check for locked tables
         self.check_tables()
 
-    def add_player(self, name='', password='', is_spectator_only=False, allows_spectators=False, is_admin=False):
+    def add_player(self, name='', password='', is_spectator_only=False, allows_spectators=False, is_admin=False, convert=False):
         """
         adds a new player
         """
         if name:
-            if name not in [x.name for x in self.players.values()]:
+            if name not in [x.name for x in self.players.values()] or convert:
                 player = Player(name=name, game=self)
                 self.players[player.id] = player
                 if password:
@@ -1286,20 +1286,21 @@ class Game:
                     self.players[player.id].is_admin = True
                 self.players[player.id].is_spectator_only = is_spectator_only
                 self.players[player.id].allows_spectators = allows_spectators
-            # return player object to get is ID for example
-            return player
+                # return player object to get its ID for example
+                return player
         # when no name was given
         return False
 
-    def add_table(self, name=''):
+    def add_table(self, name='', convert=False):
         """
         adds a new table (to sit and play on, no database table!)
         """
         if name:
-            if name not in [x.name for x in self.tables.values()]:
+            if name not in [x.name for x in self.tables.values()] or convert:
                 table = Table(name=name, game=self)
                 self.tables[table.id] = table
-            return table
+                # return table object to get its ID for example
+                return table
         # when no name was given
         return False
 
@@ -1389,20 +1390,29 @@ class Game:
         converted_players = {}
         converted_tables = {}
         # first collect all legacy players and tables
-        for player in self.players.values():
+        for player in list(self.players.values()):
             if '%' in player.id:
                 converted_player = self.add_player(name=player.name,
-                                                   password=player.password,
                                                    is_spectator_only=player.is_spectator_only,
                                                    allows_spectators=player.allows_spectators,
-                                                   is_admin=player.is_admin)
+                                                   is_admin=player.is_admin,
+                                                   convert=True)
                 if converted_player:
-                    converted_players[converted_player.id] = converted_player
-        for table in self.tables.values():
+                    # save hashed password too
+                    converted_player.password_hash = player.password_hash
+                    # add to converted players
+                    converted_players[player.id] = converted_player
+        for table in list(self.tables.values()):
             if '%' in table.id:
-                converted_table = self.add_table(name=table.name)
+                converted_table = self.add_table(name=table.name,
+                                                 convert=True)
                 if converted_table:
-                    converted_tables[converted_table.id] = converted_table
+                    converted_tables[table.id] = converted_table
         # correct ID of players and tables in collection
+        for player_id_old, converted_player in converted_players.items():
+            if self.players[converted_player.id].table in converted_tables:
+                self.players[converted_player.id].table = converted_tables[self.players[converted_player.id].table].id
+
+
 
         pass

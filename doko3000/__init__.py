@@ -49,8 +49,6 @@ socketio = SocketIO(app,
 
 # load game data from database after initialization
 game = Game(db)
-# done by __init__() already
-#game.load_from_db()
 
 # keep track of players and their sessions to enable directly emitting a socketio event
 sessions = {}
