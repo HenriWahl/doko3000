@@ -171,7 +171,7 @@ $(document).ready(function () {
         if ($('#needs_welcome').data('state')) {
             if ($('#needs_welcome').data('table_id') != undefined) {
                 let table_id = $('#needs_welcome').data('table_id')
-                $.getJSON('/get/welcome/' + encodeURIComponent(table_id), function (data, status) {
+                $.getJSON('/get/welcome/' + table_id, function (data, status) {
                     if (status == 'success') {
                         show_dialog(data.html)
                     }
@@ -594,8 +594,8 @@ $(document).ready(function () {
         socket.on('redirect-to-path', function (msg) {
             // due to stupid design decision to use URL-encoded IDs for URLs like /table/<ID>
             // there has to be conversion again
-            // should change in the future...
-            location.assign(encodeURIComponent(msg.path))
+            // should change in the future... - DONE!
+            location.assign(msg.path)
         })
 
 
@@ -611,13 +611,13 @@ $(document).ready(function () {
                 table_id: table_id
             })
             // ask server via json if player is allowed to enter or not
-            return $.getJSON('/enter/table/' + encodeURIComponent(table_id) + '/' + encodeURIComponent(player_id),
+            return $.getJSON('/enter/table/' + table_id + '/' + player_id,
                 function (data, status) {
                     if (status == 'success' && data.allowed) {
                         // return data.allowed
                         if (data.allowed) {
                             // use location.assign to avoid browsers decoding the id
-                            location.assign('/table/' + encodeURIComponent(table_id))
+                            location.assign('/table/' + table_id)
                         }
                     }
                     // dummy return just in case
@@ -662,7 +662,7 @@ $(document).ready(function () {
 
         // draggable list of players in setup table dialog
         $(document).on('click', '.setup-table', function () {
-            $.getJSON('/setup/table/' + encodeURIComponent($(this).data('table_id')), function (data, status) {
+            $.getJSON('/setup/table/' + $(this).data('table_id'), function (data, status) {
                 if (status == 'success' && data.allowed) {
                     show_dialog(data.html)
                     let dragging_players = dragula([document.querySelector('#setup_table_players'),
@@ -845,7 +845,7 @@ $(document).ready(function () {
         // delete a player in the players list
         $(document).on('click', '.delete-player', function () {
             if (player_id != $(this).data('player_id')) {
-                $.getJSON('/delete/player/' + encodeURIComponent($(this).data('player_id')),
+                $.getJSON('/delete/player/' + $(this).data('player_id'),
                     function (data, status) {
                         if (status == 'success') {
                             show_dialog(data.html)
@@ -858,11 +858,10 @@ $(document).ready(function () {
         $(document).on('click', '#button_really_delete_player', function () {
             if (player_id != $(this).data('player_id')) {
                 // once again the .post + 'json' move
-                $.post('/delete/player/' + encodeURIComponent($(this).data('player_id')),
+                $.post('/delete/player/' + $(this).data('player_id'),
                     function (data, status) {
                         if (status == 'success') {
                             if (data.status == 'ok') {
-                                // $('#list_players').html(data.html)
                                 $('#modal_dialog').modal('hide')
                                 // tell other admins about player changes
                                 socket.emit('setup-player-change', {
@@ -880,7 +879,7 @@ $(document).ready(function () {
 
         // delete a player in the players list
         $(document).on('click', '.button-delete-table', function () {
-            $.getJSON('/delete/table/' + encodeURIComponent($(this).data('table_id')),
+            $.getJSON('/delete/table/' + $(this).data('table_id'),
                 function (data, status) {
                     if (status == 'success') {
                         show_dialog(data.html)
@@ -891,7 +890,7 @@ $(document).ready(function () {
         // really delete table after safety dialog
         $(document).on('click', '#button_really_delete_table', function () {
             // once again the .post + 'json' move
-            $.post('/delete/table/' + encodeURIComponent($(this).data('table_id')),
+            $.post('/delete/table/' + $(this).data('table_id'),
                 function (data, status) {
                     if (status == 'success') {
                         if (data.status == 'ok') {
@@ -922,7 +921,7 @@ $(document).ready(function () {
 
         // table settings button starts table with new settings
         $(document).on('click', '#button_start_table', function () {
-            $.getJSON('/start/table/' + encodeURIComponent($(this).data('table_id')),
+            $.getJSON('/start/table/' + $(this).data('table_id'),
                 function (data, status) {
                     if (status == 'success') {
                         show_dialog(data.html)
@@ -953,7 +952,7 @@ $(document).ready(function () {
 
         // player setup
         $(document).on('click', '.setup-player', function () {
-            $.getJSON('/setup/player/' + encodeURIComponent($(this).data('player_id')), function (data, status) {
+            $.getJSON('/setup/player/' + $(this).data('player_id'), function (data, status) {
                 if (status == 'success') {
                     show_dialog(data.html)
                 }
@@ -1059,7 +1058,7 @@ $(document).ready(function () {
         // wait for beginning of next round
         $(document).on('click', '#button_close_info', function () {
             let table_id = $(this).data('table_id')
-            $.getJSON('/get/wait/' + encodeURIComponent(table_id) + '/' + encodeURIComponent(player_id), function (data, status) {
+            $.getJSON('/get/wait/' + table_id + '/' + player_id, function (data, status) {
                 if (status == 'success') {
                     $('#modal_body').html(data.html)
                     socket.emit('ready-for-next-round-and-read-info', {
@@ -1083,7 +1082,7 @@ $(document).ready(function () {
         // confirmed round reset
         $(document).on('click', '#button_round_reset_yes', function () {
             let table_id = $(this).data('table_id')
-            $.getJSON('/get/wait/' + encodeURIComponent(table_id) + '/' + encodeURIComponent(player_id), function (data, status) {
+            $.getJSON('/get/wait/' + table_id + '/' + player_id, function (data, status) {
                 if (status == 'success') {
                     $('#modal_body').html(data.html)
                     socket.emit('ready-for-round-reset', {
@@ -1107,7 +1106,7 @@ $(document).ready(function () {
         // round finish request confirmed
         $(document).on('click', '#button_round_finish_yes', function () {
             let table_id = $(this).data('table_id')
-            $.getJSON('/get/wait/' + encodeURIComponent(table_id) + '/' + encodeURIComponent(player_id), function (data, status) {
+            $.getJSON('/get/wait/' + table_id + '/' + player_id, function (data, status) {
                 if (status == 'success') {
                     $('#modal_body').html(data.html)
                     socket.emit('ready-for-round-finish', {
@@ -1131,7 +1130,7 @@ $(document).ready(function () {
         // last trick undo request confirmed
         $(document).on('click', '#button_undo_yes', function () {
             let table_id = $(this).data('table_id')
-            $.getJSON('/get/wait/' + encodeURIComponent(table_id) + '/' + encodeURIComponent(player_id), function (data, status) {
+            $.getJSON('/get/wait/' + table_id + '/' + player_id, function (data, status) {
                 if (status == 'success') {
                     $('#modal_body').html(data.html)
                     socket.emit('ready-for-undo', {
