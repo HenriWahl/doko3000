@@ -810,7 +810,7 @@ $(document).ready(function () {
 
         // take player id as password
         $(document).on('click', '#button_password_from_player', function () {
-            $('#new_player_password').val($('#new_player_id').val())
+            $('#new_player_password').val($('#new_player_name').val())
             return false
         })
 
