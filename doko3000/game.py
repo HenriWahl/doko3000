@@ -1267,7 +1267,7 @@ class Game:
             self.tables[table_id] = Table(document=document, game=self)
 
         # convert IDs from legacy url encoded to numerical
-        self.convert_ids()
+        self.remove_encoded_ids()
 
         # check for locked tables
         self.check_tables()
@@ -1383,36 +1383,16 @@ class Game:
             table_id += 1
         return f'table-{str(table_id)}'
 
-    def convert_ids(self):
+    def remove_encoded_ids(self):
         """
-        find and convert old url encoded IDs to numerical ones
+        find and remove old URL-encoded IDs
         """
         converted_players = {}
         converted_tables = {}
         # first collect all legacy players and tables
         for player in list(self.players.values()):
             if '%' in player.id:
-                converted_player = self.add_player(name=player.name,
-                                                   is_spectator_only=player.is_spectator_only,
-                                                   allows_spectators=player.allows_spectators,
-                                                   is_admin=player.is_admin,
-                                                   convert=True)
-                if converted_player:
-                    # save hashed password too
-                    converted_player.password_hash = player.password_hash
-                    # add to converted players
-                    converted_players[player.id] = converted_player
+                self.delete_player(player.id)
         for table in list(self.tables.values()):
             if '%' in table.id:
-                converted_table = self.add_table(name=table.name,
-                                                 convert=True)
-                if converted_table:
-                    converted_tables[table.id] = converted_table
-        # correct ID of players and tables in collection
-        for player_id_old, converted_player in converted_players.items():
-            if self.players[converted_player.id].table in converted_tables:
-                self.players[converted_player.id].table = converted_tables[self.players[converted_player.id].table].id
-
-
-
-        pass
+                self.delete_table(table.id)

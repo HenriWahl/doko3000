@@ -1293,7 +1293,7 @@ def delete_player(player_id):
                 table = game.tables.get(player.table)
                 return jsonify({'status': 'error',
                                 'html': render_template('error.html',
-                                                        message=f"{player.id} sitzt noch am Tisch {table.name}.")})
+                                                        message=f"{player.name} sitzt noch am Tisch {table.name}.")})
         elif request.method == 'POST':
             if game.delete_player(player.id):
                 return jsonify({'status': 'ok'})
