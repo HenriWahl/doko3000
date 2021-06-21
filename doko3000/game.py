@@ -1312,9 +1312,15 @@ class Game:
             if player_id in table.players:
                 table.players.pop(table.players.index(player_id))
                 table.save()
+            if player_id in table.order:
+                table.order.pop(table.players.index(player_id))
+                table.save()
         for round in self.rounds.values():
             if player_id in round.players:
                 round.players.pop(round.players.index(player_id))
+                round.save()
+            if player_id in round.trick_order:
+                round.trick_order.pop(round.trick_order.index(player_id))
                 round.save()
         if player_id in self.players:
             self.players[player_id].delete()
@@ -1387,12 +1393,13 @@ class Game:
         """
         find and remove old URL-encoded IDs
         """
-        converted_players = {}
-        converted_tables = {}
-        # first collect all legacy players and tables
+        # first collect all legacy players...
         for player in list(self.players.values()):
             if '%' in player.id:
+                # kick it out
                 self.delete_player(player.id)
+        # ...and tables
         for table in list(self.tables.values()):
             if '%' in table.id:
+                # kick it out
                 self.delete_table(table.id)
