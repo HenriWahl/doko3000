@@ -1013,8 +1013,8 @@ def index():
                                player=player,
                                game=game,
                                title=f"{app.config['TITLE']}")
-    # default return if nothing applies
-    return redirect(url_for('index'))
+    # default return if nothing applies - better do login
+    return redirect(url_for('login'))
 
 
 @app.route('/table/<table_id>')

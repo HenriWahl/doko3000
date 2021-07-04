@@ -115,7 +115,7 @@ class Player(UserMixin, Document3000):
     @property
     def id(self):
         # meanwhile returns CouchDB ID
-        return self.get('_id', '')
+        return self.get('_id').replace('player-', '')
 
     @property
     def name(self):
@@ -426,13 +426,13 @@ class Round(Document3000):
         # pretty silly but pragmatical, because the user base might be pretty small still
         # so no big problems are to be expected
         # no extra .save() needed because the next one will happen soon
-        self.players = [f'player-{x}' if not x.startswith('player-') else x for x in self.players]
-        if self.trick_order:
-            self.trick_order = [f'player-{x}' if not x.startswith('player-') else x for x in self.trick_order]
-        self.stats['score'] = {(f'player-{x}' if not x.startswith('player-') else x): y for (x, y) in
-                               self.stats['score'].items()}
-        self.stats['tricks'] = {(f'player-{x}' if not x.startswith('player-') else x): y for (x, y) in
-                                self.stats['tricks'].items()}
+        # self.players = [f'player-{x}' if not x.startswith('player-') else x for x in self.players]
+        # if self.trick_order:
+        #     self.trick_order = [f'player-{x}' if not x.startswith('player-') else x for x in self.trick_order]
+        # self.stats['score'] = {(f'player-{x}' if not x.startswith('player-') else x): y for (x, y) in
+        #                        self.stats['score'].items()}
+        # self.stats['tricks'] = {(f'player-{x}' if not x.startswith('player-') else x): y for (x, y) in
+        #                         self.stats['tricks'].items()}
 
         # just make sure tricks exist
         # + 1 due to range counting behaviour
@@ -945,12 +945,13 @@ class Table(Document3000):
         # pretty silly but pragmatical, because the user base might be pretty small still
         # so no big problems are to be expected
         # no extra .save() needed because the next one will happen soon
-        self.players = [f'player-{x}' if not x.startswith('player-') else x for x in self.players]
+        # self.players = [f'player-{x}' if not x.startswith('player-') else x for x in self.players]
+        # self.order = [f'player-{x}' if not x.startswith('player-') else x for x in self.order]
 
     @property
     def id(self):
         # meanwhile returns CouchDB ID
-        return self.get('_id', '')
+        return self.get('_id').lstrip('table-')
 
     @property
     def name(self):
@@ -1240,7 +1241,7 @@ class Game:
         """
         # get players from CouchDB
         self.players = {}
-        for player_id, document in self.db.filter_by_type_real_id('player').items():
+        for player_id, document in self.db.filter_by_type_as_number('player').items():
             self.players[player_id] = Player(document=document, game=self)
 
         # if no player exists create a dummy admin account
@@ -1258,15 +1259,16 @@ class Game:
 
         # get rounds from CouchDB
         self.rounds = {}
+        # for round_id, document in self.db.filter_by_type_as_number('round').items():
         for round_id, document in self.db.filter_by_type_as_number('round').items():
             self.rounds[round_id] = Round(document=document, game=self)
 
         # store tables
         self.tables = {}
-        for table_id, document in self.db.filter_by_type_real_id('table').items():
+        for table_id, document in self.db.filter_by_type_as_number('table').items():
             self.tables[table_id] = Table(document=document, game=self)
 
-        # convert IDs from legacy url encoded to numerical
+        # remove legacy URL-encoded IDs
         self.remove_encoded_ids()
 
         # check for locked tables
@@ -1313,7 +1315,7 @@ class Game:
                 table.players.pop(table.players.index(player_id))
                 table.save()
             if player_id in table.order:
-                table.order.pop(table.players.index(player_id))
+                table.order.pop(table.order.index(player_id))
                 table.save()
         for round in self.rounds.values():
             if player_id in round.players:
@@ -1401,5 +1403,7 @@ class Game:
         # ...and tables
         for table in list(self.tables.values()):
             if '%' in table.id:
+                # remove all players to make table deletable
+                table.players = table.order = table.round.players = []
                 # kick it out
                 self.delete_table(table.id)
