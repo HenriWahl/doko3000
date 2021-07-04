@@ -606,6 +606,9 @@ $(document).ready(function () {
         // player enters table
         $(document).on('click', '.button-enter-table', function () {
             let table_id = $(this).data('table_id')
+
+            console.log('enter-table')
+
             socket.emit('enter-table', {
                 player_id: player_id,
                 table_id: table_id
@@ -613,6 +616,7 @@ $(document).ready(function () {
             // ask server via json if player is allowed to enter or not
             return $.getJSON('/enter/table/' + table_id + '/' + player_id,
                 function (data, status) {
+                console.log(data, status)
                     if (status == 'success' && data.allowed) {
                         // return data.allowed
                         if (data.allowed) {

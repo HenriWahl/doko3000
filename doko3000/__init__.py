@@ -83,11 +83,11 @@ def check_message(msg, player_in_round=True, player_at_table=True):
     check if message is correctly sent from player
     tries to avoid permanently repeated code
 
-    player_in_round is important if there are more than 4 players - the fifth is at taböle but not in round
+    player_in_round is important if there are more than 4 players - the fifth is at table but not in round
     player_at_table is a condition when player not yet belongs to table
     """
-    player = game.players.get(msg.get('player_id'))
-    table = game.tables.get(msg.get('table_id'))
+    player = game.players.get(str(msg.get('player_id')))
+    table = game.tables.get(str(msg.get('table_id')))
     if player_in_round:
         if player and \
                 table and \
@@ -106,6 +106,7 @@ def check_message(msg, player_in_round=True, player_at_table=True):
         else:
             return False, player, table
     else:
+        pass
         if player and \
                 table and \
                 player.id == current_user.id:
@@ -1114,7 +1115,7 @@ def setup_player(player_id):
 @login_required
 def enter_table_json(table_id='', player_id=''):
     """
-    give #buttom_enter_table permission or not, depending on player membership or table lockedness
+    give enter table permission or not, depending on player membership or table lockedness
     support for socket.io request, just telling .button-enter-table if its link can be followed or not
     """
     if is_xhr(request) and table_id:
