@@ -86,8 +86,8 @@ def check_message(msg, player_in_round=True, player_at_table=True):
     player_in_round is important if there are more than 4 players - the fifth is at table but not in round
     player_at_table is a condition when player not yet belongs to table
     """
-    player = game.players.get(str(msg.get('player_id')))
-    table = game.tables.get(str(msg.get('table_id')))
+    player = game.players.get(msg.get('player_id'))
+    table = game.tables.get(msg.get('table_id'))
     if player_in_round:
         if player and \
                 table and \
@@ -106,7 +106,6 @@ def check_message(msg, player_in_round=True, player_at_table=True):
         else:
             return False, player, table
     else:
-        pass
         if player and \
                 table and \
                 player.id == current_user.id:
@@ -322,72 +321,72 @@ def setup_table(msg):
     """
     table can be set up from lobby so it makes no sense to limit setup by using check_message()
     """
-    player = game.players.get(msg.get('player_id'))
-    table = game.tables.get(msg.get('table_id'))
-    action = msg.get('action')
-    if player and table:
-        if action == 'remove_player':
-            table.remove_player(player.id)
+    msg_ok, player, table = check_message(msg)
+    if msg_ok:
+        action = msg.get('action')
+        if player and table:
+            if action == 'remove_player':
+                table.remove_player(player.id)
+                # tell others about table change
+                socketio.emit('index-list-changed',
+                              {'table': 'tables'})
+            elif action == 'lock_table':
+                table.locked = True
+                # tell others about table change
+                socketio.emit('index-list-changed',
+                              {'table': 'tables'})
+            elif action == 'unlock_table':
+                table.locked = False
+                # tell others about table change
+                socketio.emit('index-list-changed',
+                              {'table': 'tables'})
+            elif action == 'play_with_9':
+                table.round.with_9 = True
+            elif action == 'play_without_9':
+                table.round.with_9 = False
+            elif action == 'allow_undo':
+                table.round.allow_undo = True
+            elif action == 'prohibit_undo':
+                table.round.allow_undo = False
+            elif action == 'allow_exchange':
+                table.round.allow_exchange = True
+            elif action == 'prohibit_exchange':
+                table.round.allow_exchange = False
+            elif action == 'enable_debugging':
+                table.is_debugging = True
+            elif action == 'disable_debugging':
+                table.is_debugging = False
+            elif action == 'changed_order':
+                order = msg.get('order')
+                # in case there are spectator_only players just check if current active players are included
+                if set(table.order).issubset(set(order)):
+                    table.players = order
+            elif action == 'start_table':
+                table.start()
+                # when player sits on table and starts from start page it shall be redirected directly to its table
+                if not '/table/' in request.referrer and \
+                        player.id in table.players:
+                    socketio.emit('redirect-to-path',
+                                  {'path': f'/table/{table.id}'},
+                                  to=request.sid)
+                else:
+                    # just tell everybody to get personal cards
+                    # for unknown reason this does not seem to be necessary because the connection
+                    # gets lost in every case and client just tries to reconnect
+                    socketio.emit('grab-your-cards',
+                                  {'table_id': table.id,
+                                   'sync_count': table.sync_count},
+                                  to=table.id)
+            # tell others about table change
+            elif action == 'finished':
+                # tell others about table change
+                socketio.emit('index-list-changed',
+                              {'table': 'tables'})
+        # new tables do not have an id
+        elif player and action == 'finished':
             # tell others about table change
             socketio.emit('index-list-changed',
                           {'table': 'tables'})
-        elif action == 'lock_table':
-            table.locked = True
-            # tell others about table change
-            socketio.emit('index-list-changed',
-                          {'table': 'tables'})
-        elif action == 'unlock_table':
-            table.locked = False
-            # tell others about table change
-            socketio.emit('index-list-changed',
-                          {'table': 'tables'})
-        elif action == 'play_with_9':
-            table.round.with_9 = True
-        elif action == 'play_without_9':
-            table.round.with_9 = False
-        elif action == 'allow_undo':
-            table.round.allow_undo = True
-        elif action == 'prohibit_undo':
-            table.round.allow_undo = False
-        elif action == 'allow_exchange':
-            table.round.allow_exchange = True
-        elif action == 'prohibit_exchange':
-            table.round.allow_exchange = False
-        elif action == 'enable_debugging':
-            table.is_debugging = True
-        elif action == 'disable_debugging':
-            table.is_debugging = False
-        elif action == 'changed_order':
-            order = msg.get('order')
-            # in case there are spectator_only players just check if current active players are included
-            if set(table.order).issubset(set(order)):
-                table.players = order
-        elif action == 'start_table':
-            table.start()
-            # when player sits on table and starts from start page it shall be redirected directly to its table
-            if not '/table/' in request.referrer and \
-                    player.id in table.players:
-                socketio.emit('redirect-to-path',
-                              {'path': f'/table/{table.id}'},
-                              to=request.sid)
-            else:
-                # just tell everybody to get personal cards
-                # for unknown reason this does not seem to be necessary because the connection
-                # gets lost in every case and client just tries to reconnect
-                socketio.emit('grab-your-cards',
-                              {'table_id': table.id,
-                               'sync_count': table.sync_count},
-                              to=table.id)
-        # tell others about table change
-        elif action == 'finished':
-            # tell others about table change
-            socketio.emit('index-list-changed',
-                          {'table': 'tables'})
-    # new tables do not have an id
-    elif player and action == 'finished':
-        # tell others about table change
-        socketio.emit('index-list-changed',
-                      {'table': 'tables'})
 
 
 @socketio.on('setup-player-change')

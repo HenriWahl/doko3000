@@ -115,7 +115,8 @@ class Player(UserMixin, Document3000):
     @property
     def id(self):
         # meanwhile returns CouchDB ID
-        return self.get('_id').replace('player-', '')
+        # returrn self.get('_id').replace('player-', '')
+        return self.get('_id')
 
     @property
     def name(self):
@@ -426,13 +427,13 @@ class Round(Document3000):
         # pretty silly but pragmatical, because the user base might be pretty small still
         # so no big problems are to be expected
         # no extra .save() needed because the next one will happen soon
-        # self.players = [f'player-{x}' if not x.startswith('player-') else x for x in self.players]
-        # if self.trick_order:
-        #     self.trick_order = [f'player-{x}' if not x.startswith('player-') else x for x in self.trick_order]
-        # self.stats['score'] = {(f'player-{x}' if not x.startswith('player-') else x): y for (x, y) in
-        #                        self.stats['score'].items()}
-        # self.stats['tricks'] = {(f'player-{x}' if not x.startswith('player-') else x): y for (x, y) in
-        #                         self.stats['tricks'].items()}
+        self.players = [f'player-{x}' if not x.startswith('player-') else x for x in self.players]
+        if self.trick_order:
+            self.trick_order = [f'player-{x}' if not x.startswith('player-') else x for x in self.trick_order]
+        self.stats['score'] = {(f'player-{x}' if not x.startswith('player-') else x): y for (x, y) in
+                               self.stats['score'].items()}
+        self.stats['tricks'] = {(f'player-{x}' if not x.startswith('player-') else x): y for (x, y) in
+                                self.stats['tricks'].items()}
 
         # just make sure tricks exist
         # + 1 due to range counting behaviour
@@ -653,8 +654,8 @@ class Round(Document3000):
         # dynamic order, depending on who gets tricks
         self.trick_order = []
 
-        # current player - starts with the one following the dealer
-        if self.players:
+        # current player - starts with the one following the dealer - only possible if there are at least 2
+        if self.players and len(self.players) > 1:
             self.current_player_id = self.players[1]
         else:
             self.current_player_id = None
@@ -938,20 +939,21 @@ class Table(Document3000):
             super().__init__(database=self.game.db.database, document_id=document['_id'])
             # get data from given document
             self.update(document)
-        # yes, table_id
-        if self.id not in self.game.rounds:
-            self.add_round()
         # id migration fix - prepend "player-"
         # pretty silly but pragmatical, because the user base might be pretty small still
         # so no big problems are to be expected
         # no extra .save() needed because the next one will happen soon
-        # self.players = [f'player-{x}' if not x.startswith('player-') else x for x in self.players]
-        # self.order = [f'player-{x}' if not x.startswith('player-') else x for x in self.order]
+        self.players = [f'player-{x}' if not x.startswith('player-') else x for x in self.players]
+        self.order = [f'player-{x}' if not x.startswith('player-') else x for x in self.order]
+        # yes, table_id
+        if self.id not in self.game.rounds:
+            self.add_round()
 
     @property
     def id(self):
         # meanwhile returns CouchDB ID
-        return self.get('_id').lstrip('table-')
+        # return self.get('_id').replace('table-', '')
+        return self.get('_id')
 
     @property
     def name(self):
@@ -1241,7 +1243,7 @@ class Game:
         """
         # get players from CouchDB
         self.players = {}
-        for player_id, document in self.db.filter_by_type_as_number('player').items():
+        for player_id, document in self.db.filter_by_type_real_id('player').items():
             self.players[player_id] = Player(document=document, game=self)
 
         # if no player exists create a dummy admin account
@@ -1265,11 +1267,11 @@ class Game:
 
         # store tables
         self.tables = {}
-        for table_id, document in self.db.filter_by_type_as_number('table').items():
+        for table_id, document in self.db.filter_by_type_real_id('table').items():
             self.tables[table_id] = Table(document=document, game=self)
 
         # remove legacy URL-encoded IDs
-        self.remove_encoded_ids()
+        self.cleanup_ids()
 
         # check for locked tables
         self.check_tables()
@@ -1378,22 +1380,22 @@ class Game:
         creates id for player and checks if it already exists
         """
         player_id = 1
-        while f'player-{str(player_id)}' in self.players:
+        while f'player-{player_id}' in self.players:
             player_id += 1
-        return f'player-{str(player_id)}'
+        return f'player-{player_id}'
 
     def create_table_id(self):
         """
         creates id for table and checks if it already exists
         """
         table_id = 1
-        while f'table-{str(table_id)}' in self.tables:
+        while f'table-{table_id}' in self.tables:
             table_id += 1
         return f'table-{str(table_id)}'
 
-    def remove_encoded_ids(self):
+    def cleanup_ids(self):
         """
-        find and remove old URL-encoded IDs
+        find and remove old URL-encoded IDs, kick out
         """
         # first collect all legacy players...
         for player in list(self.players.values()):
@@ -1407,3 +1409,8 @@ class Game:
                 table.players = table.order = table.round.players = []
                 # kick it out
                 self.delete_table(table.id)
+            else:
+                for players in [table['players'], table['order'], table.round['players']]:
+                    for player in list(players):
+                        if not player in self.players:
+                            players.remove(player)

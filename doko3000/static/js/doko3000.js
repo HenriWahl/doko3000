@@ -649,11 +649,13 @@ $(document).ready(function () {
             // parameter 'json' makes it equivalent to .getJSON
             // because there is no .postJSON but .post(..., 'json') so it will be the same for GET and POST here
             $.post('/create/table', $('#form_create_table').serialize(), function (data, status) {
+                console.log(data, status)
                 if (status == 'success') {
                     if (data.status == 'error') {
                         show_message('#modal_message', data.message)
                     } else if (data.status == 'ok') {
                         $('#modal_dialog').modal('hide')
+                        console.log('finished')
                         socket.emit('setup-table-change', {
                             action: 'finished',
                             player_id: player_id
