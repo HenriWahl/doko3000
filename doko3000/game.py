@@ -1373,6 +1373,10 @@ class Game:
             if table_id in self.tables:
                 self.tables[table_id].delete()
                 self.tables.pop(table_id)
+            for trick in range(1, 13):
+                if f'trick-{table_id}-{trick}' in self.tricks:
+                    self.tricks[f'trick-{table_id}-{trick}'].delete()
+                    self.tricks.pop(f'trick-{table_id}-{trick}')
             return True
         else:
             return False
