@@ -322,8 +322,8 @@ def setup_table(msg):
     table can be set up from lobby so it makes no sense to limit setup by using check_message()
     """
     msg_ok, player, table = check_message(msg)
+    action = msg.get('action')
     if msg_ok:
-        action = msg.get('action')
         if player and table:
             if action == 'remove_player':
                 table.remove_player(player.id)
@@ -382,11 +382,12 @@ def setup_table(msg):
                 # tell others about table change
                 socketio.emit('index-list-changed',
                               {'table': 'tables'})
-        # new tables do not have an id
-        elif player and action == 'finished':
-            # tell others about table change
-            socketio.emit('index-list-changed',
-                          {'table': 'tables'})
+    # new tables do not have an id, so check_msg would fail
+    # only of interest on index page
+    elif player and action == 'finished':
+        # tell others about table change
+        socketio.emit('index-list-changed',
+                      {'table': 'tables'})
 
 
 @socketio.on('setup-player-change')
@@ -1218,13 +1219,13 @@ def create_table():
         if request.method == 'GET':
             return jsonify({'html': render_template('index/create_table.html')})
         elif request.method == 'POST':
-            new_table_id = request.values.get('new_table_id')
-            if new_table_id:
-                if new_table_id in game.tables:
+            new_table_name = request.values.get('new_table_name')
+            if new_table_name:
+                if game.get_table(new_table_name):
                     return jsonify({'status': 'error',
                                     'message': 'Diesen Tisch gibt es schon :-('})
                 else:
-                    game.add_table(new_table_id)
+                    game.add_table(new_table_name)
                     return jsonify({'status': 'ok'})
             else:
                 return jsonify({'status': 'error',

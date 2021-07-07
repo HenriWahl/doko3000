@@ -1334,12 +1334,22 @@ class Game:
 
     def get_player(self, name):
         """
-        return player object for login
+        check if player with this name already exists
         """
         # filter players
         players_list = [x for x in self.players.values() if x.name == name]
         if len(players_list) == 1:
             return players_list[0]
+        return False
+
+    def get_table(self, name):
+        """
+        check if table with this name already exists
+        """
+        # filter tables
+        tables_list = [x for x in self.tables.values() if x.name == name]
+        if len(tables_list) == 1:
+            return tables_list[0]
         return False
 
     def delete_table(self, table_id):

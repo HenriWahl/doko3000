@@ -660,6 +660,7 @@ $(document).ready(function () {
                             action: 'finished',
                             player_id: player_id
                         })
+                        console.log('finished2')
                     }
                 }
             }, 'json')
@@ -805,9 +806,6 @@ $(document).ready(function () {
         $(document).on('click', '#button_create_player', function () {
             $.getJSON('/create/player', function (data, status) {
                 if (status == 'success') {
-                    // $('#modal_body').html(data.html)
-                    // clear_message('#modal_message')
-                    // $('#modal_dialog').modal('show')
                     show_dialog(data.html)
                 }
             })
