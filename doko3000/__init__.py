@@ -280,7 +280,7 @@ def exchange_player_cards(msg):
                 peer_id = [x for x in exchange if x != player.id][0]
                 peer = game.players[peer_id]
                 peer.cards += exchange[player.id]
-s                cards_hand = [Deck.cards[x] for x in peer.cards]
+                cards_hand = [Deck.cards[x] for x in peer.cards]
                 cards_exchange_count = len(exchange[player.id])
                 # if peer has no cards yet put onto table exchange is still in exchange mode
                 if not exchange[peer.id]:
