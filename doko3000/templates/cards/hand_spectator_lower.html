@@ -4,7 +4,10 @@
     <div class="row h-100">
         {% if table.round.players|length >=1 %}
             <div class="col-12 mt-auto ml-0 pl-0">
-           <span class="mx-2 text-white">
+                {#           <span class="mx-2 text-white">#}
+                <span class="mx-2 spectator-player"
+                      id="spectator_player_{{ game.players[table.round.players[0]].id }}">
+
                <strong>{{ game.players[table.round.players[0]].name }}</strong>
            </span>
                 <div class="container-fluid d-inline-flex m-0 p-0">
@@ -20,8 +23,11 @@
 <div class="col-6">
     <div class="row h-100">
         {% if table.round.players|length ==4 %}
-            <div class="col-12 mt-auto mr-0 pr-0">
-           <span class="mx-2 float-right text-white">
+            <div class="col-12 mt-auto mr-0 pr-0 text-right">
+                {#           <span class="mx-2 float-right text-white">#}
+                <span class="mx-2 spectator-player"
+                      id="spectator_player_{{ game.players[table.round.players[3]].id }}">
+
                <strong>{{ game.players[table.round.players[3]].name }}</strong>
            </span>
                 <div class="container-fluid d-inline-flex m-0 p-0 justify-content-end">

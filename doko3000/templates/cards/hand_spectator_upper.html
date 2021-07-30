@@ -5,7 +5,8 @@
         <div class="row">
             {% if table.round.players|length >=2 %}
                 <div class="col-12">
-                <span class="mx-2 text-white">
+                <span class="mx-2 spectator-player"
+                      id="spectator_player_{{ game.players[table.round.players[1]].id }}">
                 <strong>{{ game.players[table.round.players[1]].name }}</strong>
                 </span>
                 </div>
@@ -21,8 +22,12 @@
     <div class="col-6">
         <div class="row">
             {% if table.round.players|length >=3 %}
-                <div class="col-12">
-                <span class="mx-2 float-right text-white">
+                <div class="col-12 text-right">
+                    {#                <span class="mx-2 float-right text-white">#}
+{#                    <span class="mx-2 float-right text-white spectator-player"#}
+                    <span class="mx-2 spectator-player"
+                          id="spectator_player_{{ game.players[table.round.players[2]].id }}">
+
                     <strong>{{ game.players[table.round.players[2]].name }}</strong>
                 </span>
                 </div>
