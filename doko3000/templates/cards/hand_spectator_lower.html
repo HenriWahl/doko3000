@@ -4,7 +4,6 @@
     <div class="row h-100">
         {% if table.round.players|length >=1 %}
             <div class="col-12 mt-auto ml-0 pl-0">
-                {#           <span class="mx-2 text-white">#}
                 <span class="mx-2 spectator-player"
                       id="spectator_player_{{ game.players[table.round.players[0]].id }}">
 
@@ -24,7 +23,6 @@
     <div class="row h-100">
         {% if table.round.players|length ==4 %}
             <div class="col-12 mt-auto mr-0 pr-0 text-right">
-                {#           <span class="mx-2 float-right text-white">#}
                 <span class="mx-2 spectator-player"
                       id="spectator_player_{{ game.players[table.round.players[3]].id }}">
 

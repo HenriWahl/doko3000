@@ -240,19 +240,16 @@ $(document).ready(function () {
                 $('.overlay-button').addClass('d-none')
 
                 // either #table_spectator or #table are visible and may show the cards on table
-                // if ($('#table_spectator').hasClass('d-none')) {
                 if (is_normal_player()) {
                     $('#table').html(msg.html.cards_table)
                 } else {
+                    // indicate current player in spectator overview
                     $('.spectator-player').removeClass('spectator-current-player')
                     $('#spectator_player_' + msg.current_player_id).addClass('spectator-current-player')
                     $('#table_spectator').html(msg.html.cards_table)
                     // strange move to take away card by class but not possible by id because it would vanish on table too
                     // make sure that even after some lost communication all cards are updated
                     // just take away already played cards
-                    console.log($('.spectator-player'))
-                    console.log($('#spectator_player_' + msg.current_player_id))
-                    console.log(msg)
                     for (let card_id of msg.played_cards) {
                         $('.card_' + card_id).remove()
                     }
