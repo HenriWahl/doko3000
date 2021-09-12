@@ -1248,7 +1248,7 @@ class Game:
 
         # if no player exists create a dummy admin account
         if len(self.players) == 0:
-            self.add_player(player_id='admin',
+            self.add_player(name='admin',
                             password='admin',
                             is_admin=True,
                             is_spectator_only=True,

@@ -23,10 +23,10 @@ def run():
 @click.argument('player_id')
 @click.option('--password', default=None, help='Set password. If not set, the player_id is used.')
 @click.option('--is-admin', default=False, is_flag=True, help='Gives admin rights to player.')
-def add_player(player_id, password, is_admin):
+def add_player(name, password, is_admin):
     if password == None:
-        password = player_id
-    game.add_player(player_id, password, is_admin)
+        password = name
+    game.add_player(name, password, is_admin)
     # game.players[player_id].set_password(password)
     # if is_admin:
     #     game.players[player_id].is_admin = True
