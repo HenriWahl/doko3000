@@ -1,0 +1,85 @@
+version: '3.9'
+
+networks:
+  doko3000:
+    name: doko3000
+  web:
+    external:
+      name: web
+
+volumes:
+  couchdb-config:
+  couchdb-data:
+
+services:
+  doko3000:
+    image: doko3000
+    container_name: doko3000
+    restart: always
+    networks:
+      - doko3000
+      - web
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - HOST
+      - SECRET_KEY
+      - COUCHDB_USER
+      - COUCHDB_PASSWORD
+    depends_on:
+      - couchdb
+      - nginx
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=web
+      # http
+      - traefik.http.routers.doko3000.rule=Host("${HOST}")
+      - traefik.http.routers.doko3000.service=doko3000
+      - traefik.http.routers.doko3000.entrypoints=http
+      # https
+      - traefik.http.routers.doko3000-https.rule=Host("${HOST}")
+      - traefik.http.routers.doko3000-https.tls=true
+      - traefik.http.routers.doko3000-https.service=doko3000-https
+      - traefik.http.routers.doko3000-https.entrypoints=https
+      - traefik.http.services.doko3000-https.loadbalancer.server.port=5000
+      # letsencrypt
+      - traefik.http.routers.doko3000-https.tls.certresolver=letsencrypt
+      # redirect http -> https
+      - traefik.http.routers.doko3000.middlewares=doko3000-to-https
+      - traefik.http.middlewares.doko3000-to-https.redirectscheme.scheme=https
+  couchdb:
+    image: couchdb
+    container_name: doko3000-couchdb
+    restart: always
+    volumes:
+      - couchdb-data:/opt/couchdb/data
+      - couchdb-config:/opt/couchdb/etc/local.d
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - COUCHDB_USER
+      - COUCHDB_PASSWORD
+    networks:
+      - doko3000
+  nginx:
+    image: nginx:stable-alpine
+    container_name: doko3000-nginx
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /root/doko3000/doko3000/static:/usr/share/nginx/html/static
+    restart: always
+    networks:
+      - web
+    depends_on:
+      - couchdb
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=web
+      # https
+      - traefik.http.routers.doko3000-static-https.rule=Host("${HOST}") && PathPrefix("/static/")
+      - traefik.http.routers.doko3000-static-https.tls=true
+      - traefik.http.routers.doko3000-static-https.service=doko3000-static-https
+      - traefik.http.routers.doko3000-static-https.entrypoints=https
+      - traefik.http.services.doko3000-static-https.loadbalancer.server.port=80
+      # letsencrypt
+      - traefik.http.routers.doko3000-static-https.tls.certresolver=letsencrypt
+
