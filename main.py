@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# ©2020 Henri Wahl
+# ©2021 Henri Wahl
 #
 # Attempt to play good ol' Doppelkopf online
 #
