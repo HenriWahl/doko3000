@@ -841,7 +841,8 @@ def show_hand(msg):
                    'sync_count': table.sync_count,
                    'html': {'cards_table': render_template('cards/table.html',
                                                            cards_table=cards_table,
-                                                           table=table)
+                                                           table=table,
+                                                           game=game)
                             }}
         room = table.id
         # debugging...
