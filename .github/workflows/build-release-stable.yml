@@ -1,7 +1,7 @@
 name: build-release-stable
 on:
   push:
-    #tags: 'v*'
+    tags: 'v*'
 
 env:
   repo: doko3000
