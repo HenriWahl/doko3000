@@ -905,10 +905,12 @@ class Round(Document3000):
                 self.turn_count -= 1
             self.current_player_id = self.previous_trick.players[0]
             self.previous_trick.reset()
-        self.save()
-
-        # recaclulate statistics due to reverted ownerships
+        # trick order has to be fixed
+        self.calculate_trick_order()
+        # recalculate statistics due to reverted ownerships
         self.calculate_stats()
+        # finally save undone trick
+        self.save()
 
 
 class Table(Document3000):
