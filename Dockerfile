@@ -1,8 +1,8 @@
-FROM python:3.9
+FROM python:3.9-alpine
 LABEL maintainer=henri.wahl@mailbox.org
 
-RUN apt -y update &&\
-    apt -y upgrade
+RUN apk update &&\
+    apk upgrade
 
 COPY . /doko3000
 WORKDIR /doko3000
@@ -10,10 +10,9 @@ WORKDIR /doko3000
 RUN pip install -r requirements.txt
 
 # run gunicorn workers as unprivileged user
-RUN useradd doko3000
+RUN adduser -D doko3000
 
 # entrypoint.sh runs gunicorn
 COPY docker/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-ENTRYPOINT ["/entrypoint.sh"]
