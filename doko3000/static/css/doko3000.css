@@ -47,7 +47,8 @@ html, body {
 .hud-player-active {
     color: #212529;
     padding-left: 0.25rem;
-    padding-right: 0.25rem;
+    /* no padding on right to keep space for tricks badge */
+    /* padding-right: 0.25rem; */
     padding-top: 0.25rem;
     padding-bottom: 0.25rem;
     border-radius: 0.25rem;
