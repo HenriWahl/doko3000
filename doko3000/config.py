@@ -1,5 +1,6 @@
 from os import environ
 
+
 class Config:
     TITLE = 'doko3000'
     # to be given by environment variable
@@ -19,13 +20,27 @@ class Config:
     debug = environ.get('DEBUG')
     # boolize DEBUG environment variable
     if environ.get('DEBUG') and \
-       environ.get('DEBUG').lower() in ['1', 'true', 'yes']:
+            environ.get('DEBUG').lower() in ['1', 'true', 'yes']:
         DEBUG = True
     else:
         DEBUG = False
     # avoid browser warnings about samesite missing
     SESSION_COOKIE_SAMESITE = 'Strict'
     SESSION_COOKIE_SECURE = True
+    # supported MIME types for compression
+    COMPRESS_MIMETYPES = [
+        'text/html',
+        'text/css',
+        'text/xml',
+        'application/json',
+        'application/javascript',
+        'application/fvnd.ms-fontobject',
+        'application/font-woff',
+        'application/font-woff2',
+        'image/svg',
+        'image/svg+xml'
+    ]
+
 
 class DummyApp:
     def __init__(self):

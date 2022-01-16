@@ -4,10 +4,22 @@ LABEL maintainer=henri.wahl@mailbox.org
 RUN apk update &&\
     apk upgrade
 
+# needed to build brotli
+RUN apk add gcc \
+            g++ \
+            libc-dev
+
 COPY . /doko3000
 WORKDIR /doko3000
 
-RUN pip install -r requirements.txt
+RUN pip install --requirement requirements.txt
+
+# BETTER USE MULTI STAGE BUILD HERE
+
+# and not needed anymores
+RUN apk del gcc \
+            g++ \
+            libc-dev
 
 # run gunicorn workers as unprivileged user
 RUN adduser -D doko3000

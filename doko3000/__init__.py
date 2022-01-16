@@ -7,6 +7,7 @@ from flask import flash, \
     render_template, \
     request, \
     url_for
+from flask_compress import Compress
 from flask_login import current_user, \
     LoginManager, \
     login_required, \
@@ -36,6 +37,8 @@ login = LoginManager(app)
 login.login_view = 'login'
 # empty message avoids useless errorflash-message-by-default
 login.login_message = ''
+# enable compression of static files
+compress = Compress(app)
 # extend by socket.io
 # shorter ping interval for better sync
 socketio = SocketIO(app,
