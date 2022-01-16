@@ -1,3 +1,4 @@
+# only build and install pip stuff here
 FROM python:3.9-alpine
 LABEL maintainer=henri.wahl@mailbox.org
 
@@ -12,14 +13,7 @@ RUN apk add gcc \
 COPY . /doko3000
 WORKDIR /doko3000
 
-RUN pip install --requirement requirements.txt
-
-# BETTER USE MULTI STAGE BUILD HERE
-
-# and not needed anymores
-RUN apk del gcc \
-            g++ \
-            libc-dev
+RUN pip install --requirement requirements.txt --user
 
 # run gunicorn workers as unprivileged user
 RUN adduser -D doko3000
