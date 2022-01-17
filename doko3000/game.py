@@ -2,6 +2,7 @@
 from copy import deepcopy
 from json import dumps
 from os import environ
+from pathlib import Path
 from random import seed, \
     shuffle
 from time import time
@@ -54,16 +55,33 @@ class Deck:
                  'König': 4,
                  'Ass': 11}
     NUMBER = 2  # Doppelkopf :-)!
-    cards = {}
 
+    # containing all cards
+    cards = {}
     # counter for card IDs in deck
     card_id = 0
-
+    # fill cards dict
     for number in range(NUMBER):
         for symbol in SYMBOLS:
             for rank in RANKS.items():
                 cards[card_id] = Card(symbol, rank, card_id)
                 card_id += 1
+
+    # expect SVG cards being default
+    file_extension = 'svg'
+
+    def __init__(self):
+        """
+        find out if there are SVG images available at initialization
+        """
+        for card in self.cards:
+            svg_path = Path(f'doko3000/static/img/cards/{self.cards[card].name}.svg')
+            if not (svg_path.exists() and svg_path.is_file()):
+                self.file_extension = 'png'
+                return None
+        # the card back image also has to exist and preferably be SVG
+        if not (Path(f'doko3000/static/img/cards/back.svg').exists() and Path(f'doko3000/static/img/cards/back.svg').is_file()):
+            self.file_extension = 'png'
 
     def get_cards(self, cards_ids):
         """
