@@ -26,6 +26,7 @@ RUN apk add libgcc \
             libstdc++
 
 # due to being installed via pip the installation can be copied without dev files
+COPY --from=build /usr/local/bin /usr/local/bin
 COPY --from=build /usr/local/lib /usr/local/lib
 
 COPY . /doko3000
