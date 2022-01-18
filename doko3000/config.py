@@ -17,13 +17,14 @@ class Config:
         CORS_ALLOWED_ORIGINS = [f'http://{host}', f'https://{host}']
     else:
         CORS_ALLOWED_ORIGINS = []
-    debug = environ.get('DEBUG')
     # boolize DEBUG environment variable
     if environ.get('DEBUG') and \
             environ.get('DEBUG').lower() in ['1', 'true', 'yes']:
         DEBUG = True
+        ENV = 'development'
     else:
         DEBUG = False
+        ENV = 'production'
     # avoid browser warnings about samesite missing
     SESSION_COOKIE_SAMESITE = 'Strict'
     SESSION_COOKIE_SECURE = True
@@ -37,11 +38,8 @@ class Config:
         'application/fvnd.ms-fontobject',
         'application/font-woff',
         'application/font-woff2',
+        'image/png',
         'image/svg',
         'image/svg+xml'
     ]
-
-
-class DummyApp:
-    def __init__(self):
-        self.config = Config.__dict__
+    SEND_FILE_MAX_AGE_DEFAULT = 86400

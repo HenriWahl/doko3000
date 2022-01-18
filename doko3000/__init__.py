@@ -1362,3 +1362,12 @@ def catch_all(path):
     catch all rule
     """
     return redirect(url_for('index'))
+
+@app.after_request
+def add_header(response):
+    #response.headers['Cache-Control'] = 'max-age=300'
+    response.cache_control.max_age = 3600
+    response.cache_control.no_cache = False
+    response.cache_control.no_store = False
+    response.headers.pop('Cache-Control')
+    return response
