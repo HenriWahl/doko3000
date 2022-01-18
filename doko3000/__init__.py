@@ -57,17 +57,6 @@ game = Game(db)
 sessions = {}
 
 
-@app.after_request
-def add_headers_to_response(response):
-    """
-    avoid client-side caching by adding headers to response
-    """
-    response.headers['Pragma'] = 'no-cache'
-    response.headers['Expires'] = '0'
-    response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate'
-    return response
-
-
 @login.user_loader
 def load_user(id):
     """
@@ -1362,12 +1351,3 @@ def catch_all(path):
     catch all rule
     """
     return redirect(url_for('index'))
-
-@app.after_request
-def add_header(response):
-    #response.headers['Cache-Control'] = 'max-age=300'
-    response.cache_control.max_age = 3600
-    response.cache_control.no_cache = False
-    response.cache_control.no_store = False
-    response.headers.pop('Cache-Control')
-    return response

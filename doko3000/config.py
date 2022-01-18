@@ -19,7 +19,7 @@ class Config:
         CORS_ALLOWED_ORIGINS = []
     # boolize DEBUG environment variable
     if environ.get('DEBUG') and \
-            environ.get('DEBUG').lower() in ['1', 'true', 'yes']:
+            environ['DEBUG'].lower() in ['1', 'true', 'yes']:
         DEBUG = True
         ENV = 'development'
     else:
