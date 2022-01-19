@@ -287,7 +287,8 @@ def exchange_player_cards(msg):
                            'html': {'cards_hand': render_template('cards/hand.html',
                                                                   cards_hand=cards_hand,
                                                                   table=table,
-                                                                  player=player),
+                                                                  player=player,
+                                                                  game=game),
                                     }}
                 room = sessions.get(peer_id)
                 # debugging...
