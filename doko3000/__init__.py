@@ -7,6 +7,7 @@ from flask import flash, \
     render_template, \
     request, \
     url_for
+from flask_compress import Compress
 from flask_login import current_user, \
     LoginManager, \
     login_required, \
@@ -36,6 +37,8 @@ login = LoginManager(app)
 login.login_view = 'login'
 # empty message avoids useless errorflash-message-by-default
 login.login_message = ''
+# enable compression of static files
+compress = Compress(app)
 # extend by socket.io
 # shorter ping interval for better sync
 socketio = SocketIO(app,
@@ -52,17 +55,6 @@ game = Game(db)
 
 # keep track of players and their sessions to enable directly emitting a socketio event
 sessions = {}
-
-
-@app.after_request
-def add_headers_to_response(response):
-    """
-    avoid client-side caching by adding headers to response
-    """
-    response.headers['Pragma'] = 'no-cache'
-    response.headers['Expires'] = '0'
-    response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate'
-    return response
 
 
 @login.user_loader
@@ -295,7 +287,8 @@ def exchange_player_cards(msg):
                            'html': {'cards_hand': render_template('cards/hand.html',
                                                                   cards_hand=cards_hand,
                                                                   table=table,
-                                                                  player=player),
+                                                                  player=player,
+                                                                  game=game),
                                     }}
                 room = sessions.get(peer_id)
                 # debugging...
@@ -509,7 +502,8 @@ def deliver_cards_to_player(msg):
                        'html': {'cards_hand': render_template('cards/hand.html',
                                                               cards_hand=cards_hand,
                                                               table=table,
-                                                              player=player),
+                                                              player=player,
+                                                              game=game),
                                 'hud_players': render_template('top/hud_players.html',
                                                                table=table,
                                                                player=player,
@@ -841,7 +835,8 @@ def show_hand(msg):
                    'sync_count': table.sync_count,
                    'html': {'cards_table': render_template('cards/table.html',
                                                            cards_table=cards_table,
-                                                           table=table)
+                                                           table=table,
+                                                           game=game)
                             }}
         room = table.id
         # debugging...

@@ -1,7 +1,8 @@
-click
 cloudant
+# some gunicorn problem causes this pinned and insecure version of eventlet
 eventlet==0.30.2
 flask
+flask-compress
 flask-login
 flask-socketio
 gunicorn

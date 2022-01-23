@@ -2,6 +2,7 @@
 from copy import deepcopy
 from json import dumps
 from os import environ
+from pathlib import Path
 from random import seed, \
     shuffle
 from time import time
@@ -54,16 +55,33 @@ class Deck:
                  'König': 4,
                  'Ass': 11}
     NUMBER = 2  # Doppelkopf :-)!
-    cards = {}
 
+    # containing all cards
+    cards = {}
     # counter for card IDs in deck
     card_id = 0
-
+    # fill cards dict
     for number in range(NUMBER):
         for symbol in SYMBOLS:
             for rank in RANKS.items():
                 cards[card_id] = Card(symbol, rank, card_id)
                 card_id += 1
+
+    # expect SVG cards being default
+    file_extension = 'svg'
+
+    def __init__(self):
+        """
+        find out if there are SVG images available at initialization
+        """
+        for card in self.cards:
+            svg_path = Path(f'doko3000/static/img/cards/{self.cards[card].name}.svg')
+            if not (svg_path.exists() and svg_path.is_file()):
+                self.file_extension = 'png'
+                return None
+        # the card back image also has to exist and preferably be SVG
+        if not (Path(f'doko3000/static/img/cards/back.svg').exists() and Path(f'doko3000/static/img/cards/back.svg').is_file()):
+            self.file_extension = 'png'
 
     def get_cards(self, cards_ids):
         """
@@ -905,10 +923,12 @@ class Round(Document3000):
                 self.turn_count -= 1
             self.current_player_id = self.previous_trick.players[0]
             self.previous_trick.reset()
-        self.save()
-
-        # recaclulate statistics due to reverted ownerships
+        # trick order has to be fixed
+        self.calculate_trick_order()
+        # recalculate statistics due to reverted ownerships
         self.calculate_stats()
+        # finally save undone trick
+        self.save()
 
 
 class Table(Document3000):
@@ -1248,7 +1268,7 @@ class Game:
 
         # if no player exists create a dummy admin account
         if len(self.players) == 0:
-            self.add_player(player_id='admin',
+            self.add_player(name='admin',
                             password='admin',
                             is_admin=True,
                             is_spectator_only=True,

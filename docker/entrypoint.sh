@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/ash
 
 # check if running inside PyCharm
 if [[ -v PYCHARM_HOSTED ]];

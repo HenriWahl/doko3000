@@ -1,6 +1,6 @@
 # doko3000
 
-Simple Doppelkopf multiplayer card deck simulation web service.
+Simple open world multiplayer Doppelkopf card deck simulation web service.
 
 ## Overview
 
@@ -81,10 +81,10 @@ necessary for the game communication.
  
 ### Getting doko3000
  
-At the moment it is only available from Github:
+The game is available from Github:
  
     git clone https://github.com/HenriWahl/doko3000.git
- 
+
 All further steps are based on the `doko3000` directory:
  
     cd doko3000
@@ -123,9 +123,14 @@ respectively as *cert.pem* and *key.pem* into [/docker](./docker) and run:
   
     docker-compose -f docker/docker-compose-https.yml up -d
     
-The third file *docker-compose-https-letsencrypt.yml* can be used for Let's Encrypt setups and is based on 
-[Nginx and Let’s Encrypt with Docker in Less Than 5 Minutes](https://medium.com/@pentacent/nginx-and-lets-encrypt-with-docker-in-less-than-5-minutes-b4b8a60d3a71) -
-maybe there is a more elegant way but it works fine here. This docker-compose configuration surely has to be customized.
+The third file *docker-compose-traefik-letsencrypt.yml* can be used for Let's Encrypt setups.
+This docker-compose configuration surely has to be customized.
+
+### Running prebuilt image from Dockerhub
+
+Instead of build the Docker image locally it is also possible to use it from Dockerhub:
+
+    docker pull henriwahl/doko3000
 
 ### Et voilà!
 
