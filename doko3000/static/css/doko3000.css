@@ -46,7 +46,6 @@ html, body {
 
 .hud-player-active {
     color: #212529;
-    /* no padding on right to keep space for tricks badge */
     padding-left: 0.25rem;
     /* no padding on right to keep space for tricks badge */
     /* padding-right: 0.25rem; */
@@ -95,12 +94,10 @@ html, body {
     z-index: 200;
     display: block;
     padding: .5rem 1rem;
-    /*font-size: 1.25rem;*/
     line-height: 0;
     border-radius: .3rem;
     height: 3rem;
     width: 100%;
-    /* btn */
     user-select: none;
     text-align: center;
     border: 0 solid;
@@ -112,6 +109,28 @@ html, body {
 
 .spectator-hand .img-fluid {
     max-height: 150px;
+}
+
+.spectator-player {
+    color: white;
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+    border-radius: 0.25rem;
+    border: 1px solid transparent;
+    background-color: transparent;
+}
+
+.spectator-current-player {
+    color: #212529;
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
+    padding-top: 0.15rem;
+    padding-bottom: 0.15rem;
+    border-radius: 0.25rem;
+    border: 1px solid white;
+    background-color: white;
 }
 
 #table_spectator {

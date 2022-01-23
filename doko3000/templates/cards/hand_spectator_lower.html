@@ -1,12 +1,16 @@
 {% set hand_spectator = True %}
+<!-- for a future me: there was a reason that here is no <div class='row'> -->
 <!-- player 4 -->
 <div class="col-6">
     <div class="row h-100">
         {% if table.round.players|length >=1 %}
+            {% set current_player = '' %}
+            {% if table.round.current_player_id == table.round.players[0] %}
+                {% set current_player = 'spectator-current-player' %}
+            {% endif %}
             <div class="col-12 mt-auto ml-0 pl-0">
-                <span class="mx-2 spectator-player"
+                <span class="mx-2 spectator-player {{ current_player }}"
                       id="spectator_player_{{ game.players[table.round.players[0]].id }}">
-
                <strong>{{ game.players[table.round.players[0]].name }}</strong>
            </span>
                 <div class="container-fluid d-inline-flex m-0 p-0">
@@ -22,10 +26,13 @@
 <div class="col-6">
     <div class="row h-100">
         {% if table.round.players|length ==4 %}
+            {% set current_player = '' %}
+            {% if table.round.current_player_id == table.round.players[3] %}
+                {% set current_player = 'spectator-current-player' %}
+            {% endif %}
             <div class="col-12 mt-auto mr-0 pr-0 text-right">
-                <span class="mx-2 spectator-player"
+                <span class="mx-2 spectator-player {{ current_player }}"
                       id="spectator_player_{{ game.players[table.round.players[3]].id }}">
-
                <strong>{{ game.players[table.round.players[3]].name }}</strong>
            </span>
                 <div class="container-fluid d-inline-flex m-0 p-0 justify-content-end">
