@@ -373,7 +373,9 @@ $(document).ready(function () {
                 } else {
                     $('#turn_indicator').addClass('d-none')
                 }
+                // the HUD
                 $('#hud_players').html(msg.html.hud_players)
+                // cards stack of gained tricks
                 if (msg.score[player_id] > 0) {
                     $('#cards_stack_img').attr('title', msg.score[player_id])
                     $('#cards_stack').removeClass('d-none')
