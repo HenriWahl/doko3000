@@ -5,7 +5,7 @@
         <div class="row">
             {% if table.round.players|length >=2 %}
                 {% set current_player = '' %}
-                {% if table.round.current_player_id == table.round.players[1] %}
+                {% if table.round.current_player_id == table.round.players[1] and not table.round.current_trick.is_last_turn %}
                    {% set current_player = 'spectator-current-player' %}
                 {% endif %}
                 <div class="col-12">
@@ -27,7 +27,7 @@
         <div class="row">
             {% if table.round.players|length >=3 %}
                 {% set current_player = '' %}
-                {% if table.round.current_player_id == table.round.players[2] %}
+                {% if table.round.current_player_id == table.round.players[2] and not table.round.current_trick.is_last_turn %}
                    {% set current_player = 'spectator-current-player' %}
                 {% endif %}
                 <div class="col-12 text-right">

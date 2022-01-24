@@ -16,7 +16,7 @@
                 {% endif %}
     </span>
         {% endfor %}
-        {% for idle_player_id in table.idle_players %}
+        {% for idle_player_id in table.players_idle %}
             <span class="text-muted mr-1">
             {{ game.players[idle_player_id].name }}
         </span>

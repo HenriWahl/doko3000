@@ -19,7 +19,7 @@
     </div>
 
     <div id="button_claim_trick" class="overlay-button justify-content-center
-     {% if player.id in table.idle_players or not table.round.needs_trick_claiming or table.round.player_showing_hand %}
+     {% if player.id in table.players_idle or not table.round.needs_trick_claiming or table.round.player_showing_hand %}
      d-none
      {% endif %}
      "

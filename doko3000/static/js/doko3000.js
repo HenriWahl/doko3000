@@ -245,7 +245,9 @@ $(document).ready(function () {
                 } else {
                     // indicate current player in spectator overview
                     $('.spectator-player').removeClass('spectator-current-player')
-                    $('#spectator_player_' + msg.current_player_id).addClass('spectator-current-player')
+                    if (!msg.is_last_turn) {
+                        $('#spectator_player_' + msg.current_player_id).addClass('spectator-current-player')
+                    }
                     $('#table_spectator').html(msg.html.cards_table)
                     // strange move to take away card by class but not possible by id because it would vanish on table too
                     // make sure that even after some lost communication all cards are updated
@@ -258,7 +260,7 @@ $(document).ready(function () {
             if (msg.is_last_turn) {
                 cards_locked = true
                 $('#turn_indicator').addClass('d-none')
-                if (!msg.idle_players.includes(player_id) && !msg.players_spectator.includes(player_id)) {
+                if (!msg.players_idle.includes(player_id) && !msg.players_spectator_only.includes(player_id)) {
                     $('#button_claim_trick').removeClass('d-none').fadeOut(1).delay(1500).fadeIn(1)
                 }
             } else if (msg.player_showing_hand) {
@@ -595,9 +597,6 @@ $(document).ready(function () {
 
         // get redirected to named path - 1st use is going to table after restart from start screen
         socket.on('redirect-to-path', function (msg) {
-            // due to stupid design decision to use URL-encoded IDs for URLs like /table/<ID>
-            // there has to be conversion again
-            // should change in the future... - DONE!
             location.assign(msg.path)
         })
 

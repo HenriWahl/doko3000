@@ -264,7 +264,7 @@ class Player(UserMixin, Document3000):
         """
         cards = []
         if self.table in self.game.tables:
-            if self.id not in self.game.tables[self.table].idle_players:
+            if self.id not in self.game.tables[self.table].players_idle:
                 try:
                     for card_id in self.cards:
                         cards.append(Deck.cards[card_id])
@@ -1025,14 +1025,20 @@ class Table(Document3000):
 
     @property
     def players_active(self):
+        """
+        access all players willing to play
+        """
         return [x for x in self['players'] if not self.game.players[x].is_spectator_only]
 
     @property
-    def players_spectator(self):
+    def players_spectator_only(self):
+        """
+        all players which are only watching
+        """
         return [x for x in self['players'] if self.game.players[x].is_spectator_only]
 
     @property
-    def idle_players(self):
+    def players_idle(self):
         """
         players who have to wait until round is over - all which are more than 4
         additionally those who are specators only
@@ -1128,7 +1134,7 @@ class Table(Document3000):
             if table in self.game.tables:
                 self.game.tables[table].remove_player(player_id)
         # clean player cards if being idle
-        if player_id in self.idle_players:
+        if player_id in self.players_idle:
             self.game.players[player_id].remove_all_cards()
         # store table in player too
         self.game.players[player_id].table = self.id
@@ -1200,7 +1206,7 @@ class Table(Document3000):
         last dealer is moved to the end of the players list
         spectators get glued at the end to avoid them appearing out of nothing
         """
-        self.players = self.players_active[1:] + self.players_active[:1] + self.players_spectator
+        self.players = self.players_active[1:] + self.players_active[:1] + self.players_spectator_only
         self.order = self.players_active[:]
         # self.order = self.order[1:] + self.order[:1]
         self.save()

@@ -218,8 +218,8 @@ def played_card(msg):
                            'card_name': card.name,
                            'is_last_turn': table.round.current_trick.is_last_turn,
                            'current_player_id': current_player_id,
-                           'idle_players': table.idle_players,
-                           'players_spectator': table.players_spectator,
+                           'players_idle': table.players_idle,
+                           'players_spectator_only': table.players_spectator_only,
                            'played_cards': table.round.played_cards,
                            'player_showing_hand': table.round.player_showing_hand,
                            'sync_count': table.sync_count,
@@ -582,7 +582,7 @@ def claim_trick(msg):
     if msg_ok:
         table.increase_sync_count()
         if not table.round.is_finished:
-            # when ownership channew one beges it does at previous trick because normally there is a new one created
+            # when ownership changes it does at previous trick because normally there is a new one created
             # so the new one becomes the current one and the reclaimed is the previous
             if not len(table.round.current_trick.cards) == 0:
                 # makes player owner of trick
@@ -650,7 +650,7 @@ def ready_for_next_round(msg):
     if msg_ok:
         table.add_ready_player(player.id)
         next_players = table.order[:4]
-        number_of_rows = max(len(next_players), len(table.idle_players))
+        number_of_rows = max(len(next_players), len(table.players_idle))
         # if set(table.players_ready) >= set(table.round.players):
         #     # now shifted when round is finished
         #     table.reset_ready_players()
@@ -715,7 +715,7 @@ def round_finish(msg):
             table.shift_players()
             table.reset_ready_players()
             next_players = table.order[:4]
-            number_of_rows = max(len(next_players), len(table.idle_players))
+            number_of_rows = max(len(next_players), len(table.players_idle))
             # just tell everybody to get personal cards
             socketio.emit('start-next-round',
                           {'table_id': table.id,

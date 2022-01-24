@@ -2,7 +2,7 @@
     <thead>
     <tr>
         <th><h5><strong>Spieler</strong></h5></th>
-        {% if table.idle_players %}
+        {% if table.players_idle %}
             <th><h5><strong>Ersatzbank</strong></h5></th>
         {% endif %}
     </tr>
@@ -15,9 +15,9 @@
             {% else %}
                 <td></td>
             {% endif %}
-            {% if table.idle_players %}
-                {% if row < table.idle_players|length %}
-                    <td><h5>{{ game.players[table.idle_players[row]].name }}</h5></td>
+            {% if table.players_idle %}
+                {% if row < table.players_idle|length %}
+                    <td><h5>{{ game.players[table.players_idle[row]].name }}</h5></td>
                 {% else %}
                     <td></td>
                 {% endif %}
