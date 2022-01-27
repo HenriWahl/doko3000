@@ -3,7 +3,7 @@
         {% for hud_player_id in table.round.trick_order %}
             <span id="hud_player_{{ hud_player_id }}" class="hud_player mx-1 text-nowrap
         {% if loop.index0 == table.round.current_trick.cards|length %}
-        hud-player-active
+        hud-player-current
         {% endif %}
     ">{{ game.players[hud_player_id].name }}
                 {% if table.round.stats['tricks'][hud_player_id] > 0 %}
@@ -16,11 +16,12 @@
                 {% endif %}
     </span>
         {% endfor %}
+{#       &nbsp;#}
         {% for idle_player_id in table.players_idle %}
-            <span class="text-muted mr-1">
+                <span class="hud-player-inactive ml-1">
             {{ game.players[idle_player_id].name }}
         </span>
-        {% endfor %}
+            {% endfor %}
     </div>
 </div>
 
