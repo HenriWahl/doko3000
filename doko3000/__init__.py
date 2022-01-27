@@ -594,6 +594,7 @@ def claim_trick(msg):
             cards_table = []
             table.round.calculate_trick_order()
             table.round.calculate_stats()
+
             socketio.emit('next-trick',
                           {'current_player_id': player.id,
                            'score': table.round.stats['score'],

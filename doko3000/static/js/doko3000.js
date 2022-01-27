@@ -382,6 +382,14 @@ $(document).ready(function () {
                 } else {
                     $('#cards_stack').addClass('d-none')
                 }
+                // highlight current player for spectators view
+                if (!is_normal_player()) {
+                    // indicate current player in spectator overview
+                    $('.spectator-player').removeClass('spectator-current-player')
+                    if (!msg.is_last_turn) {
+                        $('#spectator_player_' + msg.current_player_id).addClass('spectator-current-player')
+                    }
+                }
             }
         })
 
