@@ -1,8 +1,12 @@
 cloudant
 # some gunicorn problem causes this pinned and insecure version of eventlet
-eventlet==0.30.2
+#eventlet==0.30.2
+# fix for eventlet https://github.com/benoitc/gunicorn/pull/2581#issuecomment-994809596
+eventlet
 flask
 flask-compress
 flask-login
 flask-socketio
-gunicorn
+#gunicorn
+# fix for eventlet https://github.com/benoitc/gunicorn/pull/2581#issuecomment-994809596
+https://github.com/benoitc/gunicorn/archive/ff58e0c6da83d5520916bc4cc109a529258d76e1.zip#egg=gunicorn==20.1.0
