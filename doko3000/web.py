@@ -19,9 +19,7 @@ from flask_socketio import join_room, \
 from .config import Config
 from .database import DB
 from .game import Deck, \
-    Game, \
-    Player, \
-    Trick
+    Game
 from .misc import is_xhr
 
 # initialize app
@@ -854,30 +852,30 @@ def request_exchange(msg):
     """
     msg_ok, player, table = check_message(msg)
     if msg_ok:
-        hochzeit = table.round.has_hochzeit()
-        exchange_type = 'contra'
-        if not hochzeit and player.party == 're':
-            exchange_type = 're'
-        exchanged_already = False
-        if table.round.exchange and \
-                player.party in table.round.exchange and \
-                table.round.exchange[player.party]:
-            exchanged_already = True
-        # tell everybody there is an ongoing exchange in case it is possible
-        if not (hochzeit or table.round.card_played or exchanged_already):
-            socketio.emit('player1-requested-exchange',
-                          {'table_id': table.id,
-                           'sync_count': table.sync_count},
-                          to=table.id)
+        # hochzeit = table.round.has_hochzeit()
+        # exchange_type = 'contra'
+        # if not hochzeit and player.party == 're':
+        #     exchange_type = 're'
+        # exchanged_already = False
+        # if table.round.exchange and \
+        #         player.party in table.round.exchange and \
+        #         table.round.exchange[player.party]:
+        #     exchanged_already = True
+        # # tell everybody there is an ongoing exchange in case it is possible
+        # if not (hochzeit or table.round.card_played or exchanged_already):
+        # lock table for players
+        players_for_exchange = [x for x in game.players.values() if x.id != player.id and x.id in table.round.players]
+        socketio.emit('player1-requested-exchange',
+                      {'table_id': table.id,
+                       'sync_count': table.sync_count},
+                      to=table.id)
         # ask player if exchange really should be started or tell it is not possible
         socketio.emit('confirm-exchange',
                       {'table_id': table.id,
                        'sync_count': table.sync_count,
                        'html': render_template('round/request_exchange.html',
                                                table=table,
-                                               hochzeit=hochzeit,
-                                               exchange_type=exchange_type,
-                                               exchanged_already=exchanged_already
+                                               players_for_exchange=players_for_exchange
                                                )},
                       to=request.sid)
 

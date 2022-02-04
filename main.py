@@ -5,9 +5,8 @@
 # Attempt to play good ol' Doppelkopf online
 #
 
-from doko3000 import app,\
-                     socketio
-
+from doko3000.web import app, \
+    socketio
 
 if __name__ == '__main__':
     socketio.run(app,
