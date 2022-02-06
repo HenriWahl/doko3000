@@ -1177,11 +1177,13 @@ $(document).ready(function () {
             table_mode = 'locked'
         })
 
-        // player1 confirms intended exchange
-        $(document).on('click', '#button_start_exchange_yes', function () {
+        // player1 selects peer player fors intended exchange
+        $(document).on('click', '.button-start-exchange-player', function () {
+            console.log( $(this).data('table_id'),  $(this).data('player2'))
             socket.emit('exchange-start', {
                 player_id: player_id,
-                table_id: $(this).data('table_id')
+                table_id: $(this).data('table_id'),
+                player2: $(this).data('player2')
             })
         })
 

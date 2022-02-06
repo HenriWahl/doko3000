@@ -887,11 +887,7 @@ def exchange_ask_player2(msg):
     """
     msg_ok, player, table = check_message(msg)
     if msg_ok:
-        player2 = table.round.get_peer(player.id)
-        hochzeit = table.round.has_hochzeit()
-        exchange_type = 'contra'
-        if not hochzeit and player.party == 're':
-            exchange_type = 're'
+        player2 = msg.get('player2')
         # ask peer player2 if exchange is ok
         socketio.emit('exchange-ask-player2',
                       {'table_id': table.id,
@@ -899,7 +895,6 @@ def exchange_ask_player2(msg):
                        'html': render_template('round/exchange_ask_player2.html',
                                                game=game,
                                                table=table,
-                                               exchange_type=exchange_type,
                                                exchange_player_id=player.id
                                                )},
                       to=sessions.get(player2))
