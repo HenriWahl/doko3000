@@ -512,6 +512,7 @@ $(document).ready(function () {
 
         // peer of a player gets asked if exchange is wanted
         socket.on('exchange-ask-player2', function (msg) {
+            console.log(player_id, msg.player2)
             if (check_sync(msg)) {
                 $('#turn_indicator').addClass('d-none')
                 // there is no need anymore to deal cards
@@ -1177,7 +1178,7 @@ $(document).ready(function () {
             table_mode = 'locked'
         })
 
-        // player1 selects peer player fors intended exchange
+        // player1 selects peer player for intended exchange
         $(document).on('click', '.button-start-exchange-player', function () {
             console.log( $(this).data('table_id'),  $(this).data('player2'))
             socket.emit('exchange-start', {

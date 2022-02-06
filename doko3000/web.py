@@ -892,6 +892,7 @@ def exchange_ask_player2(msg):
         socketio.emit('exchange-ask-player2',
                       {'table_id': table.id,
                        'sync_count': table.sync_count,
+                       'player2': player2,
                        'html': render_template('round/exchange_ask_player2.html',
                                                game=game,
                                                table=table,
