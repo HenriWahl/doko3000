@@ -472,7 +472,8 @@ $(document).ready(function () {
         // a player denied an exchange and now table mode must be normal again
         socket.on('player2-denied-exchange', function (msg) {
             if (check_sync(msg)) {
-                table_mode = 'normal'
+                table_mode = 'normal'                player2: $(this).data('player2')
+
             }
         })
 
@@ -512,7 +513,7 @@ $(document).ready(function () {
 
         // peer of a player gets asked if exchange is wanted
         socket.on('exchange-ask-player2', function (msg) {
-            console.log(player_id, msg.player2)
+            console.log(player_id, msg.player2_id)
             if (check_sync(msg)) {
                 $('#turn_indicator').addClass('d-none')
                 // there is no need anymore to deal cards
@@ -1180,11 +1181,11 @@ $(document).ready(function () {
 
         // player1 selects peer player for intended exchange
         $(document).on('click', '.button-start-exchange-player', function () {
-            console.log( $(this).data('table_id'),  $(this).data('player2'))
+            console.log( $(this).data('table_id'),  $(this).data('player2_id'))
             socket.emit('exchange-start', {
                 player_id: player_id,
                 table_id: $(this).data('table_id'),
-                player2: $(this).data('player2')
+                player2_id: $(this).data('player2_id')
             })
         })
 
@@ -1192,7 +1193,8 @@ $(document).ready(function () {
         $(document).on('click', '#button_exchange_confirm_player2', function () {
             socket.emit('exchange-player2-ready', {
                 player_id: player_id,
-                table_id: $(this).data('table_id')
+                table_id: $(this).data('table_id'),
+                player1_id: $(this).data('player1_id')
             })
         })
 

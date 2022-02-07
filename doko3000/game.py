@@ -830,137 +830,137 @@ class Round(Document3000):
         opens exchange for 2 players
         """
         # force alphabetical order of exchange hash to avoid 2 exchanges of same players vice versa
-        self.exchange[''.join(sorted([player1_id, player2_id]))] = {player1_id: self.game.players[player1_id].exchange_cards,
-                                                      player2_id: self.game.players[player1_id].exchange_cards}
+        self.exchange[''.join(sorted([player1_id, player2_id]))] = [player1_id,
+                                                                    player2_id]
         self.save()
         return True
 
 
-def update_exchange(self, player_id, cards_ids):
-    """
-    modify exchange during players are dragging and dropping cards
-    """
-    player = self.game.players[player_id]
-    if player.party in self.exchange and \
-            player_id in self.exchange[player.party]:
-        self.exchange[player.party][player.id] = cards_ids
+    def update_exchange(self, player_id, cards_ids):
+        """
+        modify exchange during players are dragging and dropping cards
+        """
+        player = self.game.players[player_id]
+        if player.party in self.exchange and \
+                player_id in self.exchange[player.party]:
+            self.exchange[player.party][player.id] = cards_ids
+            self.save()
+            return True
+        return False
+
+
+    def reset_exchange(self):
+        """
+        used to remove all open exchanges, for example at .reset()
+        """
+        self.exchange = {}
+
+
+    def is_exchange_needed(self, player_id):
+        """
+        check if there are ongoing exchanges where player is involved
+        """
+        player = self.game.players[player_id]
+        if player.party in self.exchange and player.id in self.exchange[player.party]:
+            # if player did not change anything echange is needed
+            if not self.exchange[player.party][player.id]:
+                return True
+            # find out if any party member already has cards
+            for member_id in self.exchange[player.party]:
+                if len(self.exchange[player.party][member_id]) > 0:
+                    break
+            else:
+                # if both party member did not exchange any card yet exchange is needed
+                return True
+            # get ID of party member peer player to check its cards
+            peer_id = [x for x in self.exchange[player.party] if x != player.id][0]
+            # find out if the cards this player wants to exchange already found their way to its peer
+            if not all(x in self.game.players[peer_id].cards for x in self.exchange[player.party][player.id]):
+                return True
+        return False
+
+
+    def calculate_stats(self):
+        """
+        get score and tricks count of players for display
+        """
+        score = {}
+        tricks = {}
+        for player_id in self.players:
+            score[player_id] = 0
+            tricks[player_id] = 0
+        for trick in self.tricks.values():
+            if trick and trick.owner:
+                if trick.owner not in score:
+                    score[trick.owner] = 0
+                # add score of trick deck cards to owner score
+                for card_id in trick.cards:
+                    score[trick.owner] += Deck.cards[card_id].value
+                if trick.owner not in tricks:
+                    tricks[trick.owner] = 0
+                # add number of tricks count to owner
+                tricks[trick.owner] += 1
+        self.stats['score'] = deepcopy(score)
+        self.stats['tricks'] = deepcopy(tricks)
+
+
+    def calculate_trick_order(self):
+        """
+        get order by arranging players list starting from current player who is first in this trick
+        """
+        if self.current_player_id:
+            current_player_id_index = self.players.index(self.current_player_id)
+            self.trick_order = self.players[current_player_id_index:] + self.players[:current_player_id_index]
+
+
+    def increase_turn_count(self):
+        self.turn_count += 1
         self.save()
-        return True
-    return False
 
 
-def reset_exchange(self):
-    """
-    used to remove all open exchanges, for example at .reset()
-    """
-    self.exchange = {}
+    def get_players_shuffled_cards(self):
+        """
+        retrieve all cards of all players for spectator mode
+        """
+        players_cards = []
+        for player_id in self.players:
+            # only if player allows it
+            if self.game.players[player_id].allows_spectators:
+                # players_cards.append(shuffle(self.game.players[player_id].get_cards()))
+                cards = self.game.players[player_id].get_cards()
+                shuffle(cards)
+                players_cards.append(cards)
+            else:
+                players_cards.append([])
+        return players_cards
 
 
-def is_exchange_needed(self, player_id):
-    """
-    check if there are ongoing exchanges where player is involved
-    """
-    player = self.game.players[player_id]
-    if player.party in self.exchange and player.id in self.exchange[player.party]:
-        # if player did not change anything echange is needed
-        if not self.exchange[player.party][player.id]:
-            return True
-        # find out if any party member already has cards
-        for member_id in self.exchange[player.party]:
-            if len(self.exchange[player.party][member_id]) > 0:
-                break
+    def undo(self):
+        """
+        undo last trick by request
+        """
+        # if already some tricks exist take first player as it started the trick
+        if self.current_trick.players:
+            for player_id, card_id in zip(self.current_trick.players, self.current_trick.cards):
+                self.game.players[player_id].cards.append(card_id)
+                # decrease turn_count here to avoid extra self.save() like in increase_turn_count()
+                self.turn_count -= 1
+            self.current_player_id = self.current_trick.players[0]
+            self.current_trick.reset()
+        # otherwise the previous trick is to be treated
         else:
-            # if both party member did not exchange any card yet exchange is needed
-            return True
-        # get ID of party member peer player to check its cards
-        peer_id = [x for x in self.exchange[player.party] if x != player.id][0]
-        # find out if the cards this player wants to exchange already found their way to its peer
-        if not all(x in self.game.players[peer_id].cards for x in self.exchange[player.party][player.id]):
-            return True
-    return False
-
-
-def calculate_stats(self):
-    """
-    get score and tricks count of players for display
-    """
-    score = {}
-    tricks = {}
-    for player_id in self.players:
-        score[player_id] = 0
-        tricks[player_id] = 0
-    for trick in self.tricks.values():
-        if trick and trick.owner:
-            if trick.owner not in score:
-                score[trick.owner] = 0
-            # add score of trick deck cards to owner score
-            for card_id in trick.cards:
-                score[trick.owner] += Deck.cards[card_id].value
-            if trick.owner not in tricks:
-                tricks[trick.owner] = 0
-            # add number of tricks count to owner
-            tricks[trick.owner] += 1
-    self.stats['score'] = deepcopy(score)
-    self.stats['tricks'] = deepcopy(tricks)
-
-
-def calculate_trick_order(self):
-    """
-    get order by arranging players list starting from current player who is first in this trick
-    """
-    if self.current_player_id:
-        current_player_id_index = self.players.index(self.current_player_id)
-        self.trick_order = self.players[current_player_id_index:] + self.players[:current_player_id_index]
-
-
-def increase_turn_count(self):
-    self.turn_count += 1
-    self.save()
-
-
-def get_players_shuffled_cards(self):
-    """
-    retrieve all cards of all players for spectator mode
-    """
-    players_cards = []
-    for player_id in self.players:
-        # only if player allows it
-        if self.game.players[player_id].allows_spectators:
-            # players_cards.append(shuffle(self.game.players[player_id].get_cards()))
-            cards = self.game.players[player_id].get_cards()
-            shuffle(cards)
-            players_cards.append(cards)
-        else:
-            players_cards.append([])
-    return players_cards
-
-
-def undo(self):
-    """
-    undo last trick by request
-    """
-    # if already some tricks exist take first player as it started the trick
-    if self.current_trick.players:
-        for player_id, card_id in zip(self.current_trick.players, self.current_trick.cards):
-            self.game.players[player_id].cards.append(card_id)
-            # decrease turn_count here to avoid extra self.save() like in increase_turn_count()
-            self.turn_count -= 1
-        self.current_player_id = self.current_trick.players[0]
-        self.current_trick.reset()
-    # otherwise the previous trick is to be treated
-    else:
-        for player_id, card_id in zip(self.previous_trick.players, self.previous_trick.cards):
-            self.game.players[player_id].cards.append(card_id)
-            # decrease turn_count here to avoid extra self.save() like in increase_turn_count()
-            self.turn_count -= 1
-        self.current_player_id = self.previous_trick.players[0]
-        self.previous_trick.reset()
-    # trick order has to be fixed
-    self.calculate_trick_order()
-    # recalculate statistics due to reverted ownerships
-    self.calculate_stats()
-    # finally save undone trick
-    self.save()
+            for player_id, card_id in zip(self.previous_trick.players, self.previous_trick.cards):
+                self.game.players[player_id].cards.append(card_id)
+                # decrease turn_count here to avoid extra self.save() like in increase_turn_count()
+                self.turn_count -= 1
+            self.current_player_id = self.previous_trick.players[0]
+            self.previous_trick.reset()
+        # trick order has to be fixed
+        self.calculate_trick_order()
+        # recalculate statistics due to reverted ownerships
+        self.calculate_stats()
+        # finally save undone trick
+        self.save()
 
 
 class Table(Document3000):

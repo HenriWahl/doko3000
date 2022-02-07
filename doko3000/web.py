@@ -887,14 +887,14 @@ def exchange_ask_player2(msg):
     """
     msg_ok, player, table = check_message(msg)
     if msg_ok and \
-            msg.get('player2') in table.round.players and \
-            msg.get('player2') != player.id:
-        player.exchange_new(peer_id=msg.get('player2'))
+            msg.get('player2_id') in table.round.players and \
+            msg.get('player2_id') != player.id:
+        player.exchange_new(peer_id=msg.get('player2_id'))
         # ask peer player2 if exchange is ok
         socketio.emit('exchange-ask-player2',
                       {'table_id': table.id,
                        'sync_count': table.sync_count,
-                       'player2_id': player.exchange_peer_id,
+                       'player1_id': player.exchange_peer_id,
                        'html': render_template('round/exchange_ask_player2.html',
                                                game=game,
                                                table=table,
