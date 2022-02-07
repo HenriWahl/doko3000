@@ -886,19 +886,21 @@ def exchange_ask_player2(msg):
     exchange peer player2 has to be asked
     """
     msg_ok, player, table = check_message(msg)
-    if msg_ok:
-        player2 = msg.get('player2')
+    if msg_ok and \
+            msg.get('player2') in table.round.players and \
+            msg.get('player2') != player.id:
+        player.exchange_new(peer_id=msg.get('player2'))
         # ask peer player2 if exchange is ok
         socketio.emit('exchange-ask-player2',
                       {'table_id': table.id,
                        'sync_count': table.sync_count,
-                       'player2': player2,
+                       'player2_id': player.exchange_peer_id,
                        'html': render_template('round/exchange_ask_player2.html',
                                                game=game,
                                                table=table,
-                                               exchange_player_id=player.id
+                                               player1_id=player.id
                                                )},
-                      to=sessions.get(player2))
+                      to=sessions.get(player.exchange_peer_id))
 
 
 @socketio.on('exchange-player2-ready')
@@ -909,18 +911,21 @@ def exchange_player2_ready(msg):
     msg_ok, player, table = check_message(msg)
     if msg_ok:
         # peer of peer is exchange starting player again - necessary because answer comes from player2
-        player1 = table.round.get_peer(player.id)
-        if table.round.create_exchange(player1):
-            # tell all players that there is an exchange going on
-            socketio.emit('exchange-players-starting',
-                          {'table_id': table.id,
-                           'sync_count': table.sync_count},
-                          to=table.id)
-            # tell exchange initializing player to finally begin transaction
-            socketio.emit('exchange-player1-start',
-                          {'table_id': table.id,
-                           'sync_count': table.sync_count},
-                          to=sessions.get(player1))
+        player1_id = msg.get('player1_id')
+        if game.players.get(player1_id) and\
+            game.players.get(player1_id).exchange_peer_id == player.id:
+            player.exchange_new(peer_id=player1_id)
+            if table.round.create_exchange(player1=player1_id, player2=player.id):
+                # tell all players that there is an exchange going on
+                socketio.emit('exchange-players-starting',
+                              {'table_id': table.id,
+                               'sync_count': table.sync_count},
+                              to=table.id)
+                # tell exchange initializing player to finally begin transaction
+                socketio.emit('exchange-player1-start',
+                              {'table_id': table.id,
+                               'sync_count': table.sync_count},
+                              to=sessions.get(player1_id))
 
 
 @socketio.on('exchange-player2-deny')

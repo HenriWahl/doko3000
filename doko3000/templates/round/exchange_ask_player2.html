@@ -1,7 +1,9 @@
-<div class="m-3 text-center"><h5>Soll ein Austausch</strong> mit <strong>{{ game.players[exchange_player_id].name }}</strong> vorgenommen werden?</h5>
+<div class="m-3 text-center"><h5><strong>Karten annehmen</strong> von <strong>{{ game.players[exchange_player_id].name }}</strong>?</h5>
 </div>
 <div class="row mt-4">
-    <div class="col-6" id="button_exchange_confirm_player2" data-table_id="{{ table.id }}">
+    <div class="col-6" id="button_exchange_confirm_player2"
+         data-table_id="{{ table.id }}"
+         player1_id="{{ player1_id }}">
         <button class="btn btn-success btn-block" data-dismiss="modal"><strong>Ja</strong></button>
     </div>
     <div class="col-6" id="button_exchange_deny_player2" data-table_id="{{ table.id }}">
