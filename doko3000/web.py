@@ -19,10 +19,12 @@ from flask_socketio import join_room, \
 from .config import Config
 from .database import DB
 from .game import Deck, \
-    Game, \
-    Player, \
-    Trick
-from .misc import is_xhr
+    Game
+from .misc import get_hash, \
+    is_xhr
+
+# needed for ajax detection
+ACCEPTED_JSON_MIMETYPES = ['*/*', 'text/javascript', 'application/json']
 
 # initialize app
 app = Flask(__name__)
@@ -249,10 +251,12 @@ def card_exchanged(msg):
     """
     msg_ok, player, table = check_message(msg)
     if msg_ok:
+        exchange_hash = get_hash(player.id, player.exchange_peer_id)
         if table.round.exchange and \
-                player.party in table.round.exchange:
+                exchange_hash in table.round.exchange:
             cards_table_ids = msg.get('cards_table_ids')
-            table.round.update_exchange(player.id, cards_table_ids)
+            if cards_table_ids:
+                table.round.update_exchange(player.id, cards_table_ids)
 
 
 @socketio.on('exchange-player-cards-to-server')
@@ -262,15 +266,15 @@ def exchange_player_cards(msg):
     """
     msg_ok, player, table = check_message(msg)
     if msg_ok:
+        exchange_hash = get_hash(player.id, player.exchange_peer_id)
         if table.round.exchange and \
-                player.party in table.round.exchange:
-            exchange = table.round.exchange[player.party]
+                table.round.exchange.get(exchange_hash):
+            exchange = table.round.exchange[exchange_hash]
             if set(msg.get('cards_table_ids')) == set(exchange[player.id]):
                 # remove cards from exchanging player
                 player.remove_cards(exchange[player.id])
                 # get peer id to send cards to
-                peer_id = [x for x in exchange if x != player.id][0]
-                peer = game.players[peer_id]
+                peer = game.players[player.exchange_peer_id]
                 peer.cards += exchange[player.id]
                 cards_hand = [Deck.cards[x] for x in peer.cards]
                 cards_exchange_count = len(exchange[player.id])
@@ -280,7 +284,7 @@ def exchange_player_cards(msg):
                 else:
                     table_mode = 'normal'
                 event = 'exchange-player-cards-to-client'
-                payload = {'player_id': peer_id,
+                payload = {'player_id': player.exchange_peer_id,
                            'table_id': table.id,
                            'cards_exchange_count': cards_exchange_count,
                            'table_mode': table_mode,
@@ -290,7 +294,7 @@ def exchange_player_cards(msg):
                                                                   player=player,
                                                                   game=game),
                                     }}
-                room = sessions.get(peer_id)
+                room = sessions.get(player.exchange_peer_id)
                 # debugging...
                 if table.is_debugging:
                     table.log(event, payload, room)
@@ -307,6 +311,8 @@ def exchange_player_cards(msg):
                                    'sync_count': table.sync_count,
                                    'current_player_id': current_player_id},
                                   to=table.id)
+                    # finally clear exchange
+                    table.round.reset_exchange()
 
 
 @socketio.on('setup-table-change')
@@ -480,9 +486,10 @@ def deliver_cards_to_player(msg):
                 # player_showing_hand contains cards-showing player_id
                 cards_table = game.players[table.round.player_showing_hand].get_cards()
             elif exchange_needed:
-                cards_table = game.deck.get_cards(table.round.exchange[player.party][player.id])
+                exchange_hash = get_hash(player.id, player.exchange_peer_id)
+                cards_table = game.deck.get_cards(table.round.exchange[exchange_hash][player.id])
                 # take out the cards from player's hand which lay on table
-                cards_hand = [x for x in cards_hand if x.id not in table.round.exchange[player.party][player.id]]
+                cards_hand = [x for x in cards_hand if x.id not in table.round.exchange[exchange_hash][player.id]]
             else:
                 cards_table = []
             mode = 'player'
@@ -854,31 +861,22 @@ def request_exchange(msg):
     player asks for exchange
     """
     msg_ok, player, table = check_message(msg)
-    if msg_ok:
-        hochzeit = table.round.has_hochzeit()
-        exchange_type = 'contra'
-        if not hochzeit and player.party == 're':
-            exchange_type = 're'
-        exchanged_already = False
-        if table.round.exchange and \
-                player.party in table.round.exchange and \
-                table.round.exchange[player.party]:
-            exchanged_already = True
-        # tell everybody there is an ongoing exchange in case it is possible
-        if not (hochzeit or table.round.card_played or exchanged_already):
-            socketio.emit('player1-requested-exchange',
-                          {'table_id': table.id,
-                           'sync_count': table.sync_count},
-                          to=table.id)
+    if msg_ok and \
+            not table.round.card_played and \
+            not table.round.exchange:
+        # lock table for players
+        players_for_exchange = [x for x in game.players.values() if x.id != player.id and x.id in table.round.players]
+        socketio.emit('player1-requested-exchange',
+                      {'table_id': table.id,
+                       'sync_count': table.sync_count},
+                      to=table.id)
         # ask player if exchange really should be started or tell it is not possible
         socketio.emit('confirm-exchange',
                       {'table_id': table.id,
                        'sync_count': table.sync_count,
                        'html': render_template('round/request_exchange.html',
                                                table=table,
-                                               hochzeit=hochzeit,
-                                               exchange_type=exchange_type,
-                                               exchanged_already=exchanged_already
+                                               players_for_exchange=players_for_exchange
                                                )},
                       to=request.sid)
 
@@ -889,23 +887,43 @@ def exchange_ask_player2(msg):
     exchange peer player2 has to be asked
     """
     msg_ok, player, table = check_message(msg)
+    if msg_ok and \
+            msg.get('player2_id') in table.round.players and \
+            msg.get('player2_id') != player.id:
+        player2_id = msg.get('player2_id')
+        if game.players.get(player2_id) and \
+                sessions.get(player2_id):
+            player.exchange_new(peer_id=player2_id)
+            game.players.get(player2_id).exchange_new(player.id)
+            # ask peer player2 if exchange is ok
+            socketio.emit('exchange-ask-player2',
+                          {'table_id': table.id,
+                           'sync_count': table.sync_count,
+                           'player1_id': player.exchange_peer_id,
+                           'html': render_template('round/exchange_ask_player2.html',
+                                                   game=game,
+                                                   table=table,
+                                                   player1_id=player.id
+                                                   )},
+                          to=sessions.get(player.exchange_peer_id))
+
+
+@socketio.on('exchange-cancel-player1')
+def exchange_cancel(msg):
+    """
+    the initiating player 1 canceled the exchange - all other players need to know to get their tables unlocked
+    """
+    msg_ok, player, table = check_message(msg)
     if msg_ok:
-        player2 = table.round.get_peer(player.id)
-        hochzeit = table.round.has_hochzeit()
-        exchange_type = 'contra'
-        if not hochzeit and player.party == 're':
-            exchange_type = 're'
-        # ask peer player2 if exchange is ok
-        socketio.emit('exchange-ask-player2',
+        # no need for obsolete exchange peer
+        player.exchange_clear()
+        current_player_id = table.round.current_player_id
+        # cancelling is the same like being finished so just send the already teated event
+        socketio.emit('exchange-players-finished',
                       {'table_id': table.id,
                        'sync_count': table.sync_count,
-                       'html': render_template('round/exchange_ask_player2.html',
-                                               game=game,
-                                               table=table,
-                                               exchange_type=exchange_type,
-                                               exchange_player_id=player.id
-                                               )},
-                      to=sessions.get(player2))
+                       'current_player_id': current_player_id},
+                      to=table.id)
 
 
 @socketio.on('exchange-player2-ready')
@@ -916,18 +934,22 @@ def exchange_player2_ready(msg):
     msg_ok, player, table = check_message(msg)
     if msg_ok:
         # peer of peer is exchange starting player again - necessary because answer comes from player2
-        player1 = table.round.get_peer(player.id)
-        if table.round.create_exchange(player1):
-            # tell all players that there is an exchange going on
-            socketio.emit('exchange-players-starting',
-                          {'table_id': table.id,
-                           'sync_count': table.sync_count},
-                          to=table.id)
-            # tell exchange initializing player to finally begin transaction
-            socketio.emit('exchange-player1-start',
-                          {'table_id': table.id,
-                           'sync_count': table.sync_count},
-                          to=sessions.get(player1))
+        player1_id = msg.get('player1_id')
+        if game.players.get(player1_id) and \
+                game.players.get(player1_id).exchange_peer_id == player.id and \
+                sessions.get(player1_id):
+            player.exchange_new(peer_id=player1_id)
+            if table.round.create_exchange(player1_id=player1_id, player2_id=player.id):
+                # tell all players that there is an exchange going on
+                socketio.emit('exchange-players-starting',
+                              {'table_id': table.id,
+                               'sync_count': table.sync_count},
+                              to=table.id)
+                # tell exchange initializing player to finally begin transaction
+                socketio.emit('exchange-player1-start',
+                              {'table_id': table.id,
+                               'sync_count': table.sync_count},
+                              to=sessions.get(player1_id))
 
 
 @socketio.on('exchange-player2-deny')
@@ -937,12 +959,6 @@ def exchange_player2_deny(msg):
     """
     msg_ok, player, table = check_message(msg)
     if msg_ok:
-        # peer of peer is exchange starting player again - necessary because answer comes from player2
-        player1 = table.round.get_peer(player.id)
-        hochzeit = table.round.has_hochzeit()
-        exchange_type = 'contra'
-        if not hochzeit and player.party == 're':
-            exchange_type = 're'
         # tell everybody that there will be no exchange
         socketio.emit('player2-denied-exchange',
                       {'table_id': table.id,
@@ -955,10 +971,13 @@ def exchange_player2_deny(msg):
                        'html': render_template('round/exchange_player2_deny.html',
                                                game=game,
                                                table=table,
-                                               exchange_type=exchange_type,
                                                exchange_player_id=player.id
                                                )},
-                      to=sessions.get(player1))
+                      to=sessions.get(player.exchange_peer_id))
+        # exchange peer id is still needed for sending message via socket.io
+        player.exchange_clear()
+        if game.players.get(player.exchange_peer_id):
+            game.players.get(player.exchange_peer_id).exchange_clear()
 
 
 #
@@ -1034,9 +1053,10 @@ def table(table_id=''):
                 # player_showing_hand contains cards-showing player_id
                 cards_table = game.players[table.round.player_showing_hand].get_cards()
             elif exchange_needed:
-                cards_table = game.deck.get_cards(table.round.exchange[player.party][player.id])
+                exchange_hash = get_hash(player.id, player.exchange_peer_id)
+                cards_table = game.deck.get_cards(table.round.exchange[exchange_hash][player.id])
                 # take out the cards from player's hand which lay on table
-                cards_hand = [x for x in cards_hand if x.id not in table.round.exchange[player.party][player.id]]
+                cards_hand = [x for x in cards_hand if x.id not in table.round.exchange[exchange_hash][player.id]]
             else:
                 cards_table = table.round.current_trick.get_cards()
             mode = 'player'

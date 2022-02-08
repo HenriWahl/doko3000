@@ -13,6 +13,7 @@ from werkzeug.security import check_password_hash, \
     generate_password_hash
 
 from .database import Document3000
+from .misc import get_hash
 
 
 class Card:
@@ -80,7 +81,8 @@ class Deck:
                 self.file_extension = 'png'
                 return None
         # the card back image also has to exist and preferably be SVG
-        if not (Path(f'doko3000/static/img/cards/back.svg').exists() and Path(f'doko3000/static/img/cards/back.svg').is_file()):
+        if not (Path(f'doko3000/static/img/cards/back.svg').exists() and Path(
+                f'doko3000/static/img/cards/back.svg').is_file()):
             self.file_extension = 'png'
 
     def get_cards(self, cards_ids):
@@ -122,8 +124,8 @@ class Player(UserMixin, Document3000):
             self['allows_spectators'] = True
             # only watches other players playing
             self['is_spectator_only'] = False
-            # store party when dealing to keep track of player's party when exchanging cards
-            self['party'] = ''
+            # manage exchanges
+            self['exchange_peer_id'] = ''
             self.save()
         elif document:
             super().__init__(database=self.game.db.database, document_id=document['_id'])
@@ -133,7 +135,6 @@ class Player(UserMixin, Document3000):
     @property
     def id(self):
         # meanwhile returns CouchDB ID
-        # returrn self.get('_id').replace('player-', '')
         return self.get('_id')
 
     @property
@@ -155,17 +156,9 @@ class Player(UserMixin, Document3000):
     @cards.setter
     def cards(self, value):
         """
-        either re or contra, depending of Eichel Ober ownership an important for contra/re exchange
+        just cards
         """
         self['cards'] = value
-
-    @property
-    def party(self):
-        return self.get('party', '')
-
-    @party.setter
-    def party(self, value):
-        self['party'] = value
 
     @property
     def is_admin(self):
@@ -214,6 +207,14 @@ class Player(UserMixin, Document3000):
     @eichel_ober_count.setter
     def eichel_ober_count(self, value):
         self['eichel_ober_count'] = value
+
+    @property
+    def exchange_peer_id(self):
+        return self.get('exchange_peer_id', '')
+
+    @exchange_peer_id.setter
+    def exchange_peer_id(self, value):
+        self['exchange_peer_id'] = value
 
     @property
     def is_playing(self):
@@ -296,8 +297,23 @@ class Player(UserMixin, Document3000):
         """
         if player is idle or gets new cards it doesn't need its old cards
         """
-        self.cards = []
+        self.cards.clear()
         self.save()
+
+    def exchange_new(self, peer_id):
+        """
+        start new exchange process
+        """
+        self.exchange_peer_id = peer_id
+        self.save()
+
+    def exchange_clear(self):
+        """
+        remove obsolete exchange peer
+        """
+        self.exchange_peer_id = ''
+        self.save()
+
 
 
 class Trick(Document3000):
@@ -739,13 +755,6 @@ class Round(Document3000):
                 if Deck.cards[card_id].name == 'Eichel-Ober':
                     player.eichel_ober_count += 1
 
-            # find out player's party
-            player.party = 'contra'
-            if player.eichel_ober_count == 2:
-                player.party = 'hochzeit'
-            elif player.eichel_ober_count == 1:
-                player.party = 're'
-
             # next player
             player_count += 1
 
@@ -772,53 +781,26 @@ class Round(Document3000):
         # current player is the next player
         return self.current_player_id
 
-    def has_hochzeit(self):
-        """
-        check if any player has 2 Eichel Ober cards which means a Hochzeit
-        necessary for exchanges - if someone has a Hochzeit no exchange is possible
-        """
-        hochzeit = False
-        for player in self.players:
-            if self.game.players[player].eichel_ober_count == 2:
-                hochzeit = True
-                break
-        return hochzeit
 
-    def get_peer(self, player_id):
+    def create_exchange(self, player1_id, player2_id):
         """
-        returns the peer player of given player - if there is hochzeit return False
+        opens exchange for 2 players
         """
-        if self.has_hochzeit() or \
-                player_id not in self.players:
-            return False
-        for peer_player_id in [x for x in self.players if x != player_id]:
-            # the two players having the same number of Eichel Ober are peers
-            if self.game.players[peer_player_id].eichel_ober_count == self.game.players[player_id].eichel_ober_count:
-                break
-        return peer_player_id
-
-    def create_exchange(self, player_id):
-        """
-        opens exchange for the party of the player
-        """
-        player = self.game.players[player_id]
-        if not self.has_hochzeit() and \
-                player.party not in self.exchange:
-            # just containing exchanged cards per exchange peer
-            self.exchange[player.party] = {player.id: [],
-                                           self.get_peer(player.id): []}
-            self.save()
-            return True
-        return False
+        # force alphabetical order of exchange hash to avoid 2 exchanges of same players vice versa
+        self.exchange[get_hash(player1_id, player2_id)] = {player1_id: [],
+                                                           player2_id: []}
+        self.save()
+        return True
 
     def update_exchange(self, player_id, cards_ids):
         """
         modify exchange during players are dragging and dropping cards
         """
         player = self.game.players[player_id]
-        if player.party in self.exchange and \
-                player_id in self.exchange[player.party]:
-            self.exchange[player.party][player.id] = cards_ids
+        exchange_hash = get_hash(player.id, player.exchange_peer_id)
+        if exchange_hash in self.exchange and \
+                player_id in self.exchange[exchange_hash]:
+            self.exchange[exchange_hash][player.id] = cards_ids
             self.save()
             return True
         return False
@@ -834,21 +816,20 @@ class Round(Document3000):
         check if there are ongoing exchanges where player is involved
         """
         player = self.game.players[player_id]
-        if player.party in self.exchange and player.id in self.exchange[player.party]:
+        exchange_hash = get_hash(player.id, player.exchange_peer_id)
+        if exchange_hash in self.exchange and player.id in self.exchange[exchange_hash]:
             # if player did not change anything echange is needed
-            if not self.exchange[player.party][player.id]:
+            if not self.exchange[exchange_hash][player.id]:
                 return True
-            # find out if any party member already has cards
-            for member_id in self.exchange[player.party]:
-                if len(self.exchange[player.party][member_id]) > 0:
+            # find out if any exchange peer member already has cards
+            for member_id in self.exchange[exchange_hash]:
+                if len(self.exchange[exchange_hash][member_id]) > 0:
                     break
             else:
-                # if both party member did not exchange any card yet exchange is needed
+                # if both exchange peers did not exchange any card yet exchange is needed
                 return True
-            # get ID of party member peer player to check its cards
-            peer_id = [x for x in self.exchange[player.party] if x != player.id][0]
             # find out if the cards this player wants to exchange already found their way to its peer
-            if not all(x in self.game.players[peer_id].cards for x in self.exchange[player.party][player.id]):
+            if not all(x in self.game.players[player.exchange_peer_id].cards for x in self.exchange[exchange_hash][player.id]):
                 return True
         return False
 
@@ -1302,7 +1283,8 @@ class Game:
         # check for locked tables
         self.check_tables()
 
-    def add_player(self, name='', password='', is_spectator_only=False, allows_spectators=False, is_admin=False, convert=False):
+    def add_player(self, name='', password='', is_spectator_only=False, allows_spectators=False, is_admin=False,
+                   convert=False):
         """
         adds a new player
         """
