@@ -1170,8 +1170,8 @@ $(document).ready(function () {
                     player_id: player_id,
                     table_id: $(this).data('table_id')
                 })
-            }
             table_mode = 'locked'
+            }
         })
 
         // player1 selects peer player for intended exchange

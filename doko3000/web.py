@@ -311,6 +311,8 @@ def exchange_player_cards(msg):
                                    'sync_count': table.sync_count,
                                    'current_player_id': current_player_id},
                                   to=table.id)
+                    # finally clear exchange
+                    table.round.reset_exchange()
 
 
 @socketio.on('setup-table-change')
@@ -888,18 +890,22 @@ def exchange_ask_player2(msg):
     if msg_ok and \
             msg.get('player2_id') in table.round.players and \
             msg.get('player2_id') != player.id:
-        player.exchange_new(peer_id=msg.get('player2_id'))
-        # ask peer player2 if exchange is ok
-        socketio.emit('exchange-ask-player2',
-                      {'table_id': table.id,
-                       'sync_count': table.sync_count,
-                       'player1_id': player.exchange_peer_id,
-                       'html': render_template('round/exchange_ask_player2.html',
-                                               game=game,
-                                               table=table,
-                                               player1_id=player.id
-                                               )},
-                      to=sessions.get(player.exchange_peer_id))
+        player2_id = msg.get('player2_id')
+        if game.players.get(player2_id) and \
+                sessions.get(player2_id):
+            player.exchange_new(peer_id=player2_id)
+            game.players.get(player2_id).exchange_new(player.id)
+            # ask peer player2 if exchange is ok
+            socketio.emit('exchange-ask-player2',
+                          {'table_id': table.id,
+                           'sync_count': table.sync_count,
+                           'player1_id': player.exchange_peer_id,
+                           'html': render_template('round/exchange_ask_player2.html',
+                                                   game=game,
+                                                   table=table,
+                                                   player1_id=player.id
+                                                   )},
+                          to=sessions.get(player.exchange_peer_id))
 
 
 @socketio.on('exchange-cancel-player1')
@@ -909,6 +915,8 @@ def exchange_cancel(msg):
     """
     msg_ok, player, table = check_message(msg)
     if msg_ok:
+        # no need for obsolete exchange peer
+        player.exchange_clear()
         current_player_id = table.round.current_player_id
         # cancelling is the same like being finished so just send the already teated event
         socketio.emit('exchange-players-finished',
@@ -928,7 +936,8 @@ def exchange_player2_ready(msg):
         # peer of peer is exchange starting player again - necessary because answer comes from player2
         player1_id = msg.get('player1_id')
         if game.players.get(player1_id) and \
-                game.players.get(player1_id).exchange_peer_id == player.id:
+                game.players.get(player1_id).exchange_peer_id == player.id and \
+                sessions.get(player1_id):
             player.exchange_new(peer_id=player1_id)
             if table.round.create_exchange(player1_id=player1_id, player2_id=player.id):
                 # tell all players that there is an exchange going on
@@ -965,6 +974,10 @@ def exchange_player2_deny(msg):
                                                exchange_player_id=player.id
                                                )},
                       to=sessions.get(player.exchange_peer_id))
+        # exchange peer id is still needed for sending message via socket.io
+        player.exchange_clear()
+        if game.players.get(player.exchange_peer_id):
+            game.players.get(player.exchange_peer_id).exchange_clear()
 
 
 #

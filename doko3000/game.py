@@ -307,6 +307,14 @@ class Player(UserMixin, Document3000):
         self.exchange_peer_id = peer_id
         self.save()
 
+    def exchange_clear(self):
+        """
+        remove obsolete exchange peer
+        """
+        self.exchange_peer_id = ''
+        self.save()
+
+
 
 class Trick(Document3000):
     """
