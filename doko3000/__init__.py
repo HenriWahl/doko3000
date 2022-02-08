@@ -511,6 +511,7 @@ def deliver_cards_to_player(msg):
                                 'cards_table': render_template('cards/table.html',
                                                                cards_table=cards_table,
                                                                table=table,
+                                                               game=game,
                                                                mode=mode)}
                        }
             room = request.sid
