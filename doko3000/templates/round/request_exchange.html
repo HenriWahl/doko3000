@@ -4,7 +4,7 @@
 <div class="row mb-1">
     {% for player in players_for_exchange %}
         <div class="col-sm-12 col-md-6 col-xl-4 mb-3">
-            <button class="btn btn-light btn-block btn-lg button-start-exchange-player"
+            <button class="btn btn-light btn-block btn-lg button-start-exchange-player1"
                     data-table_id="{{ table.id }}"
                     data-player2_id="{{ player.id }}"
                     data-dismiss="modal">
@@ -16,7 +16,10 @@
 <div class="row">
     <div class="col-6">
     </div>
-    <div class="col-6" data-table_id="{{ table.id }}">
-        <button class="btn btn-primary btn-block" data-dismiss="modal"><strong>Zurück</strong></button>
+    <div class="col-6">
+        <button class="btn btn-primary btn-block button-cancel-exchange-player1"
+                data-table_id="{{ table.id }}"
+                data-dismiss="modal">
+            <strong>Zurück</strong></button>
     </div>
 </div>

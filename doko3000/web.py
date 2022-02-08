@@ -253,7 +253,7 @@ def card_exchanged(msg):
     if msg_ok:
         exchange_hash = get_hash(player.id, player.exchange_peer_id)
         if table.round.exchange and \
-                 exchange_hash in table.round.exchange:
+                exchange_hash in table.round.exchange:
             cards_table_ids = msg.get('cards_table_ids')
             if cards_table_ids:
                 table.round.update_exchange(player.id, cards_table_ids)
@@ -859,23 +859,23 @@ def request_exchange(msg):
     player asks for exchange
     """
     msg_ok, player, table = check_message(msg)
-    if msg_ok:
-        if not table.round.card_played:
-            # lock table for players
-            players_for_exchange = [x for x in game.players.values() if x.id != player.id and x.id in table.round.players]
-            socketio.emit('player1-requested-exchange',
-                          {'table_id': table.id,
-                           'sync_count': table.sync_count},
-                          to=table.id)
-            # ask player if exchange really should be started or tell it is not possible
-            socketio.emit('confirm-exchange',
-                          {'table_id': table.id,
-                           'sync_count': table.sync_count,
-                           'html': render_template('round/request_exchange.html',
-                                                   table=table,
-                                                   players_for_exchange=players_for_exchange
-                                                   )},
-                          to=request.sid)
+    if msg_ok and \
+            not table.round.card_played:
+        # lock table for players
+        players_for_exchange = [x for x in game.players.values() if x.id != player.id and x.id in table.round.players]
+        socketio.emit('player1-requested-exchange',
+                      {'table_id': table.id,
+                       'sync_count': table.sync_count},
+                      to=table.id)
+        # ask player if exchange really should be started or tell it is not possible
+        socketio.emit('confirm-exchange',
+                      {'table_id': table.id,
+                       'sync_count': table.sync_count,
+                       'html': render_template('round/request_exchange.html',
+                                               table=table,
+                                               players_for_exchange=players_for_exchange
+                                               )},
+                      to=request.sid)
 
 
 @socketio.on('exchange-start')
@@ -899,6 +899,22 @@ def exchange_ask_player2(msg):
                                                player1_id=player.id
                                                )},
                       to=sessions.get(player.exchange_peer_id))
+
+
+@socketio.on('exchange-cancel-player1')
+def exchange_cancel(msg):
+    """
+    the initiating player 1 canceled the exchange - all other players need to know to get their tables unlocked
+    """
+    msg_ok, player, table = check_message(msg)
+    if msg_ok:
+        current_player_id = table.round.current_player_id
+        # cancelling is the same like being finished so just send the already teated event
+        socketio.emit('exchange-players-finished',
+                      {'table_id': table.id,
+                       'sync_count': table.sync_count,
+                       'current_player_id': current_player_id},
+                      to=table.id)
 
 
 @socketio.on('exchange-player2-ready')
@@ -947,7 +963,7 @@ def exchange_player2_deny(msg):
                                                table=table,
                                                exchange_player_id=player.id
                                                )},
-                      to=sessions.get(player1))
+                      to=sessions.get(player.exchange_peer_id))
 
 
 #

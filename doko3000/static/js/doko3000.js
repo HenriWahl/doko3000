@@ -507,7 +507,6 @@ $(document).ready(function () {
 
         // peer of a player gets asked if exchange is wanted
         socket.on('exchange-ask-player2', function (msg) {
-            console.log(player_id, msg.player1_id)
             if (check_sync(msg)) {
                 $('#turn_indicator').addClass('d-none')
                 // there is no need anymore to deal cards
@@ -527,10 +526,12 @@ $(document).ready(function () {
 
         // player1 shall start card exchange
         socket.on('exchange-player1-start', function (msg) {
-            $('#turn_indicator').addClass('d-none')
-            $('#button_exchange_send_cards').removeClass('d-none')
-            table_mode = 'exchange'
-            cards_locked = false
+            if (check_sync(msg)) {
+                $('#turn_indicator').addClass('d-none')
+                $('#button_exchange_send_cards').removeClass('d-none')
+                table_mode = 'exchange'
+                cards_locked = false
+            }
         })
 
         // exchanged cards arrive at exchanging peer
@@ -544,7 +545,6 @@ $(document).ready(function () {
             }
             $('#hand').html(msg.html.cards_hand)
             cards_locked = false
-            // }
         })
 
         // tell everybody that the exchange is finally starting, so no new cards should be dealed or put onto table
@@ -1172,8 +1172,7 @@ $(document).ready(function () {
         })
 
         // player1 selects peer player for intended exchange
-        $(document).on('click', '.button-start-exchange-player', function () {
-            console.log($(this).data('table_id'), $(this).data('player2_id'))
+        $(document).on('click', '.button-start-exchange-player1', function () {
             socket.emit('exchange-start', {
                 player_id: player_id,
                 table_id: $(this).data('table_id'),
@@ -1181,9 +1180,16 @@ $(document).ready(function () {
             })
         })
 
+        // player1 cancels exchange
+        $(document).on('click', '.button-cancel-exchange-player1', function () {
+            socket.emit('exchange-cancel-player1', {
+                player_id: player_id,
+                table_id: $(this).data('table_id')
+            })
+        })
+
         // player 2 confirms exchange
         $(document).on('click', '#button_exchange_confirm_player2', function () {
-            console.log('player1_id: ', $(this).data('player1_id'))
             socket.emit('exchange-player2-ready', {
                 player_id: player_id,
                 table_id: $(this).data('table_id'),
