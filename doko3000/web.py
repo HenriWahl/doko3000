@@ -252,7 +252,7 @@ def card_exchanged(msg):
     msg_ok, player, table = check_message(msg)
     if msg_ok:
         if table.round.exchange and \
-                player.party in table.round.exchange:
+                get_hash(player.id, player.exchange_peer_id) in table.round.exchange:
             cards_table_ids = msg.get('cards_table_ids')
             table.round.update_exchange(player.id, cards_table_ids)
 
