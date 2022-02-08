@@ -251,10 +251,12 @@ def card_exchanged(msg):
     """
     msg_ok, player, table = check_message(msg)
     if msg_ok:
+        exchange_hash = get_hash(player.id, player.exchange_peer_id)
         if table.round.exchange and \
-                get_hash(player.id, player.exchange_peer_id) in table.round.exchange:
+                 exchange_hash in table.round.exchange:
             cards_table_ids = msg.get('cards_table_ids')
-            table.round.update_exchange(player.id, cards_table_ids)
+            if cards_table_ids:
+                table.round.update_exchange(player.id, cards_table_ids)
 
 
 @socketio.on('exchange-player-cards-to-server')
@@ -272,8 +274,9 @@ def exchange_player_cards(msg):
                 # remove cards from exchanging player
                 player.remove_cards(exchange[player.id])
                 # get peer id to send cards to
-                peer_id = [x for x in exchange if x != player.id][0]
-                peer = game.players[peer_id]
+                #peer_id = [x for x in exchange if x != player.id][0]
+                #peer = game.players[peer_id]
+                peer = game.players[player.exchange_peer_id]
                 peer.cards += exchange[player.id]
                 cards_hand = [Deck.cards[x] for x in peer.cards]
                 cards_exchange_count = len(exchange[player.id])
@@ -283,7 +286,7 @@ def exchange_player_cards(msg):
                 else:
                     table_mode = 'normal'
                 event = 'exchange-player-cards-to-client'
-                payload = {'player_id': peer_id,
+                payload = {'player_id': player.exchange_peer_id,
                            'table_id': table.id,
                            'cards_exchange_count': cards_exchange_count,
                            'table_mode': table_mode,
@@ -293,7 +296,7 @@ def exchange_player_cards(msg):
                                                                   player=player,
                                                                   game=game),
                                     }}
-                room = sessions.get(peer_id)
+                room = sessions.get(player.exchange_peer_id)
                 # debugging...
                 if table.is_debugging:
                     table.log(event, payload, room)

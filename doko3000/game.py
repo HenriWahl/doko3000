@@ -841,9 +841,10 @@ class Round(Document3000):
         modify exchange during players are dragging and dropping cards
         """
         player = self.game.players[player_id]
-        if player.party in self.exchange and \
-                player_id in self.exchange[player.party]:
-            self.exchange[player.party][player.id] = cards_ids
+        exchange_hash = get_hash(player.id, player.exchange_peer_id)
+        if exchange_hash in self.exchange and \
+                player_id in self.exchange[exchange_hash]:
+            self.exchange[exchange_hash][player.id] = cards_ids
             self.save()
             return True
         return False
