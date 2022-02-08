@@ -860,7 +860,8 @@ def request_exchange(msg):
     """
     msg_ok, player, table = check_message(msg)
     if msg_ok and \
-            not table.round.card_played:
+            not table.round.card_played and \
+            not table.round.exchange:
         # lock table for players
         players_for_exchange = [x for x in game.players.values() if x.id != player.id and x.id in table.round.players]
         socketio.emit('player1-requested-exchange',

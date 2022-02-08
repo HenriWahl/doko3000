@@ -1164,10 +1164,13 @@ $(document).ready(function () {
 
         // player wants to exchange cards (re/contra)
         $(document).on('click', '#menu_request_exchange', function () {
-            socket.emit('request-exchange', {
-                player_id: player_id,
-                table_id: $(this).data('table_id')
-            })
+            console.log(table_mode)
+            if (table_mode != 'locked') {
+                socket.emit('request-exchange', {
+                    player_id: player_id,
+                    table_id: $(this).data('table_id')
+                })
+            }
             table_mode = 'locked'
         })
 
