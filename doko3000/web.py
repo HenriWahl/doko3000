@@ -274,8 +274,6 @@ def exchange_player_cards(msg):
                 # remove cards from exchanging player
                 player.remove_cards(exchange[player.id])
                 # get peer id to send cards to
-                #peer_id = [x for x in exchange if x != player.id][0]
-                #peer = game.players[peer_id]
                 peer = game.players[player.exchange_peer_id]
                 peer.cards += exchange[player.id]
                 cards_hand = [Deck.cards[x] for x in peer.cards]
@@ -486,9 +484,10 @@ def deliver_cards_to_player(msg):
                 # player_showing_hand contains cards-showing player_id
                 cards_table = game.players[table.round.player_showing_hand].get_cards()
             elif exchange_needed:
-                cards_table = game.deck.get_cards(table.round.exchange[player.party][player.id])
+                exchange_hash = get_hash(player.id, player.exchange_peer_id)
+                cards_table = game.deck.get_cards(table.round.exchange[exchange_hash][player.id])
                 # take out the cards from player's hand which lay on table
-                cards_hand = [x for x in cards_hand if x.id not in table.round.exchange[player.party][player.id]]
+                cards_hand = [x for x in cards_hand if x.id not in table.round.exchange[exchange_hash][player.id]]
             else:
                 cards_table = []
             mode = 'player'
@@ -861,32 +860,22 @@ def request_exchange(msg):
     """
     msg_ok, player, table = check_message(msg)
     if msg_ok:
-        # hochzeit = table.round.has_hochzeit()
-        # exchange_type = 'contra'
-        # if not hochzeit and player.party == 're':
-        #     exchange_type = 're'
-        # exchanged_already = False
-        # if table.round.exchange and \
-        #         player.party in table.round.exchange and \
-        #         table.round.exchange[player.party]:
-        #     exchanged_already = True
-        # # tell everybody there is an ongoing exchange in case it is possible
-        # if not (hochzeit or table.round.card_played or exchanged_already):
-        # lock table for players
-        players_for_exchange = [x for x in game.players.values() if x.id != player.id and x.id in table.round.players]
-        socketio.emit('player1-requested-exchange',
-                      {'table_id': table.id,
-                       'sync_count': table.sync_count},
-                      to=table.id)
-        # ask player if exchange really should be started or tell it is not possible
-        socketio.emit('confirm-exchange',
-                      {'table_id': table.id,
-                       'sync_count': table.sync_count,
-                       'html': render_template('round/request_exchange.html',
-                                               table=table,
-                                               players_for_exchange=players_for_exchange
-                                               )},
-                      to=request.sid)
+        if not table.round.card_played:
+            # lock table for players
+            players_for_exchange = [x for x in game.players.values() if x.id != player.id and x.id in table.round.players]
+            socketio.emit('player1-requested-exchange',
+                          {'table_id': table.id,
+                           'sync_count': table.sync_count},
+                          to=table.id)
+            # ask player if exchange really should be started or tell it is not possible
+            socketio.emit('confirm-exchange',
+                          {'table_id': table.id,
+                           'sync_count': table.sync_count,
+                           'html': render_template('round/request_exchange.html',
+                                                   table=table,
+                                                   players_for_exchange=players_for_exchange
+                                                   )},
+                          to=request.sid)
 
 
 @socketio.on('exchange-start')
@@ -944,12 +933,6 @@ def exchange_player2_deny(msg):
     """
     msg_ok, player, table = check_message(msg)
     if msg_ok:
-        # peer of peer is exchange starting player again - necessary because answer comes from player2
-        player1 = table.round.get_peer(player.id)
-        hochzeit = table.round.has_hochzeit()
-        exchange_type = 'contra'
-        if not hochzeit and player.party == 're':
-            exchange_type = 're'
         # tell everybody that there will be no exchange
         socketio.emit('player2-denied-exchange',
                       {'table_id': table.id,
@@ -962,7 +945,6 @@ def exchange_player2_deny(msg):
                        'html': render_template('round/exchange_player2_deny.html',
                                                game=game,
                                                table=table,
-                                               exchange_type=exchange_type,
                                                exchange_player_id=player.id
                                                )},
                       to=sessions.get(player1))
@@ -1041,9 +1023,10 @@ def table(table_id=''):
                 # player_showing_hand contains cards-showing player_id
                 cards_table = game.players[table.round.player_showing_hand].get_cards()
             elif exchange_needed:
-                cards_table = game.deck.get_cards(table.round.exchange[player.party][player.id])
+                exchange_hash = get_hash(player.id, player.exchange_peer_id)
+                cards_table = game.deck.get_cards(table.round.exchange[exchange_hash][player.id])
                 # take out the cards from player's hand which lay on table
-                cards_hand = [x for x in cards_hand if x.id not in table.round.exchange[player.party][player.id]]
+                cards_hand = [x for x in cards_hand if x.id not in table.round.exchange[exchange_hash][player.id]]
             else:
                 cards_table = table.round.current_trick.get_cards()
             mode = 'player'

@@ -124,12 +124,8 @@ class Player(UserMixin, Document3000):
             self['allows_spectators'] = True
             # only watches other players playing
             self['is_spectator_only'] = False
-            # store party when dealing to keep track of player's party when exchanging cards
-            # MAYBE SUBJECT TO BE REMOVED
-            self['party'] = ''
             # manage exchanges
-            self['exchange'] = {'peer_id': None,
-                                'cards': []}
+            self['exchange_peer_id'] = ''
             self.save()
         elif document:
             super().__init__(database=self.game.db.database, document_id=document['_id'])
@@ -160,17 +156,9 @@ class Player(UserMixin, Document3000):
     @cards.setter
     def cards(self, value):
         """
-        either re or contra, depending of Eichel Ober ownership an important for contra/re exchange
+        just cards
         """
         self['cards'] = value
-
-    @property
-    def party(self):
-        return self.get('party', '')
-
-    @party.setter
-    def party(self, value):
-        self['party'] = value
 
     @property
     def is_admin(self):
@@ -222,19 +210,11 @@ class Player(UserMixin, Document3000):
 
     @property
     def exchange_peer_id(self):
-        return self.setdefault('exchange', {}).setdefault('peer_id', None)
+        return self.get('exchange_peer_id', '')
 
     @exchange_peer_id.setter
     def exchange_peer_id(self, value):
-        self.setdefault('exchange', {})['peer_id'] = value
-
-    @property
-    def exchange_cards(self):
-        return self.setdefault('exchange', {}).setdefault('cards', [])
-
-    @exchange_cards.setter
-    def exchange_cards(self, value):
-        self.setdefault('exchange', {})['cards'] = value
+        self['exchange_peer_id'] = value
 
     @property
     def is_playing(self):
@@ -325,7 +305,6 @@ class Player(UserMixin, Document3000):
         start new exchange process
         """
         self.exchange_peer_id = peer_id
-        self.exchange_cards.clear()
         self.save()
 
 
@@ -768,13 +747,6 @@ class Round(Document3000):
                 if Deck.cards[card_id].name == 'Eichel-Ober':
                     player.eichel_ober_count += 1
 
-            # find out player's party
-            player.party = 'contra'
-            if player.eichel_ober_count == 2:
-                player.party = 'hochzeit'
-            elif player.eichel_ober_count == 1:
-                player.party = 're'
-
             # next player
             player_count += 1
 
@@ -801,30 +773,6 @@ class Round(Document3000):
         # current player is the next player
         return self.current_player_id
 
-    def has_hochzeit(self):
-        """
-        check if any player has 2 Eichel Ober cards which means a Hochzeit
-        necessary for exchanges - if someone has a Hochzeit no exchange is possible
-        """
-        hochzeit = False
-        for player in self.players:
-            if self.game.players[player].eichel_ober_count == 2:
-                hochzeit = True
-                break
-        return hochzeit
-
-    def get_peer(self, player_id):
-        """
-        returns the peer player of given player - if there is hochzeit return False
-        """
-        if self.has_hochzeit() or \
-                player_id not in self.players:
-            return False
-        for peer_player_id in [x for x in self.players if x != player_id]:
-            # the two players having the same number of Eichel Ober are peers
-            if self.game.players[peer_player_id].eichel_ober_count == self.game.players[player_id].eichel_ober_count:
-                break
-        return peer_player_id
 
     def create_exchange(self, player1_id, player2_id):
         """
@@ -860,21 +808,20 @@ class Round(Document3000):
         check if there are ongoing exchanges where player is involved
         """
         player = self.game.players[player_id]
-        if player.party in self.exchange and player.id in self.exchange[player.party]:
+        exchange_hash = get_hash(player.id, player.exchange_peer_id)
+        if exchange_hash in self.exchange and player.id in self.exchange[exchange_hash]:
             # if player did not change anything echange is needed
-            if not self.exchange[player.party][player.id]:
+            if not self.exchange[exchange_hash][player.id]:
                 return True
-            # find out if any party member already has cards
-            for member_id in self.exchange[player.party]:
-                if len(self.exchange[player.party][member_id]) > 0:
+            # find out if any exchange peer member already has cards
+            for member_id in self.exchange[exchange_hash]:
+                if len(self.exchange[exchange_hash][member_id]) > 0:
                     break
             else:
-                # if both party member did not exchange any card yet exchange is needed
+                # if both exchange peers did not exchange any card yet exchange is needed
                 return True
-            # get ID of party member peer player to check its cards
-            peer_id = [x for x in self.exchange[player.party] if x != player.id][0]
             # find out if the cards this player wants to exchange already found their way to its peer
-            if not all(x in self.game.players[peer_id].cards for x in self.exchange[player.party][player.id]):
+            if not all(x in self.game.players[player.exchange_peer_id].cards for x in self.exchange[exchange_hash][player.id]):
                 return True
         return False
 
