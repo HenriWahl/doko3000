@@ -20,7 +20,11 @@ from .config import Config
 from .database import DB
 from .game import Deck, \
     Game
-from .misc import is_xhr
+from .misc import get_hash, \
+    is_xhr
+
+# needed for ajax detection
+ACCEPTED_JSON_MIMETYPES = ['*/*', 'text/javascript', 'application/json']
 
 # initialize app
 app = Flask(__name__)
@@ -260,9 +264,10 @@ def exchange_player_cards(msg):
     """
     msg_ok, player, table = check_message(msg)
     if msg_ok:
+        exchange_hash = get_hash(player.id, player.exchange_peer_id)
         if table.round.exchange and \
-                player.party in table.round.exchange:
-            exchange = table.round.exchange[player.party]
+                table.round.exchange.get(exchange_hash):
+            exchange = table.round.exchange[exchange_hash]
             if set(msg.get('cards_table_ids')) == set(exchange[player.id]):
                 # remove cards from exchanging player
                 player.remove_cards(exchange[player.id])
@@ -912,10 +917,10 @@ def exchange_player2_ready(msg):
     if msg_ok:
         # peer of peer is exchange starting player again - necessary because answer comes from player2
         player1_id = msg.get('player1_id')
-        if game.players.get(player1_id) and\
-            game.players.get(player1_id).exchange_peer_id == player.id:
+        if game.players.get(player1_id) and \
+                game.players.get(player1_id).exchange_peer_id == player.id:
             player.exchange_new(peer_id=player1_id)
-            if table.round.create_exchange(player1=player1_id, player2=player.id):
+            if table.round.create_exchange(player1_id=player1_id, player2_id=player.id):
                 # tell all players that there is an exchange going on
                 socketio.emit('exchange-players-starting',
                               {'table_id': table.id,

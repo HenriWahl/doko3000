@@ -13,6 +13,7 @@ from werkzeug.security import check_password_hash, \
     generate_password_hash
 
 from .database import Document3000
+from .misc import get_hash
 
 
 class Card:
@@ -830,11 +831,10 @@ class Round(Document3000):
         opens exchange for 2 players
         """
         # force alphabetical order of exchange hash to avoid 2 exchanges of same players vice versa
-        self.exchange[''.join(sorted([player1_id, player2_id]))] = [player1_id,
-                                                                    player2_id]
+        self.exchange[get_hash(player1_id, player2_id)] = {player1_id: [],
+                                                           player2_id: []}
         self.save()
         return True
-
 
     def update_exchange(self, player_id, cards_ids):
         """
@@ -848,13 +848,11 @@ class Round(Document3000):
             return True
         return False
 
-
     def reset_exchange(self):
         """
         used to remove all open exchanges, for example at .reset()
         """
         self.exchange = {}
-
 
     def is_exchange_needed(self, player_id):
         """
@@ -879,7 +877,6 @@ class Round(Document3000):
                 return True
         return False
 
-
     def calculate_stats(self):
         """
         get score and tricks count of players for display
@@ -903,7 +900,6 @@ class Round(Document3000):
         self.stats['score'] = deepcopy(score)
         self.stats['tricks'] = deepcopy(tricks)
 
-
     def calculate_trick_order(self):
         """
         get order by arranging players list starting from current player who is first in this trick
@@ -912,11 +908,9 @@ class Round(Document3000):
             current_player_id_index = self.players.index(self.current_player_id)
             self.trick_order = self.players[current_player_id_index:] + self.players[:current_player_id_index]
 
-
     def increase_turn_count(self):
         self.turn_count += 1
         self.save()
-
 
     def get_players_shuffled_cards(self):
         """
@@ -933,7 +927,6 @@ class Round(Document3000):
             else:
                 players_cards.append([])
         return players_cards
-
 
     def undo(self):
         """
