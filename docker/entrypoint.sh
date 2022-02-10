@@ -1,7 +1,7 @@
 #!/bin/ash
 
 # check if running inside PyCharm
-if [ -z ${PYCHARM_HOSTED} ];
+if [ -z "${PYCHARM_HOSTED}" ];
   then
     # when running from PyCharm just pass all arguments to enable debugger
     $@
