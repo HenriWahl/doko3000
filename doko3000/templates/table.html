@@ -37,10 +37,10 @@
 
     </div>
     <div class="container-fluid row p-0 m-0" id="topbar">
-        <div class="col-3 p-0">
+        <div class="col-3 col-sm-1 p-0">
             {% include "top/menu.html" %}
         </div>
-        <div class="col-6 p-0 mt-2">
+        <div class="col-6 col-sm-10 p-0 mt-2">
             {% set turn_indicator = '' %}
             {% if table.round.current_player_id != current_user.id or table.round.is_finished or table.round.needs_trick_claiming or table.round.player_showing_hand or exchange_needed or cards_table|length >= 4 %}
                 {% set turn_indicator = 'd-none' %}
@@ -64,7 +64,7 @@
                 <div class="col-sm-1 col-md-3 col-lg-3 col-xl-4"></div>
             </div>
         </div>
-        <div class="col-3 p-0">
+        <div class="col-3 col-sm-1 p-0">
             {% include "top/player.html" %}
         </div>
     </div>
