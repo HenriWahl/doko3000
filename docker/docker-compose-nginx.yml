@@ -1,18 +1,23 @@
 version: '3.9'
 
+networks:
+  doko3000:
+    name: doko3000
+
 volumes:
   doko3000-couchdb-config:
   doko3000-couchdb-data:
 
 services:
   doko3000:
-    image: henriwahl/doko3000
+    build: ..
+    image: doko3000
     container_name: doko3000
     restart: always
     depends_on:
       - couchdb
-    ports:
-      - "80:5000"
+    networks:
+      - doko3000
     environment:
       - HOST
       - SECRET_KEY
@@ -25,6 +30,19 @@ services:
     volumes:
       - doko3000-couchdb-data:/opt/couchdb/data
       - doko3000-couchdb-config:/opt/couchdb/etc/local.d
+    networks:
+      - doko3000
     environment:
       - COUCHDB_USER
       - COUCHDB_PASSWORD
+  nginx:
+    image: nginx:stable-alpine
+    container_name: doko3000-nginx
+    ports:
+      - 80:80/tcp
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - ../doko3000/static:/usr/share/nginx/html/static
+    restart: always
+    networks:
+      - doko3000
