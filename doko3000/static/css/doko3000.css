@@ -46,26 +46,21 @@ html, body {
 
 .hud-player-current {
     color: #212529;
-    padding-left: 0.25rem;
-    /* no padding on right to keep space for tricks badge */
-    /* padding-right: 0.25rem;*/
-    padding-right: 0;
-    padding-top: 0.25rem;
-    padding-bottom: 0.25rem;
+    padding: 0.25rem;
     border-radius: 0.25rem;
     border: 1px solid white;
     background-color: white;
 }
 
 .hud-player-inactive {
-    color: darkgray;
+    color: lightgrey;
     font-weight: lighter;
 }
 
 #topbar {
     position: fixed;
     width: 100%;
-    height: 5%;
+    height: 6%;
     left: 0;
     top: 0;
     z-index: 100;
