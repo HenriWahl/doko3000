@@ -1097,7 +1097,7 @@ class Table(Document3000):
         """
         initial count
         """
-        self['sync_count'] = 1
+        self['sync_count'] = 0
 
     def add_player(self, player_id):
         """
