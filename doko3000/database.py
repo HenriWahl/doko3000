@@ -25,9 +25,6 @@ class DB:
         if '_users' not in self.couch:
             self.couch.create_database('_users')
 
-    def add(self, data):
-        self.database.create_document(data.__dict__)
-
     def filter_by_type_as_number(self, filter_type):
         """
         retrieves documents filtered by type and ordered by non-document-id as number for tricks and rounds
