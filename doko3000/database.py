@@ -22,7 +22,7 @@ class DB:
             self.database = self.couch[app.config['COUCHDB_DATABASE']]
 
         # workaround to avoid error message about missing '_users' database
-        if not '_users' in self.couch:
+        if '_users' not in self.couch:
             self.couch.create_database('_users')
 
     def add(self, data):
@@ -46,6 +46,7 @@ class DB:
         for item in Query(self.database, selector={'type': filter_type}).result:
             result[item['_id']] = item
         return result
+
 
 class Document3000(Document):
     """
