@@ -62,6 +62,5 @@ class Document3000(Document):
         try:
             super().save()
         except Exception as error:
-            # sleep a random amount of time before next attempt
             print('ERROR', self.document_url)
             print(error)
