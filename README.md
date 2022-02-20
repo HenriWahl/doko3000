@@ -114,6 +114,8 @@ to initialize the CouchDB database in the `doko3000-couchdb` container.
 In `./docker` there are some example **docker-compose** configuration files. Just run one of them from the root 
 directory you're in.
 
+As one can see there a **CouchDB server** is required.
+
 The simplest way is running it only accessible via HTTP on port 80:
   
     docker-compose -f docker/docker-compose.yml up -d
@@ -123,10 +125,10 @@ respectively as *cert.pem* and *key.pem* into [/docker](./docker) and run:
   
     docker-compose -f docker/docker-compose-https.yml up -d
     
-The third file *docker-compose-traefik-letsencrypt.yml* can be used for Let's Encrypt setups.
+The file *docker-compose-traefik-letsencrypt.yml* can be used for Let's Encrypt setups.
 This docker-compose configuration surely has to be customized.
 
-If you need help to get it running do not hesitate to contact me.
+If you **need help** to get it running do not hesitate to contact me.
 
 ### Running prebuilt image from Dockerhub
 
