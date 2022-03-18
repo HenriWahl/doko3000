@@ -22,7 +22,7 @@ Ingame language at the moment is only german due to Doppelkopf being a mostly ge
 
 ## Demo
 
-Have a look at it at work at https://doko3000-demo.better-than.tv. Four accounts are available with their respective passwords:
+Have a look at it at work at https://doko3000-demo.dhcpy6d.de. Four accounts are available with their respective passwords:
 
 - **demo1:** demo1
 - **demo2:** demo2
