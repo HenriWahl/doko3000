@@ -17,10 +17,10 @@
         {% endfor %}
         {# separator to distinguish active and inactive players #}
         {%- if table.players_idle -%}
-            &nbsp;|&nbsp;
+            |
         {%- endif -%}
         {% for idle_player_id in table.players_idle %}
-            <span class="hud-player-inactive ml-1">
+            <span class="ml-1">
             {{ game.players[idle_player_id].name }}
         </span>
         {% endfor %}

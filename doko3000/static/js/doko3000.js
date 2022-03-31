@@ -1229,5 +1229,11 @@ $(document).ready(function () {
             })
         })
 
+    // disable contextmenu globally
+    $(document).on('contextmenu', function(){
+        return false
+    })
+
+
     }
 )
