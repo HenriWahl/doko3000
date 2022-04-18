@@ -1,34 +1,72 @@
-<table class="table table-borderless table-striped">
-    <thead>
-    <tr>
-        <th><h5><strong>Spieler</strong></h5></th>
-        {% if table.players_idle %}
-            <th><h5><strong>Ersatzbank</strong></h5></th>
-        {% endif %}
-    </tr>
-    </thead>
-    <tbody>
-    {% for row in range(number_of_rows) %}
-        <tr>
-            {% if row < 4 %}
-                <td><h5>{{ game.players[next_players[row]].name }}</h5></td>
-            {% else %}
-                <td></td>
-            {% endif %}
-            {% if table.players_idle %}
-                {% if row < table.players_idle|length %}
-                    <td><h5>{{ game.players[table.players_idle[row]].name }}</h5></td>
-                {% else %}
-                    <td></td>
-                {% endif %}
-            {% endif %}
-        </tr>
-    {% endfor %}
-    </tbody>
-</table>
+<div class="row mx-3 mt-2">
+    <h5><strong>Spiel</strong></h5></th>
+</div>
+<div class="row row-cols-3 mx-2">
+    <div class="col"></div>
+    <div class="col text-center">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-text"><span
+                        class="oi oi-layers mr-1"></span>{{ game.players[next_players[0]].name }}</h5>
+            </div>
+        </div>
+    </div>
+    <div class="col"></div>
+    <div class="col text-center my-3">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-text">
+                    {{ game.players[next_players[3]].name }}</h5>
+            </div>
+        </div>
+    </div>
+    <div class="col my-3">
+        <div class="card shadow-sm">
+            <div class="card-body background">
+                <h5 class="card-text">&nbsp;</h5>
+            </div>
+        </div>
+    </div>
+    <div class="col text-center my-3">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-text">
+                    {{ game.players[next_players[1]].name }}</h5>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+    </div>
+    <div class="col text-center">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-text">
+                    {{ game.players[next_players[2]].name }}</h5>
+            </div>
+        </div>
+    </div>
+    <div class="col"></div>
+</div>
+{% if table.players_idle %}
+    <div class="row mx-3 mt-4">
+        <h5><strong>Ersatzbank</strong></h5>
+    </div>
+    <div class="row row-cols-3 mx-2 mt-1">
+        {% for player_idle in table.players_idle %}
+            <div class="col text-center">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-text">
+                            {{ game.players[player_idle].name }}</h5>
+                    </div>
+                </div>
+            </div>
 
+        {% endfor %}
+    </div>
+{% endif %}
 
-<div id="row">
+<div class="mt-3">
     <button id="button_deal_cards"
             class="btn btn-info btn-block btn-lg"
             data-table_id="{{ table.id }}">
@@ -36,7 +74,6 @@
     </button>
     <button id="button_close_info"
             class="btn btn-success btn-block btn-lg"
-{#            data-dismiss="modal"#}
             data-table_id="{{ table.id }}">
         <strong>Los!</strong>
     </button>
