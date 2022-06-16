@@ -36,6 +36,7 @@ services:
       - traefik.http.routers.doko3000.rule=Host("${HOST}")
       - traefik.http.routers.doko3000.service=doko3000
       - traefik.http.routers.doko3000.entrypoints=http
+      - traefik.http.services.doko3000.loadbalancer.server.port=5000
       # https
       - traefik.http.routers.doko3000-https.rule=Host("${HOST}")
       - traefik.http.routers.doko3000-https.tls=true
