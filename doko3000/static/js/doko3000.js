@@ -1170,7 +1170,7 @@ $(document).ready(function () {
                     player_id: player_id,
                     table_id: $(this).data('table_id')
                 })
-            table_mode = 'locked'
+                table_mode = 'locked'
             }
         })
 
@@ -1229,10 +1229,19 @@ $(document).ready(function () {
             })
         })
 
-    // disable contextmenu globally
-    $(document).on('contextmenu', function(){
-        return false
-    })
+        // info by hamburger menu
+        $(document).on('click', '#menu_info', function () {
+            $.getJSON('/get/info', function (data, status) {
+                if (status == 'success') {
+                    show_dialog(data.html)
+                }
+            })
+        })
+
+        // disable contextmenu globally
+        $(document).on('contextmenu', function () {
+            return false
+        })
 
 
     }

@@ -1,5 +1,3 @@
-from time import time
-
 from flask import flash, \
     Flask, \
     jsonify, \
@@ -15,6 +13,7 @@ from flask_login import current_user, \
     logout_user
 from flask_socketio import join_room, \
     SocketIO
+from time import time
 
 from .config import Config
 from .database import DB
@@ -1363,6 +1362,20 @@ def start_table(table_id):
                             'html': render_template('error.html',
                                                     message='Es sitzen nicht genug Spieler am Tisch.'
                                                     )})
+    # default return if nothing applies
+    return redirect(url_for('index'))
+
+
+@app.route('/get/info')
+@login_required
+def info():
+    """
+    Show info about doko3000
+    :return:
+    """
+    if is_xhr(request):
+        return jsonify({'status': 'ok',
+                        'html': render_template('info.html')})
     # default return if nothing applies
     return redirect(url_for('index'))
 

@@ -3,4 +3,4 @@
 *.pem
 .env
 docker-compose.yml
-
+/git_info
