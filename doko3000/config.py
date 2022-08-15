@@ -29,8 +29,8 @@ def get_version():
                     git_info_text_brackets = git_info_text_brackets_list[0].lstrip('(').rstrip(')')
                     for info in git_info_text_brackets.split(','):
                         # finally some tag info
-                        if info.startswith('tag: '):
-                            version = info.split(' ')[1]
+                        if info.strip().startswith('tag: '):
+                            version = info.strip().split(' ')[1]
     # version is not too important so it is OK if it is simply catched
     except Exception as error:
         print(error)
