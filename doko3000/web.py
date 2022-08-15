@@ -115,7 +115,7 @@ def check_message(msg, player_in_round=True, player_at_table=True):
 def who_am_i():
     """
     sent by client at connection creation and if connection was refreshed
-    provide the important informartion about the game
+    provide the important information about the game
     """
     if not current_user.is_anonymous:
         player = game.players.get(current_user.id)
