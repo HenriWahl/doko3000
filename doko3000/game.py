@@ -946,7 +946,7 @@ class Table(Document3000):
         # no extra .save() needed because the next one will happen soon
         self.players = [f'player-{x}' if not x.startswith('player-') else x for x in self.players]
         self.order = [f'player-{x}' if not x.startswith('player-') else x for x in self.order]
-        # yes, table_id
+        # yes, table_idmaster
         if self.id not in self.game.rounds:
             self.add_round()
 

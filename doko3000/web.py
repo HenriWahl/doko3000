@@ -1,3 +1,5 @@
+from time import time
+
 from flask import flash, \
     Flask, \
     jsonify, \
@@ -13,7 +15,6 @@ from flask_login import current_user, \
     logout_user
 from flask_socketio import join_room, \
     SocketIO
-from time import time
 
 from .config import Config
 from .database import DB
@@ -161,7 +162,7 @@ def enter_table_socket(msg):
     msg_ok, player, table = check_message(msg, player_in_round=False, player_at_table=False)
     if msg_ok:
         if (table.locked and player.id in table.players) or \
-                not table.locked:
+                not (table.locked and not player.is_admin):
             # store old table if it exists to be able to send it a updated HUD too
             if player.table:
                 table_old = game.tables.get(player.table)
@@ -1100,7 +1101,7 @@ def setup_table(table_id):
         if table and \
                 current_user.id in game.players and \
                 (current_user.id in table.players or
-                 not table.locked):
+                 not (table.locked and not current_user.is_admin)):
             player = game.players[current_user.id]
             return jsonify({'allowed': True,
                             'html': render_template('setup/table.html',
@@ -1142,7 +1143,7 @@ def enter_table_json(table_id='', player_id=''):
         if player and \
                 table and \
                 ((table.locked and player_id in table.players) or
-                 not table.locked):
+                 not (table.locked and not player.is_admin)):
             allowed = True
         return jsonify({'allowed': allowed})
     # default return if nothing applies
