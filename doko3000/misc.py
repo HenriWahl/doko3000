@@ -2,6 +2,7 @@
 
 ACCEPTED_JSON_MIMETYPES = ['*/*', 'text/javascript', 'application/json']
 
+MESSAGE_LOGIN_FAILURE = "Login-Fehler"
 
 def is_xhr(request):
     """

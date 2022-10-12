@@ -21,7 +21,8 @@ from .database import DB
 from .game import Deck, \
     Game
 from .misc import get_hash, \
-    is_xhr
+    is_xhr, \
+    MESSAGE_LOGIN_FAILURE
 
 # needed for ajax detection
 ACCEPTED_JSON_MIMETYPES = ['*/*', 'text/javascript', 'application/json']
@@ -995,12 +996,12 @@ def login():
         player = game.get_player(request.values['name'])
         if player:
             if not player.check_password(request.values['password']):
-                flash('Falsches Passwort :-(')
+                flash(MESSAGE_LOGIN_FAILURE)
             else:
                 login_user(player, remember=True)
                 return redirect(url_for('index'))
         else:
-            flash('Spieler nicht bekannt :-(')
+            flash(MESSAGE_LOGIN_FAILURE)
     # got to login if not logged in
     return render_template('login.html',
                            title=f"{app.config['TITLE']} Login")
